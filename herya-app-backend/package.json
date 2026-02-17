@@ -1,0 +1,36 @@
+{
+	"name": "herya-app-backend",
+	"version": "1.0.0",
+	"description": "Yoga app backend built with Node.js, Express, and MongoDB. Provides RESTful APIs for managing yoga poses, breathing patterns, sequences, and user data.",
+	"main": "index.js",
+	"scripts": {
+		"start": "node index.js",
+		"dev": "nodemon index.js",
+		"seed": "node ./src/seeds/index.js"
+	},
+	"keywords": [
+		"yoga",
+		"backend",
+		"nodejs",
+		"express",
+		"mongodb",
+		"api"
+	],
+	"author": "Max Primavera",
+	"license": "ISC",
+	"type": "commonjs",
+	"dependencies": {
+		"bcrypt": "^6.0.0",
+		"cors": "^2.8.6",
+		"dotenv": "^17.3.1",
+		"express": "^5.2.1",
+		"mongodb": "^7.1.0",
+		"mongoose": "^9.2.1",
+		"morgan": "^1.10.1",
+		"papaparse": "^5.5.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.4.0",
+		"nodemon": "^3.1.11"
+	}
+}
