@@ -1,18 +1,22 @@
-const express = require("express");
+const { registerUser, loginUser } = require("../controllers/auth.controller");
+const { uploadUserImage } = require("../../middlewares/upload/user.upload");
 const {
-	login,
-	logout,
-	verifyToken,
-} = require("../controllers/auth.controller");
-const { authenticateToken } = require("../../middlewares/auth.middleware");
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
+const {
+	registerValidations,
+	loginValidations,
+} = require("../validations/auth.validations");
+const authRouter = require("express").Router();
 
-const router = express.Router();
+authRouter.post(
+	"/register",
+	uploadUserImage.single("profileImage"),
+	registerValidations,
+	handleValidationErrors,
+	registerUser,
+); // → POST /api/v1/auth/register
 
-// Public routes
-router.post("/login", login);
+authRouter.post("/login", loginValidations, handleValidationErrors, loginUser); // → POST /api/v1/auth/login
 
-// Protected routes
-router.post("/logout", authenticateToken, logout);
-router.get("/verify", authenticateToken, verifyToken);
-
-module.exports = router;
+module.exports = authRouter;

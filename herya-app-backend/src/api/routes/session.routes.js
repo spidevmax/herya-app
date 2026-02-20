@@ -8,12 +8,14 @@ const {
 	updateSession,
 	deleteSession,
 } = require("../controllers/session.controller");
-const { authenticateToken } = require("../../middlewares/auth.middleware");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
 
 const router = express.Router();
 
 // All routes require authentication
-router.use(authenticateToken);
+router.use(authenticateToken());
 
 // CRUD operations
 router.get("/", getSessions);

@@ -1,0 +1,6 @@
+name,email,password,profileImageUrl,profileImageId,level,goals,totalSessions,totalMinutes,currentStreak,lastPracticeDate
+Maria Lopez,maria@example.com,SecurePass123,https://example.com/maria.jpg,img_maria_001,beginner,Reduce stress|Improve flexibility,5,150,2,2026-02-15
+Juan Martinez,juan@example.com,SecurePass456,https://example.com/juan.jpg,img_juan_001,intermediate,Build strength|Daily practice,25,1250,5,2026-02-16
+Ana Garcia,ana@example.com,SecurePass789,https://example.com/ana.jpg,img_ana_001,advanced,Master advanced poses|Help others,100,5000,15,2026-02-17
+Carlos Rodriguez,carlos@example.com,SecurePass101,,img_carlos_001,beginner,Start yoga journey,2,60,1,2026-02-14
+Sofia Perez,sofia@example.com,SecurePass202,https://example.com/sofia.jpg,img_sofia_001,intermediate,Improve meditation|Better sleep,15,600,3,2026-02-13

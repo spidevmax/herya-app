@@ -21,8 +21,7 @@ const getJournalEntries = async (req, res, next) => {
 /**
  * GET /api/v1/journal-entries/:id
  * - Finds a journal entry by ID.
- * - If not found, returns 404.
- * - If ID format is invalid, returns 400.
+ * - User can only see their own entries (unless admin)
  */
 const getJournalEntryById = async (req, res, next) => {
 	try {
@@ -31,6 +30,15 @@ const getJournalEntryById = async (req, res, next) => {
 			.populate("user", "name email");
 		if (!entry) {
 			return res.status(404).json({ error: "Journal entry not found" });
+		}
+		// Verificar que el usuario es dueño o es admin
+		if (
+			entry.user._id.toString() !== req.user.id &&
+			req.user.role !== "admin"
+		) {
+			return res
+				.status(403)
+				.json({ error: "No tienes permiso para ver esta entrada" });
 		}
 		res.status(200).json(entry);
 	} catch (error) {
@@ -65,12 +73,24 @@ const createJournalEntry = async (req, res, next) => {
 /**
  * PUT /api/v1/journal-entries/:id
  * - Updates an existing journal entry.
- * - { new: true } returns the updated document.
- * - { runValidators: true } respects Schema validations.
- * - If not found, 404. If successful, 200.
+ * - User can only update their own entries (unless admin)
+ * - Cannot modify 'user' or 'session' fields (security)
  */
 const updateJournalEntry = async (req, res, next) => {
 	try {
+		const entry = await JournalEntry.findById(req.params.id);
+		if (!entry) {
+			return res.status(404).json({ error: "Journal entry not found" });
+		}
+		// Verificar que el usuario es dueño o es admin
+		if (entry.user.toString() !== req.user.id && req.user.role !== "admin") {
+			return res
+				.status(403)
+				.json({ error: "No tienes permiso para editar esta entrada" });
+		}
+		// Prevenir que el usuario cambie el owner o la sesión
+		delete req.body.user;
+		delete req.body.session;
 		const updated = await JournalEntry.findByIdAndUpdate(
 			req.params.id,
 			req.body,
@@ -81,9 +101,6 @@ const updateJournalEntry = async (req, res, next) => {
 		)
 			.populate("session")
 			.populate("user", "name email");
-		if (!updated) {
-			return res.status(404).json({ error: "Journal entry not found" });
-		}
 		res.status(200).json(updated);
 	} catch (error) {
 		return next(error);
@@ -93,10 +110,20 @@ const updateJournalEntry = async (req, res, next) => {
 /**
  * DELETE /api/v1/journal-entries/:id
  * - Deletes a journal entry by ID.
- * - If not found, 404. If deleted, 200 with confirmation message.
+ * - User can only delete their own entries (unless admin)
  */
 const deleteJournalEntry = async (req, res, next) => {
 	try {
+		const entry = await JournalEntry.findById(req.params.id);
+		if (!entry) {
+			return res.status(404).json({ error: "Journal entry not found" });
+		}
+		// Verificar que el usuario es dueño o es admin
+		if (entry.user.toString() !== req.user.id && req.user.role !== "admin") {
+			return res
+				.status(403)
+				.json({ error: "No tienes permiso para eliminar esta entrada" });
+		}
 		const deleted = await JournalEntry.findByIdAndDelete(req.params.id);
 		if (!deleted) {
 			return res.status(404).json({ error: "Journal entry not found" });

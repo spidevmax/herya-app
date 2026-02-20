@@ -1,5 +1,8 @@
 const express = require("express");
 const { validate } = require("../../middlewares/validation.middleware");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
 
 const {
 	getSequences,
@@ -7,21 +10,21 @@ const {
 	createSequence,
 	updateSequence,
 	deleteSequence,
-	getSequencesByLevel,
+	getSequencesByDifficulty,
 	getSequencesByStyle,
 } = require("../controllers/sequence.controller");
 
 const router = express.Router();
 
-// Filter routes
-router.get("/level/:level", getSequencesByLevel);
+// Public routes
+router.get("/difficulty/:difficulty", getSequencesByDifficulty);
 router.get("/style/:style", getSequencesByStyle);
-
-// CRUD operations
 router.get("/", getSequences);
-router.post("/", createSequence);
 router.get("/:id", getSequenceById);
-router.put("/:id", updateSequence);
-router.delete("/:id", deleteSequence);
+
+// Authenticated routes
+router.post("/", authenticateToken(), createSequence);
+router.put("/:id", authenticateToken(), updateSequence);
+router.delete("/:id", authenticateToken(), deleteSequence);
 
 module.exports = router;

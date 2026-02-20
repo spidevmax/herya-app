@@ -1,10 +1,42 @@
-const express = require("express");
-const { validate } = require("../../middlewares/validation.middleware");
+const {
+	getMyProfile,
+	updateMyProfile,
+	deleteMyAccount,
+	changeMyPassword,
+} = require("../controllers/user.controller");
+const { uploadUserImage } = require("../../middlewares/upload/user.upload");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
+const {
+	updateProfileValidations,
+	changePasswordValidations,
+} = require("../validations/user.validations");
 
-const { registerUser } = require("../controllers/user.controller");
+const usersRouter = require("express").Router();
 
-const router = express.Router();
+usersRouter.use(authenticateToken());
 
-router.post("/register", registerUser);
+usersRouter.get("/me", getMyProfile); // → GET /api/v1/users/me
 
-module.exports = router;
+usersRouter.put(
+	"/me",
+	uploadUserImage.single("profileImage"),
+	updateProfileValidations,
+	handleValidationErrors,
+	updateMyProfile,
+); // → PUT /api/v1/users/me
+
+usersRouter.put(
+	"/change-password",
+	changePasswordValidations,
+	handleValidationErrors,
+	changeMyPassword,
+); // → PUT /api/v1/users/change-password
+
+usersRouter.delete("/me", deleteMyAccount); // → DELETE /api/v1/users/me
+
+module.exports = usersRouter;

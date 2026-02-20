@@ -23,18 +23,28 @@ const getSessions = async (req, res, next) => {
 /**
  * GET /api/v1/sessions/:id
  * - Finds a session by ID.
- * - If not found, returns 404.
- * - If ID format is invalid, returns 400.
+ * - User can only see their own sessions (unless admin)
+ * - If not found, returns 404. If unauthorized, returns 403.
  */
 const getSessionById = async (req, res, next) => {
 	try {
-		const session = await Session.findById(req.params.id)
+		const { id } = req.params;
+		const session = await Session.findById(id)
 			.populate("user", "name email")
 			.populate("sequence")
 			.populate("poses.pose")
 			.populate("breathingPattern");
 		if (!session) {
 			return res.status(404).json({ error: "Session not found" });
+		}
+		// Verificar que el usuario es dueño o es admin
+		if (
+			session.user._id.toString() !== req.user.id &&
+			req.user.role !== "admin"
+		) {
+			return res
+				.status(403)
+				.json({ error: "No tienes permiso para ver esta sesión" });
 		}
 		res.status(200).json(session);
 	} catch (error) {
@@ -71,12 +81,23 @@ const createSession = async (req, res, next) => {
 /**
  * PUT /api/v1/sessions/:id
  * - Updates an existing session.
- * - { new: true } returns the updated document.
- * - { runValidators: true } respects Schema validations.
- * - If not found, 404. If successful, 200.
+ * - User can only update their own sessions (unless admin).
+ * - Cannot modify 'user' field (security)
  */
 const updateSession = async (req, res, next) => {
 	try {
+		const session = await Session.findById(req.params.id);
+		if (!session) {
+			return res.status(404).json({ error: "Session not found" });
+		}
+		// Verificar que el usuario es dueño o es admin
+		if (session.user.toString() !== req.user.id && req.user.role !== "admin") {
+			return res
+				.status(403)
+				.json({ error: "No tienes permiso para editar esta sesión" });
+		}
+		// Prevenir que el usuario cambie el owner
+		delete req.body.user;
 		const updated = await Session.findByIdAndUpdate(req.params.id, req.body, {
 			new: true,
 			runValidators: true,
@@ -85,9 +106,6 @@ const updateSession = async (req, res, next) => {
 			.populate("sequence")
 			.populate("poses.pose")
 			.populate("breathingPattern");
-		if (!updated) {
-			return res.status(404).json({ error: "Session not found" });
-		}
 		res.status(200).json(updated);
 	} catch (error) {
 		return next(error);
@@ -97,14 +115,21 @@ const updateSession = async (req, res, next) => {
 /**
  * DELETE /api/v1/sessions/:id
  * - Deletes a session by ID.
- * - If not found, 404. If deleted, 200 with confirmation message.
+ * - User can only delete their own sessions (unless admin)
  */
 const deleteSession = async (req, res, next) => {
 	try {
-		const deleted = await Session.findByIdAndDelete(req.params.id);
-		if (!deleted) {
+		const session = await Session.findById(req.params.id);
+		if (!session) {
 			return res.status(404).json({ error: "Session not found" });
 		}
+		// Verificar que el usuario es dueño o es admin
+		if (session.user.toString() !== req.user.id && req.user.role !== "admin") {
+			return res
+				.status(403)
+				.json({ error: "No tienes permiso para eliminar esta sesión" });
+		}
+		await Session.findByIdAndDelete(req.params.id);
 		res.status(200).json({ message: "Session deleted successfully" });
 	} catch (error) {
 		return next(error);

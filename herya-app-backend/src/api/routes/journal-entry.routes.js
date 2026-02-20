@@ -7,7 +7,9 @@ const {
 	updateJournalEntry,
 	deleteJournalEntry,
 } = require("../controllers/journalEntry.controller");
-const { authenticateToken } = require("../../middlewares/auth.middleware");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
 
 const router = express.Router();
 

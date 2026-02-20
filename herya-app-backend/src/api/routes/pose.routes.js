@@ -1,4 +1,8 @@
 const express = require("express");
+const {
+	authenticateToken,
+	isAdmin,
+} = require("../../middlewares/authorization.middleware");
 
 const {
 	getPoses,
@@ -16,23 +20,23 @@ const {
 const posesRouter = express.Router();
 
 // =============================
-// RUTAS ADICIONALES
+// PUBLIC ROUTES - No authentication required
 // =============================
 
 posesRouter.get("/search", searchPosesByName); // GET /api/v1/poses/search?name=text
 posesRouter.get("/category/:category", getPosesByCategory); // GET /api/v1/poses/category/:category
 posesRouter.get("/difficulty/:difficulty", getPosesByDifficulty); // GET /api/v1/poses/difficulty/:difficulty
 posesRouter.get("/random", getRandomPose); // GET /api/v1/poses/random
-posesRouter.post("/bulk", bulkCreatePoses); // POST /api/v1/poses/bulk
-
-// =============================
-// RUTAS CRUD BÁSICAS
-// =============================
-
 posesRouter.get("/", getPoses); // GET /api/v1/poses
-posesRouter.post("/", postPose); // POST /api/v1/poses
 posesRouter.get("/:id", getPoseById); // GET /api/v1/poses/:id
-posesRouter.put("/:id", updatePose); // PUT /api/v1/poses/:id
-posesRouter.delete("/:id", deletePose); // DELETE /api/v1/poses/:id
+
+// =============================
+// ADMIN ROUTES - Only admin users can access
+// =============================
+
+posesRouter.post("/bulk", authenticateToken(), isAdmin, bulkCreatePoses); // POST /api/v1/poses/bulk
+posesRouter.post("/", authenticateToken(), isAdmin, postPose); // POST /api/v1/poses
+posesRouter.put("/:id", authenticateToken(), isAdmin, updatePose); // PUT /api/v1/poses/:id
+posesRouter.delete("/:id", authenticateToken(), isAdmin, deletePose); // DELETE /api/v1/poses/:id
 
 module.exports = posesRouter;
