@@ -3,6 +3,11 @@ const {
 	authenticateToken,
 	isAdmin,
 } = require("../../middlewares/authorization.middleware");
+const {
+	uploadPoseThumbnail,
+	uploadPoseImages,
+	uploadPoseVideos,
+} = require("../../middlewares/upload/pose.upload");
 
 const {
 	getPoses,
@@ -35,8 +40,58 @@ posesRouter.get("/:id", getPoseById); // GET /api/v1/poses/:id
 // =============================
 
 posesRouter.post("/bulk", authenticateToken(), isAdmin, bulkCreatePoses); // POST /api/v1/poses/bulk
-posesRouter.post("/", authenticateToken(), isAdmin, postPose); // POST /api/v1/poses
-posesRouter.put("/:id", authenticateToken(), isAdmin, updatePose); // PUT /api/v1/poses/:id
+posesRouter.post(
+	"/",
+	authenticateToken(),
+	isAdmin,
+	uploadPoseThumbnail.single("thumbnail"),
+	postPose,
+); // POST /api/v1/poses (with optional thumbnail)
+
+posesRouter.put(
+	"/:id",
+	authenticateToken(),
+	isAdmin,
+	uploadPoseThumbnail.single("thumbnail"),
+	updatePose,
+); // PUT /api/v1/poses/:id (with optional thumbnail update)
+
+posesRouter.post(
+	"/:id/images",
+	authenticateToken(),
+	isAdmin,
+	uploadPoseImages.array("images", 10),
+	(req, _, next) => {
+		// Store image URLs in request for controller
+		if (req.files) {
+			req.imageUrls = req.files.map((file) => ({
+				url: file.path,
+				publicId: file.filename,
+			}));
+		}
+		next();
+	},
+	updatePose,
+); // POST /api/v1/poses/:id/images (add multiple images)
+
+posesRouter.post(
+	"/:id/videos",
+	authenticateToken(),
+	isAdmin,
+	uploadPoseVideos.array("videos", 5),
+	(req, _, next) => {
+		// Store video URLs in request for controller
+		if (req.files) {
+			req.videoUrls = req.files.map((file) => ({
+				url: file.path,
+				publicId: file.filename,
+			}));
+		}
+		next();
+	},
+	updatePose,
+); // POST /api/v1/poses/:id/videos (add multiple videos)
+
 posesRouter.delete("/:id", authenticateToken(), isAdmin, deletePose); // DELETE /api/v1/poses/:id
 
 module.exports = posesRouter;

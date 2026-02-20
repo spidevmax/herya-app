@@ -337,11 +337,11 @@ const journalEntrySchema = new mongoose.Schema(
 );
 
 // VALIDATION: At least one mood must be selected
-journalEntrySchema.path("moodBefore").validate(function (value) {
+journalEntrySchema.path("moodBefore").validate((value) => {
 	return value && value.length > 0;
 }, "At least one mood before practice must be selected");
 
-journalEntrySchema.path("moodAfter").validate(function (value) {
+journalEntrySchema.path("moodAfter").validate((value) => {
 	return value && value.length > 0;
 }, "At least one mood after practice must be selected");
 

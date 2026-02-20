@@ -314,7 +314,7 @@ const vkSequenceSchema = new mongoose.Schema(
 
 // VALIDATION: corePoses orders must be consecutive
 vkSequenceSchema.pre("save", function (next) {
-	if (this.structure && this.structure.corePoses) {
+	if (this.structure?.corePoses) {
 		const poses = this.structure.corePoses;
 
 		if (poses.length === 0) {
