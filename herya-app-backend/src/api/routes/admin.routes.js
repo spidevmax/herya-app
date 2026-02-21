@@ -10,6 +10,7 @@ const {
 	authenticateToken,
 	isAdmin,
 } = require("../../middlewares/authorization.middleware");
+const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const adminRouter = require("express").Router();
 
@@ -17,13 +18,13 @@ const adminRouter = require("express").Router();
 adminRouter.use(authenticateToken, isAdmin);
 
 // POSE Management
-adminRouter.get("/poses", getAllPoses); // GET /api/v1/admin/poses
-adminRouter.post("/poses", postPose); // POST /api/v1/admin/poses
-adminRouter.put("/poses/:id", updatePose); // PUT /api/v1/admin/poses/:id
-adminRouter.delete("/poses/:id", deletePose); // DELETE /api/v1/admin/poses/:id
+adminRouter.get("/poses", asyncErrorWrapper(getAllPoses)); // GET /api/v1/admin/poses
+adminRouter.post("/poses", asyncErrorWrapper(postPose)); // POST /api/v1/admin/poses
+adminRouter.put("/poses/:id", asyncErrorWrapper(updatePose)); // PUT /api/v1/admin/poses/:id
+adminRouter.delete("/poses/:id", asyncErrorWrapper(deletePose)); // DELETE /api/v1/admin/poses/:id
 
 // USER Management
-adminRouter.get("/users", getAllUsers); // GET /api/v1/admin/users
-adminRouter.delete("/users/:id", deleteUser); // DELETE /api/v1/admin/users/:id
+adminRouter.get("/users", asyncErrorWrapper(getAllUsers)); // GET /api/v1/admin/users
+adminRouter.delete("/users/:id", asyncErrorWrapper(deleteUser)); // DELETE /api/v1/admin/users/:id
 
 module.exports = adminRouter;

@@ -33,9 +33,9 @@ const updateProfileValidations = [
  * Validates password change request body.
  *
  * Fields Validated:
- * - currentPassword: Required, non-empty
- * - newPassword: Required, minimum 8 characters
- * - confirmPassword: Required, must match newPassword
+ * - currentPassword: Required, must be at least 8 characters
+ * - newPassword: Required, minimum 8 characters, uppercase letter, and number
+ * - confirmPassword: Required, must match newPassword exactly
  *
  * @example
  * router.put("/change-password", changePasswordValidations, handleValidationErrors, changeMyPassword);
@@ -43,13 +43,19 @@ const updateProfileValidations = [
 const changePasswordValidations = [
 	check("currentPassword")
 		.notEmpty()
-		.withMessage("Current password is required"),
+		.withMessage("Current password is required")
+		.isLength({ min: 8 })
+		.withMessage("Password too short"),
 
 	check("newPassword")
 		.notEmpty()
 		.withMessage("New password is required")
 		.isLength({ min: 8 })
-		.withMessage("Password must be at least 8 characters long"),
+		.withMessage("Password must be at least 8 characters")
+		.matches(/[A-Z]/)
+		.withMessage("Password must contain at least one uppercase letter")
+		.matches(/[0-9]/)
+		.withMessage("Password must contain at least one number"),
 
 	check("confirmPassword")
 		.notEmpty()

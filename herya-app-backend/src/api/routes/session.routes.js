@@ -9,6 +9,7 @@ const {
 const {
 	authenticateToken,
 } = require("../../middlewares/authorization.middleware");
+const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const router = express.Router();
 
@@ -16,10 +17,10 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // CRUD operations
-router.get("/", getSessions);
-router.post("/", createSession);
-router.get("/:id", getSessionById);
-router.put("/:id", updateSession);
-router.delete("/:id", deleteSession);
+router.get("/", asyncErrorWrapper(getSessions));
+router.post("/", asyncErrorWrapper(createSession));
+router.get("/:id", asyncErrorWrapper(getSessionById));
+router.put("/:id", asyncErrorWrapper(updateSession));
+router.delete("/:id", asyncErrorWrapper(deleteSession));
 
 module.exports = router;

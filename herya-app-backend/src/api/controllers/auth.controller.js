@@ -11,18 +11,19 @@ const { createError } = require("../../utils/createError");
  * Handles user registration by creating a new user and returning an immediate authentication token.
  *
  * Workflow:
- * 1. Validates password length (minimum 8 characters).
- * 2. Checks if a user with the same email already exists.
- * 3. If user exists, deletes any uploaded image from Cloudinary and throws a 400 error.
- * 4. Creates a new User instance from `req.body`.
- * 5. If a profile image is uploaded, stores the Cloudinary URL and public ID.
- * 6. Initializes VK progression with Tadasana family unlocked (all users start here).
- * 7. Saves the user to the database.
- * 8. Generates JWT token for immediate authentication.
- * 9. Removes password from response and returns 201 with user data and token.
+ * 1. Request data is validated by registerValidations middleware (email, password, name required; password 8+ chars).
+ * 2. handleValidationErrors middleware catches validation errors and deletes any uploaded image before responding.
+ * 3. Checks if a user with the same email already exists.
+ * 4. If user exists, deletes any uploaded image from Cloudinary and throws a 400 error.
+ * 5. Creates a new User instance from `req.body`.
+ * 6. If a profile image is uploaded, stores the Cloudinary URL and public ID.
+ * 7. Initializes VK progression with Tadasana family unlocked (all users start here).
+ * 8. Saves the user to the database.
+ * 9. Generates JWT token for immediate authentication.
+ * 10. Removes password from response and returns 201 with user data and token.
  *
  * Error Handling:
- * - 400 if password is less than 8 characters.
+ * - 400 if validation fails (handled by middleware, image automatically deleted).
  * - 400 if user already exists (deletes uploaded image to avoid orphaned files).
  * - 404/400 if database save fails (deletes image to avoid orphaned files).
  * - All errors are passed to the global error handler via `next(error)`.
@@ -40,20 +41,11 @@ const registerUser = async (req, res, next) => {
 	let imageUploaded = false;
 
 	try {
-		const { email, password, name } = req.body;
-
-		// Validate required fields
-		if (!email || !password || !name) {
-			throw createError(400, "Email, password, and name are required");
-		}
-
-		// Validate password length
-		if (password.length < 8) {
-			throw createError(400, "Password must be at least 8 characters long");
-		}
+		const { email } = req.body;
 
 		// Check if the email already exists BEFORE processing
 		const userExist = await User.findOne({ email });
+
 		if (userExist) {
 			// Delete the uploaded image since user already exists
 			if (req.file?.filename) {
@@ -106,16 +98,18 @@ const registerUser = async (req, res, next) => {
  * Authenticates a user by verifying their email and password, and returns a JWT.
  *
  * Workflow:
- * 1. Looks up the user by email from `req.body.email` (includes password field explicitly).
- * 2. If no user is found → throws a 404 error.
- * 3. Compares the provided password with the hashed password in the database using bcrypt.compare() (async).
- * 4. If credentials match → generates a JWT containing the user ID and email.
- * 5. Removes password from user object and returns a 200 response with user data and token.
- * 6. If password doesn't match → throws a 401 error.
+ * 1. Request data is validated by loginValidations middleware (email and password required).
+ * 2. Looks up the user by email (includes password field explicitly).
+ * 3. If no user is found → throws a 404 error.
+ * 4. Compares the provided password with the hashed password in the database using bcrypt.compare() (async).
+ * 5. If credentials match → generates a JWT containing the user ID and email.
+ * 6. Removes password from user object and returns a 200 response with user data and token.
+ * 7. If password doesn't match → throws a 401 error.
  *
  * Error Handling:
- * - Throws a 404 error if the user is not found.
- * - Throws a 401 error if the password is incorrect.
+ * - 400 if validation fails (handled by middleware before this function).
+ * - 404 error if the user is not found.
+ * - 401 error if the password is incorrect.
  * - All errors are caught and forwarded to the global error handler via `next(error)`.
  *
  * Notes:
@@ -130,11 +124,6 @@ const registerUser = async (req, res, next) => {
 const loginUser = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
-
-		// Validate required fields
-		if (!email || !password) {
-			throw createError(400, "Email and password are required");
-		}
 
 		// Find user and explicitly include password field
 		const user = await User.findOne({ email }).select("+password");

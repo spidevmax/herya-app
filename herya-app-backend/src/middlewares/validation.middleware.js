@@ -1,4 +1,5 @@
-const { validationResult, check } = require("express-validator");
+const { validationResult } = require("express-validator");
+const { deleteImgCloudinary } = require("../utils/deleteImage");
 
 /**
  * Middleware: handleValidationErrors
@@ -7,9 +8,10 @@ const { validationResult, check } = require("express-validator");
  *
  * Functionality:
  * 1. Collects all validation errors from request
- * 2. Maps errors to user-friendly format
- * 3. Returns 400 with structured error response if any validation fails
- * 4. Allows request to proceed if validation passes
+ * 2. If upload middleware already executed, deletes uploaded image from Cloudinary to avoid orphaned files
+ * 3. Maps errors to user-friendly format
+ * 4. Returns 400 with structured error response if any validation fails
+ * 5. Allows request to proceed if validation passes
  *
  * Error Response Format:
  * {
@@ -24,12 +26,23 @@ const { validationResult, check } = require("express-validator");
  * @returns {Function} Express middleware function
  *
  * @example
- * router.post("/register", registerValidations, handleValidationErrors, registerUser);
+ * router.post("/register", uploadUserImage.single("profileImage"), registerValidations, handleValidationErrors, registerUser);
+ * router.post("/login", loginValidations, handleValidationErrors, loginUser);
  */
-const handleValidationErrors = (req, res, next) => {
+const handleValidationErrors = async (req, res, next) => {
 	const errors = validationResult(req);
 
 	if (!errors.isEmpty()) {
+		// If image was uploaded but validation failed, delete it from Cloudinary
+		if (req.file?.filename) {
+			try {
+				await deleteImgCloudinary(req.file.filename);
+			} catch (deleteError) {
+				console.error("Error deleting image from Cloudinary:", deleteError);
+				// Continue even if deletion fails, still send validation error to client
+			}
+		}
+
 		return res.status(400).json({
 			success: false,
 			message: "Validation error",
@@ -43,150 +56,6 @@ const handleValidationErrors = (req, res, next) => {
 	next();
 };
 
-/**
- * Auth Validations
- * ----------------
- * Validation chain for user registration
- */
-const registerValidations = [
-	check("name")
-		.trim()
-		.notEmpty()
-		.withMessage("Name is required")
-		.isLength({ min: 2 })
-		.withMessage("Name must be at least 2 characters"),
-
-	check("email")
-		.trim()
-		.notEmpty()
-		.withMessage("Email is required")
-		.isEmail()
-		.withMessage("Invalid email format")
-		.normalizeEmail(),
-
-	check("password")
-		.notEmpty()
-		.withMessage("Password is required")
-		.isLength({ min: 8 })
-		.withMessage("Password must be at least 8 characters")
-		.matches(/[A-Z]/)
-		.withMessage("Password must contain at least one uppercase letter")
-		.matches(/[0-9]/)
-		.withMessage("Password must contain at least one number"),
-];
-
-/**
- * Validation chain for user login
- */
-const loginValidations = [
-	check("email")
-		.trim()
-		.notEmpty()
-		.withMessage("Email is required")
-		.isEmail()
-		.withMessage("Invalid email format")
-		.normalizeEmail(),
-
-	check("password")
-		.notEmpty()
-		.withMessage("Password is required")
-		.isLength({ min: 8 })
-		.withMessage("Password must be at least 8 characters"),
-];
-
-/**
- * User Profile Update Validations
- */
-const updateProfileValidations = [
-	check("name")
-		.optional()
-		.trim()
-		.isLength({ min: 2 })
-		.withMessage("Name must be at least 2 characters"),
-
-	check("email")
-		.optional()
-		.trim()
-		.isEmail()
-		.withMessage("Invalid email format")
-		.normalizeEmail(),
-];
-
-/**
- * Change Password Validations
- */
-const changePasswordValidations = [
-	check("currentPassword")
-		.notEmpty()
-		.withMessage("Current password is required")
-		.isLength({ min: 8 })
-		.withMessage("Password too short"),
-
-	check("newPassword")
-		.notEmpty()
-		.withMessage("New password is required")
-		.isLength({ min: 8 })
-		.withMessage("Password must be at least 8 characters")
-		.matches(/[A-Z]/)
-		.withMessage("Password must contain at least one uppercase letter")
-		.matches(/[0-9]/)
-		.withMessage("Password must contain at least one number"),
-
-	check("confirmPassword")
-		.notEmpty()
-		.withMessage("Password confirmation is required")
-		.custom((value, { req }) => {
-			if (value !== req.body.newPassword) {
-				throw new Error("Passwords do not match");
-			}
-			return true;
-		}),
-];
-
-/**
- * Journal Entry Validations
- */
-const journalValidations = [
-	check("energyLevel.before")
-		.notEmpty()
-		.withMessage("Before energy level is required")
-		.isInt({ min: 1, max: 10 })
-		.withMessage("Energy level must be between 1 and 10"),
-
-	check("energyLevel.after")
-		.notEmpty()
-		.withMessage("After energy level is required")
-		.isInt({ min: 1, max: 10 })
-		.withMessage("Energy level must be between 1 and 10"),
-
-	check("stressLevel.before")
-		.notEmpty()
-		.withMessage("Before stress level is required")
-		.isInt({ min: 1, max: 10 })
-		.withMessage("Stress level must be between 1 and 10"),
-
-	check("stressLevel.after")
-		.notEmpty()
-		.withMessage("After stress level is required")
-		.isInt({ min: 1, max: 10 })
-		.withMessage("Stress level must be between 1 and 10"),
-
-	check("moodBefore")
-		.optional()
-		.isArray()
-		.withMessage("Mood before must be an array"),
-
-	check("moodAfter")
-		.optional()
-		.isArray()
-		.withMessage("Mood after must be an array"),
-];
-
 module.exports = {
 	handleValidationErrors,
-	registerValidations,
-	loginValidations,
-	updateProfileValidations,
-	changePasswordValidations,
-	journalValidations,
 };

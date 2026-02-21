@@ -15,28 +15,29 @@ const {
 	updateProfileValidations,
 	changePasswordValidations,
 } = require("../validations/user.validations");
+const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const usersRouter = require("express").Router();
 
 usersRouter.use(authenticateToken);
 
-usersRouter.get("/me", getMyProfile); // → GET /api/v1/users/me
+usersRouter.get("/me", asyncErrorWrapper(getMyProfile)); // → GET /api/v1/users/me
 
 usersRouter.put(
 	"/me",
 	uploadUserImage.single("profileImage"),
-	updateProfileValidations,
+	...updateProfileValidations,
 	handleValidationErrors,
-	updateMyProfile,
+	asyncErrorWrapper(updateMyProfile),
 ); // → PUT /api/v1/users/me
 
 usersRouter.put(
 	"/change-password",
-	changePasswordValidations,
+	...changePasswordValidations,
 	handleValidationErrors,
-	changeMyPassword,
+	asyncErrorWrapper(changeMyPassword),
 ); // → PUT /api/v1/users/change-password
 
-usersRouter.delete("/me", deleteMyAccount); // → DELETE /api/v1/users/me
+usersRouter.delete("/me", asyncErrorWrapper(deleteMyAccount)); // → DELETE /api/v1/users/me
 
 module.exports = usersRouter;

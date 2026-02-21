@@ -14,6 +14,7 @@ const {
 	uploadJournalVoiceNotes,
 	uploadJournalMixed,
 } = require("../../middlewares/upload/journal.upload");
+const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const router = express.Router();
 
@@ -21,11 +22,11 @@ const router = express.Router();
 router.use(authenticateToken);
 
 // CRUD operations
-router.get("/", getJournalEntries); // GET /api/v1/journal-entries
-router.post("/", createJournalEntry); // POST /api/v1/journal-entries
-router.get("/:id", getJournalEntryById); // GET /api/v1/journal-entries/:id
-router.put("/:id", updateJournalEntry); // PUT /api/v1/journal-entries/:id
-router.delete("/:id", deleteJournalEntry); // DELETE /api/v1/journal-entries/:id
+router.get("/", asyncErrorWrapper(getJournalEntries)); // GET /api/v1/journal-entries
+router.post("/", asyncErrorWrapper(createJournalEntry)); // POST /api/v1/journal-entries
+router.get("/:id", asyncErrorWrapper(getJournalEntryById)); // GET /api/v1/journal-entries/:id
+router.put("/:id", asyncErrorWrapper(updateJournalEntry)); // PUT /api/v1/journal-entries/:id
+router.delete("/:id", asyncErrorWrapper(deleteJournalEntry)); // DELETE /api/v1/journal-entries/:id
 
 // =============================
 // MEDIA UPLOAD ROUTES

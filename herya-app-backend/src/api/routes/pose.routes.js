@@ -8,6 +8,7 @@ const {
 	uploadPoseImages,
 	uploadPoseVideos,
 } = require("../../middlewares/upload/pose.upload");
+const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const {
 	getPoses,
@@ -30,12 +31,15 @@ const posesRouter = express.Router();
 // PUBLIC ROUTES - No authentication required
 // =============================
 
-posesRouter.get("/search", searchPosesByName); // GET /api/v1/poses/search?name=text
-posesRouter.get("/category/:category", getPosesByCategory); // GET /api/v1/poses/category/:category
-posesRouter.get("/difficulty/:difficulty", getPosesByDifficulty); // GET /api/v1/poses/difficulty/:difficulty
-posesRouter.get("/random", getRandomPose); // GET /api/v1/poses/random
-posesRouter.get("/", getPoses); // GET /api/v1/poses
-posesRouter.get("/:id", getPoseById); // GET /api/v1/poses/:id
+posesRouter.get("/search", asyncErrorWrapper(searchPosesByName)); // GET /api/v1/poses/search?name=text
+posesRouter.get("/category/:category", asyncErrorWrapper(getPosesByCategory)); // GET /api/v1/poses/category/:category
+posesRouter.get(
+	"/difficulty/:difficulty",
+	asyncErrorWrapper(getPosesByDifficulty),
+); // GET /api/v1/poses/difficulty/:difficulty
+posesRouter.get("/random", asyncErrorWrapper(getRandomPose)); // GET /api/v1/poses/random
+posesRouter.get("/", asyncErrorWrapper(getPoses)); // GET /api/v1/poses
+posesRouter.get("/:id", asyncErrorWrapper(getPoseById)); // GET /api/v1/poses/:id
 
 // =============================
 // ADMIN ROUTES - Only admin users can access
@@ -46,7 +50,7 @@ posesRouter.post(
 	authenticateToken,
 	isAdmin,
 	uploadPoseThumbnail.single("thumbnail"),
-	postPose,
+	asyncErrorWrapper(postPose),
 ); // POST /api/v1/poses (with optional thumbnail)
 
 posesRouter.put(
@@ -54,7 +58,7 @@ posesRouter.put(
 	authenticateToken,
 	isAdmin,
 	uploadPoseThumbnail.single("thumbnail"),
-	updatePose,
+	asyncErrorWrapper(updatePose),
 ); // PUT /api/v1/poses/:id (with optional thumbnail update)
 
 posesRouter.post(
@@ -72,7 +76,7 @@ posesRouter.post(
 		}
 		next();
 	},
-	updatePose,
+	asyncErrorWrapper(updatePose),
 ); // POST /api/v1/poses/:id/images (add multiple images)
 
 posesRouter.post(
@@ -90,9 +94,14 @@ posesRouter.post(
 		}
 		next();
 	},
-	updatePose,
+	asyncErrorWrapper(updatePose),
 ); // POST /api/v1/poses/:id/videos (add multiple videos)
 
-posesRouter.delete("/:id", authenticateToken, isAdmin, deletePose); // DELETE /api/v1/poses/:id
+posesRouter.delete(
+	"/:id",
+	authenticateToken,
+	isAdmin,
+	asyncErrorWrapper(deletePose),
+); // DELETE /api/v1/poses/:id
 
 module.exports = posesRouter;

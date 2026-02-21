@@ -4,14 +4,15 @@ const { check } = require("express-validator");
  * Validation Rules: registerValidations
  * ----------------------------------------
  * Validates user registration request body.
+ * NOTE: Email uniqueness is checked in the controller, not in this middleware.
  *
  * Fields Validated:
  * - name: Required, non-empty string, 2-50 characters
- * - email: Required, valid email format, unique in database
+ * - email: Required, valid email format
  * - password: Required, minimum 8 characters
  *
  * @example
- * router.post("/register", registerValidations, handleValidationErrors, registerUser);
+ * router.post("/register", uploadUserImage.single("profileImage"), registerValidations, handleValidationErrors, registerUser);
  */
 const registerValidations = [
 	check("name")
