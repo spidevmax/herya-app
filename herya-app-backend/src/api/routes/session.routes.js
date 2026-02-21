@@ -13,7 +13,7 @@ const {
 const router = express.Router();
 
 // All routes require authentication
-router.use(authenticateToken());
+router.use(authenticateToken);
 
 // CRUD operations
 router.get("/", getSessions);

@@ -31,6 +31,24 @@ app.use(express.json());
 
 connectDB();
 
+// Health check route
+app.get("/", (req, res) => {
+	res.json({
+		message: "🧘 Herya App Backend - Vinyasa Krama Practice",
+		status: "Server is running",
+		version: "1.0.0",
+		endpoints: {
+			auth: "/api/v1/auth",
+			poses: "/api/v1/poses",
+			breathingPatterns: "/api/v1/breathing-patterns",
+			users: "/api/v1/users",
+			journalEntries: "/api/v1/journal-entries",
+			sessions: "/api/v1/sessions",
+			sequences: "/api/v1/sequences",
+		},
+	});
+});
+
 // Routes
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/poses", posesRouter);

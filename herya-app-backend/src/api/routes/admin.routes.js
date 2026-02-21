@@ -14,7 +14,7 @@ const {
 const adminRouter = require("express").Router();
 
 // All admin routes require authentication and admin role
-adminRouter.use(authenticateToken(), isAdmin);
+adminRouter.use(authenticateToken, isAdmin);
 
 // POSE Management
 adminRouter.get("/poses", getAllPoses); // GET /api/v1/admin/poses

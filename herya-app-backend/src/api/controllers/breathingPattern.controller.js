@@ -35,7 +35,4 @@ const getBreathingPatternById = async (req, res, next) => {
 module.exports = {
 	getBreathingPatterns,
 	getBreathingPatternById,
-	createBreathingPattern,
-	updateBreathingPattern,
-	deleteBreathingPattern,
 };

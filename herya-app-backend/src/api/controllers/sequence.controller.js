@@ -1,4 +1,4 @@
-const Sequence = require("../models/Sequence.model");
+const VinyasaKramaSequence = require("../models/VinyasaKramaSequence.model");
 
 /**
  * GET /api/v1/sequences/
@@ -19,7 +19,7 @@ const getSequences = async (req, res, next) => {
 			};
 		}
 
-		const sequences = await Sequence.find(query)
+		const sequences = await VinyasaKramaSequence.find(query)
 			.populate("createdBy", "name")
 			.sort({ createdAt: -1 });
 		res.status(200).json(sequences);
@@ -36,9 +36,9 @@ const getSequences = async (req, res, next) => {
  */
 const getSequenceById = async (req, res, next) => {
 	try {
-		const sequence = await Sequence.findById(req.params.id).populate(
-			"blocks.poses.pose",
-		);
+		const sequence = await VinyasaKramaSequence.findById(
+			req.params.id,
+		).populate("blocks.poses.pose");
 		if (!sequence) {
 			return res.status(404).json({ error: "Sequence not found" });
 		}
@@ -66,7 +66,7 @@ const createSequence = async (req, res, next) => {
 			sequenceData.isSystemTemplate = false;
 		}
 
-		const sequence = await Sequence.create(sequenceData);
+		const sequence = await VinyasaKramaSequence.create(sequenceData);
 		const populated = await sequence.populate("createdBy", "name");
 		res.status(201).json(populated);
 	} catch (error) {
@@ -83,7 +83,7 @@ const createSequence = async (req, res, next) => {
  */
 const updateSequence = async (req, res, next) => {
 	try {
-		const sequence = await Sequence.findById(req.params.id);
+		const sequence = await VinyasaKramaSequence.findById(req.params.id);
 		if (!sequence) {
 			return res.status(404).json({ error: "Sequence not found" });
 		}
@@ -102,10 +102,14 @@ const updateSequence = async (req, res, next) => {
 		delete req.body.isSystemTemplate;
 		delete req.body.createdBy;
 
-		const updated = await Sequence.findByIdAndUpdate(req.params.id, req.body, {
-			new: true,
-			runValidators: true,
-		}).populate("createdBy", "name");
+		const updated = await VinyasaKramaSequence.findByIdAndUpdate(
+			req.params.id,
+			req.body,
+			{
+				new: true,
+				runValidators: true,
+			},
+		).populate("createdBy", "name");
 		res.status(200).json(updated);
 	} catch (error) {
 		return next(error);
@@ -120,7 +124,7 @@ const updateSequence = async (req, res, next) => {
  */
 const deleteSequence = async (req, res, next) => {
 	try {
-		const sequence = await Sequence.findById(req.params.id);
+		const sequence = await VinyasaKramaSequence.findById(req.params.id);
 		if (!sequence) {
 			return res.status(404).json({ error: "Sequence not found" });
 		}
@@ -135,7 +139,7 @@ const deleteSequence = async (req, res, next) => {
 				.json({ error: "No tienes permiso para eliminar esta secuencia" });
 		}
 
-		await Sequence.findByIdAndDelete(req.params.id);
+		await VinyasaKramaSequence.findByIdAndDelete(req.params.id);
 		res.status(200).json({ message: "Sequence deleted successfully" });
 	} catch (error) {
 		return next(error);
@@ -149,7 +153,7 @@ const deleteSequence = async (req, res, next) => {
 const getSequencesByDifficulty = async (req, res, next) => {
 	try {
 		const { difficulty } = req.params;
-		const sequences = await Sequence.find({ difficulty }).sort({
+		const sequences = await VinyasaKramaSequence.find({ difficulty }).sort({
 			createdAt: -1,
 		});
 		res.status(200).json(sequences);
@@ -165,7 +169,7 @@ const getSequencesByDifficulty = async (req, res, next) => {
 const getSequencesByStyle = async (req, res, next) => {
 	try {
 		const { style } = req.params;
-		const sequences = await Sequence.find({ style }).sort({
+		const sequences = await VinyasaKramaSequence.find({ style }).sort({
 			createdAt: -1,
 		});
 		res.status(200).json(sequences);

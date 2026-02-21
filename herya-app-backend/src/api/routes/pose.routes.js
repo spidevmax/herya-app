@@ -12,15 +12,17 @@ const {
 const {
 	getPoses,
 	getPoseById,
-	postPose,
-	updatePose,
-	deletePose,
 	searchPosesByName,
 	getPosesByCategory,
 	getPosesByDifficulty,
 	getRandomPose,
-	bulkCreatePoses,
 } = require("../controllers/pose.controller");
+
+const {
+	postPose,
+	updatePose,
+	deletePose,
+} = require("../controllers/admin.controller");
 
 const posesRouter = express.Router();
 
@@ -39,10 +41,9 @@ posesRouter.get("/:id", getPoseById); // GET /api/v1/poses/:id
 // ADMIN ROUTES - Only admin users can access
 // =============================
 
-posesRouter.post("/bulk", authenticateToken(), isAdmin, bulkCreatePoses); // POST /api/v1/poses/bulk
 posesRouter.post(
 	"/",
-	authenticateToken(),
+	authenticateToken,
 	isAdmin,
 	uploadPoseThumbnail.single("thumbnail"),
 	postPose,
@@ -50,7 +51,7 @@ posesRouter.post(
 
 posesRouter.put(
 	"/:id",
-	authenticateToken(),
+	authenticateToken,
 	isAdmin,
 	uploadPoseThumbnail.single("thumbnail"),
 	updatePose,
@@ -58,7 +59,7 @@ posesRouter.put(
 
 posesRouter.post(
 	"/:id/images",
-	authenticateToken(),
+	authenticateToken,
 	isAdmin,
 	uploadPoseImages.array("images", 10),
 	(req, _, next) => {
@@ -76,7 +77,7 @@ posesRouter.post(
 
 posesRouter.post(
 	"/:id/videos",
-	authenticateToken(),
+	authenticateToken,
 	isAdmin,
 	uploadPoseVideos.array("videos", 5),
 	(req, _, next) => {
@@ -92,6 +93,6 @@ posesRouter.post(
 	updatePose,
 ); // POST /api/v1/poses/:id/videos (add multiple videos)
 
-posesRouter.delete("/:id", authenticateToken(), isAdmin, deletePose); // DELETE /api/v1/poses/:id
+posesRouter.delete("/:id", authenticateToken, isAdmin, deletePose); // DELETE /api/v1/poses/:id
 
 module.exports = posesRouter;

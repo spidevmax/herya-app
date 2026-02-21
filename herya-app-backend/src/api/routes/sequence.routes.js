@@ -22,8 +22,8 @@ router.get("/", getSequences);
 router.get("/:id", getSequenceById);
 
 // Authenticated routes
-router.post("/", authenticateToken(), createSequence);
-router.put("/:id", authenticateToken(), updateSequence);
-router.delete("/:id", authenticateToken(), deleteSequence);
+router.post("/", authenticateToken, createSequence);
+router.put("/:id", authenticateToken, updateSequence);
+router.delete("/:id", authenticateToken, deleteSequence);
 
 module.exports = router;

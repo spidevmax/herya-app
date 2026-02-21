@@ -1,5 +1,5 @@
-const User = require("../models/User.model");
-const { verifyToken } = require("../../utils/token");
+const User = require("../api/models/User.model");
+const { verifyToken } = require("../utils/token");
 // Note: createError is available in utils but not used in these middleware functions
 // Error responses are created inline to maintain consistency with existing patterns
 
@@ -60,12 +60,10 @@ const authenticateToken = (allowedRoles = []) => {
 
 			// Check roles if specified
 			if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
-				return res
-					.status(403)
-					.json({
-						success: false,
-						message: "Access denied: Insufficient permissions",
-					});
+				return res.status(403).json({
+					success: false,
+					message: "Access denied: Insufficient permissions",
+				});
 			}
 
 			next();

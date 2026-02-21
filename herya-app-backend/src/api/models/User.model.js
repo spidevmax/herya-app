@@ -281,7 +281,6 @@ userSchema.methods.markSequenceCompleted = function (
 };
 
 // INDEX
-userSchema.index({ email: 1 });
 userSchema.index({ createdAt: -1 });
 userSchema.index({ role: 1 });
 userSchema.index({ "vkProgression.currentMainSequence.family": 1 });

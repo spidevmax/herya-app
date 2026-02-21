@@ -101,12 +101,8 @@ const getRandomPose = async (req, res, next) => {
 module.exports = {
 	getPoses,
 	getPoseById,
-	postPose,
-	updatePose,
-	deletePose,
 	searchPosesByName,
 	getPosesByCategory,
 	getPosesByDifficulty,
 	getRandomPose,
-	bulkCreatePoses,
 };

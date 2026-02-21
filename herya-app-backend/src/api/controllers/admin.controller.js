@@ -4,7 +4,6 @@ const User = require("../models/User.model");
 const { deleteImgCloudinary } = require("../../utils/deleteImage");
 const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
-const { put } = require("../routes/pose.routes");
 
 /**
  * Controller: getAllPoses
@@ -250,7 +249,7 @@ module.exports = {
 	updatePose,
 	deletePose,
 	postBreathingPattern,
-	putBreathingPattern,
+	updateBreathingPattern,
 	deleteBreathingPattern,
 	getAllUsers,
 	deleteUser,

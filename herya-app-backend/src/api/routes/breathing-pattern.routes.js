@@ -7,10 +7,13 @@ const {
 const {
 	getBreathingPatterns,
 	getBreathingPatternById,
-	createBreathingPattern,
+} = require("../controllers/breathingPattern.controller");
+
+const {
+	postBreathingPattern,
 	updateBreathingPattern,
 	deleteBreathingPattern,
-} = require("../controllers/breathingPattern.controller");
+} = require("../controllers/admin.controller");
 
 const router = express.Router();
 
@@ -19,8 +22,8 @@ router.get("/", getBreathingPatterns); // GET all breathing patterns
 router.get("/:id", getBreathingPatternById); // GET specific breathing pattern
 
 // ADMIN routes - Only admin users
-router.post("/", authenticateToken(), isAdmin, createBreathingPattern); // Create
-router.put("/:id", authenticateToken(), isAdmin, updateBreathingPattern); // Update
-router.delete("/:id", authenticateToken(), isAdmin, deleteBreathingPattern); // Delete
+router.post("/", authenticateToken, isAdmin, postBreathingPattern); // Create
+router.put("/:id", authenticateToken, isAdmin, updateBreathingPattern); // Update
+router.delete("/:id", authenticateToken, isAdmin, deleteBreathingPattern); // Delete
 
 module.exports = router;

@@ -59,7 +59,7 @@ const registerUser = async (req, res, next) => {
 			if (req.file?.filename) {
 				await deleteImgCloudinary(req.file.filename);
 			}
-			throw createError(400, "This email is already registered");
+			throw createError(400, "This user already exists");
 		}
 
 		const user = new User(req.body);

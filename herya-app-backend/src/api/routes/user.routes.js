@@ -18,7 +18,7 @@ const {
 
 const usersRouter = require("express").Router();
 
-usersRouter.use(authenticateToken());
+usersRouter.use(authenticateToken);
 
 usersRouter.get("/me", getMyProfile); // → GET /api/v1/users/me
 
