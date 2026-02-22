@@ -1,22 +1,43 @@
 const { check } = require("express-validator");
 
 /**
- * Validation Rules: journalValidations
- * -----------------------------------
- * Validates journal entry request body.
+ * Validation Rules: journalValidations (POST - Create)
+ * ---------------------------------------------------
+ * Validates journal entry creation request body.
  *
  * Fields Validated:
- * - energyLevel.before: Required, integer 1-10 (energy level before practice)
- * - energyLevel.after: Required, integer 1-10 (energy level after practice)
- * - stressLevel.before: Required, integer 1-10 (stress level before practice)
- * - stressLevel.after: Required, integer 1-10 (stress level after practice)
- * - moodBefore: Optional, array of mood descriptions before practice
- * - moodAfter: Optional, array of mood descriptions after practice
+ * - session: Required, valid ObjectId
+ * - moodBefore: Required, non-empty array (1+ moods min)
+ * - moodAfter: Required, non-empty array (1+ moods min)
+ * - energyLevel.before: Required, integer 1-10
+ * - energyLevel.after: Required, integer 1-10
+ * - stressLevel.before: Required, integer 1-10
+ * - stressLevel.after: Required, integer 1-10
+ *
+ * Applied to: POST /api/v1/journal-entries
  *
  * @example
  * router.post("/", journalValidations, handleValidationErrors, createJournalEntry);
  */
 const journalValidations = [
+	check("session")
+		.notEmpty()
+		.withMessage("Session ID is required")
+		.isMongoId()
+		.withMessage("Session ID must be a valid MongoDB ID"),
+
+	check("moodBefore")
+		.notEmpty()
+		.withMessage("At least one mood before practice is required")
+		.isArray({ min: 1 })
+		.withMessage("moodBefore must be a non-empty array"),
+
+	check("moodAfter")
+		.notEmpty()
+		.withMessage("At least one mood after practice is required")
+		.isArray({ min: 1 })
+		.withMessage("moodAfter must be a non-empty array"),
+
 	check("energyLevel.before")
 		.notEmpty()
 		.withMessage("Energy level before practice is required")
@@ -40,16 +61,6 @@ const journalValidations = [
 		.withMessage("Stress level after practice is required")
 		.isInt({ min: 1, max: 10 })
 		.withMessage("Stress level must be between 1 and 10"),
-
-	check("moodBefore")
-		.optional()
-		.isArray()
-		.withMessage("Mood before must be an array"),
-
-	check("moodAfter")
-		.optional()
-		.isArray()
-		.withMessage("Mood after must be an array"),
 ];
 
 module.exports = {

@@ -5,6 +5,8 @@ const seedBreathingPatterns = require("./breathingPatterns.seed");
 const seedPoses = require("./poses.seed");
 const seedSequences = require("./sequences.seed");
 const seedUsers = require("./users.seed");
+const seedSessions = require("./sessions.seed");
+const seedJournalEntries = require("./journalEntries.seed");
 
 (async () => {
 	try {
@@ -17,8 +19,10 @@ const seedUsers = require("./users.seed");
 		// Orden importante: primero entidades base, luego las que dependen
 		await seedPoses();
 		await seedBreathingPatterns();
-		await seedSequences(); // depende de poses
-		await seedUsers(); // puede crear algunas sesiones de ejemplo
+		await seedSequences(); // depends on poses
+		await seedUsers(); // base users
+		await seedSessions(); // depends on users and sequences
+		await seedJournalEntries(); // depends on users and sessions
 
 		console.log("✅ All seeds completed successfully");
 		process.exit(0);

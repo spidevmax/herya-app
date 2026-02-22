@@ -1,0 +1,9 @@
+session,moodBefore,moodAfter,energyLevel_before,energyLevel_after,stressLevel_before,stressLevel_after,physicalSensations,emotionalNotes,insights
+null,peaceful,happy|energized,3,8,8,2,"Strong lower back|Flexible shoulders","Clarity and focus improved","Great session today"
+null,anxious|tired,calm|focused,2,7,7,3,"Improved posture and balance","Stress relief and joy","Good morning practice"
+null,stressed|restless,peaceful|centered,4,6,6,4,"Pain in left knee","Better emotional control","Need to work on alignment"
+null,happy|energized,energized,7,9,3,1,"Energy boost throughout body","Confidence increase","Advanced poses felt easier"
+null,overwhelmed|stressed,peaceful|light,2,6,9,4,"More spinal flexibility","Emotional release happened","Cathartic session - deep release"
+null,overwhelmed|restless,clear|centered,5,8,5,2,"Core strength improving","Anxiety dissolved","Best meditation yet"
+null,tired,energized,2,8,7,3,"Improved circulation","Mental clarity","Morning flow was excellent"
+null,calm|grounded,peaceful,6,9,2,1,"Whole body relaxation","Deep peace","Perfect evening session"

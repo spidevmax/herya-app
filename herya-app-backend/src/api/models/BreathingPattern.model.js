@@ -175,15 +175,7 @@ const breathingPatternSchema = new mongoose.Schema(
 			// Mudras (Hand gestures)
 			mudra: {
 				type: String,
-				enum: [
-					"none",
-					"jnana",
-					"chin",
-					"vishnu",
-					"nasagra",
-					"bhairava",
-					"bhairavi",
-				],
+				enum: ["none", "jnana", "chin", "vishnu", "nasagra", "bhairava", "bhairavi"],
 				default: "none",
 			},
 		},
@@ -286,8 +278,7 @@ breathingPatternSchema.virtual("calculatedPattern").get(function () {
 			inhale: this.patternRatio.inhale * this.baseBreathDuration,
 			hold: this.patternRatio.hold * this.baseBreathDuration,
 			exhale: this.patternRatio.exhale * this.baseBreathDuration,
-			holdAfterExhale:
-				this.patternRatio.holdAfterExhale * this.baseBreathDuration,
+			holdAfterExhale: this.patternRatio.holdAfterExhale * this.baseBreathDuration,
 		};
 	}
 	return this.patternTime;
@@ -306,9 +297,6 @@ breathingPatternSchema.index({ tags: 1 });
 breathingPatternSchema.index({ "vkContext.practicePhase": 1 });
 breathingPatternSchema.index({ "vkContext.recommendedBefore": 1 });
 
-const BreathingPattern = mongoose.model(
-	"BreathingPattern",
-	breathingPatternSchema,
-);
+const BreathingPattern = mongoose.model("BreathingPattern", breathingPatternSchema);
 
 module.exports = BreathingPattern;

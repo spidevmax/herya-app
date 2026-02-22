@@ -78,7 +78,7 @@ const sessionSchema = new mongoose.Schema(
 		// For individual VK session
 		vkSequence: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "VinyasaKramaSequence",
+			ref: "VKSequence",
 		},
 
 		// User modifications during practice
@@ -103,17 +103,17 @@ const sessionSchema = new mongoose.Schema(
 		completePractice: {
 			warmup: {
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "VinyasaKramaSequence",
+				ref: "VKSequence",
 			},
 			mainSequences: [
 				{
 					type: mongoose.Schema.Types.ObjectId,
-					ref: "VinyasaKramaSequence",
+					ref: "VKSequence",
 				},
 			],
 			cooldown: {
 				type: mongoose.Schema.Types.ObjectId,
-				ref: "VinyasaKramaSequence",
+				ref: "VKSequence",
 			},
 			pranayama: {
 				type: mongoose.Schema.Types.ObjectId,
@@ -121,7 +121,10 @@ const sessionSchema = new mongoose.Schema(
 			},
 			meditation: {
 				duration: Number,
-				type: String,
+				// NOTE: 'type' is a reserved Mongoose schema key.
+				// Using 'meditationType' avoids Mongoose treating this entire
+				// subdocument as a plain String field.
+				meditationType: String,
 			},
 		},
 
@@ -154,49 +157,38 @@ const sessionSchema = new mongoose.Schema(
 );
 
 // VALIDATION: Coherence between sessionType and required fields
-sessionSchema.pre("save", function (next) {
+// Uses async/throw pattern (Mongoose 9 compatible) to avoid "next is not a function" issues.
+// completePractice is checked via mainSequences.length because Mongoose always initialises
+// the subdocument as an empty object (truthy), even when the field was never set.
+sessionSchema.pre("save", async function () {
 	const { sessionType, vkSequence, completePractice } = this;
+
+	// A completePractice subdocument is considered "set" only when it has real content
+	const hasCompletePractice =
+		completePractice?.mainSequences?.length > 0 ||
+		completePractice?.warmup ||
+		completePractice?.cooldown ||
+		completePractice?.pranayama;
 
 	// vk_sequence requiere vkSequence field
 	if (sessionType === "vk_sequence" && !vkSequence) {
-		return next(
-			new Error("vk_sequence session type requires vkSequence field"),
-		);
+		throw new Error("vk_sequence session type requires vkSequence field");
 	}
 
-	// complete_practice requiere completePractice field
-	if (sessionType === "complete_practice" && !completePractice) {
-		return next(new Error("complete_practice requires completePractice field"));
+	// complete_practice requiere completePractice field con al menos una secuencia
+	if (sessionType === "complete_practice" && !hasCompletePractice) {
+		throw new Error("complete_practice requires at least one sequence in mainSequences");
 	}
 
-	// vk_sequence NO debe tener completePractice
-	if (sessionType === "vk_sequence" && completePractice) {
-		return next(new Error("vk_sequence cannot have completePractice field"));
+	// vk_sequence NO debe tener completePractice con datos reales
+	if (sessionType === "vk_sequence" && hasCompletePractice) {
+		throw new Error("vk_sequence cannot have completePractice field");
 	}
 
 	// complete_practice NO debe tener vkSequence directo
 	if (sessionType === "complete_practice" && vkSequence) {
-		return next(
-			new Error(
-				"complete_practice uses completePractice.mainSequences, not vkSequence",
-			),
-		);
+		throw new Error("complete_practice uses completePractice.mainSequences, not vkSequence");
 	}
-
-	// complete_practice requiere al menos una secuencia principal
-	if (
-		sessionType === "complete_practice" &&
-		(!completePractice.mainSequences ||
-			completePractice.mainSequences.length === 0)
-	) {
-		return next(
-			new Error(
-				"complete_practice requires at least one sequence in mainSequences",
-			),
-		);
-	}
-
-	next();
 });
 
 // INDEX

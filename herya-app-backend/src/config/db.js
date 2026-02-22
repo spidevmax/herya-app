@@ -62,9 +62,7 @@ const mongoose = require("mongoose");
 // Validate required environment variables
 if (!process.env.DB_URL) {
 	console.error("❌ Error: Missing required environment variable: DB_URL");
-	console.error(
-		"MongoDB connection string is required. Configure in .env file:",
-	);
+	console.error("MongoDB connection string is required. Configure in .env file:");
 	console.error(
 		"DB_URL=mongodb+srv://username:password@cluster.mongodb.net/dbname?retryWrites=true&w=majority",
 	);
@@ -99,9 +97,7 @@ const connectDB = async () => {
 
 		// Validate DB_URL exists
 		if (!process.env.DB_URL) {
-			throw new Error(
-				"DB_URL environment variable is not set. Cannot connect to database.",
-			);
+			throw new Error("DB_URL environment variable is not set. Cannot connect to database.");
 		}
 
 		// Establish connection with optimized options
@@ -116,9 +112,7 @@ const connectDB = async () => {
 		console.log(`🔗 Host: ${mongoose.connection.host}`);
 	} catch (error) {
 		console.error("❌ Error connecting to MongoDB: ", error.message);
-		console.error(
-			"Make sure MongoDB is running and DB_URL is correctly configured.",
-		);
+		console.error("Make sure MongoDB is running and DB_URL is correctly configured.");
 		// Rethrow to allow caller to handle critical startup error
 		throw error;
 	}

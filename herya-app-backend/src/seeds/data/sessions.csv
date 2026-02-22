@@ -1,0 +1,9 @@
+sessionType,duration,completed,notes,vkSequence
+vk_sequence,45,true,"Good practice session - strong holds",null
+pranayama,10,true,"Morning breathing practice",null
+meditation,20,true,"Evening meditation",null
+complete_practice,60,true,"Full practice session",null
+vk_sequence,30,true,"Gentle session",null
+pranayama,15,true,"Afternoon pranayama",null
+meditation,25,true,"Rest and recovery",null
+complete_practice,75,true,"Advanced session",null

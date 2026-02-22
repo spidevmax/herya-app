@@ -55,18 +55,12 @@
 const cloudinary = require("cloudinary").v2;
 
 // Validate required environment variables
-const requiredEnvVars = [
-	"CLOUDINARY_CLOUD_NAME",
-	"CLOUDINARY_API_KEY",
-	"CLOUDINARY_API_SECRET",
-];
+const requiredEnvVars = ["CLOUDINARY_CLOUD_NAME", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 
 const missingVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingVars.length > 0) {
-	console.warn(
-		`⚠️ Warning: Missing Cloudinary environment variables: ${missingVars.join(", ")}`,
-	);
+	console.warn(`⚠️ Warning: Missing Cloudinary environment variables: ${missingVars.join(", ")}`);
 	console.warn("File uploads will fail. Configure these in your .env file:");
 	console.warn("CLOUDINARY_CLOUD_NAME");
 	console.warn("CLOUDINARY_API_KEY");

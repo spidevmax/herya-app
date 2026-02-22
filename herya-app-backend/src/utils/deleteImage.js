@@ -41,10 +41,7 @@ const deleteImgCloudinary = async (publicId) => {
 	try {
 		await cloudinary.uploader.destroy(publicId);
 	} catch (error) {
-		console.error(
-			`[Cloudinary] Failed to delete image ${publicId}:`,
-			error.message,
-		);
+		console.error(`[Cloudinary] Failed to delete image ${publicId}:`, error.message);
 		// Don't throw error - just log it to avoid breaking the main flow
 	}
 };

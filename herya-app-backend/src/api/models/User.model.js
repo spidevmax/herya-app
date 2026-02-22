@@ -162,16 +162,7 @@ const userSchema = new mongoose.Schema(
 				targetAreas: [
 					{
 						type: String,
-						enum: [
-							"spine",
-							"hips",
-							"shoulders",
-							"knees",
-							"ankles",
-							"wrists",
-							"core",
-							"neck",
-						],
+						enum: ["spine", "hips", "shoulders", "knees", "ankles", "wrists", "core", "neck"],
 					},
 				],
 				conditions: [{ type: String, trim: true }], // ej: "lower back pain"
@@ -248,11 +239,7 @@ userSchema.methods.canAccessLevel = function (family, level) {
 };
 
 // METHOD: Mark sequence as completed
-userSchema.methods.markSequenceCompleted = function (
-	family,
-	level,
-	sequenceId,
-) {
+userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) {
 	const existingIndex = this.vkProgression.completedSequences.findIndex(
 		(seq) =>
 			seq.family === family &&

@@ -6,7 +6,7 @@ const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
 
 /**
- * Controller: registerUser
+ * Controller: register
  * ------------------------
  * Handles user registration by creating a new user and returning an immediate authentication token.
  *
@@ -37,7 +37,7 @@ const { createError } = require("../../utils/createError");
  * - Returns both user data and token for immediate login (improved UX).
  */
 
-const registerUser = async (req, res, next) => {
+const register = async (req, res, next) => {
 	let imageUploaded = false;
 
 	try {
@@ -93,7 +93,7 @@ const registerUser = async (req, res, next) => {
 };
 
 /**
- * Controller: loginUser
+ * Controller: login
  * ---------------------
  * Authenticates a user by verifying their email and password, and returns a JWT.
  *
@@ -121,7 +121,7 @@ const registerUser = async (req, res, next) => {
  * - Returns both user data and token to client for convenient session management.
  */
 
-const loginUser = async (req, res, next) => {
+const login = async (req, res, next) => {
 	try {
 		const { email, password } = req.body;
 
@@ -156,6 +156,6 @@ const loginUser = async (req, res, next) => {
 };
 
 module.exports = {
-	registerUser,
-	loginUser,
+	register,
+	login,
 };

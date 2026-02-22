@@ -79,7 +79,7 @@ const uploadJournalPhotos = multer({
 	limits: {
 		fileSize: 5 * 1024 * 1024, // 5MB per photo
 	},
-	fileFilter: (file, cb) => {
+	fileFilter: (_, file, cb) => {
 		// Validate MIME type for images only
 		const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
@@ -125,7 +125,7 @@ const uploadJournalVoiceNotes = multer({
 	limits: {
 		fileSize: 10 * 1024 * 1024, // 10MB per audio file
 	},
-	fileFilter: (file, cb) => {
+	fileFilter: (_, file, cb) => {
 		// Validate MIME type for audio only
 		const allowedMimes = [
 			"audio/mpeg", // .mp3
@@ -137,11 +137,7 @@ const uploadJournalVoiceNotes = multer({
 		if (allowedMimes.includes(file.mimetype)) {
 			cb(null, true);
 		} else {
-			cb(
-				new Error(
-					"Invalid file type. Only mp3, wav, m4a, webm allowed for audio",
-				),
-			);
+			cb(new Error("Invalid file type. Only mp3, wav, m4a, webm allowed for audio"));
 		}
 	},
 });
@@ -180,7 +176,7 @@ const uploadJournalMixed = multer({
 	limits: {
 		fileSize: 10 * 1024 * 1024, // 10MB max (accommodates audio)
 	},
-	fileFilter: (file, cb) => {
+	fileFilter: (_, file, cb) => {
 		// Validate MIME type for both images and audio
 		const allowedMimes = [
 			// Images
@@ -232,8 +228,7 @@ const uploadJournalMixed = multer({
 const uploadJournalErrorHandler = (code) => {
 	const errorMessages = {
 		LIMIT_FILE_SIZE: "File size too large. Images max 5MB, audio max 10MB.",
-		LIMIT_FILE_COUNT:
-			"Too many files. Max 10 photos or 5 voice notes per upload.",
+		LIMIT_FILE_COUNT: "Too many files. Max 10 photos or 5 voice notes per upload.",
 		LIMIT_FIELD_VALUE: "Field value too long.",
 		LIMIT_FIELD_COUNT: "Too many fields.",
 		LIMIT_UNEXPECTED_FILE: "Unexpected file field.",

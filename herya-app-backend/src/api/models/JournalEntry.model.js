@@ -162,15 +162,7 @@ const journalEntrySchema = new mongoose.Schema(
 				},
 				sensation: {
 					type: String,
-					enum: [
-						"tension",
-						"relief",
-						"pain",
-						"openness",
-						"strength",
-						"flexibility",
-						"neutral",
-					],
+					enum: ["tension", "relief", "pain", "openness", "strength", "flexibility", "neutral"],
 				},
 			},
 		],

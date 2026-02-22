@@ -1,83 +1,81 @@
+const fs = require("node:fs");
+const path = require("node:path");
+const Papa = require("papaparse");
 const User = require("../api/models/User.model");
-const { hashPassword } = require("../utils/bcrypt");
 
+/**
+ * Seed Users from CSV file
+ * Reads users.csv and populates User collection.
+ *
+ * IMPORTANT: Uses individual User.save() calls (not insertMany) so that
+ * the pre-save bcrypt hook runs and passwords are stored hashed.
+ */
 async function seedUsers() {
 	try {
-		// Check if users already exist
 		const existingUsers = await User.countDocuments();
 		if (existingUsers > 0) {
 			console.log("⏭️  Users already seeded, skipping...");
 			return;
 		}
 
-		const users = [
-			{
-				name: "Maria Lopez",
-				email: "maria@example.com",
-				password: "password123",
-				level: "beginner",
-				goals: ["Reduce stress", "Improve flexibility"],
-				totalSessions: 5,
-				totalMinutes: 150,
-				currentStreak: 2,
-				lastPracticeDate: new Date(),
-			},
-			{
-				name: "Juan Martínez",
-				email: "juan@example.com",
-				password: "password123",
-				level: "intermediate",
-				goals: ["Build strength", "Daily practice"],
-				totalSessions: 25,
-				totalMinutes: 1250,
-				currentStreak: 5,
-				lastPracticeDate: new Date(),
-			},
-			{
-				name: "Ana García",
-				email: "ana@example.com",
-				password: "password123",
-				level: "advanced",
-				goals: ["Master advanced poses", "Help others"],
-				totalSessions: 100,
-				totalMinutes: 5000,
-				currentStreak: 15,
-				lastPracticeDate: new Date(),
-			},
-			{
-				name: "Carlos Rodríguez",
-				email: "carlos@example.com",
-				password: "password123",
-				level: "beginner",
-				goals: ["Start yoga journey"],
-				totalSessions: 2,
-				totalMinutes: 60,
-				currentStreak: 1,
-				lastPracticeDate: new Date(),
-			},
-			{
-				name: "Sofia Pérez",
-				email: "sofia@example.com",
-				password: "password123",
-				level: "intermediate",
-				goals: ["Improve meditation", "Better sleep"],
-				totalSessions: 15,
-				totalMinutes: 600,
-				currentStreak: 3,
-				lastPracticeDate: new Date(),
-			},
-		];
+		// Read CSV file
+		const csvPath = path.join(__dirname, "data", "users.csv");
+		const csvContent = fs.readFileSync(csvPath, "utf-8");
 
-		// Hash passwords before inserting
-		const usersWithHashedPasswords = users.map((user) => ({
-			...user,
-			password: hashPassword(user.password),
-		}));
+		// Parse CSV with Papa Parse
+		const { data, errors } = Papa.parse(csvContent, {
+			header: true,
+			dynamicTyping: false,
+			skipEmptyLines: true,
+		});
 
-		await User.insertMany(usersWithHashedPasswords);
-		console.log(`✅ Seeded ${users.length} users`);
+		if (errors.length > 0) {
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+		}
+
+		// Valid intensity values matching model enum
+		const validIntensity = ["gentle", "moderate", "vigorous"];
+		const validLanguage = ["en", "es"];
+
+		let count = 0;
+		for (const row of data) {
+			const intensity = validIntensity.includes(row.preferredIntensity)
+				? row.preferredIntensity
+				: "moderate";
+			const language = validLanguage.includes(row.language) ? row.language : "en";
+
+			const user = new User({
+				name: row.name,
+				email: row.email,
+				password: row.password, // hashed by pre-save hook
+				role: row.role || "user",
+				goals: row.goals
+					? row.goals
+							.split(",")
+							.map((g) => g.trim())
+							.filter(Boolean)
+					: [],
+				totalSessions: parseInt(row.totalSessions, 10) || 0,
+				totalMinutes: parseInt(row.totalMinutes, 10) || 0,
+				currentStreak: parseInt(row.currentStreak, 10) || 0,
+				vkProgression: {
+					unlockedFamilies: ["tadasana"],
+					currentMainSequence: null,
+					completedSequences: [],
+				},
+				preferences: {
+					practiceIntensity: intensity,
+					language,
+				},
+			});
+
+			await user.save(); // triggers bcrypt pre-save hook
+			count++;
+		}
+
+		console.log(`✅ Seeded ${count} users from CSV`);
 	} catch (error) {
-		console.error("❌ Error seeding users:", error);
+		console.error("❌ Error seeding users:", error.message);
 		throw error;
 	}
 }

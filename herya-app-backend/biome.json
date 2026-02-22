@@ -6,21 +6,48 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": true
 	},
 	"formatter": {
 		"enabled": true,
-		"indentStyle": "tab"
+		"indentStyle": "tab",
+		"lineWidth": 100
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"correctness": {
+				"noUnusedFunctionParameters": "info"
+			},
+			"style": {
+				"useNodejsImportProtocol": "warn"
+			}
 		}
 	},
 	"javascript": {
+		"globals": [
+			"process",
+			"__dirname",
+			"__filename",
+			"require",
+			"module",
+			"exports",
+			"Buffer",
+			"setTimeout",
+			"setInterval",
+			"clearTimeout",
+			"clearInterval",
+			"console"
+		],
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"trailingCommas": "all",
+			"semicolons": "always",
+			"arrowParentheses": "always"
+		},
+		"parser": {
+			"unsafeParameterDecoratorsEnabled": false
 		}
 	},
 	"assist": {
@@ -30,5 +57,17 @@
 				"organizeImports": "on"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["src/seeds/**"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnusedFunctionParameters": "off"
+					}
+				}
+			}
+		}
+	]
 }

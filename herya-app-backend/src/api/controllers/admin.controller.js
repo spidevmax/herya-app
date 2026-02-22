@@ -1,256 +1,682 @@
-const BreathingPattern = require("../models/BreathingPattern.model");
-const Pose = require("../models/Pose.model");
 const User = require("../models/User.model");
-const { deleteImgCloudinary } = require("../../utils/deleteImage");
+const VKSequence = require("../models/VinyasaKramaSequence.model");
+const Pose = require("../models/Pose.model");
+const BreathingPattern = require("../models/BreathingPattern.model");
+const Session = require("../models/Session.model");
+const JournalEntry = require("../models/JournalEntry.model");
 const { sendResponse } = require("../../utils/sendResponse");
-const { createError } = require("../../utils/createError");
+const { deleteImgCloudinary } = require("../../utils/deleteImage");
+const createError = require("../../utils/createError");
+
+// ==================== USER MANAGEMENT ====================
 
 /**
- * Controller: getAllPoses
- * ------------------------
- * Retrieves all poses in the database.
- * Accessible only to admin users (via isAuth middleware with role validation).
+ * Controller: getAllUsers (Admin)
+ * --------------------------------
+ * Retrieves all users with pagination and filtering.
  *
- * Workflow:
- * 1. Fetches all poses using `Pose.find()`.
- * 3. Sends a 200 response containing all poses.
- *
- * Error Handling:
- * - Any database or population error is forwarded to the global error handler.
+ * Query Parameters:
+ * - role: Filter by role (user/admin)
+ * - page: Page number
+ * - limit: Results per page
+ * - search: Search by name or email
  *
  * Notes:
- * - Useful for admin dashboards or moderation views.
- * - Regular users cannot access this route.
+ * - Excludes password field.
+ * - Admin only endpoint.
  */
-
-const getAllPoses = async (req, res, next) => {
-	try {
-		const poses = await Pose.find();
-		return sendResponse(res, 200, true, "Poses fetched successfully", poses);
-	} catch (error) {
-		next(error);
-	}
-};
-
-/**
- * POST /api/v1/poses/
- * - Creates a new pose.
- * - Applies Schema validations automatically.
- * - If creation is successful, returns 201 with the created document.
- */
-const postPose = async (req, res, next) => {
-	try {
-		const newPose = new Pose(req.body);
-		const savedPose = await newPose.save();
-		res.status(201).json(savedPose);
-	} catch (error) {
-		return next(error);
-	}
-};
-
-/**
- * PUT /api/v1/poses/:id
- * - Updates an existing pose.
- * - { new: true } returns the updated document.
- * - { runValidators: true } respects Schema validations.
- * - If not found, 404. If successful, 200.
- */
-const updatePose = async (req, res, next) => {
-	try {
-		const { poseId } = req.params;
-		const updatedPose = await Pose.findByIdAndUpdate(poseId, req.body, {
-			new: true,
-			runValidators: true,
-		});
-		if (!updatedPose) {
-			return res.status(404).json({ error: "Pose not found" });
-		}
-		res.status(200).json(updatedPose);
-	} catch (error) {
-		return next(error);
-	}
-};
-
-/**
- * Controller: deletePose
- * ----------------------
- * Deletes a pose by its ID (admin-only operation).
- *
- * Workflow:
- * 1. If the pose has an image in Cloudinary → deletes it using `deleteImgCloudinary()`.
- * 2. Extracts the pose ID from `req.params.id`.
- * 3. Deletes the pose from the database using `findByIdAndDelete`.
- * 4. Returns a 200 response with the deleted pose data.
- *
- * Error Handling:
- * - If no pose is found or a deletion error occurs, forwards the error to the global handler.
- *
- * Notes:
- * - Always check for the existence of `poseDeleted` before accessing its properties.
- * - Used primarily by admins to manage inappropriate or duplicate entries.
- */
-
-const deletePose = async (req, res, next) => {
-	try {
-		// If there is an image, delete it
-		if (req.pose.imageId) {
-			await deleteImgCloudinary(req.pose.imageId);
-		}
-
-		// Delete the pose
-		const deletedPose = await Pose.findByIdAndDelete(req.pose._id);
-
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Pose deleted successfully",
-			deletedPose,
-		);
-	} catch (error) {
-		next(error);
-	}
-};
-
-/**
- * POST /api/v1/breathing-patterns/
- * - Creates a new breathing pattern.
- * - Applies Schema validations automatically.
- * - If creation is successful, returns 201 with the created document.
- */
-const postBreathingPattern = async (req, res, next) => {
-	try {
-		const breathingPattern = await BreathingPattern.create(req.body);
-		res.status(201).json(breathingPattern);
-	} catch (error) {
-		return next(error);
-	}
-};
-
-/**
- * PUT /api/v1/breathing-patterns/:id
- * - Updates an existing breathing pattern.
- * - { new: true } returns the updated document.
- * - { runValidators: true } respects Schema validations.
- * - If not found, 404. If successful, 200.
- */
-const updateBreathingPattern = async (req, res, next) => {
-	try {
-		const updated = await BreathingPattern.findByIdAndUpdate(
-			req.params.id,
-			req.body,
-			{
-				new: true,
-				runValidators: true,
-			},
-		);
-		if (!updated) {
-			return res.status(404).json({ error: "Breathing Pattern not found" });
-		}
-		res.status(200).json(updated);
-	} catch (error) {
-		return next(error);
-	}
-};
-
-/**
- * DELETE /api/v1/breathing-patterns/:id
- * - Deletes a breathing pattern by ID.
- * - If not found, 404. If deleted, 200 with confirmation message.
- */
-const deleteBreathingPattern = async (req, res, next) => {
-	try {
-		const deleted = await BreathingPattern.findByIdAndDelete(req.params.id);
-		if (!deleted) {
-			return res.status(404).json({ error: "Breathing Pattern not found" });
-		}
-		res.status(200).json({ message: "Breathing pattern deleted successfully" });
-	} catch (error) {
-		return next(error);
-	}
-};
-
-/**
- * Controller: getAllUsers
- * -----------------------
- * Fetches all users from the database (admin-only operation).
- *
- * Workflow:
- * 1. Retrieves all users using `User.find()`.
- * 2. Sends a 200 response with the list of users.
- *
- * Error Handling:
- * - Any database error is caught and forwarded to the error handler.
- *
- * Notes:
- * - Only admin users (validated by isAuth) can access this endpoint.
- * - Useful for admin panels, moderation tools, or analytics dashboards.
- */
-
 const getAllUsers = async (req, res, next) => {
 	try {
-		const users = await User.find();
-		return sendResponse(res, 200, true, "Users fetched successfully", users);
+		const { role, page = 1, limit = 20, search } = req.query;
+
+		const filter = {};
+		if (role) filter.role = role;
+
+		if (search) {
+			filter.$or = [{ name: new RegExp(search, "i") }, { email: new RegExp(search, "i") }];
+		}
+
+		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
+
+		const users = await User.find(filter)
+			.select("-password")
+			.sort({ createdAt: -1 })
+			.skip(skip)
+			.limit(parseInt(limit, 10));
+
+		const total = await User.countDocuments(filter);
+
+		return sendResponse(res, 200, true, "Users retrieved successfully", {
+			users,
+			pagination: {
+				page: parseInt(page, 10),
+				limit: parseInt(limit, 10),
+				total,
+				pages: Math.ceil(total / parseInt(limit, 10)),
+			},
+		});
 	} catch (error) {
-		next(error);
+		return next(error);
 	}
 };
 
 /**
- * Controller: deleteUser
- * ----------------------
- * Deletes a user account by its ID (admin-only operation).
- *
- * Workflow:
- * 1. Extracts the user ID from `req.params.id`.
- * 2. Deletes the user with `User.findByIdAndDelete()`.
- * 3. If the user had a profile image stored in Cloudinary → removes it using `deleteImgCloudinary()`.
- * 4. Returns a 200 response with the deleted user's data.
- *
- * Error Handling:
- * - If the user does not exist or deletion fails, forwards the error to the global handler.
- *
- * Notes:
- * - Important for admin account management.
- * - Always ensure related data (e.g., user albums) are handled or cleaned up as needed.
+ * Controller: updateUserRole (Admin)
+ * -----------------------------------
+ * Updates a user's role (user ↔ admin).
  */
+const updateUserRole = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const { role } = req.body;
 
+		if (!["user", "admin"].includes(role)) {
+			throw createError(400, "Invalid role. Must be 'user' or 'admin'");
+		}
+
+		const user = await User.findByIdAndUpdate(id, { role }, { new: true }).select("-password");
+
+		if (!user) {
+			throw createError(404, "User not found");
+		}
+
+		return sendResponse(res, 200, true, "User role updated successfully", user);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: deleteUser (Admin)
+ * -------------------------------
+ * Deletes a user and all associated data.
+ *
+ * Cascade deletes:
+ * - All sessions
+ * - All journal entries (with photos/voice notes)
+ * - Profile image
+ */
 const deleteUser = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 
-		// Delete the user and return the deleted document
-		const userDeleted = await User.findByIdAndDelete(id);
-
-		if (!userDeleted) {
+		const user = await User.findById(id);
+		if (!user) {
 			throw createError(404, "User not found");
 		}
 
-		// Delete Cloudinary image if it exists
-		if (userDeleted.profileImageId) {
-			await deleteImgCloudinary(userDeleted.profileImageId);
+		// Delete profile image
+		if (user.profileImageId) {
+			await deleteImgCloudinary(user.profileImageId);
 		}
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"User deleted successfully",
-			userDeleted,
-		);
+		// Delete all journal entries with media
+		const journals = await JournalEntry.find({ user: id });
+		for (const journal of journals) {
+			// Delete photos
+			for (const photo of journal.photos) {
+				const urlParts = photo.url.split("/");
+				const publicId = urlParts[urlParts.length - 1].split(".")[0];
+				await deleteImgCloudinary(publicId);
+			}
+			// Delete voice notes
+			for (const voiceNote of journal.voiceNotes) {
+				const urlParts = voiceNote.url.split("/");
+				const publicId = urlParts[urlParts.length - 1].split(".")[0];
+				await deleteImgCloudinary(publicId);
+			}
+		}
+
+		// Delete all journals
+		await JournalEntry.deleteMany({ user: id });
+
+		// Delete all sessions
+		await Session.deleteMany({ user: id });
+
+		// Delete user
+		await User.findByIdAndDelete(id);
+
+		return sendResponse(res, 200, true, "User deleted successfully", null);
 	} catch (error) {
-		next(error);
+		return next(error);
+	}
+};
+
+// ==================== VK SEQUENCE MANAGEMENT ====================
+
+/**
+ * Controller: createVKSequence (Admin)
+ * -------------------------------------
+ * Creates a new VK sequence (system template).
+ */
+const createVKSequence = async (req, res, next) => {
+	try {
+		const sequence = new VKSequence({
+			...req.body,
+			isSystemSequence: true,
+		});
+
+		const savedSequence = await sequence.save();
+
+		await savedSequence.populate("structure.corePoses.pose");
+		await savedSequence.populate("prerequisites");
+		await savedSequence.populate("recommendedPranayama.pattern");
+
+		return sendResponse(res, 201, true, "VK Sequence created successfully", savedSequence);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: updateVKSequence (Admin)
+ * -------------------------------------
+ * Updates an existing VK sequence.
+ */
+const updateVKSequence = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const sequence = await VKSequence.findByIdAndUpdate(id, req.body, {
+			new: true,
+			runValidators: true,
+		})
+			.populate("structure.corePoses.pose")
+			.populate("prerequisites")
+			.populate("recommendedPranayama.pattern");
+
+		if (!sequence) {
+			throw createError(404, "VK Sequence not found");
+		}
+
+		return sendResponse(res, 200, true, "VK Sequence updated successfully", sequence);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: deleteVKSequence (Admin)
+ * -------------------------------------
+ * Deletes a VK sequence.
+ *
+ * Notes:
+ * - Cannot delete if sequence is referenced in sessions.
+ * - Or implement soft delete with isActive flag.
+ */
+const deleteVKSequence = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		// Check if sequence is used in any sessions
+		const sessionCount = await Session.countDocuments({ vkSequence: id });
+
+		if (sessionCount > 0) {
+			throw createError(400, `Cannot delete: Sequence is used in ${sessionCount} sessions`);
+		}
+
+		const sequence = await VKSequence.findByIdAndDelete(id);
+
+		if (!sequence) {
+			throw createError(404, "VK Sequence not found");
+		}
+
+		return sendResponse(res, 200, true, "VK Sequence deleted successfully", null);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+// ==================== POSE MANAGEMENT ====================
+
+/**
+ * Controller: createPose (Admin)
+ * -------------------------------
+ * Creates a new pose (system pose).
+ */
+const createPose = async (req, res, next) => {
+	const uploadedImages = [];
+
+	try {
+		const pose = new Pose({
+			...req.body,
+			isSystemPose: true,
+		});
+
+		// Handle media uploads
+		if (req.files) {
+			if (req.files.thumbnail) {
+				pose.media.thumbnail = req.files.thumbnail[0].path;
+				uploadedImages.push(req.files.thumbnail[0].filename);
+			}
+
+			if (req.files.images) {
+				pose.media.images = req.files.images.map((file) => file.path);
+				uploadedImages.push(...req.files.images.map((f) => f.filename));
+			}
+
+			if (req.files.videos) {
+				pose.media.videos = req.files.videos.map((file) => file.path);
+			}
+		}
+
+		const savedPose = await pose.save();
+
+		await savedPose.populate("preparatoryPoses");
+		await savedPose.populate("followUpPoses");
+
+		return sendResponse(res, 201, true, "Pose created successfully", savedPose);
+	} catch (error) {
+		// Clean up uploaded images on error
+		for (const imageId of uploadedImages) {
+			await deleteImgCloudinary(imageId);
+		}
+		return next(error);
+	}
+};
+
+/**
+ * Controller: updatePose (Admin)
+ * -------------------------------
+ * Updates an existing pose.
+ */
+const updatePose = async (req, res, next) => {
+	const uploadedImages = [];
+	const oldImageIds = [];
+
+	try {
+		const { id } = req.params;
+
+		const pose = await Pose.findById(id);
+		if (!pose) {
+			throw createError(404, "Pose not found");
+		}
+
+		// Store old image IDs for cleanup
+		if (pose.media.thumbnail) {
+			const urlParts = pose.media.thumbnail.split("/");
+			oldImageIds.push(urlParts[urlParts.length - 1].split(".")[0]);
+		}
+
+		// Update fields
+		Object.keys(req.body).forEach((key) => {
+			if (req.body[key] !== undefined && key !== "_id") {
+				pose[key] = req.body[key];
+			}
+		});
+
+		// Handle new media uploads
+		if (req.files) {
+			if (req.files.thumbnail) {
+				pose.media.thumbnail = req.files.thumbnail[0].path;
+				uploadedImages.push(req.files.thumbnail[0].filename);
+			}
+
+			if (req.files.images) {
+				const newImages = req.files.images.map((file) => file.path);
+				pose.media.images = [...pose.media.images, ...newImages];
+				uploadedImages.push(...req.files.images.map((f) => f.filename));
+			}
+		}
+
+		const updatedPose = await pose.save();
+
+		// Delete old images only after successful save
+		for (const imageId of oldImageIds) {
+			await deleteImgCloudinary(imageId);
+		}
+
+		await updatedPose.populate("preparatoryPoses");
+		await updatedPose.populate("followUpPoses");
+
+		return sendResponse(res, 200, true, "Pose updated successfully", updatedPose);
+	} catch (error) {
+		// Clean up newly uploaded images on error
+		for (const imageId of uploadedImages) {
+			await deleteImgCloudinary(imageId);
+		}
+		return next(error);
+	}
+};
+
+/**
+ * Controller: deletePose (Admin)
+ * -------------------------------
+ * Deletes a pose.
+ *
+ * Notes:
+ * - Cannot delete if pose is referenced in sequences.
+ * - Deletes associated media from Cloudinary.
+ */
+const deletePose = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		// Check if pose is used in any sequences
+		const sequenceCount = await VKSequence.countDocuments({
+			"structure.corePoses.pose": id,
+		});
+
+		if (sequenceCount > 0) {
+			throw createError(400, `Cannot delete: Pose is used in ${sequenceCount} sequences`);
+		}
+
+		const pose = await Pose.findById(id);
+		if (!pose) {
+			throw createError(404, "Pose not found");
+		}
+
+		// Delete media from Cloudinary
+		if (pose.media.thumbnail) {
+			const urlParts = pose.media.thumbnail.split("/");
+			const publicId = urlParts[urlParts.length - 1].split(".")[0];
+			await deleteImgCloudinary(publicId);
+		}
+
+		for (const imageUrl of pose.media.images) {
+			const urlParts = imageUrl.split("/");
+			const publicId = urlParts[urlParts.length - 1].split(".")[0];
+			await deleteImgCloudinary(publicId);
+		}
+
+		await Pose.findByIdAndDelete(id);
+
+		return sendResponse(res, 200, true, "Pose deleted successfully", null);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+// ==================== BREATHING PATTERN MANAGEMENT ====================
+
+/**
+ * Controller: createBreathingPattern (Admin)
+ * -------------------------------------------
+ * Creates a new breathing pattern (system pattern).
+ */
+const createBreathingPattern = async (req, res, next) => {
+	try {
+		const pattern = new BreathingPattern({
+			...req.body,
+			isSystemPattern: true,
+		});
+
+		const savedPattern = await pattern.save();
+
+		await savedPattern.populate("vkContext.prerequisiteBreathing");
+
+		return sendResponse(res, 201, true, "Breathing pattern created successfully", savedPattern);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: updateBreathingPattern (Admin)
+ * -------------------------------------------
+ * Updates an existing breathing pattern.
+ */
+const updateBreathingPattern = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		const pattern = await BreathingPattern.findByIdAndUpdate(id, req.body, {
+			new: true,
+			runValidators: true,
+		}).populate("vkContext.prerequisiteBreathing");
+
+		if (!pattern) {
+			throw createError(404, "Breathing pattern not found");
+		}
+
+		return sendResponse(res, 200, true, "Breathing pattern updated successfully", pattern);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: deleteBreathingPattern (Admin)
+ * -------------------------------------------
+ * Deletes a breathing pattern.
+ */
+const deleteBreathingPattern = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+
+		// Check if pattern is used in any sessions
+		const sessionCount = await Session.countDocuments({
+			"completePractice.pranayama": id,
+		});
+
+		if (sessionCount > 0) {
+			throw createError(400, `Cannot delete: Pattern is used in ${sessionCount} sessions`);
+		}
+
+		const pattern = await BreathingPattern.findByIdAndDelete(id);
+
+		if (!pattern) {
+			throw createError(404, "Breathing pattern not found");
+		}
+
+		return sendResponse(res, 200, true, "Breathing pattern deleted successfully", null);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+// ==================== ANALYTICS & STATS ====================
+
+/**
+ * Controller: getDashboardStats (Admin)
+ * --------------------------------------
+ * Retrieves overall platform statistics.
+ *
+ * Returns:
+ * - Total users
+ * - New users this month
+ * - Total sessions
+ * - Total journal entries
+ * - Most popular VK families
+ * - Active users (last 30 days)
+ * - Average session duration
+ */
+const getDashboardStats = async (_, res, next) => {
+	try {
+		// Total counts
+		const totalUsers = await User.countDocuments();
+		const totalSessions = await Session.countDocuments();
+		const totalJournals = await JournalEntry.countDocuments();
+		const totalPoses = await Pose.countDocuments({ isSystemPose: true });
+		const totalSequences = await VKSequence.countDocuments({
+			isSystemSequence: true,
+		});
+		const totalBreathingPatterns = await BreathingPattern.countDocuments({
+			isSystemPattern: true,
+		});
+
+		// New users this month
+		const thisMonth = new Date();
+		thisMonth.setDate(1);
+		thisMonth.setHours(0, 0, 0, 0);
+
+		const newUsersThisMonth = await User.countDocuments({
+			createdAt: { $gte: thisMonth },
+		});
+
+		// Active users (last 30 days)
+		const thirtyDaysAgo = new Date();
+		thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+		const activeUsers = await User.countDocuments({
+			lastPracticeDate: { $gte: thirtyDaysAgo },
+		});
+
+		// Most popular VK families
+		const popularFamilies = await Session.aggregate([
+			{
+				$lookup: {
+					from: "vksequences",
+					localField: "vkSequence",
+					foreignField: "_id",
+					as: "sequenceData",
+				},
+			},
+			{ $unwind: "$sequenceData" },
+			{
+				$group: {
+					_id: "$sequenceData.family",
+					count: { $sum: 1 },
+				},
+			},
+			{ $sort: { count: -1 } },
+			{ $limit: 5 },
+		]);
+
+		// Average session duration
+		const sessionStats = await Session.aggregate([
+			{ $match: { completed: true } },
+			{
+				$group: {
+					_id: null,
+					avgDuration: { $avg: "$duration" },
+					totalMinutes: { $sum: "$duration" },
+				},
+			},
+		]);
+
+		// Sessions per day (last 7 days)
+		const sevenDaysAgo = new Date();
+		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+		const sessionsPerDay = await Session.aggregate([
+			{
+				$match: {
+					date: { $gte: sevenDaysAgo },
+					completed: true,
+				},
+			},
+			{
+				$group: {
+					_id: {
+						$dateToString: { format: "%Y-%m-%d", date: "$date" },
+					},
+					count: { $sum: 1 },
+				},
+			},
+			{ $sort: { _id: 1 } },
+		]);
+
+		return sendResponse(res, 200, true, "Dashboard stats retrieved", {
+			users: {
+				total: totalUsers,
+				newThisMonth: newUsersThisMonth,
+				active: activeUsers,
+			},
+			content: {
+				totalSessions,
+				totalJournals,
+				totalPoses,
+				totalSequences,
+				totalBreathingPatterns,
+			},
+			sessions: {
+				avgDuration: sessionStats[0]?.avgDuration || 0,
+				totalMinutes: sessionStats[0]?.totalMinutes || 0,
+				perDay: sessionsPerDay,
+			},
+			popularFamilies,
+		});
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: getUserAnalytics (Admin)
+ * -------------------------------------
+ * Gets detailed analytics for a specific user.
+ */
+const getUserAnalytics = async (req, res, next) => {
+	try {
+		const { userId } = req.params;
+
+		const user = await User.findById(userId);
+		if (!user) {
+			throw createError(404, "User not found");
+		}
+
+		// Session breakdown
+		const sessionsByType = await Session.aggregate([
+			{ $match: { user: user._id, completed: true } },
+			{
+				$group: {
+					_id: "$sessionType",
+					count: { $sum: 1 },
+					totalMinutes: { $sum: "$duration" },
+				},
+			},
+		]);
+
+		// Journal entry count
+		const journalCount = await JournalEntry.countDocuments({ user: user._id });
+
+		// VK progression
+		const completedSequences = user.vkProgression.completedSequences.length;
+		const unlockedFamilies = user.vkProgression.unlockedFamilies.length;
+
+		// Recent activity
+		const recentSessions = await Session.find({ user: user._id })
+			.sort({ date: -1 })
+			.limit(10)
+			.populate("vkSequence");
+
+		return sendResponse(res, 200, true, "User analytics retrieved", {
+			user: {
+				_id: user._id,
+				name: user.name,
+				email: user.email,
+				totalSessions: user.totalSessions,
+				totalMinutes: user.totalMinutes,
+				currentStreak: user.currentStreak,
+				lastPracticeDate: user.lastPracticeDate,
+			},
+			sessionsByType,
+			journalCount,
+			vkProgression: {
+				completedSequences,
+				unlockedFamilies,
+				currentLevel: user.vkProgression.currentMainSequence,
+			},
+			recentSessions,
+		});
+	} catch (error) {
+		return next(error);
 	}
 };
 
 module.exports = {
-	getAllPoses,
-	postPose,
+	// User Management
+	getAllUsers,
+	updateUserRole,
+	deleteUser,
+
+	// VK Sequence Management
+	createVKSequence,
+	updateVKSequence,
+	deleteVKSequence,
+
+	// Pose Management
+	createPose,
 	updatePose,
 	deletePose,
-	postBreathingPattern,
+
+	// Breathing Pattern Management
+	createBreathingPattern,
 	updateBreathingPattern,
 	deleteBreathingPattern,
-	getAllUsers,
-	deleteUser,
+
+	// Analytics
+	getDashboardStats,
+	getUserAnalytics,
 };

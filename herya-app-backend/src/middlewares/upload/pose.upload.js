@@ -72,18 +72,14 @@ const uploadPoseThumbnail = multer({
 	limits: {
 		fileSize: 5 * 1024 * 1024, // 5MB
 	},
-	fileFilter: (file, cb) => {
+	fileFilter: (_, file, cb) => {
 		// Validate MIME type for images only
 		const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
 		if (allowedMimes.includes(file.mimetype)) {
 			cb(null, true);
 		} else {
-			cb(
-				new Error(
-					"Invalid file type for thumbnail. Only jpg, png, gif, webp allowed",
-				),
-			);
+			cb(new Error("Invalid file type for thumbnail. Only jpg, png, gif, webp allowed"));
 		}
 	},
 });
@@ -113,7 +109,7 @@ const uploadPoseImages = multer({
 	limits: {
 		fileSize: 5 * 1024 * 1024, // 5MB per image
 	},
-	fileFilter: (file, cb) => {
+	fileFilter: (_, file, cb) => {
 		// Validate MIME type for images only
 		const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
 
@@ -152,7 +148,7 @@ const uploadPoseVideos = multer({
 	limits: {
 		fileSize: 50 * 1024 * 1024, // 50MB per video
 	},
-	fileFilter: (file, cb) => {
+	fileFilter: (_, file, cb) => {
 		// Validate MIME type for videos only
 		const allowedMimes = [
 			"video/mp4",
@@ -164,15 +160,33 @@ const uploadPoseVideos = multer({
 		if (allowedMimes.includes(file.mimetype)) {
 			cb(null, true);
 		} else {
-			cb(
-				new Error(
-					"Invalid file type. Only mp4, webm, mov, avi allowed for videos",
-				),
-			);
+			cb(new Error("Invalid file type. Only mp4, webm, mov, avi allowed for videos"));
 		}
 	},
 });
 
+/**
+ * Error Handler for Pose Upload Middleware
+ * ========================================
+ * Handles multer errors for pose media uploads gracefully.
+ *
+ * Common Errors:
+ * - LIMIT_FILE_SIZE: File exceeds size limit (5MB images, 50MB videos)
+ * - LIMIT_FILE_COUNT: Too many files uploaded
+ * - LIMIT_FIELD_VALUE: Field value too long
+ * - MIMETYPE: Invalid file type
+ *
+ * Usage in Error Middleware:
+ * app.use((err, req, res, next) => {
+ *   if (err instanceof multer.MulterError) {
+ *     return res.status(400).json({
+ *       success: false,
+ *       message: uploadPoseErrorHandler(err.code)
+ *     });
+ *   }
+ *   next(err);
+ * });
+ */
 /**
  * Error Handler for Pose Upload Middleware
  * ========================================
@@ -208,9 +222,74 @@ const uploadPoseErrorHandler = (code) => {
 	return errorMessages[code] || "Pose media upload failed.";
 };
 
+/**
+ * Multer Configuration for Mixed Pose Media Upload
+ * ================================================
+ * Allows simultaneous upload of thumbnail, multiple images, and videos.
+ *
+ * Configuration:
+ * - Storage: Cloudinary
+ * - File size limits: 5MB images, 50MB videos
+ * - File counts: 1 thumbnail, up to 10 images, up to 5 videos
+ * - Formats: All image and video types
+ *
+ * Usage in Routes:
+ * router.post("/pose", uploadPoseMixed.fields([
+ *   { name: "thumbnail", maxCount: 1 },
+ *   { name: "images", maxCount: 10 },
+ *   { name: "videos", maxCount: 5 }
+ * ]), controller);
+ *
+ * Middleware Details:
+ * - req.files.thumbnail → array with single uploaded thumbnail
+ * - req.files.images → array of uploaded images (max 10)
+ * - req.files.videos → array of uploaded videos (max 5)
+ * - Each file: path (URL), filename (public_id), originalname, size, mimetype
+ *
+ * Use Case:
+ * - Complete pose creation with thumbnail, demo images, and instruction videos
+ * - Single request handling multiple media types
+ */
+const uploadPoseMixed = multer({
+	storage: poseMediaStorage,
+	limits: {
+		fileSize: 50 * 1024 * 1024, // 50MB max (accommodates videos)
+	},
+	fileFilter: (_, file, cb) => {
+		// Validate MIME type for both images and videos
+		const allowedMimes = [
+			// Images
+			"image/jpeg",
+			"image/png",
+			"image/gif",
+			"image/webp",
+			// Videos
+			"video/mp4",
+			"video/webm",
+			"video/quicktime",
+			"video/avi",
+		];
+
+		if (allowedMimes.includes(file.mimetype)) {
+			cb(null, true);
+		} else {
+			cb(
+				new Error(
+					"Invalid file type. Only images (jpg, png, gif, webp) and videos (mp4, webm, mov, avi) allowed",
+				),
+			);
+		}
+	},
+}).fields([
+	{ name: "thumbnail", maxCount: 1 },
+	{ name: "images", maxCount: 10 },
+	{ name: "videos", maxCount: 5 },
+]);
+
 module.exports = {
 	uploadPoseThumbnail,
 	uploadPoseImages,
 	uploadPoseVideos,
+	uploadPoseMixed,
 	uploadPoseErrorHandler,
 };
