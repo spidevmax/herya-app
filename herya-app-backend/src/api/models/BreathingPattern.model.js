@@ -14,8 +14,9 @@
  * - Supports 3 pattern types: ratio-based (preferred), time-based, count-based
  * - Flexible ratios: can be 1:2:2:1 (Ujjayi), 2:2:2:2 (Viloma), etc.
  * - Complete VK integration: practice phases, recommended families, prerequisites
- * - Virtual fields for automatic calculations (eg: calculatedPattern)
- * - Useful methods: getRatioString() for conversion
+ * - Domain validation via pre-validate hooks (ratio consistency, min/max/default ranges)
+ * - Virtuals: calculatedPattern (actual seconds per phase), totalCycleDuration (full cycle in seconds)
+ * - Methods: getRatioString(), estimatePracticeDuration(cycles), isSafeForLevel(userLevel)
  *
  * Relationships:
  * - Referenced by: Session.completePractice.pranayama
@@ -23,39 +24,63 @@
  * - Self-reference: prerequisiteBreathing (technique progression)
  *
  * @example
- * // Create Ujjayi technique (Ocean Breath)
+ * // Create Ujjayi technique (Ocean Breath) — traditional 1:0:2:0 ratio (extended exhale)
  * const ujjayi = new BreathingPattern({
  *   romanizationName: "Ujjayi",
  *   sanskritName: "उज्जयी",
+ *   iastName: "Ujjāyī",
  *   difficulty: "beginner",
  *   patternType: "ratio_based",
- *   patternRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
+ *   patternRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
+ *   baseBreathDuration: 5,
  *   vkTechniques: { ujjayi: { enabled: true, withSound: true } },
  *   energyEffect: "calming"
  * });
  *
  * @example
  * // Get ratio as string
- * const ratioStr = breathingPattern.getRatioString(); // "1:0:1:0"
- * // Calculate actual breath times
- * const times = breathingPattern.calculatedPattern; // { inhale: 5, hold: 0, exhale: 5, holdAfterExhale: 0 }
+ * const ratioStr = breathingPattern.getRatioString(); // "1:0:2:0"
+ * // Calculate actual breath times (baseBreathDuration = 5s)
+ * const times = breathingPattern.calculatedPattern; // { inhale: 5, hold: 0, exhale: 10, holdAfterExhale: 0 }
  */
 const mongoose = require("mongoose");
 
 const breathingPatternSchema = new mongoose.Schema(
 	{
+		// ==========================================
 		// IDENTIFICATION
-		romanizationName: { type: String, required: true, trim: true },
-		iastName: { type: String, required: true, trim: true },
-		sanskritName: { type: String, required: true, trim: true },
-		alias: [{ type: String, trim: true }],
+		// ==========================================
+		romanizationName: {
+			type: String,
+			required: true,
+			trim: true,
+			unique: true,
+		},
+		iastName: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		sanskritName: {
+			type: String,
+			required: true,
+			trim: true,
+		},
+		alias: [
+			{
+				type: String,
+				trim: true,
+			},
+		],
 		description: {
 			type: String,
 			required: true,
 			trim: true,
 		},
 
+		// ==========================================
 		// CLASSIFICATION
+		// ==========================================
 		difficulty: {
 			type: String,
 			enum: ["beginner", "intermediate", "advanced"],
@@ -63,7 +88,9 @@ const breathingPatternSchema = new mongoose.Schema(
 			required: true,
 		},
 
-		// BREATHING PATTERN - Improved with ratios
+		// ==========================================
+		// BREATHING PATTERN
+		// ==========================================
 		patternType: {
 			type: String,
 			enum: ["ratio_based", "time_based", "count_based"],
@@ -72,10 +99,30 @@ const breathingPatternSchema = new mongoose.Schema(
 
 		// For patterns based on ratio (preferred in VK)
 		patternRatio: {
-			inhale: { type: Number, default: 1, min: 0 },
-			hold: { type: Number, default: 0, min: 0 },
-			exhale: { type: Number, default: 1, min: 0 },
-			holdAfterExhale: { type: Number, default: 0, min: 0 },
+			inhale: {
+				type: Number,
+				default: 1,
+				min: 0,
+				max: 10,
+			},
+			hold: {
+				type: Number,
+				default: 0,
+				min: 0,
+				max: 10,
+			},
+			exhale: {
+				type: Number,
+				default: 1,
+				min: 0,
+				max: 10,
+			},
+			holdAfterExhale: {
+				type: Number,
+				default: 0,
+				min: 0,
+				max: 10,
+			},
 		},
 
 		// Base duration (multiplier for the ratio)
@@ -88,13 +135,35 @@ const breathingPatternSchema = new mongoose.Schema(
 
 		// For patterns based on absolute time (legacy support)
 		patternTime: {
-			inhale: { type: Number, default: 5, min: 0 },
-			hold: { type: Number, default: 0, min: 0 },
-			exhale: { type: Number, default: 5, min: 0 },
-			holdAfterExhale: { type: Number, default: 0, min: 0 },
+			inhale: {
+				type: Number,
+				default: 5,
+				min: 0,
+				max: 60,
+			},
+			hold: {
+				type: Number,
+				default: 0,
+				min: 0,
+				max: 60,
+			},
+			exhale: {
+				type: Number,
+				default: 5,
+				min: 0,
+				max: 60,
+			},
+			holdAfterExhale: {
+				type: Number,
+				default: 0,
+				min: 0,
+				max: 60,
+			},
 		},
 
-		// RECOMMENDED PRACTICE - Improved
+		// ==========================================
+		// RECOMMENDED PRACTICE
+		// ==========================================
 		recommendedPractice: {
 			measureBy: {
 				type: String,
@@ -102,18 +171,20 @@ const breathingPatternSchema = new mongoose.Schema(
 				default: "cycles",
 			},
 			durationMinutes: {
-				min: { type: Number, default: 3, min: 1 },
-				max: { type: Number, default: 10, min: 1 },
-				default: { type: Number, default: 5 },
+				min: { type: Number, default: 3, min: 1, max: 60 },
+				max: { type: Number, default: 10, min: 1, max: 120 },
+				default: { type: Number, default: 5, min: 1, max: 60 },
 			},
 			cycles: {
-				min: { type: Number, default: 5, min: 1 },
-				max: { type: Number, default: 20, min: 1 },
-				default: { type: Number, default: 10 },
+				min: { type: Number, default: 5, min: 1, max: 500 },
+				max: { type: Number, default: 20, min: 1, max: 1000 },
+				default: { type: Number, default: 10, min: 1, max: 500 },
 			},
 		},
 
+		// ==========================================
 		// VK-SPECIFIC TECHNIQUES
+		// ==========================================
 		vkTechniques: {
 			// Nadi Shodhana (Alternate Nostril Breathing)
 			nadishodhana: {
@@ -122,14 +193,19 @@ const breathingPatternSchema = new mongoose.Schema(
 					type: String,
 					enum: ["classic", "anuloma", "viloma", "pratiloma"],
 				},
-				nostrilSequence: [String], // ['left', 'right', 'both']
+				nostrilSequence: [
+					{
+						type: String,
+						enum: ["left", "right", "both"],
+					},
+				], // e.g. ['left', 'right', 'both']
 			},
 
 			// Kapalabhati (Skull Shining Breath)
 			kapalabhati: {
 				enabled: { type: Boolean, default: false },
 				pumpingRate: { type: Number, min: 30, max: 120 }, // per minute
-				rounds: { type: Number, default: 3 },
+				rounds: { type: Number, default: 3, min: 1, max: 10 },
 			},
 
 			// Bhastrika (Bellows Breath)
@@ -138,8 +214,9 @@ const breathingPatternSchema = new mongoose.Schema(
 				intensity: {
 					type: String,
 					enum: ["gentle", "moderate", "vigorous"],
+					default: "gentle",
 				},
-				rounds: { type: Number, default: 3 },
+				rounds: { type: Number, default: 3, min: 1, max: 10 },
 			},
 
 			// Ujjayi (Ocean Breath)
@@ -151,13 +228,21 @@ const breathingPatternSchema = new mongoose.Schema(
 			// Bhramari (Bee Breath)
 			bhramari: {
 				enabled: { type: Boolean, default: false },
-				pitch: { type: String, enum: ["low", "medium", "high"] },
+				pitch: {
+					type: String,
+					enum: ["low", "medium", "high"],
+					default: "medium",
+				},
 			},
 
 			// Sitali / Sitkari (Cooling Breaths)
 			cooling: {
 				enabled: { type: Boolean, default: false },
-				type: { type: String, enum: ["sitali", "sitkari"] },
+				type: {
+					type: String,
+					enum: ["sitali", "sitkari"],
+					default: "sitali",
+				},
 			},
 
 			// Bandhas (Energy Locks) - CRUCIAL in VK
@@ -167,7 +252,7 @@ const breathingPatternSchema = new mongoose.Schema(
 				jalandhara: { type: Boolean, default: false }, // Throat lock
 				whenToApply: {
 					type: String,
-					enum: ["on_hold", "throughout", "on_exhale", "none"],
+					enum: ["on_hold", "throughout", "on_exhale", "on_inhale", "none"],
 					default: "none",
 				},
 			},
@@ -175,17 +260,29 @@ const breathingPatternSchema = new mongoose.Schema(
 			// Mudras (Hand gestures)
 			mudra: {
 				type: String,
-				enum: ["none", "jnana", "chin", "vishnu", "nasagra", "bhairava", "bhairavi"],
+				enum: [
+					"none",
+					"jnana",
+					"chin",
+					"vishnu",
+					"nasagra",
+					"bhairava",
+					"bhairavi",
+				],
 				default: "none",
 			},
 		},
 
+		// ==========================================
 		// BENEFITS AND CONTRAINDICATIONS
+		// ==========================================
 		benefits: [{ type: String, trim: true }],
 		contraindications: [{ type: String, trim: true }],
 		warnings: { type: String, trim: true },
 
+		// ==========================================
 		// VK CONTEXT
+		// ==========================================
 		vkContext: {
 			// When in the practice?
 			practicePhase: {
@@ -224,7 +321,9 @@ const breathingPatternSchema = new mongoose.Schema(
 			progressionNotes: { type: String, trim: true },
 		},
 
+		// ==========================================
 		// TEACHING INFORMATION
+		// ==========================================
 		teaching: {
 			setupInstructions: [{ type: String, trim: true }],
 			stepByStep: [{ type: String, trim: true }],
@@ -234,7 +333,9 @@ const breathingPatternSchema = new mongoose.Schema(
 			safetyGuidelines: [{ type: String, trim: true }],
 		},
 
+		// ==========================================
 		// UI/UX
+		// ==========================================
 		visualType: {
 			type: String,
 			enum: ["circle", "square", "wave", "nostril", "pulse", "continuous-wave"],
@@ -247,7 +348,9 @@ const breathingPatternSchema = new mongoose.Schema(
 			default: "bell",
 		},
 
+		// ==========================================
 		// EFFECTS
+		// ==========================================
 		energyEffect: {
 			type: String,
 			enum: ["calming", "energizing", "balancing", "cooling", "heating"],
@@ -261,15 +364,23 @@ const breathingPatternSchema = new mongoose.Schema(
 			},
 		],
 
+		// ==========================================
 		// METADATA
+		// ==========================================
 		tags: [{ type: String, trim: true }],
 		isSystemPattern: { type: Boolean, default: true },
 	},
 	{
 		timestamps: true,
 		versionKey: false,
+		toJSON: { virtuals: true }, // Important for virtuals to be included in API responses
+		toObject: { virtuals: true }, // Important for virtuals to be included when converting to objects
 	},
 );
+
+// ==========================================
+// VIRTUALS
+// ==========================================
 
 // VIRTUAL: Calculate actual breath times from ratio
 breathingPatternSchema.virtual("calculatedPattern").get(function () {
@@ -278,11 +389,24 @@ breathingPatternSchema.virtual("calculatedPattern").get(function () {
 			inhale: this.patternRatio.inhale * this.baseBreathDuration,
 			hold: this.patternRatio.hold * this.baseBreathDuration,
 			exhale: this.patternRatio.exhale * this.baseBreathDuration,
-			holdAfterExhale: this.patternRatio.holdAfterExhale * this.baseBreathDuration,
+			holdAfterExhale:
+				this.patternRatio.holdAfterExhale * this.baseBreathDuration,
 		};
 	}
 	return this.patternTime;
 });
+
+// VIRTUAL: Total duration of one full breath cycle (inhale + hold + exhale + holdAfterExhale)
+breathingPatternSchema.virtual("totalCycleDuration").get(function () {
+	const pattern = this.calculatedPattern;
+	return (
+		pattern.inhale + pattern.hold + pattern.exhale + pattern.holdAfterExhale
+	);
+});
+
+// ==========================================
+// METHODS
+// ==========================================
 
 // METHOD: Get ratio as string (e.g., "1:2:2:0")
 breathingPatternSchema.methods.getRatioString = function () {
@@ -290,13 +414,90 @@ breathingPatternSchema.methods.getRatioString = function () {
 	return `${inhale}:${hold}:${exhale}:${holdAfterExhale}`;
 };
 
-// INDEX
+// METHOD: Estimate practice duration based on number of cycles and total cycle duration
+breathingPatternSchema.methods.estimatePracticeDuration = function (cycles) {
+	const cycleDuration = this.totalCycleDuration;
+	return Math.round((cycleDuration * cycles) / 60); // return duration in minutes
+};
+
+// METHOD: Check if pattern is safe for a given user level (basic example, can be expanded with more complex logic)
+breathingPatternSchema.methods.isSafeForLevel = function (userLevel) {
+	const levelOrder = { beginner: 1, intermediate: 2, advanced: 3 };
+	const patternLevel = levelOrder[this.difficulty];
+	const currentLevel = levelOrder[userLevel];
+	return currentLevel >= patternLevel;
+};
+
+// ==========================================
+// INDEXES
+// ==========================================
 breathingPatternSchema.index({ romanizationName: 1 });
 breathingPatternSchema.index({ difficulty: 1, energyEffect: 1 });
 breathingPatternSchema.index({ tags: 1 });
 breathingPatternSchema.index({ "vkContext.practicePhase": 1 });
 breathingPatternSchema.index({ "vkContext.recommendedBefore": 1 });
+breathingPatternSchema.index({ isSystemPattern: 1 });
+breathingPatternSchema.index({ bestTimeOfDay: 1 });
 
-const BreathingPattern = mongoose.model("BreathingPattern", breathingPatternSchema);
+// Text index for full-text search across name fields, description and tags
+breathingPatternSchema.index({
+	romanizationName: "text",
+	iastName: "text",
+	sanskritName: "text",
+	description: "text",
+	tags: "text",
+});
+
+// ==========================================
+// VALIDATION
+// ==========================================
+
+// VALIDATION: Ensure that ratio-based patterns have at least inhale or exhale > 0
+breathingPatternSchema.pre("validate", function (next) {
+	if (this.patternType === "ratio_based") {
+		const { inhale, exhale } = this.patternRatio;
+
+		if (inhale === 0 && exhale === 0) {
+			return next(
+				new Error("Breathing pattern must have at least inhale or exhale > 0"),
+			);
+		}
+	}
+
+	next();
+});
+
+// VALIDATION: Ensure that recommended practice durations and cycles are logically consistent
+breathingPatternSchema.pre("validate", function (next) {
+	const { durationMinutes, cycles } = this.recommendedPractice;
+
+	// Min cannot be greater than max
+	if (durationMinutes.min > durationMinutes.max) {
+		return next(new Error("Duration min cannot be greater than max"));
+	}
+
+	if (cycles.min > cycles.max) {
+		return next(new Error("Cycles min cannot be greater than max"));
+	}
+
+	// Default must be between min and max
+	if (
+		durationMinutes.default < durationMinutes.min ||
+		durationMinutes.default > durationMinutes.max
+	) {
+		return next(new Error("Duration default must be between min and max"));
+	}
+
+	if (cycles.default < cycles.min || cycles.default > cycles.max) {
+		return next(new Error("Cycles default must be between min and max"));
+	}
+
+	next();
+});
+
+const BreathingPattern = mongoose.model(
+	"BreathingPattern",
+	breathingPatternSchema,
+);
 
 module.exports = BreathingPattern;
