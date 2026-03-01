@@ -20,7 +20,7 @@
  * - Detailed qualitative fields for deep reflection
  * - Anatomical tracking for therapeutic insights
  * - Unique relationship with Session: one journal per session (1:1)
- * - Virtuals: moodImprovement, energyChange, stressReduction
+ * - Virtuals: moodImprovement, energyChange, stressReduction, gardenColor
  * - Indexes for searches by user, date, mood, energy, sequence family
  *
  * Relationships:
@@ -57,8 +57,8 @@
  * @example
  * // Calculate improvement
  * const moodChange = journal.moodImprovement; // Positive mood increase
- * const energyDelta = journal.energyChange; // +4
- * const stressReduction = journal.stressReduction; // -5
+ * const energyDelta = journal.energyChange;    // +4  (after 7 - before 3)
+ * const stressDelta = journal.stressReduction;  // +5  (before 8 - after 3, positive = stress went down)
  */
 const mongoose = require("mongoose");
 
@@ -420,6 +420,9 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		],
 
+		// ==========================================
+		// TAGS
+		// ==========================================
 		tags: [
 			{
 				type: String,
@@ -556,13 +559,22 @@ journalEntrySchema
 // INDEXES
 // ==========================================
 journalEntrySchema.index({ user: 1, createdAt: -1 }); // User's journals chronological
-journalEntrySchema.index({ session: 1 }); // Backed by unique constraint
 journalEntrySchema.index({ createdAt: -1 }); // All journals chronological
 journalEntrySchema.index({ "vkReflection.sequenceFamily": 1 }); // By VK family
 journalEntrySchema.index({ "vkReflection.sequenceLevel": 1 }); // By VK level
 journalEntrySchema.index({ "vkReflection.readyForNextLevel": 1 }); // For progression tracking
 journalEntrySchema.index({ tags: 1 }); // For tag-based searches
 journalEntrySchema.index({ user: 1, "vkReflection.sequenceFamily": 1 }); // User journeys by VK family
+journalEntrySchema.index(
+	// Full-text search across journal content
+	{
+		insights: "text",
+		emotionalNotes: "text",
+		gratitude: "text",
+		physicalSensations: "text",
+	},
+	{ name: "journal_text_search" },
+);
 
 const JournalEntry = mongoose.model("JournalEntry", journalEntrySchema);
 
