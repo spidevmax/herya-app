@@ -37,7 +37,14 @@ const { deleteImgCloudinary } = require("../../utils/deleteImage");
 const getJournalEntries = async (req, res, next) => {
 	try {
 		// req.user verified by authenticateToken middleware
-		const { page = 1, limit = 20, startDate, endDate, sequenceFamily, sortBy = "date" } = req.query;
+		const {
+			page = 1,
+			limit = 20,
+			startDate,
+			endDate,
+			sequenceFamily,
+			sortBy = "date",
+		} = req.query;
 
 		// Build filter
 		const filter = { user: req.user._id };
@@ -84,15 +91,21 @@ const getJournalEntries = async (req, res, next) => {
 
 		const total = await JournalEntry.countDocuments(filter);
 
-		return sendResponse(res, 200, true, "Journal entries retrieved successfully", {
-			journals,
-			pagination: {
-				page: parseInt(page, 10),
-				limit: parseInt(limit, 10),
-				total,
-				pages: Math.ceil(total / parseInt(limit, 10)),
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Journal entries retrieved successfully",
+			{
+				journals,
+				pagination: {
+					page: parseInt(page, 10),
+					limit: parseInt(limit, 10),
+					total,
+					pages: Math.ceil(total / parseInt(limit, 10)),
+				},
 			},
-		});
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -140,7 +153,13 @@ const getJournalEntryById = async (req, res, next) => {
 			throw createError(403, "You don't have access to this journal entry");
 		}
 
-		return sendResponse(res, 200, true, "Journal entry retrieved successfully", journal);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Journal entry retrieved successfully",
+			journal,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -223,6 +242,7 @@ const createJournalEntry = async (req, res, next) => {
 		if (req.files?.photos && Array.isArray(req.files.photos)) {
 			journalEntry.photos = req.files.photos.map((file) => ({
 				url: file.path,
+				cloudinaryId: file.filename,
 				caption: "",
 			}));
 			uploadedPhotos = req.files.photos.map((f) => f.filename);
@@ -232,6 +252,7 @@ const createJournalEntry = async (req, res, next) => {
 		if (req.files?.voiceNotes && Array.isArray(req.files.voiceNotes)) {
 			journalEntry.voiceNotes = req.files.voiceNotes.map((file) => ({
 				url: file.path,
+				cloudinaryId: file.filename,
 				duration: parseInt(req.body.voiceNoteDuration, 10) || 0,
 			}));
 			uploadedVoiceNotes = req.files.voiceNotes.map((f) => f.filename);
@@ -267,7 +288,13 @@ const createJournalEntry = async (req, res, next) => {
 		await savedJournal.populate("favoritePoses.pose");
 		await savedJournal.populate("challengingPoses.pose");
 
-		return sendResponse(res, 201, true, "Journal entry created successfully", savedJournal);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"Journal entry created successfully",
+			savedJournal,
+		);
 	} catch (error) {
 		// Clean up uploaded files on error
 		if (uploadedPhotos.length > 0 || uploadedVoiceNotes.length > 0) {
@@ -349,6 +376,7 @@ const updateJournalEntry = async (req, res, next) => {
 			"pacingFeedback",
 			"vkReflection",
 			"nextSessionGoals",
+			"tags",
 		];
 
 		allowedUpdates.forEach((field) => {
@@ -361,6 +389,7 @@ const updateJournalEntry = async (req, res, next) => {
 		if (req.files?.photos && Array.isArray(req.files.photos)) {
 			const newPhotos = req.files.photos.map((file) => ({
 				url: file.path,
+				cloudinaryId: file.filename,
 				caption: "",
 			}));
 			journal.photos = [...journal.photos, ...newPhotos];
@@ -371,6 +400,7 @@ const updateJournalEntry = async (req, res, next) => {
 		if (req.files?.voiceNotes && Array.isArray(req.files.voiceNotes)) {
 			const newVoiceNotes = req.files.voiceNotes.map((file) => ({
 				url: file.path,
+				cloudinaryId: file.filename,
 				duration: parseInt(req.body.voiceNoteDuration, 10) || 0,
 			}));
 			journal.voiceNotes = [...journal.voiceNotes, ...newVoiceNotes];
@@ -383,7 +413,13 @@ const updateJournalEntry = async (req, res, next) => {
 		await updatedJournal.populate("favoritePoses.pose");
 		await updatedJournal.populate("challengingPoses.pose");
 
-		return sendResponse(res, 200, true, "Journal entry updated successfully", updatedJournal);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Journal entry updated successfully",
+			updatedJournal,
+		);
 	} catch (error) {
 		// Clean up newly uploaded files on error
 		if (uploadedPhotos.length > 0 || uploadedVoiceNotes.length > 0) {
@@ -445,11 +481,8 @@ const deleteJournalEntry = async (req, res, next) => {
 		// Delete photos from Cloudinary (continue even if some fail)
 		for (const photo of journal.photos) {
 			try {
-				// Extract public_id from URL
-				const urlParts = photo.url.split("/");
-				const publicId = urlParts[urlParts.length - 1].split(".")[0];
-				if (publicId) {
-					await deleteImgCloudinary(publicId);
+				if (photo.cloudinaryId) {
+					await deleteImgCloudinary(photo.cloudinaryId);
 				}
 			} catch (photoError) {
 				console.error("Failed to delete photo:", photoError);
@@ -459,10 +492,8 @@ const deleteJournalEntry = async (req, res, next) => {
 		// Delete voice notes from Cloudinary (continue even if some fail)
 		for (const voiceNote of journal.voiceNotes) {
 			try {
-				const urlParts = voiceNote.url.split("/");
-				const publicId = urlParts[urlParts.length - 1].split(".")[0];
-				if (publicId) {
-					await deleteImgCloudinary(publicId);
+				if (voiceNote.cloudinaryId) {
+					await deleteImgCloudinary(voiceNote.cloudinaryId);
 				}
 			} catch (voiceError) {
 				console.error("Failed to delete voice note:", voiceError);
@@ -471,7 +502,13 @@ const deleteJournalEntry = async (req, res, next) => {
 
 		await JournalEntry.findByIdAndDelete(id);
 
-		return sendResponse(res, 200, true, "Journal entry deleted successfully", null);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Journal entry deleted successfully",
+			null,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -519,8 +556,8 @@ const getDigitalGarden = async (req, res, next) => {
 			date: journal.createdAt,
 			// Size based on session duration
 			size: journal.session?.duration || 30,
-			// Color based on mood improvement
-			color: calculateMoodColor(journal.moodBefore, journal.moodAfter),
+			// Color from gardenColor virtual (tracks both positive and negative moods)
+			color: journal.gardenColor,
 			// Position in garden (can be calculated client-side)
 			moodBefore: journal.moodBefore,
 			moodAfter: journal.moodAfter,
@@ -596,52 +633,6 @@ async function updateUserVKProgression(userId, family, level, sequenceId) {
 }
 
 /**
- * Helper: calculateMoodColor
- * ---------------------------
- * Returns color hex code based on mood improvement.
- * Maps positive mood change → green, neutral → yellow, negative → orange/red.
- *
- * Returns:
- * - #4CAF50: Strong improvement (+2 moods)
- * - #8BC34A: Moderate improvement (+1 mood)
- * - #FFC107: No change
- * - #FF9800: Slight regression (-1 mood)
- * - #F44336: Strong regression (-2+ moods)
- */
-function calculateMoodColor(moodBefore, moodAfter) {
-	// Validate inputs
-	if (!Array.isArray(moodBefore) || !Array.isArray(moodAfter)) {
-		return "#FFC107"; // Default yellow if invalid
-	}
-
-	const positiveMoods = [
-		"calm",
-		"energized",
-		"focused",
-		"happy",
-		"grounded",
-		"peaceful",
-		"motivated",
-		"renewed",
-		"centered",
-		"light",
-		"clear",
-	];
-
-	const beforePositive = moodBefore.filter((m) => positiveMoods.includes(m)).length;
-	const afterPositive = moodAfter.filter((m) => positiveMoods.includes(m)).length;
-
-	const improvement = afterPositive - beforePositive;
-
-	// Color scale from red (negative) to yellow (neutral) to green (positive)
-	if (improvement >= 2) return "#4CAF50"; // Strong green
-	if (improvement === 1) return "#8BC34A"; // Light green
-	if (improvement === 0) return "#FFC107"; // Yellow
-	if (improvement === -1) return "#FF9800"; // Orange
-	return "#F44336"; // Red
-}
-
-/**
  * Helper: calculateEmotionalTrends
  * ---------------------------------
  * Computes aggregate emotional metrics from journal entries.
@@ -688,7 +679,9 @@ function calculateEmotionalTrends(journals) {
 		}
 	});
 
-	trends.avgEnergyImprovement = (totalEnergyChange / journals.length).toFixed(1);
+	trends.avgEnergyImprovement = (totalEnergyChange / journals.length).toFixed(
+		1,
+	);
 	trends.avgStressReduction = (totalStressChange / journals.length).toFixed(1);
 
 	if (Object.keys(moodBeforeCount).length > 0) {
@@ -726,7 +719,10 @@ function calculatePhysicalProgress(journals) {
 	if (!Array.isArray(journals)) return bodyAreaProgress;
 
 	journals.forEach((journal) => {
-		if (journal.vkReflection && Array.isArray(journal.vkReflection.anatomicalObservations)) {
+		if (
+			journal.vkReflection &&
+			Array.isArray(journal.vkReflection.anatomicalObservations)
+		) {
 			journal.vkReflection.anatomicalObservations.forEach((obs) => {
 				if (!obs.area) return; // Skip if no area specified
 
@@ -742,7 +738,11 @@ function calculatePhysicalProgress(journals) {
 
 				bodyAreaProgress[obs.area].observations++;
 
-				if (obs.improvement && obs.improvement !== "none" && obs.improvement !== "regressed") {
+				if (
+					obs.improvement &&
+					obs.improvement !== "none" &&
+					obs.improvement !== "regressed"
+				) {
 					bodyAreaProgress[obs.area].improvements++;
 					if (bodyAreaProgress[obs.area][obs.improvement] !== undefined) {
 						bodyAreaProgress[obs.area][obs.improvement]++;

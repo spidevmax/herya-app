@@ -151,7 +151,7 @@ const login = async (req, res, next) => {
 			token,
 		});
 	} catch (error) {
-		next(error);
+		return next(error);
 	}
 };
 

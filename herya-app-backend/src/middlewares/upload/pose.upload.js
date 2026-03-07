@@ -79,7 +79,11 @@ const uploadPoseThumbnail = multer({
 		if (allowedMimes.includes(file.mimetype)) {
 			cb(null, true);
 		} else {
-			cb(new Error("Invalid file type for thumbnail. Only jpg, png, gif, webp allowed"));
+			cb(
+				new Error(
+					"Invalid file type for thumbnail. Only jpg, png, gif, webp allowed",
+				),
+			);
 		}
 	},
 });
@@ -160,33 +164,15 @@ const uploadPoseVideos = multer({
 		if (allowedMimes.includes(file.mimetype)) {
 			cb(null, true);
 		} else {
-			cb(new Error("Invalid file type. Only mp4, webm, mov, avi allowed for videos"));
+			cb(
+				new Error(
+					"Invalid file type. Only mp4, webm, mov, avi allowed for videos",
+				),
+			);
 		}
 	},
 });
 
-/**
- * Error Handler for Pose Upload Middleware
- * ========================================
- * Handles multer errors for pose media uploads gracefully.
- *
- * Common Errors:
- * - LIMIT_FILE_SIZE: File exceeds size limit (5MB images, 50MB videos)
- * - LIMIT_FILE_COUNT: Too many files uploaded
- * - LIMIT_FIELD_VALUE: Field value too long
- * - MIMETYPE: Invalid file type
- *
- * Usage in Error Middleware:
- * app.use((err, req, res, next) => {
- *   if (err instanceof multer.MulterError) {
- *     return res.status(400).json({
- *       success: false,
- *       message: uploadPoseErrorHandler(err.code)
- *     });
- *   }
- *   next(err);
- * });
- */
 /**
  * Error Handler for Pose Upload Middleware
  * ========================================

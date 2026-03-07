@@ -36,8 +36,8 @@ const { deleteImgCloudinary } = require("../utils/deleteImage");
  * ```
  *
  * Field Mapping:
- * - Uses error.param for standard fields (body, query params)
- * - Uses error.entity as fallback (some custom validators)
+ * - Uses error.path for field errors (body, query, param fields) — express-validator v7+
+ * - Uses error.type as fallback for non-field errors (e.g. 'alternative', 'unknown_fields')
  * - Maps to user-friendly field names for client
  *
  * Error Types Handled:
@@ -55,7 +55,8 @@ const { deleteImgCloudinary } = require("../utils/deleteImage");
  * @returns {Function} Express middleware function
  *
  * Request Properties Used:
- * - req.file?.filename - Cloudinary public_id if file uploaded
+ * - req.file?.filename - Cloudinary public_id if single file uploaded
+ * - req.files - array (.array()) or object of arrays (.fields()) for multi-file uploads
  * - validationResult(req) - express-validator result object
  *
  * HTTP Status:
@@ -118,12 +119,36 @@ const handleValidationErrors = async (req, res, next) => {
 	const errors = validationResult(req);
 
 	if (!errors.isEmpty()) {
-		// If image was uploaded but validation failed, delete it from Cloudinary
+		// Collect all Cloudinary public_ids from any uploaded files and delete them
+		const publicIds = [];
+
+		// Single-file upload (.single())
 		if (req.file?.filename) {
+			publicIds.push(req.file.filename);
+		}
+
+		// Multiple-file upload (.array() → array, or .fields() → object of arrays)
+		if (req.files) {
+			if (Array.isArray(req.files)) {
+				// .array() — req.files is a flat array
+				for (const f of req.files) {
+					if (f.filename) publicIds.push(f.filename);
+				}
+			} else {
+				// .fields() — req.files is { fieldName: [file, ...], ... }
+				for (const fileArr of Object.values(req.files)) {
+					for (const f of fileArr) {
+						if (f.filename) publicIds.push(f.filename);
+					}
+				}
+			}
+		}
+
+		for (const publicId of publicIds) {
 			try {
-				await deleteImgCloudinary(req.file.filename);
+				await deleteImgCloudinary(publicId);
 			} catch (deleteError) {
-				console.error("Error deleting image from Cloudinary:", deleteError);
+				console.error("Error deleting file from Cloudinary:", deleteError);
 				// Continue even if deletion fails, still send validation error to client
 			}
 		}
@@ -132,7 +157,7 @@ const handleValidationErrors = async (req, res, next) => {
 			success: false,
 			message: "Validation error",
 			errors: errors.array().map((error) => ({
-				field: error.param || error.entity,
+				field: error.path || error.type,
 				message: error.msg,
 			})),
 		});

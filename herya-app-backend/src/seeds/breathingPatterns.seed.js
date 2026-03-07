@@ -20,94 +20,122 @@ async function seedBreathingPatterns() {
 		const csvPath = path.join(__dirname, "data", "breathingPatterns.csv");
 		const csvContent = fs.readFileSync(csvPath, "utf-8");
 
-		// Parse CSV
+		// Parse CSV — dynamicTyping auto-converts numbers and booleans
 		const { data, errors } = Papa.parse(csvContent, {
 			header: true,
-			dynamicTyping: false,
+			dynamicTyping: true,
 			skipEmptyLines: true,
 		});
 
 		if (errors.length > 0) {
-			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+			throw new Error(
+				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
+			);
 		}
 
-		// Map energy effect values from CSV to model enum
-		const energyEffectMap = {
-			warming: "heating",
-			heating: "heating",
-			energizing: "energizing",
-			balancing: "balancing",
-			calming: "calming",
-			cooling: "cooling",
-		};
+		// Helper: split pipe-separated string into array
+		// (dynamicTyping handles numbers and booleans; arrays use | as delimiter)
+		const toArray = (val) =>
+			val != null && val !== ""
+				? String(val)
+						.split("|")
+						.map((s) => s.trim())
+						.filter(Boolean)
+				: [];
 
-		// Build vkTechniques object based on technique name
-		const buildVkTechniques = (technique) => {
-			const techniques = {
-				nadishodhana: { enabled: false },
-				kapalabhati: { enabled: false },
-				bhastrika: { enabled: false },
-				ujjayi: { enabled: false },
-				bhramari: { enabled: false },
-				cooling: { enabled: false },
-			};
-			if (techniques[technique] !== undefined) {
-				techniques[technique] = { enabled: true };
-			}
-			return techniques;
-		};
+		// Helper: coerce CSV boolean values (dynamicTyping may yield true/false or "true"/"false")
+		const toBool = (val) =>
+			val === true || val === "true" || val === 1 || val === "1";
 
 		// Transform CSV data to BreathingPattern schema
-		const breathingPatterns = data.map((row) => {
-			const duration = parseInt(row.duration, 10) || 5;
-			const cycles = parseInt(row.holdRatioCycles, 10) || 5;
-			const energyEffect = energyEffectMap[row.energyEffect?.toLowerCase()] || "balancing";
+		const breathingPatterns = data.map((row) => ({
+			// IDENTIFICATION
+			romanizationName: row["romanizationName"]?.trim(),
+			iastName: row["iastName"]?.trim(),
+			sanskritName: row["sanskritName"]?.trim(),
+			alias: toArray(row["alias"]),
+			description: row["description"]?.trim(),
 
-			return {
-				romanizationName: row.name?.trim(),
-				iastName: row.name?.trim(), // No IAST column in CSV, use romanization name
-				sanskritName: row.sanskritName?.trim(),
-				description: `${row.name?.trim()} is a pranayama technique. ${
-					row.benefits ? `Benefits include: ${row.benefits.replace(/,/g, ", ")}.` : ""
-				}`,
-				difficulty: row.difficulty?.trim() || "beginner",
-				patternType: "ratio_based",
-				patternRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
-				vkTechniques: buildVkTechniques(row.technique?.trim()),
-				benefits: row.benefits
-					? row.benefits
-							.split(",")
-							.map((b) => b.trim())
-							.filter(Boolean)
-					: [],
-				contraindications:
-					row.contraindications && row.contraindications !== "none"
-						? row.contraindications
-								.split(";")
-								.map((c) => c.trim())
-								.filter(Boolean)
-						: [],
-				energyEffect,
-				recommendedPractice: {
-					measureBy: "cycles",
-					durationMinutes: {
-						min: duration - 2,
-						max: duration + 5,
-						default: duration,
-					},
-					cycles: {
-						min: Math.max(3, cycles - 2),
-						max: cycles + 5,
-						default: cycles,
-					},
+			// CLASSIFICATION
+			difficulty: row["difficulty"]?.trim() || "beginner",
+
+			// BREATHING PATTERN
+			patternType: row["patternType"]?.trim() || "ratio_based",
+			patternRatio: {
+				inhale: row["patternRatio.inhale"] ?? 1,
+				hold: row["patternRatio.hold"] ?? 0,
+				exhale: row["patternRatio.exhale"] ?? 1,
+				holdAfterExhale: row["patternRatio.holdAfterExhale"] ?? 0,
+			},
+			baseBreathDuration: row["baseBreathDuration"] ?? 5,
+
+			// RECOMMENDED PRACTICE
+			recommendedPractice: {
+				measureBy: row["recommendedPractice.measureBy"] || "cycles",
+				durationMinutes: {
+					min: row["recommendedPractice.durationMinutes.min"] ?? 3,
+					max: row["recommendedPractice.durationMinutes.max"] ?? 10,
+					default: row["recommendedPractice.durationMinutes.default"] ?? 5,
 				},
-				isSystemPattern: row.isSystemPattern === "true",
-			};
-		});
+				cycles: {
+					min: row["recommendedPractice.cycles.min"] ?? 5,
+					max: row["recommendedPractice.cycles.max"] ?? 20,
+					default: row["recommendedPractice.cycles.default"] ?? 10,
+				},
+			},
+
+			// VK TECHNIQUES
+			vkTechniques: {
+				nadishodhana: {
+					enabled: row["vkTechniques.nadishodhana.enabled"] ?? false,
+				},
+				kapalabhati: {
+					enabled: row["vkTechniques.kapalabhati.enabled"] ?? false,
+				},
+				bhastrika: { enabled: row["vkTechniques.bhastrika.enabled"] ?? false },
+				ujjayi: { enabled: row["vkTechniques.ujjayi.enabled"] ?? false },
+				bhramari: { enabled: row["vkTechniques.bhramari.enabled"] ?? false },
+				cooling: { enabled: row["vkTechniques.cooling.enabled"] ?? false },
+				bandhas: {
+					mula: row["vkTechniques.bandhas.mula"] ?? false,
+					uddiyana: row["vkTechniques.bandhas.uddiyana"] ?? false,
+					jalandhara: row["vkTechniques.bandhas.jalandhara"] ?? false,
+					whenToApply: row["vkTechniques.bandhas.whenToApply"] || "none",
+				},
+				mudra: row["vkTechniques.mudra"] || "none",
+			},
+
+			// BENEFITS AND CONTRAINDICATIONS
+			benefits: toArray(row["benefits"]),
+			contraindications: toArray(row["contraindications"]),
+			warnings: row["warnings"]?.trim() || undefined,
+
+			// VK CONTEXT
+			vkContext: {
+				practicePhase: row["vkContext.practicePhase"]?.trim() || "opening",
+				recommendedBefore: toArray(row["vkContext.recommendedBefore"]),
+				progressionNotes:
+					row["vkContext.progressionNotes"]?.trim() || undefined,
+			},
+
+			// UI/UX
+			visualType: row["visualType"]?.trim() || "circle",
+			soundCue: row["soundCue"]?.trim() || "bell",
+
+			// EFFECTS
+			energyEffect: row["energyEffect"]?.trim() || "balancing",
+			bestTimeOfDay: toArray(row["bestTimeOfDay"]),
+
+			// METADATA
+			tags: toArray(row["tags"]),
+			isSystemPattern: toBool(row["isSystemPattern"]),
+		}));
 
 		// Insert into database
 		await BreathingPattern.insertMany(breathingPatterns);
-		console.log(`✅ Seeded ${breathingPatterns.length} breathing patterns from CSV`);
+		console.log(
+			`✅ Seeded ${breathingPatterns.length} breathing patterns from CSV`,
+		);
 	} catch (error) {
 		console.error("❌ Error seeding breathing patterns:", error.message);
 		throw error;

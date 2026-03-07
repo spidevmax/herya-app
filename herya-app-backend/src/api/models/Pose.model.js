@@ -26,21 +26,27 @@
  * - Self-reference: counterpose, preparatory, transition
  *
  * @example
- * // Create Tadasana (Mountain Pose)
- * const tadasana = new Pose({
- *   name: "Mountain Pose",
- *   sanskritName: "ताडासन",
- *   romanizationName: "Tadasana",
+ * // Create Utkatasana (Chair Pose)
+ * const utkatasana = new Pose({
+ *   name: "Chair Pose",
+ *   romanizationName: "Utkatasana",
+ *   iastName: "utkaṭāsana",
+ *   sanskritName: "उत्कटासन",
+ *   alias: ["Fierce Pose"],
  *   difficulty: "beginner",
  *   vkCategory: { primary: "standing_mountain" },
  *   sidedness: { type: "symmetric" },
- *   recommendedBreaths: { min: 5, max: 8 },
+ *   recommendedBreaths: {
+ *     beginner:     { min: 3, max: 5 },
+ *     intermediate: { min: 5, max: 8 },
+ *     advanced:     { min: 8, max: 12 },
+ *   },
  *   vkContext: {
  *     appearsInFamilies: ["tadasana"],
  *     roleInSequence: "primary"
  *   }
  * });
- * await tadasana.save();
+ * await utkatasana.save();
  */
 const mongoose = require("mongoose");
 
@@ -307,8 +313,16 @@ const poseSchema = new mongoose.Schema(
 
 		// MULTIMEDIA
 		media: {
-			thumbnail: { type: String, trim: true },
-			images: [{ type: String, trim: true }],
+			thumbnail: {
+				url: { type: String, trim: true },
+				cloudinaryId: { type: String, trim: true },
+			},
+			images: [
+				{
+					url: { type: String, trim: true },
+					cloudinaryId: { type: String, trim: true },
+				},
+			],
 			videos: [{ type: String, trim: true }],
 		},
 
@@ -317,7 +331,15 @@ const poseSchema = new mongoose.Schema(
 
 		chakraRelated: {
 			type: String,
-			enum: ["muladhara", "svadhisthana", "manipura", "anahata", "vishuddha", "ajna", "sahasrara"],
+			enum: [
+				"muladhara",
+				"svadhisthana",
+				"manipura",
+				"anahata",
+				"vishuddha",
+				"ajna",
+				"sahasrara",
+			],
 		},
 
 		energyEffect: {
@@ -361,6 +383,8 @@ const poseSchema = new mongoose.Schema(
 	},
 );
 
+// METHODS
+
 // METHOD: Get recommended breaths for user's level
 poseSchema.methods.getBreathsForLevel = function (userLevel) {
 	const level = userLevel || "beginner";
@@ -388,7 +412,7 @@ poseSchema.methods.getTotalBreaths = function (level = "beginner") {
 	return avgBreaths;
 };
 
-// INDEX
+// INDEXES
 poseSchema.index({
 	name: "text",
 	romanizationName: "text",

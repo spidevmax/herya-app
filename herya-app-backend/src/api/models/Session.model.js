@@ -54,6 +54,7 @@
  * const completePractice = new Session({
  *   user: userId,
  *   sessionType: "complete_practice",
+ *   duration: 60,
  *   completePractice: {
  *     warmup: warmupSequenceId,
  *     mainSequences: [sequenceId1, sequenceId2],
@@ -128,7 +129,7 @@ const sessionSchema = new mongoose.Schema(
 			},
 		},
 
-		duration: { type: Number, required: true },
+		duration: { type: Number, required: true, min: 1 },
 		completed: { type: Boolean, default: false },
 		date: { type: Date, default: Date.now },
 
@@ -148,13 +149,15 @@ const sessionSchema = new mongoose.Schema(
 			},
 		},
 
-		notes: String,
+		notes: { type: String, trim: true, maxlength: 1000 },
 	},
 	{
 		timestamps: true,
 		versionKey: false,
 	},
 );
+
+// VALIDATION
 
 // VALIDATION: Coherence between sessionType and required fields
 // Uses async/throw pattern (Mongoose 9 compatible) to avoid "next is not a function" issues.
@@ -170,28 +173,32 @@ sessionSchema.pre("save", async function () {
 		completePractice?.cooldown ||
 		completePractice?.pranayama;
 
-	// vk_sequence requiere vkSequence field
+	// vk_sequence requires a vkSequence reference
 	if (sessionType === "vk_sequence" && !vkSequence) {
 		throw new Error("vk_sequence session type requires vkSequence field");
 	}
 
-	// complete_practice requiere completePractice field con al menos una secuencia
+	// complete_practice requires completePractice with at least one sequence
 	if (sessionType === "complete_practice" && !hasCompletePractice) {
-		throw new Error("complete_practice requires at least one sequence in mainSequences");
+		throw new Error(
+			"complete_practice requires at least one sequence in mainSequences",
+		);
 	}
 
-	// vk_sequence NO debe tener completePractice con datos reales
+	// vk_sequence must NOT include completePractice data
 	if (sessionType === "vk_sequence" && hasCompletePractice) {
 		throw new Error("vk_sequence cannot have completePractice field");
 	}
 
-	// complete_practice NO debe tener vkSequence directo
+	// complete_practice must NOT include a direct vkSequence reference
 	if (sessionType === "complete_practice" && vkSequence) {
-		throw new Error("complete_practice uses completePractice.mainSequences, not vkSequence");
+		throw new Error(
+			"complete_practice uses completePractice.mainSequences, not vkSequence",
+		);
 	}
 });
 
-// INDEX
+// INDEXES
 sessionSchema.index({ user: 1, date: -1 });
 sessionSchema.index({ user: 1, completed: 1 });
 sessionSchema.index({ user: 1, sessionType: 1 });

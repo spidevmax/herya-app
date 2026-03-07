@@ -33,7 +33,14 @@ const VKSequence = VinyasaKramaSequence;
  */
 const getSequences = async (req, res, next) => {
 	try {
-		const { family, level, difficulty, page = 1, limit = 20, unlocked } = req.query;
+		const {
+			family,
+			level,
+			difficulty,
+			page = 1,
+			limit = 20,
+			unlocked,
+		} = req.query;
 
 		// Build filter
 		const filter = {};
@@ -43,15 +50,12 @@ const getSequences = async (req, res, next) => {
 		if (difficulty) filter.difficulty = difficulty;
 
 		// Handle unlocked sequences for authenticated users
-		if (unlocked === "true" && req.user) {
-			const user = req.user;
-
-			if (family) {
-				// Check if user can access this family
-				// Level 1 always accessible, higher levels require previous completion
-				const maxLevel = user.canAccessLevel ? await user.canAccessLevel(family, 3) : 1;
-				filter.level = { $lte: maxLevel };
-			}
+		// canAccessLevel() returns a boolean, so we probe each level to find the highest accessible one
+		if (unlocked === "true" && req.user && family) {
+			let maxAccessibleLevel = 1;
+			if (req.user.canAccessLevel(family, 3)) maxAccessibleLevel = 3;
+			else if (req.user.canAccessLevel(family, 2)) maxAccessibleLevel = 2;
+			filter.level = { $lte: maxAccessibleLevel };
 		}
 
 		// Pagination
@@ -123,7 +127,13 @@ const getSequenceById = async (req, res, next) => {
 			throw createError(404, "Sequence not found");
 		}
 
-		return sendResponse(res, 200, true, "Sequence retrieved successfully", sequence);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Sequence retrieved successfully",
+			sequence,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -182,7 +192,8 @@ const getSequencesByFamily = async (req, res, next) => {
 		if (req.user) {
 			sequencesWithAccess = sequences.map((seq) => {
 				const seqObj = seq.toObject();
-				seqObj.isAccessible = seq.level === 1 || req.user.canAccessLevel(family, seq.level);
+				seqObj.isAccessible =
+					seq.level === 1 || req.user.canAccessLevel(family, seq.level);
 				return seqObj;
 			});
 		}
@@ -270,7 +281,9 @@ const getRecommendedSequence = async (req, res, next) => {
 				.limit(3)
 				.populate("vkSequence");
 
-			const recentFamilies = recentSessions.map((s) => s.vkSequence?.family).filter(Boolean);
+			const recentFamilies = recentSessions
+				.map((s) => s.vkSequence?.family)
+				.filter(Boolean);
 
 			recommendedSequence = await VKSequence.findOne({
 				"therapeuticFocus.anatomicalFocus.area": mostProblematicArea,
@@ -292,20 +305,26 @@ const getRecommendedSequence = async (req, res, next) => {
 				}
 			}
 
-			// Fallback to beginner standing sequence
+			// Fallback to beginner tadasana sequence
 			if (!recommendedSequence) {
 				recommendedSequence = await VKSequence.findOne({
-					family: "standing_asymmetric",
+					family: "tadasana",
 					level: 1,
 				}).populate("structure.corePoses.pose");
 				reason = "Great foundational sequence to continue your practice";
 			}
 		}
 
-		return sendResponse(res, 200, true, "Recommendation generated successfully", {
-			sequence: recommendedSequence,
-			reason,
-		});
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Recommendation generated successfully",
+			{
+				sequence: recommendedSequence,
+				reason,
+			},
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -357,7 +376,13 @@ const searchSequences = async (req, res, next) => {
 			.sort({ score: { $meta: "textScore" } })
 			.limit(20);
 
-		return sendResponse(res, 200, true, `Found ${sequences.length} sequences`, sequences);
+		return sendResponse(
+			res,
+			200,
+			true,
+			`Found ${sequences.length} sequences`,
+			sequences,
+		);
 	} catch (error) {
 		return next(error);
 	}

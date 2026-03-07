@@ -27,7 +27,10 @@ const getAllUsersValidation = [
 		.isLength({ min: 1 })
 		.withMessage("Search query must not be empty"),
 
-	query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+	query("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
 
 	query("limit")
 		.optional()
@@ -55,26 +58,34 @@ const updateUserRoleValidation = [
  * userIdParamValidation
  * Validates MongoDB ObjectId for user parameter
  */
-const userIdParamValidation = [param("id").isMongoId().withMessage("Invalid user ID format")];
+const userIdParamValidation = [
+	param("id").isMongoId().withMessage("Invalid user ID format"),
+];
 
 /**
  * createVKSequenceValidation
  * Validates body for creating new VK sequence
- * - name: sequence name (required, non-empty)
- * - description: brief description (optional)
+ * - sanskritName: Sanskrit name (required)
+ * - englishName: English name (required)
  * - family: VK family name (required)
  * - level: progression level 1-3 (required)
- * - duration: practice duration in minutes (required, positive integer)
- * - structure: sequence poses structure (required, array)
  */
 const createVKSequenceValidation = [
-	body("name")
+	body("sanskritName")
 		.notEmpty()
-		.withMessage("Sequence name is required")
+		.withMessage("Sanskrit name is required")
 		.isString()
-		.withMessage("Name must be a string")
+		.withMessage("Sanskrit name must be a string")
 		.isLength({ min: 2, max: 255 })
-		.withMessage("Name must be between 2 and 255 characters"),
+		.withMessage("Sanskrit name must be between 2 and 255 characters"),
+
+	body("englishName")
+		.notEmpty()
+		.withMessage("English name is required")
+		.isString()
+		.withMessage("English name must be a string")
+		.isLength({ min: 2, max: 255 })
+		.withMessage("English name must be between 2 and 255 characters"),
 
 	body("family").notEmpty().withMessage("Family is required"),
 
@@ -83,12 +94,6 @@ const createVKSequenceValidation = [
 		.withMessage("Level is required")
 		.isInt({ min: 1, max: 3 })
 		.withMessage("Level must be 1, 2, or 3"),
-
-	body("duration")
-		.notEmpty()
-		.withMessage("Duration is required")
-		.isInt({ min: 1 })
-		.withMessage("Duration must be a positive integer"),
 ];
 
 /**
@@ -98,15 +103,22 @@ const createVKSequenceValidation = [
 const updateVKSequenceValidation = [
 	param("id").isMongoId().withMessage("Invalid sequence ID format"),
 
-	body("name")
+	body("sanskritName")
 		.optional()
 		.isString()
 		.isLength({ min: 2, max: 255 })
-		.withMessage("Name must be between 2 and 255 characters"),
+		.withMessage("Sanskrit name must be between 2 and 255 characters"),
 
-	body("level").optional().isInt({ min: 1, max: 3 }).withMessage("Level must be 1, 2, or 3"),
+	body("englishName")
+		.optional()
+		.isString()
+		.isLength({ min: 2, max: 255 })
+		.withMessage("English name must be between 2 and 255 characters"),
 
-	body("duration").optional().isInt({ min: 1 }).withMessage("Duration must be a positive integer"),
+	body("level")
+		.optional()
+		.isInt({ min: 1, max: 3 })
+		.withMessage("Level must be 1, 2, or 3"),
 ];
 
 /**
@@ -120,11 +132,12 @@ const resourceIdParamValidation = [
 /**
  * createPoseValidation
  * Validates body for creating new pose
- * - name: pose name (required, non-empty)
- * - category: pose category (required)
+ * - name: English pose name (required)
+ * - romanizationName: romanized Sanskrit name (required)
+ * - iastName: IAST transliteration (required)
+ * - sanskritName: Sanskrit script name (required)
+ * - vkCategory.primary: VK pose category (required)
  * - difficulty: difficulty level (required)
- * - sanskriName: Sanskrit name (optional)
- * - description: pose description (optional)
  */
 const createPoseValidation = [
 	body("name")
@@ -134,9 +147,28 @@ const createPoseValidation = [
 		.isLength({ min: 2, max: 255 })
 		.withMessage("Name must be between 2 and 255 characters"),
 
-	body("category")
+	body("romanizationName")
 		.notEmpty()
-		.withMessage("Category is required")
+		.withMessage("Romanization name is required")
+		.isString()
+		.isLength({ min: 2, max: 255 })
+		.withMessage("Romanization name must be between 2 and 255 characters"),
+
+	body("iastName")
+		.notEmpty()
+		.withMessage("IAST name is required")
+		.isString()
+		.withMessage("IAST name must be a string"),
+
+	body("sanskritName")
+		.notEmpty()
+		.withMessage("Sanskrit name is required")
+		.isString()
+		.withMessage("Sanskrit name must be a string"),
+
+	body("vkCategory.primary")
+		.notEmpty()
+		.withMessage("Pose category is required")
 		.isString()
 		.withMessage("Category must be a string"),
 
@@ -160,6 +192,12 @@ const updatePoseValidation = [
 		.isLength({ min: 2, max: 255 })
 		.withMessage("Name must be between 2 and 255 characters"),
 
+	body("romanizationName")
+		.optional()
+		.isString()
+		.isLength({ min: 2, max: 255 })
+		.withMessage("Romanization name must be between 2 and 255 characters"),
+
 	body("difficulty")
 		.optional()
 		.isIn(["beginner", "intermediate", "advanced"])
@@ -169,35 +207,43 @@ const updatePoseValidation = [
 /**
  * createBreathingPatternValidation
  * Validates body for creating new breathing pattern
- * - name: pattern name (required, non-empty)
- * - technique: breathing technique (required)
+ * - romanizationName: romanized Sanskrit name (required, unique)
+ * - iastName: IAST transliteration (required)
+ * - sanskritName: Sanskrit script name (required)
+ * - description: pattern description (required)
  * - difficulty: difficulty level (required)
- * - duration: recommended duration (optional, positive integer)
- * - description: pattern description (optional)
  */
 const createBreathingPatternValidation = [
-	body("name")
+	body("romanizationName")
 		.notEmpty()
-		.withMessage("Pattern name is required")
+		.withMessage("Romanization name is required")
 		.isString()
 		.isLength({ min: 2, max: 255 })
-		.withMessage("Name must be between 2 and 255 characters"),
+		.withMessage("Romanization name must be between 2 and 255 characters"),
 
-	body("technique")
+	body("iastName")
 		.notEmpty()
-		.withMessage("Technique is required")
-		.isIn(["nadishodhana", "kapalabhati", "bhastrika", "ujjayi", "bhramari", "cooling"])
-		.withMessage(
-			"Invalid technique. Must be one of: nadishodhana, kapalabhati, bhastrika, ujjayi, bhramari, cooling",
-		),
+		.withMessage("IAST name is required")
+		.isString()
+		.withMessage("IAST name must be a string"),
+
+	body("sanskritName")
+		.notEmpty()
+		.withMessage("Sanskrit name is required")
+		.isString()
+		.withMessage("Sanskrit name must be a string"),
+
+	body("description")
+		.notEmpty()
+		.withMessage("Description is required")
+		.isString()
+		.withMessage("Description must be a string"),
 
 	body("difficulty")
 		.notEmpty()
 		.withMessage("Difficulty is required")
 		.isIn(["beginner", "intermediate", "advanced"])
 		.withMessage("Difficulty must be beginner, intermediate, or advanced"),
-
-	body("duration").optional().isInt({ min: 1 }).withMessage("Duration must be a positive integer"),
 ];
 
 /**
@@ -207,18 +253,11 @@ const createBreathingPatternValidation = [
 const updateBreathingPatternValidation = [
 	param("id").isMongoId().withMessage("Invalid pattern ID format"),
 
-	body("name")
+	body("romanizationName")
 		.optional()
 		.isString()
 		.isLength({ min: 2, max: 255 })
-		.withMessage("Name must be between 2 and 255 characters"),
-
-	body("technique")
-		.optional()
-		.isIn(["nadishodhana", "kapalabhati", "bhastrika", "ujjayi", "bhramari", "cooling"])
-		.withMessage(
-			"Invalid technique. Must be one of: nadishodhana, kapalabhati, bhastrika, ujjayi, bhramari, cooling",
-		),
+		.withMessage("Romanization name must be between 2 and 255 characters"),
 
 	body("difficulty")
 		.optional()
@@ -227,10 +266,12 @@ const updateBreathingPatternValidation = [
 ];
 
 /**
- * userIdQueryValidation
- * Validates userId query parameter for user analytics
+ * analyticsUserIdValidation
+ * Validates userId URL parameter for user analytics endpoint
  */
-const userIdQueryValidation = [param("userId").isMongoId().withMessage("Invalid user ID format")];
+const analyticsUserIdValidation = [
+	param("userId").isMongoId().withMessage("Invalid user ID format"),
+];
 
 module.exports = {
 	// User validations
@@ -252,5 +293,5 @@ module.exports = {
 	updateBreathingPatternValidation,
 
 	// User analytics
-	userIdQueryValidation,
+	analyticsUserIdValidation,
 };

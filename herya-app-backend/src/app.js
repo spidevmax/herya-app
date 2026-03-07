@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 
 // Import routes
 const authRouter = require("./api/routes/auth.routes");
@@ -13,7 +14,7 @@ const sessionsRouter = require("./api/routes/session.routes");
 const sequencesRouter = require("./api/routes/sequence.routes");
 
 const NODE_ENV = process.env.NODE_ENV || "development";
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:3000";
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
 const app = express();
 
@@ -34,10 +35,37 @@ if (NODE_ENV !== "test") {
 
 app.use(express.json());
 
+// === Rate Limiting ===
+const authLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	max: 10,
+	standardHeaders: true,
+	legacyHeaders: false,
+	message: {
+		success: false,
+		message: "Too many requests, please try again later.",
+	},
+	skip: () => NODE_ENV === "test",
+});
+
+const apiLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 100,
+	standardHeaders: true,
+	legacyHeaders: false,
+	message: {
+		success: false,
+		message: "Too many requests, please try again later.",
+	},
+	skip: () => NODE_ENV === "test",
+});
+
 // === Swagger Documentation (skip in test to avoid JSDoc parsing overhead) ===
 if (NODE_ENV !== "test") {
 	if (NODE_ENV === "production" && !process.env.FRONTEND_URL) {
-		console.warn("⚠️  FRONTEND_URL not defined in production. CORS may not work correctly.");
+		console.warn(
+			"⚠️  FRONTEND_URL not defined in production. CORS may not work correctly.",
+		);
 	}
 	const { swaggerUiMiddleware, swaggerUiSetup } = require("./config/swagger");
 	app.use("/api-docs", swaggerUiMiddleware, swaggerUiSetup);
@@ -46,7 +74,7 @@ if (NODE_ENV !== "test") {
 // === Health Check ===
 app.get("/", (_req, res) => {
 	res.json({
-		message: "🧘 Herya App Backend - Vinyasa Krama Practice",
+		message: "Herya App Backend - Vinyasa Krama Practice",
 		status: "Server is running",
 		version: "1.0.0",
 		endpoints: {
@@ -63,23 +91,23 @@ app.get("/", (_req, res) => {
 });
 
 // === API Routes ===
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/admin", adminRouter);
-app.use("/api/v1/poses", posesRouter);
-app.use("/api/v1/breathing-patterns", breathingPatternsRouter);
-app.use("/api/v1/users", usersRouter);
-app.use("/api/v1/journal-entries", journalEntriesRouter);
-app.use("/api/v1/sessions", sessionsRouter);
-app.use("/api/v1/sequences", sequencesRouter);
+app.use("/api/v1/auth", authLimiter, authRouter);
+app.use("/api/v1/admin", apiLimiter, adminRouter);
+app.use("/api/v1/poses", apiLimiter, posesRouter);
+app.use("/api/v1/breathing-patterns", apiLimiter, breathingPatternsRouter);
+app.use("/api/v1/users", apiLimiter, usersRouter);
+app.use("/api/v1/journal-entries", apiLimiter, journalEntriesRouter);
+app.use("/api/v1/sessions", apiLimiter, sessionsRouter);
+app.use("/api/v1/sequences", apiLimiter, sequencesRouter);
 
 // === Error Handling ===
-app.use((_req, _res, next) => {
+app.use((req, res, next) => {
 	const error = new Error("Route Not Found");
 	error.status = 404;
 	next(error);
 });
 
-app.use((err, _req, res, _next) => {
+app.use((err, req, res, next) => {
 	const status = err.status || 500;
 	const message = err.message || "Internal Server Error";
 

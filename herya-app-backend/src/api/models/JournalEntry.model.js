@@ -64,9 +64,7 @@ const mongoose = require("mongoose");
 
 const journalEntrySchema = new mongoose.Schema(
 	{
-		// ==========================================
 		// RELATIONSHIPS
-		// ==========================================
 		session: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Session",
@@ -80,9 +78,7 @@ const journalEntrySchema = new mongoose.Schema(
 			index: true, // Index for frequent user queries
 		},
 
-		// ==========================================
 		// MOOD BEFORE AND AFTER
-		// ==========================================
 		moodBefore: [
 			{
 				type: String,
@@ -134,9 +130,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		],
 
-		// ==========================================
 		// LEVELS BEFORE AND AFTER
-		// ==========================================
 		energyLevel: {
 			before: {
 				type: Number,
@@ -166,9 +160,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		},
 
-		// ==========================================
 		// PHYSICAL REFLECTION
-		// ==========================================
 		physicalSensations: {
 			type: String,
 			trim: true,
@@ -216,9 +208,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		],
 
-		// ==========================================
 		// EMOTIONAL REFLECTION
-		// ==========================================
 		emotionalNotes: {
 			type: String,
 			trim: true,
@@ -230,18 +220,14 @@ const journalEntrySchema = new mongoose.Schema(
 			maxlength: 2000,
 		},
 
-		// ==========================================
 		// GRATITUDE SECTION
-		// ==========================================
 		gratitude: {
 			type: String,
 			trim: true,
 			maxlength: 1000,
 		},
 
-		// ==========================================
 		// FAVORITE AND CHALLENGING POSES
-		// ==========================================
 		favoritePoses: [
 			{
 				pose: {
@@ -267,9 +253,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		],
 
-		// ==========================================
 		// FEEDBACK ON SESSION
-		// ==========================================
 		difficultyFeedback: {
 			type: String,
 			enum: ["too_easy", "just_right", "too_hard"],
@@ -279,9 +263,7 @@ const journalEntrySchema = new mongoose.Schema(
 			enum: ["too_slow", "perfect", "too_fast"],
 		},
 
-		// ==========================================
 		// MULTIMEDIA ATTACHMENTS
-		// ==========================================
 		photos: [
 			{
 				url: {
@@ -329,9 +311,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		],
 
-		// ==========================================
 		// VK REFLECTION (Digital Garden Core)
-		// ==========================================
 		vkReflection: {
 			sequenceFamily: {
 				type: String,
@@ -409,9 +389,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		},
 
-		// ==========================================
 		// NEXT SESSION GOALS
-		// ==========================================
 		nextSessionGoals: [
 			{
 				type: String,
@@ -420,9 +398,7 @@ const journalEntrySchema = new mongoose.Schema(
 			},
 		],
 
-		// ==========================================
 		// TAGS
-		// ==========================================
 		tags: [
 			{
 				type: String,
@@ -439,9 +415,7 @@ const journalEntrySchema = new mongoose.Schema(
 	},
 );
 
-// ==========================================
 // VIRTUALS
-// ==========================================
 
 // moodImprovement: positive score = more positive moods + fewer negative moods after practice
 journalEntrySchema.virtual("moodImprovement").get(function () {
@@ -506,9 +480,7 @@ journalEntrySchema.virtual("gardenColor").get(function () {
 	return "#FF6B6B"; // Coral  — regression (rare but possible)
 });
 
-// ==========================================
 // VALIDATION
-// ==========================================
 
 // VALIDATION: At least one mood must be selected
 journalEntrySchema
@@ -525,7 +497,7 @@ journalEntrySchema
 		"At least one mood after practice must be selected",
 	);
 
-// Prevent duplicate mood selections
+// VALIDATION: Prevent duplicate mood selections
 journalEntrySchema
 	.path("moodBefore")
 	.validate(
@@ -540,7 +512,7 @@ journalEntrySchema
 		"Cannot select the same mood multiple times in moodAfter",
 	);
 
-// Maximum 5 moods per entry
+// VALIDATION: Maximum 5 moods per entry
 journalEntrySchema
 	.path("moodBefore")
 	.validate(
@@ -555,9 +527,7 @@ journalEntrySchema
 		"Cannot select more than 5 moods after practice",
 	);
 
-// ==========================================
 // INDEXES
-// ==========================================
 journalEntrySchema.index({ user: 1, createdAt: -1 }); // User's journals chronological
 journalEntrySchema.index({ createdAt: -1 }); // All journals chronological
 journalEntrySchema.index({ "vkReflection.sequenceFamily": 1 }); // By VK family

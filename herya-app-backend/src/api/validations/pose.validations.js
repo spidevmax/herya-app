@@ -86,7 +86,7 @@ const familyParamValidation = [
  * - category: Optional, valid pose category
  * - difficulty: Optional, one of: beginner, intermediate, advanced
  * - vkFamily: Optional, valid VK family
- * - sidedness: Optional, one of: single_sided, both_sides, symmetrical
+ * - sidedness: Optional, one of: symmetric, left_only, right_only, both_sides
  * - drishti: Optional, valid drishti value
  * - page: Optional, positive integer (default: 1)
  * - limit: Optional, integer 1-100 (default: 50)
@@ -142,10 +142,15 @@ const getPosesValidation = [
 
 	query("sidedness")
 		.optional()
-		.isIn(["single_sided", "both_sides", "symmetrical"])
-		.withMessage("Sidedness must be one of: single_sided, both_sides, symmetrical"),
+		.isIn(["symmetric", "left_only", "right_only", "both_sides"])
+		.withMessage(
+			"Sidedness must be one of: symmetric, left_only, right_only, both_sides",
+		),
 
-	query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+	query("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
 
 	query("limit")
 		.optional()

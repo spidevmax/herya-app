@@ -80,21 +80,21 @@ const vkSequenceSchema = new mongoose.Schema(
 		family: {
 			type: String,
 			enum: [
-				"tadasana", // Variaciones de montaña
+				"tadasana", // Mountain pose variations
 				"standing_asymmetric", // Asymmetric standing poses
 				"standing_symmetric", // Symmetric standing poses
-				"one_leg_standing", // Equilibrios en una pierna
-				"seated", // Posturas sentadas
+				"one_leg_standing", // One-leg balance poses
+				"seated", // Seated poses
 				"supine", // Lying on back
 				"prone", // Lying on stomach
-				"inverted", // Inversiones
-				"meditative", // Posturas meditativas
-				"bow_sequence", // Secuencia de arco
+				"inverted", // Inversions
+				"meditative", // Meditative poses
+				"bow_sequence", // Bow sequence
 				"triangle_sequence", // Triangle sequence
-				// FAMILIAS ADICIONALES
-				"sun_salutation", // Surya Namaskar (fundamental en VK)
-				"vajrasana_variations", // Posturas sobre rodillas
-				"lotus_variations", // Variaciones de Padmasana
+				// ADDITIONAL FAMILIES
+				"sun_salutation", // Surya Namaskar (fundamental in VK)
+				"vajrasana_variations", // Knee-based poses
+				"lotus_variations", // Padmasana variations
 			],
 			required: true,
 		},
@@ -109,14 +109,14 @@ const vkSequenceSchema = new mongoose.Schema(
 		englishName: { type: String, required: true, trim: true },
 		description: { type: String, trim: true },
 
-		// ESTRUCTURA VK
+		// VK STRUCTURE
 		structure: {
-			// Vinyasa de entrada (desde postura previa)
+			// Entry vinyasa (transition from previous pose)
 			entry: {
 				fromPose: {
 					type: mongoose.Schema.Types.ObjectId,
 					ref: "Pose",
-					default: null, // null = empieza desde Tadasana/Savasana
+					default: null, // null = starts from Tadasana/Savasana
 				},
 				steps: [
 					{
@@ -145,13 +145,13 @@ const vkSequenceSchema = new mongoose.Schema(
 						max: 12,
 					},
 
-					// Contrapostura (opcional)
+					// Counterpose (optional)
 					counterpose: {
 						pose: { type: mongoose.Schema.Types.ObjectId, ref: "Pose" },
 						breaths: { type: Number, default: 3, min: 1 },
 					},
 
-					// Vinyasa entre poses
+					// Vinyasa transition between poses
 					vinyasaTransition: {
 						type: String,
 						enum: ["full", "half", "direct", "custom"],
@@ -169,7 +169,7 @@ const vkSequenceSchema = new mongoose.Schema(
 					// Contextual cues specific to this pose
 					contextualCues: [{ type: String, trim: true }],
 
-					// Variaciones para distintos niveles
+					// Variations for different levels
 					variations: [
 						{
 							name: { type: String, trim: true },
@@ -180,7 +180,7 @@ const vkSequenceSchema = new mongoose.Schema(
 				},
 			],
 
-			// Vinyasa de salida
+			// Exit vinyasa
 			exit: {
 				toPose: {
 					type: mongoose.Schema.Types.ObjectId,
@@ -210,12 +210,28 @@ const vkSequenceSchema = new mongoose.Schema(
 				{
 					area: {
 						type: String,
-						enum: ["spine", "hips", "shoulders", "knees", "ankles", "wrists", "core", "neck"],
+						enum: [
+							"spine",
+							"hips",
+							"shoulders",
+							"knees",
+							"ankles",
+							"wrists",
+							"core",
+							"neck",
+						],
 						required: true,
 					},
 					action: {
 						type: String,
-						enum: ["flexion", "extension", "rotation", "lateral_flexion", "strength", "mobility"],
+						enum: [
+							"flexion",
+							"extension",
+							"rotation",
+							"lateral_flexion",
+							"strength",
+							"mobility",
+						],
 						required: true,
 					},
 				},
@@ -269,7 +285,7 @@ const vkSequenceSchema = new mongoose.Schema(
 					type: mongoose.Schema.Types.ObjectId,
 					ref: "BreathingPattern",
 				},
-				duration: { type: Number, min: 1 }, // minutos
+				duration: { type: Number, min: 1 }, // minutes
 			},
 		],
 
@@ -296,62 +312,88 @@ const vkSequenceSchema = new mongoose.Schema(
 	},
 );
 
-// VALIDATION: corePoses orders must be consecutive
-vkSequenceSchema.pre("save", function (next) {
-	if (this.structure?.corePoses) {
-		const poses = this.structure.corePoses;
+// VALIDATION
 
-		if (poses.length === 0) {
-			return next();
-		}
+// VALIDATION: corePoses orders must be consecutive starting from 1
+// Uses async/throw pattern (Mongoose 9 compatible)
+vkSequenceSchema.pre("save", async function () {
+	if (this.structure?.corePoses && this.structure.corePoses.length > 0) {
+		const orders = this.structure.corePoses
+			.map((p) => p.order)
+			.sort((a, b) => a - b);
+		const expectedOrders = Array.from(
+			{ length: orders.length },
+			(_, i) => i + 1,
+		);
 
-		// Extraer y ordenar los orders
-		const orders = poses.map((p) => p.order).sort((a, b) => a - b);
-
-		// Verificar que empiecen en 1 y sean consecutivos
-		const expectedOrders = Array.from({ length: orders.length }, (_, i) => i + 1);
-
-		const isValid = orders.every((order, idx) => order === expectedOrders[idx]);
-
-		if (!isValid) {
-			return next(
-				new Error("corePoses orders must be consecutive starting from 1 (e.g., 1, 2, 3, 4...)"),
+		if (!orders.every((order, idx) => order === expectedOrders[idx])) {
+			throw new Error(
+				"corePoses orders must be consecutive starting from 1 (e.g., 1, 2, 3, 4...)",
 			);
 		}
 
-		// Check for duplicates (although previous check should cover it)
-		const uniqueOrders = new Set(orders);
-		if (uniqueOrders.size !== orders.length) {
-			return next(new Error("corePoses orders must be unique"));
+		if (new Set(orders).size !== orders.length) {
+			throw new Error("corePoses orders must be unique");
 		}
 	}
-	next();
 });
 
-// VALIDACIÓN: estimatedDuration.max debe ser >= min
-vkSequenceSchema.pre("save", function (next) {
+// VALIDATION: estimatedDuration.max must be >= min
+vkSequenceSchema.pre("save", async function () {
 	if (this.estimatedDuration) {
 		const { min, max } = this.estimatedDuration;
 		if (min && max && max < min) {
-			return next(new Error("estimatedDuration.max must be greater than or equal to min"));
+			throw new Error(
+				"estimatedDuration.max must be greater than or equal to min",
+			);
 		}
 	}
-	next();
 });
 
-// ÍNDICES
+// METHODS
+
+// METHOD: Get estimated total duration accounting for repetitions
+vkSequenceSchema.methods.getEstimatedDuration = function () {
+	const { recommended = 0, min = 0, max = 0 } = this.estimatedDuration || {};
+	const reps = this.repetitions || 1;
+	return {
+		min: min * reps,
+		max: max * reps,
+		recommended: recommended * reps,
+	};
+};
+
+// METHOD: Check if a user can progress beyond this sequence's level in the same family
+vkSequenceSchema.methods.canProgressTo = function (user) {
+	if (this.level >= 3) return false; // Level 3 is the maximum
+	return user.canAccessLevel(this.family, this.level + 1);
+};
+
+// METHOD: Get the next sequence in the progression path
+vkSequenceSchema.methods.getNextSequence = async function () {
+	if (this.nextSteps?.length > 0) {
+		return VinyasaKramaSequence.findById(this.nextSteps[0].sequence);
+	}
+	// Fallback: find next level in the same family
+	return VinyasaKramaSequence.findOne({
+		family: this.family,
+		level: this.level + 1,
+	});
+};
+
+// INDEXES
 vkSequenceSchema.index({ family: 1, level: 1 });
 vkSequenceSchema.index({ difficulty: 1 });
 vkSequenceSchema.index({ "therapeuticFocus.targetConditions": 1 });
 vkSequenceSchema.index({ "therapeuticFocus.anatomicalFocus.area": 1 });
 
-// ÍNDICES ADICIONALES para búsquedas de prerrequisitos
+// Additional indexes for prerequisite traversal
 vkSequenceSchema.index({ prerequisites: 1 });
 vkSequenceSchema.index({ "nextSteps.sequence": 1 });
 vkSequenceSchema.index({ tags: 1 });
 vkSequenceSchema.index({ isSystemSequence: 1 });
 
-// ÍNDICE DE TEXTO para búsquedas
+// Text index for full-text search
 vkSequenceSchema.index({
 	sanskritName: "text",
 	englishName: "text",

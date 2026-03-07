@@ -1,0 +1,29 @@
+# EditorConfig — https://editorconfig.org
+root = true
+
+# ── Defaults for all files ────────────────────────────────────────────────────
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# ── Backend (Node.js / Express) — matches Biome formatter ────────────────────
+[herya-app-backend/**/*.{js,json}]
+indent_style = tab
+indent_size = 2
+max_line_length = 100
+
+# ── Frontend (React / Vite) — matches existing code style ────────────────────
+[herya-app-frontend/**/*.{js,jsx,ts,tsx,css}]
+indent_style = space
+indent_size = 2
+
+# ── Shared config & manifest files ───────────────────────────────────────────
+[*.{json,yaml,yml}]
+indent_style = space
+indent_size = 2
+
+# ── Markdown — preserve intentional trailing spaces (line breaks) ─────────────
+[*.md]
+trim_trailing_whitespace = false

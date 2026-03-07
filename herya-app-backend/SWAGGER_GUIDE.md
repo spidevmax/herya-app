@@ -64,9 +64,6 @@ The API is organized into these main sections:
 - `GET /api/v1/poses/family/{family}` - Get poses by VK family (public)
 - `GET /api/v1/poses/{id}` - Get pose details (public)
 - `GET /api/v1/poses/{id}/related` - Get related poses (public)
-- `POST /api/v1/poses` - Create pose (admin only)
-- `PUT /api/v1/poses/{id}` - Update pose (admin only)
-- `DELETE /api/v1/poses/{id}` - Delete pose (admin only)
 
 ### Journal Entries
 - `GET /api/v1/journal-entries` - Get all entries (requires auth)
@@ -79,9 +76,13 @@ The API is organized into these main sections:
 ### Breathing Patterns
 - `GET /api/v1/breathing-patterns` - Get all patterns (public)
 - `GET /api/v1/breathing-patterns/search` - Search patterns (public)
+- `GET /api/v1/breathing-patterns/recommended` - Get recommended pattern by goal/level (public)
+- `GET /api/v1/breathing-patterns/progression` - Get learning progression path (public)
+- `GET /api/v1/breathing-patterns/technique/{technique}` - Get patterns by technique (public)
 - `GET /api/v1/breathing-patterns/{id}` - Get pattern details (public)
 
 ### Sessions
+- `GET /api/v1/sessions/stats` - Get aggregate practice statistics (requires auth)
 - `GET /api/v1/sessions` - Get all sessions (requires auth)
 - `POST /api/v1/sessions` - Create session (requires auth)
 - `GET /api/v1/sessions/{id}` - Get session details (requires auth)
@@ -91,18 +92,39 @@ The API is organized into these main sections:
 ### Sequences
 - `GET /api/v1/sequences` - Get all sequences (public)
 - `GET /api/v1/sequences/search` - Search sequences (public)
+- `GET /api/v1/sequences/stats/recommended` - Get recommended sequence for user (requires auth)
+- `GET /api/v1/sequences/family/{family}` - Get sequences by VK family (public, marks isAccessible with auth)
 - `GET /api/v1/sequences/{id}` - Get sequence details (public)
 
 ### Admin
-- `GET /api/v1/admin/stats` - Global statistics (admin only)
-- `GET /api/v1/admin/users` - List all users (admin only)
-- `GET /api/v1/admin/user/:id` - Get user details (admin only)
-- `PUT /api/v1/admin/user/:id` - Update user (admin only)
-- `DELETE /api/v1/admin/user/:id` - Delete user (admin only)
+
+**User Management**
+- `GET /api/v1/admin/users` - List all users with pagination/search (admin only)
+- `PUT /api/v1/admin/users/{id}/role` - Change user role (admin only)
+- `DELETE /api/v1/admin/users/{id}` - Delete user + cascade data (admin only)
+
+**VK Sequence Management**
+- `POST /api/v1/admin/sequences` - Create system sequence (admin only)
+- `PUT /api/v1/admin/sequences/{id}` - Update sequence (admin only)
+- `DELETE /api/v1/admin/sequences/{id}` - Delete sequence (admin only)
+
+**Pose Management**
+- `POST /api/v1/admin/poses` - Create system pose with media (admin only)
+- `PUT /api/v1/admin/poses/{id}` - Update pose and/or media (admin only)
+- `DELETE /api/v1/admin/poses/{id}` - Delete pose + Cloudinary media (admin only)
+
+**Breathing Pattern Management**
+- `POST /api/v1/admin/breathing-patterns` - Create system pattern (admin only)
+- `PUT /api/v1/admin/breathing-patterns/{id}` - Update pattern (admin only)
+- `DELETE /api/v1/admin/breathing-patterns/{id}` - Delete pattern (admin only)
+
+**Analytics**
+- `GET /api/v1/admin/analytics/dashboard` - Global platform statistics (admin only)
+- `GET /api/v1/admin/analytics/users/{userId}` - Detailed analytics per user (admin only)
 
 ## 🛠️ Swagger Configuration
 
-The Swagger configuration is in [index.js](index.js#L25-L72):
+The Swagger configuration is in [src/config/swagger.js](src/config/swagger.js):
 
 ```javascript
 const swaggerOptions = {
@@ -166,7 +188,7 @@ router.get("/your-endpoint", yourController);
 ### Authorization not working
 - Token format must include "Bearer " prefix
 - JWT_SECRET in .env must match token generation
-- Token expires based on JWT_SECRET configuration
+- Token expires after **1 day** (hardcoded in `src/utils/token.js`)
 
 ### Endpoints not showing up
 - Documentation must be in JSDoc comments (`/** @swagger ... */`)
@@ -196,8 +218,13 @@ Should return:
   "version": "1.0.0",
   "endpoints": {
     "auth": "/api/v1/auth",
+    "admin": "/api/v1/admin",
     "poses": "/api/v1/poses",
-    ...
+    "breathingPatterns": "/api/v1/breathing-patterns",
+    "users": "/api/v1/users",
+    "journalEntries": "/api/v1/journal-entries",
+    "sessions": "/api/v1/sessions",
+    "sequences": "/api/v1/sequences"
   }
 }
 ```

@@ -41,6 +41,7 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 | Auth | JWT (jsonwebtoken) + bcrypt |
 | Image Storage | Cloudinary + Multer |
 | Validation | express-validator |
+| Rate Limiting | express-rate-limit |
 | Documentation | Swagger (swagger-jsdoc + swagger-ui-express) |
 | Linter/Formatter | Biome 2 |
 | Testing | Jest 30 + Supertest + mongodb-memory-server |
@@ -50,7 +51,7 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 ## Project Structure
 
 ```
-├── index.js                  # Entry point: connects DB and starts server
+├── index.js                  # Entry point: connects DB, starts server, graceful shutdown
 ├── src/
 │   ├── app.js                # Express app (middleware, routes, error handlers)
 │   ├── api/
@@ -232,6 +233,7 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 | GET | `/api/v1/breathing-patterns/search?q=` | — | Search patterns by name |
 | GET | `/api/v1/breathing-patterns/recommended` | — | Get recommended pattern by `?goal` and `?level` |
 | GET | `/api/v1/breathing-patterns/progression` | — | Full beginner → advanced progression list |
+| GET | `/api/v1/breathing-patterns/technique/:technique` | — | Filter patterns by technique type |
 | GET | `/api/v1/breathing-patterns/:id` | — | Get pattern by ID |
 
 **Recommended query params:** `?goal=calm&level=beginner`
@@ -295,6 +297,9 @@ Valid `sessionType` values: `meditation`, `pranayama`, `asana`, `vinyasa`, `rest
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/api/v1/sequences` | ✅ user | List all Vinyasa Krama sequences |
+| GET | `/api/v1/sequences/search?q=` | ✅ user | Search sequences by name and description |
+| GET | `/api/v1/sequences/stats/recommended` | ✅ user | Get recommended sequence by goal and level |
+| GET | `/api/v1/sequences/family/:family` | ✅ user | Filter sequences by VK family |
 | GET | `/api/v1/sequences/:id` | ✅ user | Get sequence by ID |
 
 ---
@@ -303,13 +308,44 @@ Valid `sessionType` values: `meditation`, `pranayama`, `asana`, `vinyasa`, `rest
 
 All admin routes require `role: "admin"`.
 
+**User Management**
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/v1/admin/users` | ✅ admin | List all users (supports `?role`, `?search`, `?page`, `?limit`) |
+| PUT | `/api/v1/admin/users/:id/role` | ✅ admin | Update user role (`user` or `admin`) |
+| DELETE | `/api/v1/admin/users/:id` | ✅ admin | Delete user and all associated data |
+
+**Pose Management**
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | POST | `/api/v1/admin/poses` | ✅ admin | Create a pose |
 | PUT | `/api/v1/admin/poses/:id` | ✅ admin | Update a pose |
 | DELETE | `/api/v1/admin/poses/:id` | ✅ admin | Delete a pose |
-| GET | `/api/v1/admin/users` | ✅ admin | List all users |
-| DELETE | `/api/v1/admin/users/:id` | ✅ admin | Delete a user |
+
+**Breathing Pattern Management**
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/api/v1/admin/breathing-patterns` | ✅ admin | Create a breathing pattern |
+| PUT | `/api/v1/admin/breathing-patterns/:id` | ✅ admin | Update a breathing pattern |
+| DELETE | `/api/v1/admin/breathing-patterns/:id` | ✅ admin | Delete a breathing pattern |
+
+**VK Sequence Management**
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/api/v1/admin/sequences` | ✅ admin | Create a VK sequence |
+| PUT | `/api/v1/admin/sequences/:id` | ✅ admin | Update a VK sequence |
+| DELETE | `/api/v1/admin/sequences/:id` | ✅ admin | Delete a VK sequence |
+
+**Analytics**
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/v1/admin/analytics/dashboard` | ✅ admin | Global dashboard stats |
+| GET | `/api/v1/admin/analytics/users/:userId` | ✅ admin | Analytics for a specific user |
 
 ---
 
@@ -363,7 +399,7 @@ Error responses:
 | 404 | Resource not found |
 | 500 | Internal server error |
 
-All unhandled async errors are caught by `asyncErrorWrapper` and forwarded to the global error handler.
+All async errors are caught via try-catch in each controller and forwarded to the global error handler via `next(error)`. Express 5 also propagates unhandled promise rejections automatically.
 
 ---
 
@@ -381,6 +417,10 @@ Seeds the following collections from CSV files in `src/seeds/data/`:
 | `breathingPatterns.csv` | BreathingPattern |
 | `sequences.csv` | VKSequence |
 | `users.csv` | User |
+| `sessions.csv` | Session |
+| `journalEntries.csv` | JournalEntry |
+
+> Seeds run in dependency order: poses → breathing patterns → sequences → users → sessions → journal entries.
 
 Default seeded users:
 

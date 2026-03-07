@@ -1,7 +1,12 @@
 const express = require("express");
-const { authenticateToken } = require("../../middlewares/authorization.middleware");
+const {
+	authenticateToken,
+	optionalAuth,
+} = require("../../middlewares/authorization.middleware");
 const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 
 const {
 	getSequences,
@@ -77,7 +82,11 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get("/stats/recommended", authenticateToken(), asyncErrorWrapper(getRecommendedSequence));
+router.get(
+	"/stats/recommended",
+	authenticateToken(),
+	asyncErrorWrapper(getRecommendedSequence),
+);
 
 /**
  * @swagger
@@ -110,6 +119,7 @@ router.get(
 	"/family/:family",
 	familyIdValidation,
 	handleValidationErrors,
+	optionalAuth,
 	asyncErrorWrapper(getSequencesByFamily),
 );
 
@@ -165,7 +175,13 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get("/", getSequencesValidation, handleValidationErrors, asyncErrorWrapper(getSequences));
+router.get(
+	"/",
+	getSequencesValidation,
+	handleValidationErrors,
+	optionalAuth,
+	asyncErrorWrapper(getSequences),
+);
 
 /**
  * @swagger

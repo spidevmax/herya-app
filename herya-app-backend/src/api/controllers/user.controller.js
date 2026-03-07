@@ -1,4 +1,6 @@
 const User = require("../models/User.model");
+const Session = require("../models/Session.model");
+const JournalEntry = require("../models/JournalEntry.model");
 const bcrypt = require("bcrypt");
 const { deleteImgCloudinary } = require("../../utils/deleteImage");
 const { sendResponse } = require("../../utils/sendResponse");
@@ -153,7 +155,13 @@ const updateMyProfile = async (req, res, next) => {
 		const userResponse = updatedUser.toObject();
 		delete userResponse.password;
 
-		return sendResponse(res, 200, true, "Profile updated successfully", userResponse);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile updated successfully",
+			userResponse,
+		);
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -241,9 +249,6 @@ const updateMyPassword = async (req, res, next) => {
 
 const deleteMyAccount = async (req, res, next) => {
 	try {
-		const Session = require("../models/Session.model");
-		const JournalEntry = require("../models/JournalEntry.model");
-
 		// Find the authenticated user
 		const user = await User.findById(req.user._id);
 
@@ -261,15 +266,15 @@ const deleteMyAccount = async (req, res, next) => {
 		for (const journal of journals) {
 			// Delete photos
 			for (const photo of journal.photos) {
-				const urlParts = photo.url.split("/");
-				const publicId = urlParts[urlParts.length - 1].split(".")[0];
-				await deleteImgCloudinary(publicId);
+				if (photo.cloudinaryId) {
+					await deleteImgCloudinary(photo.cloudinaryId);
+				}
 			}
 			// Delete voice notes
 			for (const voiceNote of journal.voiceNotes) {
-				const urlParts = voiceNote.url.split("/");
-				const publicId = urlParts[urlParts.length - 1].split(".")[0];
-				await deleteImgCloudinary(publicId);
+				if (voiceNote.cloudinaryId) {
+					await deleteImgCloudinary(voiceNote.cloudinaryId);
+				}
 			}
 		}
 
@@ -320,8 +325,6 @@ const deleteMyAccount = async (req, res, next) => {
  */
 const getMyStats = async (req, res, next) => {
 	try {
-		const Session = require("../models/Session.model");
-
 		const user = await User.findById(req.user._id);
 		if (!user) {
 			throw createError(404, "User not found");
@@ -366,7 +369,9 @@ const getMyStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
+			recentSessions.length > 0
+				? Math.round(totalMinutes / recentSessions.length)
+				: 0;
 
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,

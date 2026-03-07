@@ -1,26 +1,32 @@
 const Session = require("../models/Session.model");
 const VKSequence = require("../models/VinyasaKramaSequence.model");
 const User = require("../models/User.model");
+const JournalEntry = require("../models/JournalEntry.model");
 const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
+const { deleteImgCloudinary } = require("../../utils/deleteImage");
 
 /**
  * Controller: createSession
  * -------------------------
  * Creates a new practice session for the authenticated user.
  *
- * Workflow:
- * 1. Validates sessionType and required fields based on type.
- * 2. Creates Session document with user reference.
- * 3. Increments user's totalSessions counter.
- * 4. Returns created session.
- *
  * Request Body:
  * - sessionType: "vk_sequence" | "pranayama" | "meditation" | "complete_practice"
  * - For vk_sequence: requires vkSequence (ObjectId)
  * - For complete_practice: requires completePractice object
- * - duration: number (required)
+ * - duration: number (required, min: 1)
  * - completed: boolean (default: false)
+ * - notes: string (optional, max 1000 chars)
+ *
+ * Workflow:
+ * 1. Validates sessionType and required fields based on type.
+ * 2. Verifies referenced VK sequence exists (if provided).
+ * 3. Creates Session document with user reference.
+ * 4. Populates all references before returning.
+ *
+ * Response:
+ * - Newly created session with populated vkSequence and completePractice references
  *
  * Error Handling:
  * - 400: Missing required fields or invalid sessionType
@@ -42,11 +48,17 @@ const createSession = async (req, res, next) => {
 
 		// Validate required fields based on sessionType
 		if (sessionType === "vk_sequence" && !vkSequence) {
-			throw createError(400, "vkSequence is required for vk_sequence session type");
+			throw createError(
+				400,
+				"vkSequence is required for vk_sequence session type",
+			);
 		}
 
 		if (sessionType === "complete_practice" && !completePractice) {
-			throw createError(400, "completePractice is required for complete_practice session type");
+			throw createError(
+				400,
+				"completePractice is required for complete_practice session type",
+			);
 		}
 
 		if (!duration) {
@@ -76,7 +88,13 @@ const createSession = async (req, res, next) => {
 		await savedSession.populate("completePractice.cooldown");
 		await savedSession.populate("completePractice.pranayama");
 
-		return sendResponse(res, 201, true, "Session created successfully", savedSession);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"Session created successfully",
+			savedSession,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -115,7 +133,14 @@ const getSessions = async (req, res, next) => {
 			throw createError(401, "Authentication required");
 		}
 
-		const { page = 1, limit = 20, sessionType, completed, startDate, endDate } = req.query;
+		const {
+			page = 1,
+			limit = 20,
+			sessionType,
+			completed,
+			startDate,
+			endDate,
+		} = req.query;
 
 		// Build filter
 		const filter = { user: req.user._id };
@@ -206,7 +231,13 @@ const getSessionById = async (req, res, next) => {
 			throw createError(403, "You don't have access to this session");
 		}
 
-		return sendResponse(res, 200, true, "Session retrieved successfully", session);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Session retrieved successfully",
+			session,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -260,8 +291,17 @@ const updateSession = async (req, res, next) => {
 			throw createError(403, "You don't have access to this session");
 		}
 
+		// Save whether it was already completed before applying updates
+		const wasAlreadyCompleted = session.completed;
+
 		// Update allowed fields
-		const allowedUpdates = ["completed", "duration", "actualPractice", "vkFeedback", "notes"];
+		const allowedUpdates = [
+			"completed",
+			"duration",
+			"actualPractice",
+			"vkFeedback",
+			"notes",
+		];
 
 		allowedUpdates.forEach((field) => {
 			if (req.body[field] !== undefined) {
@@ -271,14 +311,24 @@ const updateSession = async (req, res, next) => {
 
 		const updatedSession = await session.save();
 
-		// Update user stats if marking as completed
-		if (req.body.completed && !session.completed) {
+		// Update user stats only when transitioning from incomplete → complete
+		if (req.body.completed && !wasAlreadyCompleted) {
 			await updateUserStats(req.user._id, updatedSession);
 		}
 
 		await updatedSession.populate("vkSequence");
+		await updatedSession.populate("completePractice.warmup");
+		await updatedSession.populate("completePractice.mainSequences");
+		await updatedSession.populate("completePractice.cooldown");
+		await updatedSession.populate("completePractice.pranayama");
 
-		return sendResponse(res, 200, true, "Session updated successfully", updatedSession);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Session updated successfully",
+			updatedSession,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -326,6 +376,23 @@ const deleteSession = async (req, res, next) => {
 		}
 
 		await Session.findByIdAndDelete(id);
+
+		// Cascade-delete the associated journal entry (avoids orphaned documents)
+		const journal = await JournalEntry.findOne({ session: id });
+		if (journal) {
+			for (const photo of journal.photos) {
+				try {
+					if (photo.cloudinaryId) await deleteImgCloudinary(photo.cloudinaryId);
+				} catch (_) {}
+			}
+			for (const voiceNote of journal.voiceNotes) {
+				try {
+					if (voiceNote.cloudinaryId)
+						await deleteImgCloudinary(voiceNote.cloudinaryId);
+				} catch (_) {}
+			}
+			await JournalEntry.findByIdAndDelete(journal._id);
+		}
 
 		// Update user stats if session was completed
 		if (session.completed) {
@@ -422,7 +489,9 @@ const getSessionStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
+			recentSessions.length > 0
+				? Math.round(totalMinutes / recentSessions.length)
+				: 0;
 
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,
@@ -465,7 +534,9 @@ async function updateUserStats(userId, session) {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	const lastPractice = user.lastPracticeDate ? new Date(user.lastPracticeDate) : null;
+	const lastPractice = user.lastPracticeDate
+		? new Date(user.lastPracticeDate)
+		: null;
 	if (lastPractice) {
 		lastPractice.setHours(0, 0, 0, 0);
 	}

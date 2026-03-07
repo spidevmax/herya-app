@@ -15,8 +15,8 @@
  * - NODE_ENV: Deployment environment (development/production)
  *
  * Usage:
- * const { swaggerUiMiddleware, swaggerSpec } = require("./src/config/swagger");
- * app.use("/api-docs", swaggerUiMiddleware);
+ * const { swaggerUiMiddleware, swaggerUiSetup } = require("./src/config/swagger");
+ * app.use("/api-docs", swaggerUiMiddleware, swaggerUiSetup);
  *
  * Integration:
  * - Automatically discovers @swagger JSDoc comments in ./src/api/routes/*.js

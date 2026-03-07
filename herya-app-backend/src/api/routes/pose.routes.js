@@ -1,8 +1,7 @@
 const express = require("express");
-const { authenticateToken, isAdmin } = require("../../middlewares/authorization.middleware");
-const { uploadPoseThumbnail } = require("../../middlewares/upload/pose.upload");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 
 const {
 	getPoses,
@@ -20,8 +19,6 @@ const {
 	getPosesValidation,
 	searchPosesValidation,
 } = require("../validations/pose.validations");
-
-const { postPose, updatePose, deletePose } = require("../controllers/admin.controller");
 
 const posesRouter = express.Router();
 
@@ -72,7 +69,7 @@ posesRouter.get(
 	"/search",
 	searchPosesValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(searchPoses),
+	searchPoses,
 );
 
 /**
@@ -108,7 +105,7 @@ posesRouter.get(
 	"/category/:category",
 	categoryParamValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getPosesByCategory),
+	getPosesByCategory,
 );
 
 /**
@@ -152,7 +149,7 @@ posesRouter.get(
 	"/family/:family",
 	familyParamValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getPosesByVKFamily),
+	getPosesByVKFamily,
 );
 
 /**
@@ -214,7 +211,7 @@ posesRouter.get(
  *       500:
  *         description: Server error
  */
-posesRouter.get("/", getPosesValidation, handleValidationErrors, asyncErrorWrapper(getPoses));
+posesRouter.get("/", getPosesValidation, handleValidationErrors, getPoses);
 
 /**
  * @swagger
@@ -258,7 +255,7 @@ posesRouter.get(
 	"/:id/related",
 	poseIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getRelatedPoses),
+	getRelatedPoses,
 );
 
 /**
@@ -290,174 +287,6 @@ posesRouter.get(
  *       500:
  *         description: Server error
  */
-posesRouter.get("/:id", poseIdValidation, handleValidationErrors, asyncErrorWrapper(getPoseById));
-
-// =============================
-// ADMIN ROUTES (admin only)
-// =============================
-
-/**
- * @swagger
- * /api/v1/poses:
- *   post:
- *     summary: Create new pose
- *     description: Create a new yoga pose (admin only)
- *     tags:
- *       - Poses (Admin)
- *     security:
- *       - bearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - sanskritName
- *               - difficulty
- *               - category
- *             properties:
- *               name:
- *                 type: string
- *                 example: Downward Dog
- *               sanskritName:
- *                 type: string
- *                 example: Adho Mukha Svanasana
- *               difficulty:
- *                 type: string
- *                 enum: [beginner, intermediate, advanced]
- *               category:
- *                 type: string
- *               description:
- *                 type: string
- *               vkFamily:
- *                 type: array
- *                 items:
- *                   type: string
- *               preparatoryPoses:
- *                 type: array
- *                 items:
- *                   type: string
- *               thumbnail:
- *                 type: string
- *                 format: binary
- *     responses:
- *       201:
- *         description: Pose created successfully
- *       401:
- *         description: Unauthorized - missing or invalid token
- *       403:
- *         description: Forbidden - user not admin
- *       500:
- *         description: Server error
- */
-posesRouter.post(
-	"/",
-	authenticateToken(),
-	isAdmin,
-	uploadPoseThumbnail.single("thumbnail"),
-	asyncErrorWrapper(postPose),
-);
-
-/**
- * @swagger
- * /api/v1/poses/{id}:
- *   put:
- *     summary: Update existing pose
- *     description: Update yoga pose information (admin only)
- *     tags:
- *       - Poses (Admin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Pose MongoDB ObjectId
- *     requestBody:
- *       required: true
- *       content:
- *         multipart/form-data:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               sanskritName:
- *                 type: string
- *               difficulty:
- *                 type: string
- *                 enum: [beginner, intermediate, advanced]
- *               description:
- *                 type: string
- *               thumbnail:
- *                 type: string
- *                 format: binary
- *     responses:
- *       200:
- *         description: Pose updated successfully
- *       400:
- *         description: Invalid pose ID or validation error
- *       401:
- *         description: Unauthorized - missing or invalid token
- *       403:
- *         description: Forbidden - user not admin
- *       404:
- *         description: Pose not found
- *       500:
- *         description: Server error
- */
-posesRouter.put(
-	"/:id",
-	poseIdValidation,
-	handleValidationErrors,
-	authenticateToken(),
-	isAdmin,
-	uploadPoseThumbnail.single("thumbnail"),
-	asyncErrorWrapper(updatePose),
-);
-
-/**
- * @swagger
- * /api/v1/poses/{id}:
- *   delete:
- *     summary: Delete pose
- *     description: Delete yoga pose and associated media (admin only)
- *     tags:
- *       - Poses (Admin)
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Pose MongoDB ObjectId
- *     responses:
- *       200:
- *         description: Pose deleted successfully
- *       400:
- *         description: Invalid pose ID
- *       401:
- *         description: Unauthorized - missing or invalid token
- *       403:
- *         description: Forbidden - user not admin
- *       404:
- *         description: Pose not found
- *       500:
- *         description: Server error
- */
-posesRouter.delete(
-	"/:id",
-	poseIdValidation,
-	handleValidationErrors,
-	authenticateToken(),
-	isAdmin,
-	asyncErrorWrapper(deletePose),
-);
+posesRouter.get("/:id", poseIdValidation, handleValidationErrors, getPoseById);
 
 module.exports = posesRouter;

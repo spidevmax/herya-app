@@ -24,11 +24,14 @@ const {
 	getUserAnalytics,
 } = require("../controllers/admin.controller");
 
-const { authenticateToken, isAdmin } = require("../../middlewares/authorization.middleware");
+const {
+	authenticateToken,
+	isAdmin,
+} = require("../../middlewares/authorization.middleware");
 
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
-
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 
 const { uploadPoseMixed } = require("../../middlewares/upload/pose.upload");
 
@@ -43,7 +46,7 @@ const {
 	updatePoseValidation,
 	createBreathingPatternValidation,
 	updateBreathingPatternValidation,
-	userIdQueryValidation,
+	analyticsUserIdValidation,
 } = require("../validations/admin.validations");
 
 const adminRouter = require("express").Router();
@@ -106,7 +109,7 @@ adminRouter.get(
 	"/users",
 	getAllUsersValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getAllUsers),
+	getAllUsers,
 );
 
 /**
@@ -156,7 +159,7 @@ adminRouter.put(
 	"/users/:id/role",
 	updateUserRoleValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(updateUserRole),
+	updateUserRole,
 );
 
 /**
@@ -194,7 +197,7 @@ adminRouter.delete(
 	"/users/:id",
 	userIdParamValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(deleteUser),
+	deleteUser,
 );
 
 // ==================== VK SEQUENCE MANAGEMENT ====================
@@ -254,7 +257,7 @@ adminRouter.post(
 	"/sequences",
 	createVKSequenceValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(createVKSequence),
+	createVKSequence,
 );
 
 /**
@@ -307,7 +310,7 @@ adminRouter.put(
 	"/sequences/:id",
 	updateVKSequenceValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(updateVKSequence),
+	updateVKSequence,
 );
 
 /**
@@ -345,7 +348,7 @@ adminRouter.delete(
 	"/sequences/:id",
 	resourceIdParamValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(deleteVKSequence),
+	deleteVKSequence,
 );
 
 // ==================== POSE MANAGEMENT ====================
@@ -399,7 +402,7 @@ adminRouter.post(
 	uploadPoseMixed,
 	createPoseValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(createPose),
+	createPose,
 );
 
 /**
@@ -450,7 +453,7 @@ adminRouter.put(
 	uploadPoseMixed,
 	updatePoseValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(updatePose),
+	updatePose,
 );
 
 /**
@@ -488,7 +491,7 @@ adminRouter.delete(
 	"/poses/:id",
 	resourceIdParamValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(deletePose),
+	deletePose,
 );
 
 // ==================== BREATHING PATTERN MANAGEMENT ====================
@@ -543,7 +546,7 @@ adminRouter.post(
 	"/breathing-patterns",
 	createBreathingPatternValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(createBreathingPattern),
+	createBreathingPattern,
 );
 
 /**
@@ -596,7 +599,7 @@ adminRouter.put(
 	"/breathing-patterns/:id",
 	updateBreathingPatternValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(updateBreathingPattern),
+	updateBreathingPattern,
 );
 
 /**
@@ -634,7 +637,7 @@ adminRouter.delete(
 	"/breathing-patterns/:id",
 	resourceIdParamValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(deleteBreathingPattern),
+	deleteBreathingPattern,
 );
 
 // ==================== ANALYTICS ====================
@@ -672,7 +675,7 @@ adminRouter.delete(
  *       500:
  *         description: Server error
  */
-adminRouter.get("/analytics/dashboard", asyncErrorWrapper(getDashboardStats));
+adminRouter.get("/analytics/dashboard", getDashboardStats);
 
 /**
  * @swagger
@@ -720,9 +723,9 @@ adminRouter.get("/analytics/dashboard", asyncErrorWrapper(getDashboardStats));
  */
 adminRouter.get(
 	"/analytics/users/:userId",
-	userIdQueryValidation,
+	analyticsUserIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getUserAnalytics),
+	getUserAnalytics,
 );
 
 module.exports = adminRouter;

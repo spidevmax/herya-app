@@ -6,9 +6,7 @@ const Session = require("../models/Session.model");
 const JournalEntry = require("../models/JournalEntry.model");
 const { sendResponse } = require("../../utils/sendResponse");
 const { deleteImgCloudinary } = require("../../utils/deleteImage");
-const createError = require("../../utils/createError");
-
-// ==================== USER MANAGEMENT ====================
+const { createError } = require("../../utils/createError");
 
 /**
  * Controller: getAllUsers (Admin)
@@ -33,7 +31,10 @@ const getAllUsers = async (req, res, next) => {
 		if (role) filter.role = role;
 
 		if (search) {
-			filter.$or = [{ name: new RegExp(search, "i") }, { email: new RegExp(search, "i") }];
+			filter.$or = [
+				{ name: new RegExp(search, "i") },
+				{ email: new RegExp(search, "i") },
+			];
 		}
 
 		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
@@ -63,7 +64,28 @@ const getAllUsers = async (req, res, next) => {
 /**
  * Controller: updateUserRole (Admin)
  * -----------------------------------
- * Updates a user's role (user ↔ admin).
+ * Changes a user's role between 'user' and 'admin'.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the target user
+ *
+ * Request Body:
+ * - role: "user" | "admin"
+ *
+ * Workflow:
+ * 1. Validates role value against allowed list.
+ * 2. Updates user's role field with findByIdAndUpdate.
+ * 3. Returns updated user (password excluded).
+ *
+ * Response:
+ * - Updated user object (no password)
+ *
+ * Error Handling:
+ * - 400: Invalid role value
+ * - 404: User not found
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const updateUserRole = async (req, res, next) => {
 	try {
@@ -74,7 +96,11 @@ const updateUserRole = async (req, res, next) => {
 			throw createError(400, "Invalid role. Must be 'user' or 'admin'");
 		}
 
-		const user = await User.findByIdAndUpdate(id, { role }, { new: true }).select("-password");
+		const user = await User.findByIdAndUpdate(
+			id,
+			{ role },
+			{ new: true },
+		).select("-password");
 
 		if (!user) {
 			throw createError(404, "User not found");
@@ -89,12 +115,28 @@ const updateUserRole = async (req, res, next) => {
 /**
  * Controller: deleteUser (Admin)
  * -------------------------------
- * Deletes a user and all associated data.
+ * Permanently deletes a user and all associated data.
  *
- * Cascade deletes:
- * - All sessions
- * - All journal entries (with photos/voice notes)
- * - Profile image
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the target user
+ *
+ * Workflow:
+ * 1. Finds user by ID.
+ * 2. Deletes profile image from Cloudinary (if exists).
+ * 3. Cascade deletes all journal entries with their Cloudinary media (photos + voice notes).
+ * 4. Cascade deletes all sessions.
+ * 5. Deletes the user document.
+ *
+ * Response:
+ * - null (deletion confirmed)
+ *
+ * Error Handling:
+ * - 404: User not found
+ *
+ * Notes:
+ * - Admin only endpoint.
+ * - Permanent — no soft delete.
+ * - Uses cloudinaryId field for safe media deletion.
  */
 const deleteUser = async (req, res, next) => {
 	try {
@@ -115,15 +157,15 @@ const deleteUser = async (req, res, next) => {
 		for (const journal of journals) {
 			// Delete photos
 			for (const photo of journal.photos) {
-				const urlParts = photo.url.split("/");
-				const publicId = urlParts[urlParts.length - 1].split(".")[0];
-				await deleteImgCloudinary(publicId);
+				if (photo.cloudinaryId) {
+					await deleteImgCloudinary(photo.cloudinaryId);
+				}
 			}
 			// Delete voice notes
 			for (const voiceNote of journal.voiceNotes) {
-				const urlParts = voiceNote.url.split("/");
-				const publicId = urlParts[urlParts.length - 1].split(".")[0];
-				await deleteImgCloudinary(publicId);
+				if (voiceNote.cloudinaryId) {
+					await deleteImgCloudinary(voiceNote.cloudinaryId);
+				}
 			}
 		}
 
@@ -142,12 +184,28 @@ const deleteUser = async (req, res, next) => {
 	}
 };
 
-// ==================== VK SEQUENCE MANAGEMENT ====================
-
 /**
  * Controller: createVKSequence (Admin)
  * -------------------------------------
- * Creates a new VK sequence (system template).
+ * Creates a new VK sequence and marks it as a system template.
+ *
+ * Request Body:
+ * - All VinyasaKramaSequence schema fields (family, level, sanskritName, englishName, structure, etc.)
+ *
+ * Workflow:
+ * 1. Creates VKSequence document from request body with isSystemSequence: true.
+ * 2. Mongoose pre-save hooks validate corePoses order and estimatedDuration consistency.
+ * 3. Populates corePoses, prerequisites, and pranayama references.
+ * 4. Returns created sequence.
+ *
+ * Response:
+ * - Newly created sequence with populated references
+ *
+ * Error Handling:
+ * - 400: Mongoose validation error (missing required fields, invalid enums, invalid corePoses order)
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const createVKSequence = async (req, res, next) => {
 	try {
@@ -162,7 +220,13 @@ const createVKSequence = async (req, res, next) => {
 		await savedSequence.populate("prerequisites");
 		await savedSequence.populate("recommendedPranayama.pattern");
 
-		return sendResponse(res, 201, true, "VK Sequence created successfully", savedSequence);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"VK Sequence created successfully",
+			savedSequence,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -171,7 +235,28 @@ const createVKSequence = async (req, res, next) => {
 /**
  * Controller: updateVKSequence (Admin)
  * -------------------------------------
- * Updates an existing VK sequence.
+ * Updates fields on an existing VK sequence.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the sequence
+ *
+ * Request Body:
+ * - Any VinyasaKramaSequence fields to update
+ *
+ * Workflow:
+ * 1. Finds sequence by ID and applies updates atomically with findByIdAndUpdate.
+ * 2. Runs Mongoose validators on update (runValidators: true).
+ * 3. Populates references and returns updated sequence.
+ *
+ * Response:
+ * - Updated sequence with populated references
+ *
+ * Error Handling:
+ * - 400: Validation error
+ * - 404: Sequence not found
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const updateVKSequence = async (req, res, next) => {
 	try {
@@ -189,7 +274,13 @@ const updateVKSequence = async (req, res, next) => {
 			throw createError(404, "VK Sequence not found");
 		}
 
-		return sendResponse(res, 200, true, "VK Sequence updated successfully", sequence);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"VK Sequence updated successfully",
+			sequence,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -198,11 +289,26 @@ const updateVKSequence = async (req, res, next) => {
 /**
  * Controller: deleteVKSequence (Admin)
  * -------------------------------------
- * Deletes a VK sequence.
+ * Deletes a VK sequence after verifying it is not in use.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the sequence
+ *
+ * Workflow:
+ * 1. Counts sessions that reference this sequence.
+ * 2. Throws 400 if sequence is in use.
+ * 3. Deletes sequence document.
+ *
+ * Response:
+ * - null (deletion confirmed)
+ *
+ * Error Handling:
+ * - 400: Sequence referenced in one or more sessions
+ * - 404: Sequence not found
  *
  * Notes:
- * - Cannot delete if sequence is referenced in sessions.
- * - Or implement soft delete with isActive flag.
+ * - Admin only endpoint.
+ * - Does not cascade delete user vkProgression references.
  */
 const deleteVKSequence = async (req, res, next) => {
 	try {
@@ -212,7 +318,10 @@ const deleteVKSequence = async (req, res, next) => {
 		const sessionCount = await Session.countDocuments({ vkSequence: id });
 
 		if (sessionCount > 0) {
-			throw createError(400, `Cannot delete: Sequence is used in ${sessionCount} sessions`);
+			throw createError(
+				400,
+				`Cannot delete: Sequence is used in ${sessionCount} sessions`,
+			);
 		}
 
 		const sequence = await VKSequence.findByIdAndDelete(id);
@@ -221,18 +330,46 @@ const deleteVKSequence = async (req, res, next) => {
 			throw createError(404, "VK Sequence not found");
 		}
 
-		return sendResponse(res, 200, true, "VK Sequence deleted successfully", null);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"VK Sequence deleted successfully",
+			null,
+		);
 	} catch (error) {
 		return next(error);
 	}
 };
 
-// ==================== POSE MANAGEMENT ====================
-
 /**
  * Controller: createPose (Admin)
  * -------------------------------
- * Creates a new pose (system pose).
+ * Creates a new pose and marks it as a system pose.
+ *
+ * Request Body:
+ * - All Pose schema fields (name, category, difficulty, vkContext, etc.)
+ *
+ * Request Files (multipart):
+ * - thumbnail: Single image file (optional)
+ * - images: Multiple image files (optional)
+ * - videos: Multiple video files (optional)
+ *
+ * Workflow:
+ * 1. Creates Pose document with isSystemPose: true.
+ * 2. Uploads thumbnail and images to Cloudinary if provided.
+ * 3. Saves pose and populates preparatoryPoses and followUpPoses.
+ * 4. On error, cleans up uploaded files from Cloudinary.
+ *
+ * Response:
+ * - Newly created pose with populated relationships
+ *
+ * Error Handling:
+ * - 400: Mongoose validation error
+ * - Uploaded images deleted on any save failure
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const createPose = async (req, res, next) => {
 	const uploadedImages = [];
@@ -246,12 +383,18 @@ const createPose = async (req, res, next) => {
 		// Handle media uploads
 		if (req.files) {
 			if (req.files.thumbnail) {
-				pose.media.thumbnail = req.files.thumbnail[0].path;
+				pose.media.thumbnail = {
+					url: req.files.thumbnail[0].path,
+					cloudinaryId: req.files.thumbnail[0].filename,
+				};
 				uploadedImages.push(req.files.thumbnail[0].filename);
 			}
 
 			if (req.files.images) {
-				pose.media.images = req.files.images.map((file) => file.path);
+				pose.media.images = req.files.images.map((file) => ({
+					url: file.path,
+					cloudinaryId: file.filename,
+				}));
 				uploadedImages.push(...req.files.images.map((f) => f.filename));
 			}
 
@@ -278,7 +421,36 @@ const createPose = async (req, res, next) => {
 /**
  * Controller: updatePose (Admin)
  * -------------------------------
- * Updates an existing pose.
+ * Updates an existing pose's fields and/or media.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the pose
+ *
+ * Request Body:
+ * - Any Pose schema fields to update
+ *
+ * Request Files (multipart):
+ * - thumbnail: Replaces existing thumbnail
+ * - images: Appended to existing image array
+ *
+ * Workflow:
+ * 1. Finds pose by ID.
+ * 2. Stores old thumbnail publicId (parsed from URL) for deferred cleanup.
+ * 3. Updates body fields on the document.
+ * 4. Replaces thumbnail / appends images if new files provided.
+ * 5. Saves pose and deletes old thumbnail from Cloudinary.
+ *
+ * Response:
+ * - Updated pose with populated relationships
+ *
+ * Error Handling:
+ * - 400: Validation error
+ * - 404: Pose not found
+ * - New uploads cleaned up on save error
+ *
+ * Notes:
+ * - Admin only endpoint.
+ * - Pose media stores { url, cloudinaryId } objects for safe Cloudinary deletion.
  */
 const updatePose = async (req, res, next) => {
 	const uploadedImages = [];
@@ -292,10 +464,9 @@ const updatePose = async (req, res, next) => {
 			throw createError(404, "Pose not found");
 		}
 
-		// Store old image IDs for cleanup
-		if (pose.media.thumbnail) {
-			const urlParts = pose.media.thumbnail.split("/");
-			oldImageIds.push(urlParts[urlParts.length - 1].split(".")[0]);
+		// Store old thumbnail cloudinaryId for cleanup after successful save
+		if (pose.media.thumbnail?.cloudinaryId) {
+			oldImageIds.push(pose.media.thumbnail.cloudinaryId);
 		}
 
 		// Update fields
@@ -308,12 +479,18 @@ const updatePose = async (req, res, next) => {
 		// Handle new media uploads
 		if (req.files) {
 			if (req.files.thumbnail) {
-				pose.media.thumbnail = req.files.thumbnail[0].path;
+				pose.media.thumbnail = {
+					url: req.files.thumbnail[0].path,
+					cloudinaryId: req.files.thumbnail[0].filename,
+				};
 				uploadedImages.push(req.files.thumbnail[0].filename);
 			}
 
 			if (req.files.images) {
-				const newImages = req.files.images.map((file) => file.path);
+				const newImages = req.files.images.map((file) => ({
+					url: file.path,
+					cloudinaryId: file.filename,
+				}));
 				pose.media.images = [...pose.media.images, ...newImages];
 				uploadedImages.push(...req.files.images.map((f) => f.filename));
 			}
@@ -329,7 +506,13 @@ const updatePose = async (req, res, next) => {
 		await updatedPose.populate("preparatoryPoses");
 		await updatedPose.populate("followUpPoses");
 
-		return sendResponse(res, 200, true, "Pose updated successfully", updatedPose);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Pose updated successfully",
+			updatedPose,
+		);
 	} catch (error) {
 		// Clean up newly uploaded images on error
 		for (const imageId of uploadedImages) {
@@ -342,11 +525,28 @@ const updatePose = async (req, res, next) => {
 /**
  * Controller: deletePose (Admin)
  * -------------------------------
- * Deletes a pose.
+ * Deletes a pose after verifying it is not referenced in any sequence.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the pose
+ *
+ * Workflow:
+ * 1. Counts VK sequences that reference this pose in corePoses.
+ * 2. Throws 400 if pose is in use.
+ * 3. Finds the pose to read media URLs.
+ * 4. Deletes thumbnail and images from Cloudinary.
+ * 5. Deletes pose document.
+ *
+ * Response:
+ * - null (deletion confirmed)
+ *
+ * Error Handling:
+ * - 400: Pose referenced in one or more sequences
+ * - 404: Pose not found
  *
  * Notes:
- * - Cannot delete if pose is referenced in sequences.
- * - Deletes associated media from Cloudinary.
+ * - Admin only endpoint.
+ * - Pose media stores { url, cloudinaryId } objects for safe Cloudinary deletion.
  */
 const deletePose = async (req, res, next) => {
 	try {
@@ -358,7 +558,10 @@ const deletePose = async (req, res, next) => {
 		});
 
 		if (sequenceCount > 0) {
-			throw createError(400, `Cannot delete: Pose is used in ${sequenceCount} sequences`);
+			throw createError(
+				400,
+				`Cannot delete: Pose is used in ${sequenceCount} sequences`,
+			);
 		}
 
 		const pose = await Pose.findById(id);
@@ -366,17 +569,15 @@ const deletePose = async (req, res, next) => {
 			throw createError(404, "Pose not found");
 		}
 
-		// Delete media from Cloudinary
-		if (pose.media.thumbnail) {
-			const urlParts = pose.media.thumbnail.split("/");
-			const publicId = urlParts[urlParts.length - 1].split(".")[0];
-			await deleteImgCloudinary(publicId);
+		// Delete media from Cloudinary using stored cloudinaryId
+		if (pose.media.thumbnail?.cloudinaryId) {
+			await deleteImgCloudinary(pose.media.thumbnail.cloudinaryId);
 		}
 
-		for (const imageUrl of pose.media.images) {
-			const urlParts = imageUrl.split("/");
-			const publicId = urlParts[urlParts.length - 1].split(".")[0];
-			await deleteImgCloudinary(publicId);
+		for (const image of pose.media.images) {
+			if (image.cloudinaryId) {
+				await deleteImgCloudinary(image.cloudinaryId);
+			}
 		}
 
 		await Pose.findByIdAndDelete(id);
@@ -387,12 +588,28 @@ const deletePose = async (req, res, next) => {
 	}
 };
 
-// ==================== BREATHING PATTERN MANAGEMENT ====================
-
 /**
  * Controller: createBreathingPattern (Admin)
  * -------------------------------------------
- * Creates a new breathing pattern (system pattern).
+ * Creates a new breathing pattern and marks it as a system pattern.
+ *
+ * Request Body:
+ * - All BreathingPattern schema fields (romanizationName, patternType, patternRatio, etc.)
+ *
+ * Workflow:
+ * 1. Creates BreathingPattern document with isSystemPattern: true.
+ * 2. Mongoose pre-validate hooks verify ratio consistency and min/max/default ranges.
+ * 3. Populates prerequisiteBreathing references.
+ * 4. Returns created pattern.
+ *
+ * Response:
+ * - Newly created pattern with populated prerequisites
+ *
+ * Error Handling:
+ * - 400: Mongoose validation error (invalid ratio, inconsistent practice ranges)
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const createBreathingPattern = async (req, res, next) => {
 	try {
@@ -405,7 +622,13 @@ const createBreathingPattern = async (req, res, next) => {
 
 		await savedPattern.populate("vkContext.prerequisiteBreathing");
 
-		return sendResponse(res, 201, true, "Breathing pattern created successfully", savedPattern);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"Breathing pattern created successfully",
+			savedPattern,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -414,7 +637,28 @@ const createBreathingPattern = async (req, res, next) => {
 /**
  * Controller: updateBreathingPattern (Admin)
  * -------------------------------------------
- * Updates an existing breathing pattern.
+ * Updates fields on an existing breathing pattern.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the pattern
+ *
+ * Request Body:
+ * - Any BreathingPattern fields to update
+ *
+ * Workflow:
+ * 1. Finds pattern by ID and applies updates with findByIdAndUpdate.
+ * 2. Runs Mongoose validators (runValidators: true).
+ * 3. Populates prerequisiteBreathing and returns updated pattern.
+ *
+ * Response:
+ * - Updated pattern with populated references
+ *
+ * Error Handling:
+ * - 400: Validation error
+ * - 404: Pattern not found
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const updateBreathingPattern = async (req, res, next) => {
 	try {
@@ -429,7 +673,13 @@ const updateBreathingPattern = async (req, res, next) => {
 			throw createError(404, "Breathing pattern not found");
 		}
 
-		return sendResponse(res, 200, true, "Breathing pattern updated successfully", pattern);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Breathing pattern updated successfully",
+			pattern,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -438,7 +688,25 @@ const updateBreathingPattern = async (req, res, next) => {
 /**
  * Controller: deleteBreathingPattern (Admin)
  * -------------------------------------------
- * Deletes a breathing pattern.
+ * Deletes a breathing pattern after verifying it is not in use.
+ *
+ * URL Parameters:
+ * - id: MongoDB ObjectId of the pattern
+ *
+ * Workflow:
+ * 1. Counts sessions that reference this pattern in completePractice.pranayama.
+ * 2. Throws 400 if pattern is in use.
+ * 3. Deletes pattern document.
+ *
+ * Response:
+ * - null (deletion confirmed)
+ *
+ * Error Handling:
+ * - 400: Pattern referenced in one or more sessions
+ * - 404: Pattern not found
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const deleteBreathingPattern = async (req, res, next) => {
 	try {
@@ -450,7 +718,10 @@ const deleteBreathingPattern = async (req, res, next) => {
 		});
 
 		if (sessionCount > 0) {
-			throw createError(400, `Cannot delete: Pattern is used in ${sessionCount} sessions`);
+			throw createError(
+				400,
+				`Cannot delete: Pattern is used in ${sessionCount} sessions`,
+			);
 		}
 
 		const pattern = await BreathingPattern.findByIdAndDelete(id);
@@ -459,27 +730,43 @@ const deleteBreathingPattern = async (req, res, next) => {
 			throw createError(404, "Breathing pattern not found");
 		}
 
-		return sendResponse(res, 200, true, "Breathing pattern deleted successfully", null);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Breathing pattern deleted successfully",
+			null,
+		);
 	} catch (error) {
 		return next(error);
 	}
 };
 
-// ==================== ANALYTICS & STATS ====================
-
 /**
  * Controller: getDashboardStats (Admin)
  * --------------------------------------
- * Retrieves overall platform statistics.
+ * Retrieves overall platform statistics for the admin dashboard.
  *
- * Returns:
- * - Total users
- * - New users this month
- * - Total sessions
- * - Total journal entries
- * - Most popular VK families
- * - Active users (last 30 days)
- * - Average session duration
+ * Workflow:
+ * 1. Counts total documents across all collections.
+ * 2. Counts new users registered this calendar month.
+ * 3. Counts active users (lastPracticeDate within 30 days).
+ * 4. Aggregates most popular VK families from sessions.
+ * 5. Calculates average and total session duration.
+ * 6. Aggregates daily session counts for the last 7 days.
+ *
+ * Response:
+ * - users: { total, newThisMonth, active }
+ * - content: { totalSessions, totalJournals, totalPoses, totalSequences, totalBreathingPatterns }
+ * - sessions: { avgDuration, totalMinutes, perDay }
+ * - popularFamilies: Array of { _id: family, count }
+ *
+ * Error Handling:
+ * - Database errors passed to global handler via next(error)
+ *
+ * Notes:
+ * - Admin only endpoint. No request parameters.
+ * - Can be cached for performance (expensive aggregations).
  */
 const getDashboardStats = async (_, res, next) => {
 	try {
@@ -595,7 +882,30 @@ const getDashboardStats = async (_, res, next) => {
 /**
  * Controller: getUserAnalytics (Admin)
  * -------------------------------------
- * Gets detailed analytics for a specific user.
+ * Gets detailed practice analytics for a specific user.
+ *
+ * URL Parameters:
+ * - userId: MongoDB ObjectId of the target user
+ *
+ * Workflow:
+ * 1. Finds user by ID.
+ * 2. Aggregates completed sessions by type (count + totalMinutes per type).
+ * 3. Counts total journal entries for the user.
+ * 4. Reads VK progression data from user document.
+ * 5. Fetches 10 most recent sessions with populated sequences.
+ *
+ * Response:
+ * - user: Basic profile + practice totals
+ * - sessionsByType: Array of { _id: type, count, totalMinutes }
+ * - journalCount: number
+ * - vkProgression: { completedSequences, unlockedFamilies, currentLevel }
+ * - recentSessions: Array of last 10 sessions
+ *
+ * Error Handling:
+ * - 404: User not found
+ *
+ * Notes:
+ * - Admin only endpoint.
  */
 const getUserAnalytics = async (req, res, next) => {
 	try {

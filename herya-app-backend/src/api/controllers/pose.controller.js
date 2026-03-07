@@ -11,7 +11,7 @@ const { createError } = require("../../utils/createError");
  * - category: Optional, filter by primary VK category
  * - difficulty: Optional, filter by difficulty level (beginner, intermediate, advanced)
  * - vkFamily: Optional, filter by VK family where pose appears
- * - sidedness: Optional, filter by sidedness type (single_sided, both_sides, symmetrical)
+ * - sidedness: Optional, filter by sidedness type (symmetric, left_only, right_only, both_sides)
  * - drishti: Optional, filter by drishti (eye gaze direction)
  * - search: Optional, full-text search across name, romanization, IAST, Sanskrit, aliases, tags
  * - page: Optional, page number (default: 1)
@@ -200,7 +200,13 @@ const getPosesByCategory = async (req, res, next) => {
 			name: 1,
 		});
 
-		return sendResponse(res, 200, true, `Poses for ${category} retrieved successfully`, poses);
+		return sendResponse(
+			res,
+			200,
+			true,
+			`Poses for ${category} retrieved successfully`,
+			poses,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -388,7 +394,13 @@ const getPosesByVKFamily = async (req, res, next) => {
 			groupedPoses[role].push(pose);
 		});
 
-		return sendResponse(res, 200, true, `Poses for ${family} family retrieved`, groupedPoses);
+		return sendResponse(
+			res,
+			200,
+			true,
+			`Poses for ${family} family retrieved`,
+			groupedPoses,
+		);
 	} catch (error) {
 		return next(error);
 	}

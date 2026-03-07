@@ -49,7 +49,7 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
 	{
-		name: { type: String, trim: true, required: true },
+		name: { type: String, trim: true, required: true, maxlength: 50 },
 		email: {
 			type: String,
 			trim: true,
@@ -137,7 +137,7 @@ const userSchema = new mongoose.Schema(
 			],
 		},
 
-		// PREFERENCES adaptadas para VK
+		// PRACTICE PREFERENCES (VK-adapted)
 		preferences: {
 			// Instead of "yogaStyle", now it's practice intensity
 			practiceIntensity: {
@@ -149,7 +149,7 @@ const userSchema = new mongoose.Schema(
 			// Preferred session duration
 			preferredSessionDuration: { type: Number, default: 30 },
 
-			// Hora preferida
+			// Preferred time of day
 			preferredTimeOfDay: {
 				type: String,
 				enum: ["morning", "afternoon", "evening", "anytime"],
@@ -162,7 +162,16 @@ const userSchema = new mongoose.Schema(
 				targetAreas: [
 					{
 						type: String,
-						enum: ["spine", "hips", "shoulders", "knees", "ankles", "wrists", "core", "neck"],
+						enum: [
+							"spine",
+							"hips",
+							"shoulders",
+							"knees",
+							"ankles",
+							"wrists",
+							"core",
+							"neck",
+						],
 					},
 				],
 				conditions: [{ type: String, trim: true }], // ej: "lower back pain"
@@ -174,13 +183,13 @@ const userSchema = new mongoose.Schema(
 				default: false,
 			},
 
-			// Preferencia de pranayama
+			// Pranayama preference
 			pranayamaPreference: {
 				includeInPractice: { type: Boolean, default: true },
-				preferredDuration: { type: Number, default: 5 }, // minutos
+				preferredDuration: { type: Number, default: 5 }, // minutes
 			},
 
-			// Notificaciones
+			// Notifications
 			notifications: {
 				enabled: { type: Boolean, default: true },
 				frequency: {
@@ -191,14 +200,14 @@ const userSchema = new mongoose.Schema(
 				reminderTime: { type: String, default: "09:00" }, // HH:mm format
 			},
 
-			// Idioma (para bilingual support)
+			// Language (for bilingual support)
 			language: {
 				type: String,
 				enum: ["en", "es"],
 				default: "en",
 			},
 
-			// Preferencias de UI
+			// UI preferences
 			uiPreferences: {
 				showSanskritNames: { type: Boolean, default: true },
 				audioGuidance: { type: Boolean, default: true },
@@ -208,6 +217,8 @@ const userSchema = new mongoose.Schema(
 	},
 	{ timestamps: true, versionKey: false },
 );
+
+// VALIDATION
 
 // Hash password before saving
 userSchema.pre("save", async function () {
@@ -224,6 +235,8 @@ userSchema.pre("save", async function () {
 	}
 });
 
+// METHODS
+
 // METHOD: Check if user can access a specific level
 userSchema.methods.canAccessLevel = function (family, level) {
 	// Level 1 is always unlocked
@@ -239,7 +252,11 @@ userSchema.methods.canAccessLevel = function (family, level) {
 };
 
 // METHOD: Mark sequence as completed
-userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) {
+userSchema.methods.markSequenceCompleted = function (
+	family,
+	level,
+	sequenceId,
+) {
 	const existingIndex = this.vkProgression.completedSequences.findIndex(
 		(seq) =>
 			seq.family === family &&
@@ -248,10 +265,10 @@ userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) 
 	);
 
 	if (existingIndex >= 0) {
-		// Ya existe, incrementar contador
+		// Already exists, increment session count
 		this.vkProgression.completedSequences[existingIndex].sessionCount += 1;
 	} else {
-		// Nueva secuencia completada
+		// New completed sequence
 		this.vkProgression.completedSequences.push({
 			family,
 			level,
@@ -260,7 +277,7 @@ userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) 
 			sessionCount: 1,
 		});
 
-		// Desbloquear familia si no estaba desbloqueada
+		// Unlock family if not already unlocked
 		if (!this.vkProgression.unlockedFamilies.includes(family)) {
 			this.vkProgression.unlockedFamilies.push(family);
 		}
@@ -269,7 +286,7 @@ userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) 
 	return this.save();
 };
 
-// INDEX
+// INDEXES
 userSchema.index({ createdAt: -1 });
 userSchema.index({ role: 1 });
 userSchema.index({ "vkProgression.currentMainSequence.family": 1 });

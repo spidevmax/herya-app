@@ -51,7 +51,8 @@ const getBreathingPatterns = async (req, res, next) => {
 		if (difficulty) filter.difficulty = difficulty;
 		if (energyEffect) filter.energyEffect = energyEffect;
 		if (practicePhase) filter["vkContext.practicePhase"] = practicePhase;
-		if (recommendedBefore) filter["vkContext.recommendedBefore"] = recommendedBefore;
+		if (recommendedBefore)
+			filter["vkContext.recommendedBefore"] = recommendedBefore;
 
 		// Pagination
 		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
@@ -64,15 +65,21 @@ const getBreathingPatterns = async (req, res, next) => {
 
 		const total = await BreathingPattern.countDocuments(filter);
 
-		return sendResponse(res, 200, true, "Breathing patterns retrieved successfully", {
-			patterns,
-			pagination: {
-				page: parseInt(page, 10),
-				limit: parseInt(limit, 10),
-				total,
-				pages: Math.ceil(total / parseInt(limit, 10)),
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Breathing patterns retrieved successfully",
+			{
+				patterns,
+				pagination: {
+					page: parseInt(page, 10),
+					limit: parseInt(limit, 10),
+					total,
+					pages: Math.ceil(total / parseInt(limit, 10)),
+				},
 			},
-		});
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -124,7 +131,13 @@ const getBreathingPatternById = async (req, res, next) => {
 		// Add calculated pattern times (from virtual field)
 		const patternObj = breathingPattern.toObject({ virtuals: true });
 
-		return sendResponse(res, 200, true, "Breathing pattern retrieved successfully", patternObj);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Breathing pattern retrieved successfully",
+			patternObj,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -184,7 +197,7 @@ const getRecommendedBreathingPattern = async (req, res, next) => {
 		}
 
 		if (timeOfDay) {
-			filter.bestTimeOfDay = timeOfDay;
+			filter.bestTimeOfDay = { $in: [timeOfDay, "anytime"] };
 		}
 
 		if (userLevel) {
@@ -213,21 +226,31 @@ const getRecommendedBreathingPattern = async (req, res, next) => {
 		} else {
 			// Fallback to basic ujjayi
 			pattern = await BreathingPattern.findOne({
-				romanizationName: "Ujjayi Breath",
+				romanizationName: "Ujjayi",
 			});
-			reason = "Ujjayi breathing is a great foundational technique for any practice";
+			reason =
+				"Ujjayi breathing is a great foundational technique for any practice";
 		}
 
 		if (!pattern) {
-			throw createError(404, "No breathing patterns found. Please seed the database.");
+			throw createError(
+				404,
+				"No breathing patterns found. Please seed the database.",
+			);
 		}
 
 		const patternObj = pattern.toObject({ virtuals: true });
 
-		return sendResponse(res, 200, true, "Recommendation generated successfully", {
-			pattern: patternObj,
-			reason,
-		});
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Recommendation generated successfully",
+			{
+				pattern: patternObj,
+				reason,
+			},
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -285,7 +308,13 @@ const getBreathingPatternsByTechnique = async (req, res, next) => {
 			difficulty: 1,
 		});
 
-		return sendResponse(res, 200, true, `Patterns using ${technique} retrieved`, patterns);
+		return sendResponse(
+			res,
+			200,
+			true,
+			`Patterns using ${technique} retrieved`,
+			patterns,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -374,7 +403,13 @@ const getPranayamaProgression = async (_req, res, next) => {
 			})),
 		};
 
-		return sendResponse(res, 200, true, "Pranayama progression path retrieved", progression);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Pranayama progression path retrieved",
+			progression,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -393,9 +428,8 @@ const getPranayamaProgression = async (_req, res, next) => {
  * Workflow:
  * 1. Validates that search query (q) is provided
  * 2. Creates case-insensitive regex pattern
- * 3. Searches across multiple name fields and description
+ * 3. Searches across name fields, description, and tags
  * 4. Returns up to 20 matching patterns
- * 5. Matches sorted by relevance (default Mongoose order)
  *
  * Response:
  * - Array of breathing patterns matching search query
@@ -407,10 +441,9 @@ const getPranayamaProgression = async (_req, res, next) => {
  * - Database errors passed to global handler
  *
  * Notes:
- * - Regex search works across different name formats
+ * - Regex search covers romanizationName, iastName, sanskritName, description, tags
  * - Case-insensitive matching for better UX
- * - Can be upgraded to MongoDB text indexes for performance
- * - Useful for pattern lookup/discovery features
+ * - MongoDB $text cannot be nested inside $or — regex search used throughout
  */
 const searchBreathingPatterns = async (req, res, next) => {
 	try {
@@ -432,7 +465,13 @@ const searchBreathingPatterns = async (req, res, next) => {
 			],
 		}).limit(20);
 
-		return sendResponse(res, 200, true, `Found ${patterns.length} patterns`, patterns);
+		return sendResponse(
+			res,
+			200,
+			true,
+			`Found ${patterns.length} patterns`,
+			patterns,
+		);
 	} catch (error) {
 		return next(error);
 	}

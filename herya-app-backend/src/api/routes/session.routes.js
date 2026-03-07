@@ -7,9 +7,13 @@ const {
 	deleteSession,
 	getSessionStats,
 } = require("../controllers/session.controller");
-const { authenticateToken } = require("../../middlewares/authorization.middleware");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
 const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 const {
 	createSessionValidations,
 	updateSessionValidations,
@@ -77,15 +81,31 @@ router.get("/stats", asyncErrorWrapper(getSessionStats));
  *         name: limit
  *         schema:
  *           type: integer
- *           default: 10
+ *           default: 20
  *         description: Results per page
  *       - in: query
- *         name: sortBy
+ *         name: sessionType
  *         schema:
  *           type: string
- *           enum: [date, duration]
- *           default: date
- *         description: Sort field
+ *           enum: [vk_sequence, pranayama, meditation, complete_practice]
+ *         description: Filter by session type
+ *       - in: query
+ *         name: completed
+ *         schema:
+ *           type: boolean
+ *         description: Filter by completion status
+ *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter sessions from this date (ISO format)
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filter sessions until this date (ISO format)
  *     responses:
  *       200:
  *         description: User's sessions with pagination
@@ -216,7 +236,12 @@ router.post(
  *       500:
  *         description: Server error
  */
-router.get("/:id", sessionIdValidation, handleValidationErrors, asyncErrorWrapper(getSessionById));
+router.get(
+	"/:id",
+	sessionIdValidation,
+	handleValidationErrors,
+	asyncErrorWrapper(getSessionById),
+);
 
 /**
  * @swagger

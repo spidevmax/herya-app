@@ -63,6 +63,77 @@ const journalValidations = [
 		.withMessage("Stress level must be between 1 and 10"),
 ];
 
+/**
+ * Validation Rules: journalIdValidation
+ * -------------------------------------
+ * Validates the journal entry ID URL parameter.
+ *
+ * Applied to: GET /:id, PUT /:id, DELETE /:id
+ *
+ * @example
+ * router.get("/:id", journalIdValidation, handleValidationErrors, getJournalEntryById);
+ */
+const journalIdValidation = [
+	check("id")
+		.notEmpty()
+		.withMessage("Journal entry ID is required")
+		.isMongoId()
+		.withMessage("Journal entry ID must be a valid MongoDB ID"),
+];
+
+/**
+ * Validation Rules: getJournalEntriesValidation
+ * ----------------------------------------------
+ * Validates optional query parameters for listing journal entries.
+ *
+ * Fields Validated:
+ * - page: Optional, positive integer
+ * - limit: Optional, integer 1-100
+ * - startDate: Optional, valid ISO 8601 date
+ * - endDate: Optional, valid ISO 8601 date
+ * - sequenceFamily: Optional, non-empty string
+ * - sortBy: Optional, one of: "date", "mood", "energy"
+ *
+ * Applied to: GET /api/v1/journal-entries
+ *
+ * @example
+ * router.get("/", getJournalEntriesValidation, handleValidationErrors, getJournalEntries);
+ */
+const getJournalEntriesValidation = [
+	check("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
+
+	check("limit")
+		.optional()
+		.isInt({ min: 1, max: 100 })
+		.withMessage("Limit must be between 1 and 100"),
+
+	check("startDate")
+		.optional()
+		.isISO8601()
+		.withMessage("Start date must be a valid ISO 8601 date"),
+
+	check("endDate")
+		.optional()
+		.isISO8601()
+		.withMessage("End date must be a valid ISO 8601 date"),
+
+	check("sequenceFamily")
+		.optional()
+		.trim()
+		.notEmpty()
+		.withMessage("Sequence family cannot be empty if provided"),
+
+	check("sortBy")
+		.optional()
+		.isIn(["date", "mood", "energy"])
+		.withMessage('Sort by must be one of: "date", "mood", "energy"'),
+];
+
 module.exports = {
 	journalValidations,
+	journalIdValidation,
+	getJournalEntriesValidation,
 };

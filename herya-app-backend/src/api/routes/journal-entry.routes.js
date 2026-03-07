@@ -7,10 +7,20 @@ const {
 	deleteJournalEntry,
 	getDigitalGarden,
 } = require("../controllers/journalEntry.controller");
-const { authenticateToken } = require("../../middlewares/authorization.middleware");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
-const { uploadJournalMixed } = require("../../middlewares/upload/journal.upload");
-const { journalValidations } = require("../validations/journal.validations");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
+const {
+	uploadJournalMixed,
+} = require("../../middlewares/upload/journal.upload");
+const {
+	journalValidations,
+	journalIdValidation,
+	getJournalEntriesValidation,
+} = require("../validations/journal.validations");
 const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const router = express.Router();
@@ -86,7 +96,12 @@ router.use(authenticateToken());
  *       500:
  *         description: Server error
  */
-router.get("/", asyncErrorWrapper(getJournalEntries));
+router.get(
+	"/",
+	getJournalEntriesValidation,
+	handleValidationErrors,
+	asyncErrorWrapper(getJournalEntries),
+);
 
 /**
  * @swagger
@@ -118,15 +133,16 @@ router.get("/", asyncErrorWrapper(getJournalEntries));
  *                 type: array
  *                 items:
  *                   type: string
- *                   enum: [happy, peaceful, calm, energetic, anxious, tired, frustrated]
+ *                   enum: [calm, anxious, energized, tired, focused, stressed, happy, sad, grounded, restless, peaceful, overwhelmed, motivated, discouraged, scattered, irritated]
  *                 minItems: 1
- *                 description: Moods before practice
+ *                 description: Moods before practice (up to 16 options)
  *               moodAfter:
  *                 type: array
  *                 items:
  *                   type: string
+ *                   enum: [calm, anxious, energized, tired, focused, stressed, happy, sad, grounded, restless, peaceful, overwhelmed, motivated, discouraged, scattered, irritated, renewed, centered, light, clear]
  *                 minItems: 1
- *                 description: Moods after practice
+ *                 description: Moods after practice (up to 20 options, includes 4 exclusive post-practice moods)
  *               energyLevel:
  *                 type: object
  *                 required:
@@ -299,7 +315,12 @@ router.get("/digital-garden", asyncErrorWrapper(getDigitalGarden));
  *       500:
  *         description: Server error
  */
-router.get("/:id", asyncErrorWrapper(getJournalEntryById));
+router.get(
+	"/:id",
+	journalIdValidation,
+	handleValidationErrors,
+	asyncErrorWrapper(getJournalEntryById),
+);
 
 /**
  * @swagger
@@ -379,6 +400,8 @@ router.get("/:id", asyncErrorWrapper(getJournalEntryById));
  */
 router.put(
 	"/:id",
+	journalIdValidation,
+	handleValidationErrors,
 	uploadJournalMixed.fields([
 		{ name: "photos", maxCount: 10 },
 		{ name: "voiceNotes", maxCount: 5 },
@@ -415,6 +438,11 @@ router.put(
  *       500:
  *         description: Server error
  */
-router.delete("/:id", asyncErrorWrapper(deleteJournalEntry));
+router.delete(
+	"/:id",
+	journalIdValidation,
+	handleValidationErrors,
+	asyncErrorWrapper(deleteJournalEntry),
+);
 
 module.exports = router;
