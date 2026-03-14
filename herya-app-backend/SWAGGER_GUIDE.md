@@ -213,7 +213,7 @@ Should return:
 
 ```json
 {
-  "message": "🧘 Herya App Backend - Vinyasa Krama Practice",
+  "message": "Herya App Backend - Vinyasa Krama Practice",
   "status": "Server is running",
   "version": "1.0.0",
   "endpoints": {

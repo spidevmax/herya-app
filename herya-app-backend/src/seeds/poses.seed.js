@@ -9,12 +9,6 @@ const Pose = require("../api/models/Pose.model");
  */
 async function seedPoses() {
 	try {
-		const existingPoses = await Pose.countDocuments();
-		if (existingPoses > 0) {
-			console.log("⏭️  Poses already seeded, skipping...");
-			return;
-		}
-
 		const csvPath = path.join(__dirname, "data", "poses.csv");
 		const csvContent = fs.readFileSync(csvPath, "utf-8");
 
@@ -57,8 +51,9 @@ async function seedPoses() {
 			// chakraRelated is a single value - take first if pipe-separated
 			const chakra = row.chakraRelated ? row.chakraRelated.split("|")[0].trim() : undefined;
 
-			// sidedness derived from bilateral column
+			// sidedness: use explicit column if present, otherwise derive from bilateral
 			const bilateral = row.bilateral === "true";
+			const sidednessType = row.sidedness?.trim() || (bilateral ? "both_sides" : "symmetric");
 
 			return {
 				name: row.name?.trim(),
@@ -72,7 +67,12 @@ async function seedPoses() {
 				category: categories,
 				difficulty: row.difficulty?.trim() || "beginner",
 				sidedness: {
-					type: bilateral ? "both_sides" : "symmetric",
+					type: sidednessType,
+				},
+				drishti: row.drishti?.trim() || "none",
+				vkContext: {
+					appearsInFamilies: parseArray(row.vkFamilies),
+					roleInSequence: row.roleInSequence?.trim() || "primary",
 				},
 				transitionType: row.transitionType?.trim() || "static",
 				recommendedHoldSeconds: Math.min(parseInt(row.recommendedHoldDefault, 10) || 30, 300),
@@ -89,8 +89,18 @@ async function seedPoses() {
 			};
 		});
 
-		await Pose.insertMany(poses);
-		console.log(`✅ Seeded ${poses.length} poses from CSV`);
+		// Upsert by romanizationName — adds new poses without overwriting existing ones
+		const ops = poses.map((pose) => ({
+			updateOne: {
+				filter: { romanizationName: pose.romanizationName },
+				update: { $setOnInsert: pose },
+				upsert: true,
+			},
+		}));
+		const result = await Pose.bulkWrite(ops);
+		console.log(
+			`✅ Poses seeded: ${result.upsertedCount} inserted, ${result.matchedCount} already existed`,
+		);
 	} catch (error) {
 		console.error("❌ Error seeding poses:", error.message);
 		throw error;

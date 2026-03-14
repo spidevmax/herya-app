@@ -32,11 +32,57 @@ const journalValidations = [
 		.isArray({ min: 1 })
 		.withMessage("moodBefore must be a non-empty array"),
 
+	check("moodBefore.*")
+		.isIn([
+			"calm",
+			"anxious",
+			"energized",
+			"tired",
+			"focused",
+			"stressed",
+			"happy",
+			"sad",
+			"grounded",
+			"restless",
+			"peaceful",
+			"overwhelmed",
+			"motivated",
+			"discouraged",
+			"scattered",
+			"irritated",
+		])
+		.withMessage("Invalid mood value in moodBefore"),
+
 	check("moodAfter")
 		.notEmpty()
 		.withMessage("At least one mood after practice is required")
 		.isArray({ min: 1 })
 		.withMessage("moodAfter must be a non-empty array"),
+
+	check("moodAfter.*")
+		.isIn([
+			"calm",
+			"anxious",
+			"energized",
+			"tired",
+			"focused",
+			"stressed",
+			"happy",
+			"sad",
+			"grounded",
+			"restless",
+			"peaceful",
+			"overwhelmed",
+			"motivated",
+			"discouraged",
+			"renewed",
+			"centered",
+			"light",
+			"clear",
+			"scattered",
+			"irritated",
+		])
+		.withMessage("Invalid mood value in moodAfter"),
 
 	check("energyLevel.before")
 		.notEmpty()
@@ -61,6 +107,20 @@ const journalValidations = [
 		.withMessage("Stress level after practice is required")
 		.isInt({ min: 1, max: 10 })
 		.withMessage("Stress level must be between 1 and 10"),
+
+	check("difficultyFeedback")
+		.optional()
+		.isIn(["too_easy", "just_right", "too_hard"])
+		.withMessage(
+			'difficultyFeedback must be one of: "too_easy", "just_right", "too_hard"',
+		),
+
+	check("pacingFeedback")
+		.optional()
+		.isIn(["too_slow", "perfect", "too_fast"])
+		.withMessage(
+			'pacingFeedback must be one of: "too_slow", "perfect", "too_fast"',
+		),
 ];
 
 /**
@@ -122,9 +182,23 @@ const getJournalEntriesValidation = [
 
 	check("sequenceFamily")
 		.optional()
-		.trim()
-		.notEmpty()
-		.withMessage("Sequence family cannot be empty if provided"),
+		.isIn([
+			"tadasana",
+			"standing_asymmetric",
+			"standing_symmetric",
+			"one_leg_standing",
+			"seated",
+			"supine",
+			"prone",
+			"inverted",
+			"meditative",
+			"bow_sequence",
+			"triangle_sequence",
+			"sun_salutation",
+			"vajrasana_variations",
+			"lotus_variations",
+		])
+		.withMessage("Invalid VK family for sequenceFamily filter"),
 
 	check("sortBy")
 		.optional()

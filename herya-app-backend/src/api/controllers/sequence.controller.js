@@ -1,4 +1,6 @@
 const VinyasaKramaSequence = require("../models/VinyasaKramaSequence.model");
+const JournalEntry = require("../models/JournalEntry.model");
+const Session = require("../models/Session.model");
 const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
 
@@ -236,13 +238,6 @@ const getSequencesByFamily = async (req, res, next) => {
  */
 const getRecommendedSequence = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required for recommendations");
-		}
-
-		const JournalEntry = require("../models/JournalEntry.model");
-		const Session = require("../models/Session.model");
-
 		// Get last 5 journal entries
 		const recentJournals = await JournalEntry.find({ user: req.user._id })
 			.sort({ createdAt: -1 })

@@ -25,6 +25,55 @@ const updateProfileValidations = [
 		.isEmail()
 		.withMessage("Please provide a valid email address")
 		.normalizeEmail(),
+
+	check("goals").optional().isArray().withMessage("Goals must be an array"),
+
+	check("goals.*")
+		.optional()
+		.isIn([
+			"increase_flexibility",
+			"build_strength",
+			"reduce_stress",
+			"improve_balance",
+			"therapeutic_healing",
+			"deepen_practice",
+			"meditation_focus",
+			"breath_awareness",
+		])
+		.withMessage("Invalid goal value"),
+
+	check("preferences.practiceIntensity")
+		.optional()
+		.isIn(["gentle", "moderate", "vigorous"])
+		.withMessage(
+			'preferences.practiceIntensity must be one of: "gentle", "moderate", "vigorous"',
+		),
+
+	check("preferences.sessionDuration")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage(
+			"preferences.sessionDuration must be a positive integer (minutes)",
+		),
+
+	check("preferences.timeOfDay")
+		.optional()
+		.isIn(["morning", "afternoon", "evening", "anytime"])
+		.withMessage(
+			'preferences.timeOfDay must be one of: "morning", "afternoon", "evening", "anytime"',
+		),
+
+	check("preferences.language")
+		.optional()
+		.isIn(["en", "es"])
+		.withMessage('preferences.language must be one of: "en", "es"'),
+
+	check("preferences.notifications.frequency")
+		.optional()
+		.isIn(["daily", "weekly", "never"])
+		.withMessage(
+			'preferences.notifications.frequency must be one of: "daily", "weekly", "never"',
+		),
 ];
 
 /**
@@ -38,7 +87,7 @@ const updateProfileValidations = [
  * - confirmPassword: Required, must match newPassword exactly
  *
  * @example
- * router.put("/change-password", changePasswordValidations, handleValidationErrors, changeMyPassword);
+ * router.put("/change-password", changePasswordValidations, handleValidationErrors, updateMyPassword);
  */
 const changePasswordValidations = [
 	check("currentPassword")

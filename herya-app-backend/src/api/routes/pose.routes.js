@@ -86,8 +86,8 @@ posesRouter.get(
  *         required: true
  *         schema:
  *           type: string
- *           enum: [standing_mountain, standing_asymmetric, sitting, inverted, prone, supine]
- *         description: Vinyasa Krama category
+ *           enum: [standing_mountain, standing_asymmetric, standing_symmetric, one_leg_balance, seated_forward, seated_twist, seated_hip_opener, supine, prone, inverted, arm_support, backbend, meditative]
+ *         description: Vinyasa Krama primary category
  *         example: standing_mountain
  *     responses:
  *       200:
@@ -181,7 +181,20 @@ posesRouter.get(
  *         name: sidedness
  *         schema:
  *           type: string
- *         description: Filter by sidedness (asymmetric, symmetric, etc.)
+ *           enum: [symmetric, left_only, right_only, both_sides]
+ *         description: Filter by sidedness type
+ *       - in: query
+ *         name: drishti
+ *         schema:
+ *           type: string
+ *           enum: [nasagrai, brumadhya, nabi_chakra, hastagrai, padayoragrai, parshva_drishti, angushta_madhyai, urdhva_drishti, none]
+ *         description: Filter by gaze point (drishti)
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *           minLength: 2
+ *         description: Full-text search across name, romanization, IAST, Sanskrit, aliases, tags
  *       - in: query
  *         name: page
  *         schema:

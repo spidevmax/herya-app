@@ -12,15 +12,14 @@
  *
  * Key Features:
  * - Supports 3 pattern types: ratio-based (preferred), time-based, count-based
- * - Flexible ratios: can be 1:2:2:1 (Ujjayi), 2:2:2:2 (Viloma), etc.
+ * - Flexible ratios: e.g. 1:0:2:0 (Ujjayi), 1:4:2:0 (Nadi Shodhana), 1:1:1:1 (Sama Vritti)
  * - Complete VK integration: practice phases, recommended families, prerequisites
  * - Domain validation via pre-validate hooks (ratio consistency, min/max/default ranges)
- * - Virtuals: calculatedPattern (actual seconds per phase), totalCycleDuration (full cycle in seconds)
+ * - Virtuals: calculatedPattern (actual seconds per phase), totalCycleDuration (full cycle in seconds) — only meaningful for ratio_based and time_based patterns
  * - Methods: getRatioString(), estimatePracticeDuration(cycles), isSafeForLevel(userLevel)
  *
  * Relationships:
  * - Referenced by: Session.completePractice.pranayama
- * - Referenced by: User.preferences.pranayamaPreference
  * - Self-reference: prerequisiteBreathing (technique progression)
  *
  * @example
@@ -291,6 +290,11 @@ const breathingPatternSchema = new mongoose.Schema(
 						"prone",
 						"inverted",
 						"meditative",
+						"bow_sequence",
+						"triangle_sequence",
+						"sun_salutation",
+						"vajrasana_variations",
+						"lotus_variations",
 					],
 				},
 			],
@@ -394,7 +398,7 @@ breathingPatternSchema.methods.estimatePracticeDuration = function (cycles) {
 	return Math.round((cycleDuration * cycles) / 60); // return duration in minutes
 };
 
-// METHOD: Check if pattern is safe for a given user level (basic example, can be expanded with more complex logic)
+// METHOD: Check if pattern is safe for a given user level based on difficulty comparison
 breathingPatternSchema.methods.isSafeForLevel = function (userLevel) {
 	const levelOrder = { beginner: 1, intermediate: 2, advanced: 3 };
 	const patternLevel = levelOrder[this.difficulty];
@@ -404,6 +408,11 @@ breathingPatternSchema.methods.isSafeForLevel = function (userLevel) {
 
 // INDEXES
 breathingPatternSchema.index({ difficulty: 1, energyEffect: 1 });
+breathingPatternSchema.index({
+	energyEffect: 1,
+	bestTimeOfDay: 1,
+	difficulty: 1,
+}); // Used by getRecommendedBreathingPattern
 breathingPatternSchema.index({ tags: 1 });
 breathingPatternSchema.index({ "vkContext.practicePhase": 1 });
 breathingPatternSchema.index({ "vkContext.recommendedBefore": 1 });

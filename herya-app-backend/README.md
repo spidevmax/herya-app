@@ -1,6 +1,6 @@
 # Herya App — Backend
 
-REST API for the Herya yoga application. Built with Node.js, Express and MongoDB, it manages yoga poses, breathing patterns, Vinyasa Krama sequences, user profiles, practice sessions and journal entries.
+REST API for the Herya yoga application. Built with Node.js, Express and MongoDB, it manages yoga poses, breathing patterns, Vinyasa Krama sequences, user profiles, practice sessions and journal entries. Includes JWT authentication with role-based access control and an admin panel for content and user management.
 
 ---
 
@@ -23,6 +23,7 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
   - [Admin](#admin)
 - [Authentication](#authentication)
 - [Response Format](#response-format)
+- [Rate Limiting](#rate-limiting)
 - [Error Handling](#error-handling)
 - [Database Seeding](#database-seeding)
 - [Testing](#testing)
@@ -39,12 +40,17 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 | Framework | Express 5 |
 | Database | MongoDB + Mongoose 9 |
 | Auth | JWT (jsonwebtoken) + bcrypt |
-| Image Storage | Cloudinary + Multer |
+| Image Storage | Cloudinary + Multer + multer-storage-cloudinary |
 | Validation | express-validator |
 | Rate Limiting | express-rate-limit |
+| CORS | cors |
+| Logging | Morgan |
+| Environment | dotenv |
+| CSV Parsing | PapaParse (seeds) |
 | Documentation | Swagger (swagger-jsdoc + swagger-ui-express) |
 | Linter/Formatter | Biome 2 |
 | Testing | Jest 30 + Supertest + mongodb-memory-server |
+| Dev Server | Nodemon |
 
 ---
 
@@ -52,6 +58,9 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 
 ```
 ├── index.js                  # Entry point: connects DB, starts server, graceful shutdown
+├── jest.config.js            # Jest configuration
+├── biome.json                # Biome linter/formatter configuration
+├── SWAGGER_GUIDE.md          # Swagger annotation guide for contributors
 ├── src/
 │   ├── app.js                # Express app (middleware, routes, error handlers)
 │   ├── api/
@@ -61,12 +70,14 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 │   │   └── validations/      # express-validator rule sets
 │   ├── config/
 │   │   ├── db.js             # MongoDB connection
-│   │   └── cloudinary.js     # Cloudinary configuration
+│   │   ├── cloudinary.js     # Cloudinary configuration
+│   │   └── swagger.js        # Swagger/OpenAPI configuration
 │   ├── middlewares/
 │   │   ├── authorization.middleware.js  # JWT auth + RBAC
 │   │   ├── validation.middleware.js     # Validation error handler
 │   │   └── upload/           # Multer/Cloudinary upload configs
 │   ├── seeds/                # DB seed scripts (CSV → MongoDB)
+│   │   └── data/             # CSV source files
 │   ├── tests/                # Jest test suites
 │   └── utils/                # Shared helpers (createError, sendResponse, token…)
 ```
@@ -85,8 +96,8 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-org/herya-app-backend.git
-cd herya-app-backend
+git clone https://github.com/spidevmax/herya-app.git
+cd herya-app/herya-app-backend
 
 # Install dependencies
 npm install
@@ -109,7 +120,7 @@ The server starts at `http://localhost:3000` by default.
 npm run seed
 ```
 
-Loads poses, breathing patterns, sequences and default users from the CSV files in `src/seeds/data/`.
+Loads poses, breathing patterns, sequences, users, sessions and journal entries from the CSV files in `src/seeds/data/`.
 
 ---
 
@@ -171,8 +182,8 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 **Register body** (`multipart/form-data` or JSON):
 ```json
 {
-  "name": "Marina López",
-  "email": "marina@example.com",
+  "name": "John Doe",
+  "email": "johndoe@example.com",
   "password": "SecurePass123",
   "experienceLevel": "beginner",
   "goals": ["reduce_stress", "improve_balance"],
@@ -183,7 +194,7 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 **Login body:**
 ```json
 {
-  "email": "marina@example.com",
+  "email": "johndoe@example.com",
   "password": "SecurePass123"
 }
 ```
@@ -191,6 +202,8 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 **Response includes:**
 ```json
 {
+  "success": true,
+  "message": "User registered successfully",
   "data": {
     "token": "<jwt>",
     "user": { ... }
@@ -206,7 +219,7 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 |---|---|---|---|
 | GET | `/api/v1/users/me` | ✅ user | Get authenticated user profile |
 | PUT | `/api/v1/users/me` | ✅ user | Update profile (name, preferences, goals…) |
-| PUT | `/api/v1/users/me/change-password` | ✅ user | Change password |
+| PUT | `/api/v1/users/change-password` | ✅ user | Change password |
 | GET | `/api/v1/users/me/stats` | ✅ user | Get practice statistics (sessions, minutes, streak) |
 | DELETE | `/api/v1/users/me` | ✅ user | Delete account |
 
@@ -216,7 +229,7 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/api/v1/poses` | — | List all poses (supports `?limit`, `?page`, `?difficulty`) |
+| GET | `/api/v1/poses` | — | List all poses (supports `?limit`, `?page`, `?difficulty`, `?category`, `?vkFamily`, `?sidedness`, `?drishti`, `?search`) |
 | GET | `/api/v1/poses/search?q=` | — | Full-text search across names and tags |
 | GET | `/api/v1/poses/category/:category` | — | Filter by VK category |
 | GET | `/api/v1/poses/family/:family` | — | Filter by VK family |
@@ -236,9 +249,11 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 | GET | `/api/v1/breathing-patterns/technique/:technique` | — | Filter patterns by technique type |
 | GET | `/api/v1/breathing-patterns/:id` | — | Get pattern by ID |
 
-**Recommended query params:** `?goal=calm&level=beginner`
+**Recommended query params:** `?goal=calm&userLevel=beginner&timeOfDay=morning&duration=15`
 
-Valid `goal` values: `calm`, `energize`, `balance`, `focus`, `restore`
+Valid `goal` values: `calm`, `energize`, `balance`, `focus`, `cool`, `heat`
+
+Valid `userLevel` values: `beginner`, `intermediate`, `advanced`
 
 ---
 
@@ -256,14 +271,16 @@ Valid `goal` values: `calm`, `energize`, `balance`, `focus`, `restore`
 **Create session body:**
 ```json
 {
-  "sessionType": "meditation",
-  "duration": 30,
-  "sequence": "<sequenceId>",
+  "sessionType": "vk_sequence",
+  "vkSequence": "<sequenceId>",
+  "duration": 45,
   "notes": "Felt grounded today"
 }
 ```
 
-Valid `sessionType` values: `meditation`, `pranayama`, `asana`, `vinyasa`, `restorative`, `yin`, `mixed`
+Valid `sessionType` values: `vk_sequence`, `pranayama`, `meditation`, `complete_practice`
+
+> If `sessionType` is `vk_sequence`, the `vkSequence` field (sequence ObjectId) is required. If `sessionType` is `complete_practice`, a `completePractice` object is required instead.
 
 ---
 
@@ -296,11 +313,11 @@ Valid `sessionType` values: `meditation`, `pranayama`, `asana`, `vinyasa`, `rest
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/api/v1/sequences` | ✅ user | List all Vinyasa Krama sequences |
-| GET | `/api/v1/sequences/search?q=` | ✅ user | Search sequences by name and description |
+| GET | `/api/v1/sequences` | — | List all Vinyasa Krama sequences |
+| GET | `/api/v1/sequences/search?q=` | — | Search sequences by name and description |
 | GET | `/api/v1/sequences/stats/recommended` | ✅ user | Get recommended sequence by goal and level |
-| GET | `/api/v1/sequences/family/:family` | ✅ user | Filter sequences by VK family |
-| GET | `/api/v1/sequences/:id` | ✅ user | Get sequence by ID |
+| GET | `/api/v1/sequences/family/:family` | — | Filter sequences by VK family |
+| GET | `/api/v1/sequences/:id` | — | Get sequence by ID |
 
 ---
 
@@ -377,15 +394,48 @@ All responses follow a consistent envelope:
 }
 ```
 
-Error responses:
+Error responses (validation errors — 400):
 
 ```json
 {
   "success": false,
-  "message": "Error description",
-  "errors": [ ... ]
+  "message": "Validation error",
+  "errors": [
+    { "field": "email", "message": "Please provide a valid email address" }
+  ]
 }
 ```
+
+Other error responses (404, 401, 403, 500):
+
+```json
+{
+  "success": false,
+  "message": "Error description"
+}
+```
+
+---
+
+## Rate Limiting
+
+All routes are protected by `express-rate-limit`. Limits are applied per IP address and reset every 15 minutes.
+
+| Route group | Max requests | Window |
+|---|---|---|
+| `/api/v1/auth` | 10 | 15 min |
+| All other `/api/v1/*` routes | 100 | 15 min |
+
+When the limit is exceeded the API responds with HTTP `429 Too Many Requests`:
+
+```json
+{
+  "success": false,
+  "message": "Too many requests, please try again later."
+}
+```
+
+Rate limiting is disabled in the `test` environment.
 
 ---
 
@@ -426,9 +476,12 @@ Default seeded users:
 
 | Name | Email | Password | Role |
 |---|---|---|---|
-| Maria | maria@example.com | `SecurePass123` | user |
-| Juan | juan@example.com | `SecurePass456` | user |
-| Ana | ana@example.com | `SecurePass789` | admin |
+| Sarah Mitchell | sarah@example.com | `SecurePass123` | user |
+| James Carter | james@example.com | `SecurePass456` | user |
+| Emma Thompson | emma@example.com | `SecurePass789` | user |
+| Daniel Harris | daniel@example.com | `SecurePass101` | user |
+| Laura Bennett | laura@example.com | `SecurePass202` | admin |
+| Admin User | admin@herya-app.com | `AdminPass123` | admin |
 
 > ⚠️ Running seed drops and recreates all seeded collections.
 

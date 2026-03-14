@@ -115,12 +115,7 @@ app.use((err, req, res, next) => {
 		console.error(`[${status}] ${message}`);
 	}
 
-	res.status(status).json({
-		error: {
-			message,
-			status,
-		},
-	});
+	res.status(status).json({ success: false, message });
 });
 
 module.exports = app;

@@ -157,6 +157,21 @@ const getPosesValidation = [
 		.isInt({ min: 1, max: 100 })
 		.withMessage("Limit must be between 1 and 100"),
 
+	query("drishti")
+		.optional()
+		.isIn([
+			"nasagrai",
+			"brumadhya",
+			"nabi_chakra",
+			"hastagrai",
+			"padayoragrai",
+			"parshva_drishti",
+			"angushta_madhyai",
+			"urdhva_drishti",
+			"none",
+		])
+		.withMessage("Invalid drishti value"),
+
 	query("search")
 		.optional()
 		.trim()

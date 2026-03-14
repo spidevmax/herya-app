@@ -40,10 +40,6 @@ const { deleteImgCloudinary } = require("../../utils/deleteImage");
  */
 const createSession = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required");
-		}
-
 		const { sessionType, vkSequence, completePractice, duration } = req.body;
 
 		// Validate required fields based on sessionType
@@ -129,10 +125,6 @@ const createSession = async (req, res, next) => {
  */
 const getSessions = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required");
-		}
-
 		const {
 			page = 1,
 			limit = 20,
@@ -206,10 +198,6 @@ const getSessions = async (req, res, next) => {
  */
 const getSessionById = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required");
-		}
-
 		const { id } = req.params;
 
 		const session = await Session.findById(id)
@@ -274,10 +262,6 @@ const getSessionById = async (req, res, next) => {
  */
 const updateSession = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required");
-		}
-
 		const { id } = req.params;
 
 		const session = await Session.findById(id);
@@ -343,8 +327,8 @@ const updateSession = async (req, res, next) => {
  * 1. Finds session by ID.
  * 2. Verifies ownership.
  * 3. Deletes session.
- * 4. Updates user stats (decrements counts).
- * 5. Note: Related journal entry should be handled separately.
+ * 4. Cascade-deletes the associated journal entry (photos and voice notes cleaned up from Cloudinary).
+ * 5. Decrements user stats if session was completed.
  *
  * Error Handling:
  * - 401: User not authenticated
@@ -352,16 +336,11 @@ const updateSession = async (req, res, next) => {
  * - 404: Session not found
  *
  * Notes:
- * - Consider soft delete with isDeleted flag.
- * - Cascade delete or orphan journal entries.
+ * - Journal entry deletion is best-effort: Cloudinary failures are logged but don't block the session delete.
  * - Adjust user stats accordingly.
  */
 const deleteSession = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required");
-		}
-
 		const { id } = req.params;
 
 		const session = await Session.findById(id);
@@ -437,10 +416,6 @@ const deleteSession = async (req, res, next) => {
  */
 const getSessionStats = async (req, res, next) => {
 	try {
-		if (!req.user) {
-			throw createError(401, "Authentication required");
-		}
-
 		// Get user for basic stats
 		const user = await User.findById(req.user._id);
 

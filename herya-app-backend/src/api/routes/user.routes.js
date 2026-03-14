@@ -6,13 +6,16 @@ const {
 	getMyStats,
 } = require("../controllers/user.controller");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
-const { authenticateToken } = require("../../middlewares/authorization.middleware");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 const {
 	updateProfileValidations,
 	changePasswordValidations,
 } = require("../validations/user.validations");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const usersRouter = require("express").Router();
 
@@ -23,7 +26,7 @@ usersRouter.use(authenticateToken());
  * /api/v1/users/me:
  *   get:
  *     summary: Get my profile
- *     description: Retrieve current authenticated user's profile information
+ *     description: Retrieve current authenticated user's profile information, including VK progression and preferences
  *     tags:
  *       - Users
  *     security:
@@ -36,42 +39,99 @@ usersRouter.use(authenticateToken());
  *             schema:
  *               type: object
  *               properties:
- *                 user:
+ *                 _id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                   enum: [user, admin]
+ *                 profileImageUrl:
+ *                   type: string
+ *                 goals:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     enum: [increase_flexibility, build_strength, reduce_stress, improve_balance, therapeutic_healing, deepen_practice, meditation_focus, breath_awareness]
+ *                 totalSessions:
+ *                   type: integer
+ *                 totalMinutes:
+ *                   type: integer
+ *                 currentStreak:
+ *                   type: integer
+ *                 lastPracticeDate:
+ *                   type: string
+ *                   format: date-time
+ *                 vkProgression:
  *                   type: object
  *                   properties:
- *                     _id:
- *                       type: string
- *                     email:
- *                       type: string
- *                     name:
- *                       type: string
- *                     profileImage:
- *                       type: string
- *                     goals:
+ *                     currentMainSequence:
+ *                       type: object
+ *                       properties:
+ *                         family:
+ *                           type: string
+ *                         level:
+ *                           type: integer
+ *                           enum: [1, 2, 3]
+ *                         sequenceId:
+ *                           type: string
+ *                     completedSequences:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           family:
+ *                             type: string
+ *                           level:
+ *                             type: integer
+ *                           sequenceId:
+ *                             type: string
+ *                           completedAt:
+ *                             type: string
+ *                             format: date-time
+ *                           sessionCount:
+ *                             type: integer
+ *                     unlockedFamilies:
  *                       type: array
  *                       items:
  *                         type: string
- *                     experienceLevel:
+ *                 preferences:
+ *                   type: object
+ *                   properties:
+ *                     practiceIntensity:
  *                       type: string
+ *                       enum: [gentle, moderate, vigorous]
+ *                     sessionDuration:
+ *                       type: integer
+ *                     timeOfDay:
+ *                       type: string
+ *                       enum: [morning, afternoon, evening, anytime]
+ *                     language:
+ *                       type: string
+ *                       enum: [en, es]
  *       401:
  *         description: Unauthorized - missing or invalid token
+ *       404:
+ *         description: User not found
  *       500:
  *         description: Server error
  */
-usersRouter.get("/me", asyncErrorWrapper(getMyProfile));
+usersRouter.get("/me", getMyProfile);
 
 /**
  * @swagger
  * /api/v1/users/me:
  *   put:
  *     summary: Update my profile
- *     description: Update current user's profile information and optional profile image
+ *     description: Update current user's profile information and optional profile image. vkProgression is system-managed and cannot be changed here.
  *     tags:
  *       - Users
  *     security:
  *       - bearerAuth: []
  *     requestBody:
- *       required: true
+ *       required: false
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -79,18 +139,82 @@ usersRouter.get("/me", asyncErrorWrapper(getMyProfile));
  *             properties:
  *               name:
  *                 type: string
- *                 example: John Doe Updated
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
  *               goals:
  *                 type: array
  *                 items:
  *                   type: string
- *                 example: ["flexibility", "strength", "balance"]
- *               preferredDuration:
- *                 type: integer
- *                 example: 45
- *               experienceLevel:
- *                 type: string
- *                 enum: [beginner, intermediate, advanced]
+ *                   enum: [increase_flexibility, build_strength, reduce_stress, improve_balance, therapeutic_healing, deepen_practice, meditation_focus, breath_awareness]
+ *                 example: ["reduce_stress", "improve_balance"]
+ *               preferences:
+ *                 type: object
+ *                 properties:
+ *                   practiceIntensity:
+ *                     type: string
+ *                     enum: [gentle, moderate, vigorous]
+ *                     example: moderate
+ *                   sessionDuration:
+ *                     type: integer
+ *                     description: Preferred session duration in minutes
+ *                     example: 45
+ *                   timeOfDay:
+ *                     type: string
+ *                     enum: [morning, afternoon, evening, anytime]
+ *                     example: morning
+ *                   therapeuticFocus:
+ *                     type: object
+ *                     properties:
+ *                       enabled:
+ *                         type: boolean
+ *                       targetAreas:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                           enum: [spine, hips, shoulders, knees, ankles, wrists, core, neck]
+ *                       conditions:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                         description: Free-text conditions (e.g. "lower back pain")
+ *                   meditativeEmphasis:
+ *                     type: boolean
+ *                     description: Whether to emphasise meditative aspects of practice
+ *                   pranayamaPreference:
+ *                     type: object
+ *                     properties:
+ *                       includeInPractice:
+ *                         type: boolean
+ *                       preferredDuration:
+ *                         type: integer
+ *                         description: Preferred pranayama duration in minutes
+ *                   notifications:
+ *                     type: object
+ *                     properties:
+ *                       enabled:
+ *                         type: boolean
+ *                       frequency:
+ *                         type: string
+ *                         enum: [daily, weekly, never]
+ *                       reminderTime:
+ *                         type: string
+ *                         description: Reminder time in HH:mm format (e.g. "09:00")
+ *                   language:
+ *                     type: string
+ *                     enum: [en, es]
+ *                     example: es
+ *                   uiPreferences:
+ *                     type: object
+ *                     properties:
+ *                       showSanskritNames:
+ *                         type: boolean
+ *                       audioGuidance:
+ *                         type: boolean
+ *                       visualMetronome:
+ *                         type: boolean
  *               profileImage:
  *                 type: string
  *                 format: binary
@@ -99,9 +223,13 @@ usersRouter.get("/me", asyncErrorWrapper(getMyProfile));
  *       200:
  *         description: Profile updated successfully
  *       400:
- *         description: Validation error
+ *         description: Validation error or email already in use
  *       401:
  *         description: Unauthorized - missing or invalid token
+ *       403:
+ *         description: Forbidden - attempted to change role, password, or vkProgression
+ *       404:
+ *         description: User not found
  *       500:
  *         description: Server error
  */
@@ -110,7 +238,7 @@ usersRouter.put(
 	uploadUserImage.single("profileImage"),
 	...updateProfileValidations,
 	handleValidationErrors,
-	asyncErrorWrapper(updateMyProfile),
+	updateMyProfile,
 );
 
 /**
@@ -139,11 +267,11 @@ usersRouter.put(
  *                 example: oldPassword123
  *               newPassword:
  *                 type: string
- *                 minLength: 6
- *                 example: newPassword123
+ *                 minLength: 8
+ *                 example: NewPassword123
  *               confirmPassword:
  *                 type: string
- *                 example: newPassword123
+ *                 example: NewPassword123
  *     responses:
  *       200:
  *         description: Password changed successfully
@@ -158,7 +286,7 @@ usersRouter.put(
 	"/change-password",
 	...changePasswordValidations,
 	handleValidationErrors,
-	asyncErrorWrapper(updateMyPassword),
+	updateMyPassword,
 );
 
 /**
@@ -179,7 +307,7 @@ usersRouter.put(
  *       500:
  *         description: Server error
  */
-usersRouter.delete("/me", asyncErrorWrapper(deleteMyAccount));
+usersRouter.delete("/me", deleteMyAccount);
 
 /**
  * @swagger
@@ -199,22 +327,57 @@ usersRouter.delete("/me", asyncErrorWrapper(deleteMyAccount));
  *             schema:
  *               type: object
  *               properties:
- *                 stats:
+ *                 totalSessions:
+ *                   type: integer
+ *                 totalMinutes:
+ *                   type: integer
+ *                 currentStreak:
+ *                   type: integer
+ *                 lastPracticeDate:
+ *                   type: string
+ *                   format: date-time
+ *                 sessionsPerWeek:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   description: Session count for each of the last 4 weeks (oldest to newest)
+ *                 mostPracticedFamilies:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       family:
+ *                         type: string
+ *                       count:
+ *                         type: integer
+ *                 avgDuration:
+ *                   type: integer
+ *                   description: Average session duration in minutes (last 4 weeks)
+ *                 vkProgression:
  *                   type: object
  *                   properties:
- *                     totalSessions:
- *                       type: integer
- *                     totalPracticeDuration:
- *                       type: integer
- *                     favoriteSequences:
+ *                     unlockedFamilies:
  *                       type: array
  *                       items:
  *                         type: string
+ *                     completedSequencesCount:
+ *                       type: integer
+ *                     currentSequence:
+ *                       type: object
+ *                       properties:
+ *                         family:
+ *                           type: string
+ *                         level:
+ *                           type: integer
+ *                         sequenceId:
+ *                           type: string
  *       401:
  *         description: Unauthorized - missing or invalid token
+ *       404:
+ *         description: User not found
  *       500:
  *         description: Server error
  */
-usersRouter.get("/me/stats", asyncErrorWrapper(getMyStats));
+usersRouter.get("/me/stats", getMyStats);
 
 module.exports = usersRouter;

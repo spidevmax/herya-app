@@ -3,18 +3,17 @@
  * @description Model for recording completed yoga practice sessions
  *
  * Manages:
- * - Individual VK or pranayama sessions
+ * - Individual VK, pranayama, or meditation sessions
  * - Complete sessions (warmup + main + cooldown + pranayama + meditation)
  * - Real modifications during practice (poses alternated, skipped, repetitions)
  * - Session duration and date
  * - VK-specific feedback (difficulty, pace, breathing comfort)
- * - Validation of coherence between sessionType and required fields
  *
  * Key Features:
  * - 4 session types: vk_sequence, pranayama, meditation, complete_practice
  * - Tracking of modifications: which poses changed, why, which variations used
  * - VK-specific feedback: challenge level, vinyasa pace, breath comfort
- * - Pre-save validation ensures data integrity
+ * - Pre-save validation ensures coherence between sessionType and required fields
  * - Automatic timestamps for creation/update
  *
  * Relationships:
@@ -60,7 +59,7 @@
  *     mainSequences: [sequenceId1, sequenceId2],
  *     cooldown: cooldownSequenceId,
  *     pranayama: breathingPatternId,
- *     meditation: { duration: 10, type: "guided" }
+ *     meditation: { duration: 10, meditationType: "guided" }
  *   }
  * });
  */
@@ -200,7 +199,7 @@ sessionSchema.pre("save", async function () {
 
 // INDEXES
 sessionSchema.index({ user: 1, date: -1 });
-sessionSchema.index({ user: 1, completed: 1 });
+sessionSchema.index({ user: 1, completed: 1, date: -1 }); // Used by getSessionStats (recent completed sessions per user)
 sessionSchema.index({ user: 1, sessionType: 1 });
 sessionSchema.index({ date: -1 });
 sessionSchema.index({ sessionType: 1 });

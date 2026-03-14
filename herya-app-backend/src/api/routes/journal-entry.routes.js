@@ -21,7 +21,6 @@ const {
 	journalIdValidation,
 	getJournalEntriesValidation,
 } = require("../validations/journal.validations");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 
 const router = express.Router();
 
@@ -71,12 +70,13 @@ router.use(authenticateToken());
  *         name: sequenceFamily
  *         schema:
  *           type: string
+ *           enum: [tadasana, standing_asymmetric, standing_symmetric, one_leg_standing, seated, supine, prone, inverted, meditative, bow_sequence, triangle_sequence, sun_salutation, vajrasana_variations, lotus_variations]
  *         description: Filter by Vinyasa Krama family
  *       - in: query
  *         name: sortBy
  *         schema:
  *           type: string
- *           enum: [date, energy]
+ *           enum: [date, mood, energy]
  *           default: date
  *         description: Sort field
  *     responses:
@@ -100,7 +100,7 @@ router.get(
 	"/",
 	getJournalEntriesValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getJournalEntries),
+	getJournalEntries,
 );
 
 /**
@@ -201,6 +201,44 @@ router.get(
  *                 type: string
  *                 enum: [too_easy, just_right, too_hard]
  *                 description: Session difficulty feedback
+ *               pacingFeedback:
+ *                 type: string
+ *                 enum: [too_slow, perfect, too_fast]
+ *                 description: Session pacing feedback
+ *               bodyAreas:
+ *                 type: array
+ *                 description: Physical sensations per body area
+ *               vkReflection:
+ *                 type: object
+ *                 description: VK-specific progression reflection
+ *                 properties:
+ *                   sequenceFamily:
+ *                     type: string
+ *                     enum: [tadasana, standing_asymmetric, standing_symmetric, one_leg_standing, seated, supine, prone, inverted, meditative, bow_sequence, triangle_sequence, sun_salutation, vajrasana_variations, lotus_variations]
+ *                   sequenceLevel:
+ *                     type: integer
+ *                     enum: [1, 2, 3]
+ *                   progressionNotes:
+ *                     type: string
+ *                     maxLength: 1000
+ *                   anatomicalObservations:
+ *                     type: array
+ *                   readyForNextLevel:
+ *                     type: boolean
+ *               nextSessionGoals:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   maxLength: 500
+ *                 description: Goals for the next practice session
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Optional tags for categorisation
+ *               voiceNoteDuration:
+ *                 type: integer
+ *                 description: Duration in seconds applied to all uploaded voice notes
  *               photos:
  *                 type: array
  *                 items:
@@ -239,7 +277,7 @@ router.post(
 	]),
 	journalValidations,
 	handleValidationErrors,
-	asyncErrorWrapper(createJournalEntry),
+	createJournalEntry,
 );
 
 /**
@@ -266,9 +304,11 @@ router.post(
  *                   type: object
  *                   properties:
  *                     emotional:
- *                       type: array
+ *                       type: object
+ *                       description: Aggregate emotional metrics (avgEnergyImprovement, avgStressReduction, mostCommonMoodBefore, mostCommonMoodAfter)
  *                     physical:
- *                       type: array
+ *                       type: object
+ *                       description: Body area progress keyed by area name (observations, improvements, significant, moderate, slight)
  *                 totalEntries:
  *                   type: integer
  *                 firstEntry:
@@ -280,7 +320,7 @@ router.post(
  *       500:
  *         description: Server error
  */
-router.get("/digital-garden", asyncErrorWrapper(getDigitalGarden));
+router.get("/digital-garden", getDigitalGarden);
 
 /**
  * @swagger
@@ -319,7 +359,7 @@ router.get(
 	"/:id",
 	journalIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getJournalEntryById),
+	getJournalEntryById,
 );
 
 /**
@@ -350,42 +390,87 @@ router.get(
  *                 type: array
  *                 items:
  *                   type: string
+ *                   enum: [calm, anxious, energized, tired, focused, stressed, happy, sad, grounded, restless, peaceful, overwhelmed, motivated, discouraged, scattered, irritated]
  *               moodAfter:
  *                 type: array
  *                 items:
  *                   type: string
+ *                   enum: [calm, anxious, energized, tired, focused, stressed, happy, sad, grounded, restless, peaceful, overwhelmed, motivated, discouraged, renewed, centered, light, clear, scattered, irritated]
  *               energyLevel:
  *                 type: object
  *                 properties:
  *                   before:
  *                     type: integer
+ *                     minimum: 1
+ *                     maximum: 10
  *                   after:
  *                     type: integer
+ *                     minimum: 1
+ *                     maximum: 10
  *               stressLevel:
  *                 type: object
  *                 properties:
  *                   before:
  *                     type: integer
+ *                     minimum: 1
+ *                     maximum: 10
  *                   after:
  *                     type: integer
+ *                     minimum: 1
+ *                     maximum: 10
  *               physicalSensations:
  *                 type: string
+ *                 maxLength: 2000
  *               emotionalNotes:
  *                 type: string
+ *                 maxLength: 2000
  *               insights:
  *                 type: string
+ *                 maxLength: 2000
  *               gratitude:
  *                 type: string
+ *                 maxLength: 1000
+ *               bodyAreas:
+ *                 type: array
+ *                 description: Physical sensations per body area
+ *               favoritePoses:
+ *                 type: array
+ *                 description: Favorite poses from the session
+ *               challengingPoses:
+ *                 type: array
+ *                 description: Challenging poses from the session
+ *               difficultyFeedback:
+ *                 type: string
+ *                 enum: [too_easy, just_right, too_hard]
+ *               pacingFeedback:
+ *                 type: string
+ *                 enum: [too_slow, perfect, too_fast]
+ *               vkReflection:
+ *                 type: object
+ *                 description: VK-specific progression reflection
+ *               nextSessionGoals:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               tags:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               voiceNoteDuration:
+ *                 type: integer
+ *                 description: Duration in seconds applied to all new voice notes
  *               photos:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
+ *                 description: New photos to add (additive)
  *               voiceNotes:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
+ *                 description: New voice notes to add (additive)
  *     responses:
  *       200:
  *         description: Journal updated successfully
@@ -406,7 +491,7 @@ router.put(
 		{ name: "photos", maxCount: 10 },
 		{ name: "voiceNotes", maxCount: 5 },
 	]),
-	asyncErrorWrapper(updateJournalEntry),
+	updateJournalEntry,
 );
 
 /**
@@ -442,7 +527,7 @@ router.delete(
 	"/:id",
 	journalIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(deleteJournalEntry),
+	deleteJournalEntry,
 );
 
 module.exports = router;

@@ -1,7 +1,7 @@
-name,email,password,role,goals,totalSessions,totalMinutes,currentStreak,language,preferredIntensity,practicePreferences
-Maria Lopez,maria@example.com,SecurePass123,user,"reduce_stress,improve_balance",5,150,2,es,moderate,"morning,short-sessions"
-Juan Martínez,juan@example.com,SecurePass456,user,"increase_flexibility,build_strength",25,1250,5,es,vigorous,"evening,full-practice"
-Ana García,ana@example.com,SecurePass789,user,"therapeutic_healing,deepen_practice",100,5000,15,es,vigorous,"any-time,long-practice"
-Carlos Rodríguez,carlos@example.com,SecurePass101,user,"meditation_focus,breath_awareness",2,60,1,es,gentle,"morning,short-sessions"
-Sofia Pérez,sofia@example.com,SecurePass202,admin,"improve_balance,meditation_focus",15,600,3,es,moderate,"evening,meditation-focus"
-Admin User,admin@herya-app.com,AdminPass123,admin,"deepen_practice",0,0,0,en,vigorous,"any-time"
+name,email,password,role,goals,totalSessions,totalMinutes,currentStreak,lastPracticeDate,language,practiceIntensity,sessionDuration,timeOfDay
+Sarah Mitchell,sarah@example.com,SecurePass123,user,"reduce_stress,improve_balance",5,150,2,2026-03-06,en,moderate,30,morning
+James Carter,james@example.com,SecurePass456,user,"increase_flexibility,build_strength",25,1250,5,2026-03-08,en,vigorous,60,evening
+Emma Thompson,emma@example.com,SecurePass789,user,"therapeutic_healing,deepen_practice",100,5000,15,2026-03-08,en,vigorous,45,morning
+Daniel Harris,daniel@example.com,SecurePass101,user,"meditation_focus,breath_awareness",2,60,1,2026-03-05,en,gentle,20,anytime
+Laura Bennett,laura@example.com,SecurePass202,admin,"improve_balance,meditation_focus",15,600,3,2026-03-07,en,moderate,30,evening
+Admin User,admin@herya-app.com,AdminPass123,admin,deepen_practice,0,0,0,,en,vigorous,30,anytime

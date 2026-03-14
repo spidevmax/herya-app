@@ -427,8 +427,8 @@ const getPranayamaProgression = async (_req, res, next) => {
  *
  * Workflow:
  * 1. Validates that search query (q) is provided
- * 2. Creates case-insensitive regex pattern
- * 3. Searches across name fields, description, and tags
+ * 2. Performs full-text search using the MongoDB text index
+ * 3. Sorts by relevance score (most relevant first)
  * 4. Returns up to 20 matching patterns
  *
  * Response:
@@ -441,9 +441,8 @@ const getPranayamaProgression = async (_req, res, next) => {
  * - Database errors passed to global handler
  *
  * Notes:
- * - Regex search covers romanizationName, iastName, sanskritName, description, tags
- * - Case-insensitive matching for better UX
- * - MongoDB $text cannot be nested inside $or — regex search used throughout
+ * - Uses the text index on romanizationName, iastName, sanskritName, description, tags
+ * - Text search is safe against ReDoS and uses MongoDB index (faster than regex)
  */
 const searchBreathingPatterns = async (req, res, next) => {
 	try {
@@ -453,17 +452,12 @@ const searchBreathingPatterns = async (req, res, next) => {
 			throw createError(400, "Search query is required");
 		}
 
-		const searchRegex = new RegExp(q, "i");
-
-		const patterns = await BreathingPattern.find({
-			$or: [
-				{ romanizationName: searchRegex },
-				{ iastName: searchRegex },
-				{ sanskritName: searchRegex },
-				{ description: searchRegex },
-				{ tags: searchRegex },
-			],
-		}).limit(20);
+		const patterns = await BreathingPattern.find(
+			{ $text: { $search: q } },
+			{ score: { $meta: "textScore" } },
+		)
+			.sort({ score: { $meta: "textScore" } })
+			.limit(20);
 
 		return sendResponse(
 			res,

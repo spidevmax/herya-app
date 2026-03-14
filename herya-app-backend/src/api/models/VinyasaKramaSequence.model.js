@@ -331,10 +331,6 @@ vkSequenceSchema.pre("save", async function () {
 				"corePoses orders must be consecutive starting from 1 (e.g., 1, 2, 3, 4...)",
 			);
 		}
-
-		if (new Set(orders).size !== orders.length) {
-			throw new Error("corePoses orders must be unique");
-		}
 	}
 });
 

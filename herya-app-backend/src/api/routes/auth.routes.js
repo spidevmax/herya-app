@@ -1,5 +1,4 @@
 const { register, login } = require("../controllers/auth.controller");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 const { registerValidations, loginValidations } = require("../validations/auth.validations");
 const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
@@ -11,7 +10,7 @@ const authRouter = require("express").Router();
  * /api/v1/auth/register:
  *   post:
  *     summary: Register a new user account
- *     description: Create a new user account with profile image, email, password, name, and preferences
+ *     description: Create a new user account. Returns a JWT token for immediate authentication. All new users start with the Tadasana family unlocked.
  *     tags:
  *       - Authentication
  *     requestBody:
@@ -31,27 +30,23 @@ const authRouter = require("express").Router();
  *                 example: user@example.com
  *               password:
  *                 type: string
- *                 minLength: 6
- *                 example: password123
+ *                 minLength: 8
+ *                 example: SecurePass123
  *               name:
  *                 type: string
+ *                 minLength: 2
+ *                 maxLength: 50
  *                 example: John Doe
  *               goals:
  *                 type: array
  *                 items:
  *                   type: string
- *                 example: ["flexibility", "strength"]
- *               preferredDuration:
- *                 type: integer
- *                 example: 30
- *               experienceLevel:
- *                 type: string
- *                 enum: [beginner, intermediate, advanced]
- *                 example: beginner
+ *                   enum: [increase_flexibility, build_strength, reduce_stress, improve_balance, therapeutic_healing, deepen_practice, meditation_focus, breath_awareness]
+ *                 example: ["reduce_stress", "improve_balance"]
  *               profileImage:
  *                 type: string
  *                 format: binary
- *                 description: User profile image (jpg, png, webp, gif)
+ *                 description: Optional profile image (jpg, png, webp, gif)
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -60,14 +55,28 @@ const authRouter = require("express").Router();
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
  *                   example: User registered successfully
- *                 token:
- *                   type: string
- *                   description: JWT authentication token
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: JWT authentication token (expires in 1 day)
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     user:
+ *                       type: object
+ *                       description: Newly created user profile (password excluded)
  *       400:
- *         description: Invalid input or user already exists
+ *         description: Validation error or email already in use
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Server error
  */
@@ -76,7 +85,7 @@ authRouter.post(
 	uploadUserImage.single("profileImage"),
 	registerValidations,
 	handleValidationErrors,
-	asyncErrorWrapper(register),
+	register,
 );
 
 /**
@@ -112,20 +121,43 @@ authRouter.post(
  *             schema:
  *               type: object
  *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
  *                 message:
  *                   type: string
  *                   example: Login successful
- *                 token:
- *                   type: string
- *                   description: JWT authentication token (use in Authorization header)
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       description: JWT authentication token (expires in 1 day, use in Authorization header)
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     user:
+ *                       type: object
+ *                       description: Authenticated user profile (password excluded)
  *       400:
- *         description: Invalid email or password
+ *         description: Validation error (missing/invalid fields)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       401:
- *         description: Unauthorized - credentials incorrect
+ *         description: Incorrect password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Server error
  */
-authRouter.post("/login", loginValidations, handleValidationErrors, asyncErrorWrapper(login));
+authRouter.post("/login", loginValidations, handleValidationErrors, login);
 
 module.exports = authRouter;

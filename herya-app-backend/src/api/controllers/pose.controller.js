@@ -123,11 +123,6 @@ const getPoseById = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 
-		// Validate MongoDB ObjectId format
-		if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-			throw createError(400, "Invalid pose ID format");
-		}
-
 		const pose = await Pose.findById(id)
 			.populate("preparatoryPoses")
 			.populate("followUpPoses")
@@ -290,11 +285,6 @@ const searchPoses = async (req, res, next) => {
 const getRelatedPoses = async (req, res, next) => {
 	try {
 		const { id } = req.params;
-
-		// Validate MongoDB ObjectId format
-		if (!id.match(/^[0-9a-fA-F]{24}$/)) {
-			throw createError(400, "Invalid pose ID format");
-		}
 
 		const pose = await Pose.findById(id)
 			.populate("preparatoryPoses")

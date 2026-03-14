@@ -238,6 +238,11 @@ const createJournalEntry = async (req, res, next) => {
 			session: sessionId,
 		});
 
+		// Explicitly reset media arrays — prevent body-injected photo/voiceNote objects
+		// from bypassing the Cloudinary upload flow (req.body spread above would set them).
+		journalEntry.photos = [];
+		journalEntry.voiceNotes = [];
+
 		// Handle photo uploads
 		if (req.files?.photos && Array.isArray(req.files.photos)) {
 			journalEntry.photos = req.files.photos.map((file) => ({
@@ -408,6 +413,26 @@ const updateJournalEntry = async (req, res, next) => {
 		}
 
 		const updatedJournal = await journal.save();
+
+		// Trigger VK progression if readyForNextLevel was set via this update
+		if (updatedJournal.vkReflection?.readyForNextLevel) {
+			try {
+				const populatedSession = await Session.findById(
+					updatedJournal.session,
+				).populate("vkSequence");
+				if (populatedSession?.vkSequence) {
+					await updateUserVKProgression(
+						req.user._id,
+						populatedSession.vkSequence.family,
+						populatedSession.vkSequence.level,
+						populatedSession.vkSequence._id,
+					);
+				}
+			} catch (progressError) {
+				// Log but don't fail — journal update is already saved
+				console.error("Failed to update VK progression:", progressError);
+			}
+		}
 
 		await updatedJournal.populate("session");
 		await updatedJournal.populate("favoritePoses.pose");

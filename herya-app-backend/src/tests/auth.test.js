@@ -21,7 +21,8 @@ describe("Auth — POST /register", () => {
 		await request(app).post(`${BASE}/register`).send(payload);
 		const res = await request(app).post(`${BASE}/register`).send(payload);
 		expect(res.status).toBe(400);
-		expect(res.body).toHaveProperty("error");
+		expect(res.body.success).toBe(false);
+		expect(res.body).toHaveProperty("message");
 	});
 
 	it("returns 400 when required fields are missing", async () => {

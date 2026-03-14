@@ -17,16 +17,17 @@ async function seedJournalEntries() {
 			return;
 		}
 
-		// Get user and session for associations
+		// Get user and sessions for associations
 		const user = await User.findOne();
-		const session = await Session.findOne({ user: user?._id });
 
 		if (!user) {
 			console.log("⚠️  No users found, skipping journal seeding");
 			return;
 		}
 
-		if (!session) {
+		const sessions = await Session.find({ user: user._id });
+
+		if (sessions.length === 0) {
 			console.log(
 				"⚠️  No sessions found, skipping journal seeding (session is required)",
 			);
@@ -117,7 +118,7 @@ async function seedJournalEntries() {
 
 			return {
 				user: user._id,
-				session: session._id, // all seed entries reuse the first session
+				session: sessions[index % sessions.length]._id,
 				moodBefore: moodBefore.length > 0 ? moodBefore : ["calm"],
 				moodAfter: moodAfter.length > 0 ? moodAfter : ["peaceful"],
 				energyLevel: {

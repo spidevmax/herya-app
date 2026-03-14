@@ -73,14 +73,34 @@ const swaggerOptions = {
 				Error: {
 					type: "object",
 					properties: {
-						error: {
-							type: "object",
-							properties: {
-								message: {
-									type: "string",
-								},
-								status: {
-									type: "integer",
+						success: {
+							type: "boolean",
+							example: false,
+						},
+						message: {
+							type: "string",
+							example: "Error description",
+						},
+					},
+				},
+				ValidationError: {
+					type: "object",
+					properties: {
+						success: {
+							type: "boolean",
+							example: false,
+						},
+						message: {
+							type: "string",
+							example: "Validation error",
+						},
+						errors: {
+							type: "array",
+							items: {
+								type: "object",
+								properties: {
+									field: { type: "string" },
+									message: { type: "string" },
 								},
 							},
 						},

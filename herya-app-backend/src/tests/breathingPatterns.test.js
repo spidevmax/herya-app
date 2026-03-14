@@ -4,6 +4,11 @@ const BreathingPattern = require("../api/models/BreathingPattern.model");
 
 const BASE = "/api/v1/breathing-patterns";
 
+// Ensure text indexes are built before running search tests
+beforeAll(async () => {
+	await BreathingPattern.ensureIndexes();
+});
+
 const breathingPatternFactory = (overrides = {}) => ({
 	romanizationName: "Ujjayi Pranayama",
 	iastName: "Ujjāyī Prāṇāyāma",

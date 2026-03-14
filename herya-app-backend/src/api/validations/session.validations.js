@@ -34,7 +34,41 @@ const createSessionValidations = [
 		.isInt({ min: 1 })
 		.withMessage("Duration must be a positive integer (minutes)"),
 
-	check("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+	check("vkSequence")
+		.optional()
+		.isMongoId()
+		.withMessage("vkSequence must be a valid MongoDB ID"),
+
+	check("completed")
+		.optional()
+		.isBoolean()
+		.withMessage("Completed must be a boolean value"),
+
+	check("date")
+		.optional()
+		.isISO8601()
+		.withMessage("Date must be a valid ISO 8601 date"),
+
+	check("vkFeedback.sequenceChallenge")
+		.optional()
+		.isIn(["too_easy", "appropriate", "too_challenging"])
+		.withMessage(
+			'vkFeedback.sequenceChallenge must be one of: "too_easy", "appropriate", "too_challenging"',
+		),
+
+	check("vkFeedback.vinyasaPace")
+		.optional()
+		.isIn(["too_slow", "perfect", "too_fast"])
+		.withMessage(
+			'vkFeedback.vinyasaPace must be one of: "too_slow", "perfect", "too_fast"',
+		),
+
+	check("vkFeedback.breathComfort")
+		.optional()
+		.isIn(["comfortable", "slightly_strained", "very_difficult"])
+		.withMessage(
+			'vkFeedback.breathComfort must be one of: "comfortable", "slightly_strained", "very_difficult"',
+		),
 ];
 
 /**
@@ -53,7 +87,10 @@ const createSessionValidations = [
  * router.put("/:id", updateSessionValidations, handleValidationErrors, updateSession);
  */
 const updateSessionValidations = [
-	check("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+	check("completed")
+		.optional()
+		.isBoolean()
+		.withMessage("Completed must be a boolean value"),
 
 	check("duration")
 		.optional()
@@ -65,6 +102,27 @@ const updateSessionValidations = [
 		.trim()
 		.isLength({ max: 1000 })
 		.withMessage("Notes cannot exceed 1000 characters"),
+
+	check("vkFeedback.sequenceChallenge")
+		.optional()
+		.isIn(["too_easy", "appropriate", "too_challenging"])
+		.withMessage(
+			'vkFeedback.sequenceChallenge must be one of: "too_easy", "appropriate", "too_challenging"',
+		),
+
+	check("vkFeedback.vinyasaPace")
+		.optional()
+		.isIn(["too_slow", "perfect", "too_fast"])
+		.withMessage(
+			'vkFeedback.vinyasaPace must be one of: "too_slow", "perfect", "too_fast"',
+		),
+
+	check("vkFeedback.breathComfort")
+		.optional()
+		.isIn(["comfortable", "slightly_strained", "very_difficult"])
+		.withMessage(
+			'vkFeedback.breathComfort must be one of: "comfortable", "slightly_strained", "very_difficult"',
+		),
 ];
 
 /**
@@ -92,7 +150,10 @@ const sessionIdValidation = [
  * router.get("/", sessionPaginationValidation, handleValidationErrors, getUserSessions);
  */
 const sessionPaginationValidation = [
-	check("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+	check("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
 
 	check("limit")
 		.optional()
@@ -106,11 +167,20 @@ const sessionPaginationValidation = [
 			'Session type must be one of: "vk_sequence", "pranayama", "meditation", "complete_practice"',
 		),
 
-	check("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+	check("completed")
+		.optional()
+		.isBoolean()
+		.withMessage("Completed must be a boolean value"),
 
-	check("startDate").optional().isISO8601().withMessage("Start date must be a valid ISO 8601 date"),
+	check("startDate")
+		.optional()
+		.isISO8601()
+		.withMessage("Start date must be a valid ISO 8601 date"),
 
-	check("endDate").optional().isISO8601().withMessage("End date must be a valid ISO 8601 date"),
+	check("endDate")
+		.optional()
+		.isISO8601()
+		.withMessage("End date must be a valid ISO 8601 date"),
 ];
 
 module.exports = {

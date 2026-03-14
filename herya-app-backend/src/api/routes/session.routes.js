@@ -10,7 +10,6 @@ const {
 const {
 	authenticateToken,
 } = require("../../middlewares/authorization.middleware");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 const {
 	handleValidationErrors,
 } = require("../../middlewares/validation.middleware");
@@ -46,11 +45,28 @@ router.use(authenticateToken());
  *               properties:
  *                 totalSessions:
  *                   type: integer
- *                 totalDuration:
+ *                   description: All-time completed session count (from User document)
+ *                 totalMinutes:
  *                   type: integer
- *                 averageDuration:
- *                   type: number
- *                 lastSessionDate:
+ *                   description: All-time practice minutes (from User document)
+ *                 currentStreak:
+ *                   type: integer
+ *                   description: Consecutive practice days streak
+ *                 sessionsByType:
+ *                   type: object
+ *                   description: Count of completed sessions per type (vk_sequence, pranayama, etc.)
+ *                 sessionsPerWeek:
+ *                   type: array
+ *                   items:
+ *                     type: integer
+ *                   description: Session count per week for last 4 weeks (index 0 = oldest)
+ *                 mostPracticedFamilies:
+ *                   type: array
+ *                   description: Top 5 VK families by session count (last 4 weeks)
+ *                 avgDuration:
+ *                   type: integer
+ *                   description: Average session duration in minutes (last 4 weeks)
+ *                 lastPracticeDate:
  *                   type: string
  *                   format: date-time
  *       401:
@@ -58,7 +74,7 @@ router.use(authenticateToken());
  *       500:
  *         description: Server error
  */
-router.get("/stats", asyncErrorWrapper(getSessionStats));
+router.get("/stats", getSessionStats);
 
 /**
  * @swagger
@@ -129,7 +145,7 @@ router.get(
 	"/",
 	sessionPaginationValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getSessions),
+	getSessions,
 );
 
 /**
@@ -163,14 +179,10 @@ router.get(
  *                 type: integer
  *                 minimum: 1
  *                 description: Session duration in minutes
- *               startTime:
+ *               date:
  *                 type: string
  *                 format: date-time
- *                 description: When the session started (optional)
- *               endTime:
- *                 type: string
- *                 format: date-time
- *                 description: When the session ended (optional)
+ *                 description: Date of practice (defaults to now if omitted)
  *               completed:
  *                 type: boolean
  *                 description: Whether the session was completed (default false)
@@ -178,6 +190,59 @@ router.get(
  *                 type: string
  *                 maxLength: 1000
  *                 description: Optional session notes
+ *               completePractice:
+ *                 type: object
+ *                 description: Required when sessionType is complete_practice
+ *                 properties:
+ *                   warmup:
+ *                     type: string
+ *                     description: VKSequence ObjectId for warmup
+ *                   mainSequences:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                     description: Array of VKSequence ObjectIds (at least one required)
+ *                   cooldown:
+ *                     type: string
+ *                     description: VKSequence ObjectId for cooldown
+ *                   pranayama:
+ *                     type: string
+ *                     description: BreathingPattern ObjectId
+ *                   meditation:
+ *                     type: object
+ *                     properties:
+ *                       duration:
+ *                         type: integer
+ *                         description: Meditation duration in minutes
+ *                       meditationType:
+ *                         type: string
+ *                         description: Type of meditation practiced
+ *               actualPractice:
+ *                 type: object
+ *                 description: Modifications made during practice
+ *                 properties:
+ *                   repetitionsCompleted:
+ *                     type: integer
+ *                     description: Number of repetitions completed
+ *                   posesModified:
+ *                     type: array
+ *                     description: Poses that were replaced with variations
+ *                   skippedPoses:
+ *                     type: array
+ *                     description: Poses that were skipped
+ *               vkFeedback:
+ *                 type: object
+ *                 description: VK-specific feedback (for vk_sequence sessions)
+ *                 properties:
+ *                   sequenceChallenge:
+ *                     type: string
+ *                     enum: [too_easy, appropriate, too_challenging]
+ *                   vinyasaPace:
+ *                     type: string
+ *                     enum: [too_slow, perfect, too_fast]
+ *                   breathComfort:
+ *                     type: string
+ *                     enum: [comfortable, slightly_strained, very_difficult]
  *     responses:
  *       201:
  *         description: Session created successfully
@@ -198,7 +263,7 @@ router.post(
 	"/",
 	createSessionValidations,
 	handleValidationErrors,
-	asyncErrorWrapper(createSession),
+	createSession,
 );
 
 /**
@@ -236,12 +301,7 @@ router.post(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/:id",
-	sessionIdValidation,
-	handleValidationErrors,
-	asyncErrorWrapper(getSessionById),
-);
+router.get("/:id", sessionIdValidation, handleValidationErrors, getSessionById);
 
 /**
  * @swagger
@@ -278,6 +338,29 @@ router.get(
  *                 type: string
  *                 maxLength: 1000
  *                 description: Session notes
+ *               actualPractice:
+ *                 type: object
+ *                 description: Modifications made during practice
+ *                 properties:
+ *                   repetitionsCompleted:
+ *                     type: integer
+ *                   posesModified:
+ *                     type: array
+ *                   skippedPoses:
+ *                     type: array
+ *               vkFeedback:
+ *                 type: object
+ *                 description: VK-specific session feedback
+ *                 properties:
+ *                   sequenceChallenge:
+ *                     type: string
+ *                     enum: [too_easy, appropriate, too_challenging]
+ *                   vinyasaPace:
+ *                     type: string
+ *                     enum: [too_slow, perfect, too_fast]
+ *                   breathComfort:
+ *                     type: string
+ *                     enum: [comfortable, slightly_strained, very_difficult]
  *     responses:
  *       200:
  *         description: Session updated successfully
@@ -301,7 +384,7 @@ router.put(
 	sessionIdValidation,
 	updateSessionValidations,
 	handleValidationErrors,
-	asyncErrorWrapper(updateSession),
+	updateSession,
 );
 
 /**
@@ -337,7 +420,7 @@ router.delete(
 	"/:id",
 	sessionIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(deleteSession),
+	deleteSession,
 );
 
 module.exports = router;

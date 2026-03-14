@@ -1,6 +1,7 @@
 const express = require("express");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 
 const {
 	getBreathingPatterns,
@@ -54,7 +55,7 @@ router.get(
 	"/search",
 	searchBreathingPatternValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(searchBreathingPatterns),
+	searchBreathingPatterns,
 );
 
 /**
@@ -111,7 +112,7 @@ router.get(
 	"/recommended",
 	recommendedBreathingPatternValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getRecommendedBreathingPattern),
+	getRecommendedBreathingPattern,
 );
 
 /**
@@ -139,7 +140,7 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get("/progression", asyncErrorWrapper(getPranayamaProgression));
+router.get("/progression", getPranayamaProgression);
 
 /**
  * @swagger
@@ -173,7 +174,7 @@ router.get(
 	"/technique/:technique",
 	breathingPatternTechniqueValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getBreathingPatternsByTechnique),
+	getBreathingPatternsByTechnique,
 );
 
 /**
@@ -201,7 +202,14 @@ router.get(
  *         name: practicePhase
  *         schema:
  *           type: string
- *         description: Filter by Vinyasa Krama practice phase
+ *           enum: [opening, mid_practice, closing, anytime]
+ *         description: Filter by VK practice phase
+ *       - in: query
+ *         name: recommendedBefore
+ *         schema:
+ *           type: string
+ *           enum: [tadasana, standing_asymmetric, standing_symmetric, one_leg_standing, seated, supine, prone, inverted, meditative, bow_sequence, triangle_sequence, sun_salutation, vajrasana_variations, lotus_variations]
+ *         description: Filter by VK family this pattern is recommended before
  *       - in: query
  *         name: page
  *         schema:
@@ -236,7 +244,7 @@ router.get(
 	"/",
 	getBreathingPatternsValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getBreathingPatterns),
+	getBreathingPatterns,
 );
 
 /**
@@ -272,7 +280,7 @@ router.get(
 	"/:id",
 	breathingPatternIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getBreathingPatternById),
+	getBreathingPatternById,
 );
 
 module.exports = router;

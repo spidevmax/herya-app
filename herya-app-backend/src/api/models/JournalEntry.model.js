@@ -4,7 +4,7 @@
  *
  * Manages:
  * - Personal post-session records (reflections, sensations, changes)
- * - Mood tracking: before and after (up to 18 selectable moods)
+ * - Mood tracking: before and after (16 moods before / 20 moods after)
  * - Energy & Stress levels: 1-10 scale before/after
  * - Physical sensations: how the body feels after practice
  * - Emotional/mental insights: clarity, peace, rest, etc.
@@ -300,7 +300,7 @@ const journalEntrySchema = new mongoose.Schema(
 				duration: {
 					type: Number,
 					required: true,
-					min: 1,
+					min: 0, // 0 = unknown duration (client did not report it)
 					max: 1800, // maximum 30 minutes
 				},
 				title: {
@@ -530,6 +530,7 @@ journalEntrySchema
 // INDEXES
 journalEntrySchema.index({ user: 1, createdAt: -1 }); // User's journals chronological
 journalEntrySchema.index({ createdAt: -1 }); // All journals chronological
+journalEntrySchema.index({ user: 1, "energyLevel.after": -1 }); // sortBy: "energy" in getJournalEntries
 journalEntrySchema.index({ "vkReflection.sequenceFamily": 1 }); // By VK family
 journalEntrySchema.index({ "vkReflection.sequenceLevel": 1 }); // By VK level
 journalEntrySchema.index({ "vkReflection.readyForNextLevel": 1 }); // For progression tracking

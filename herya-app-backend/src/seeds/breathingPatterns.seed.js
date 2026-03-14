@@ -9,13 +9,6 @@ const BreathingPattern = require("../api/models/BreathingPattern.model");
  */
 async function seedBreathingPatterns() {
 	try {
-		// Check if patterns already exist
-		const existingPatterns = await BreathingPattern.countDocuments();
-		if (existingPatterns > 0) {
-			console.log("⏭️  Breathing patterns already seeded, skipping...");
-			return;
-		}
-
 		// Read CSV file
 		const csvPath = path.join(__dirname, "data", "breathingPatterns.csv");
 		const csvContent = fs.readFileSync(csvPath, "utf-8");
@@ -87,19 +80,42 @@ async function seedBreathingPatterns() {
 			// VK TECHNIQUES
 			vkTechniques: {
 				nadishodhana: {
-					enabled: row["vkTechniques.nadishodhana.enabled"] ?? false,
+					enabled: toBool(row["vkTechniques.nadishodhana.enabled"]),
+					...(row["vkTechniques.nadishodhana.pattern"] && {
+						pattern: row["vkTechniques.nadishodhana.pattern"],
+					}),
 				},
 				kapalabhati: {
-					enabled: row["vkTechniques.kapalabhati.enabled"] ?? false,
+					enabled: toBool(row["vkTechniques.kapalabhati.enabled"]),
+					...(row["vkTechniques.kapalabhati.pumpingRate"] != null && {
+						pumpingRate: row["vkTechniques.kapalabhati.pumpingRate"],
+					}),
+					rounds: row["vkTechniques.kapalabhati.rounds"] ?? 3,
 				},
-				bhastrika: { enabled: row["vkTechniques.bhastrika.enabled"] ?? false },
-				ujjayi: { enabled: row["vkTechniques.ujjayi.enabled"] ?? false },
-				bhramari: { enabled: row["vkTechniques.bhramari.enabled"] ?? false },
-				cooling: { enabled: row["vkTechniques.cooling.enabled"] ?? false },
+				bhastrika: {
+					enabled: toBool(row["vkTechniques.bhastrika.enabled"]),
+					intensity: row["vkTechniques.bhastrika.intensity"] || "gentle",
+					rounds: row["vkTechniques.bhastrika.rounds"] ?? 3,
+				},
+				ujjayi: {
+					enabled: toBool(row["vkTechniques.ujjayi.enabled"]),
+					withSound:
+						row["vkTechniques.ujjayi.withSound"] != null
+							? toBool(row["vkTechniques.ujjayi.withSound"])
+							: true,
+				},
+				bhramari: {
+					enabled: toBool(row["vkTechniques.bhramari.enabled"]),
+					pitch: row["vkTechniques.bhramari.pitch"] || "medium",
+				},
+				cooling: {
+					enabled: toBool(row["vkTechniques.cooling.enabled"]),
+					type: row["vkTechniques.cooling.type"] || "sitali",
+				},
 				bandhas: {
-					mula: row["vkTechniques.bandhas.mula"] ?? false,
-					uddiyana: row["vkTechniques.bandhas.uddiyana"] ?? false,
-					jalandhara: row["vkTechniques.bandhas.jalandhara"] ?? false,
+					mula: toBool(row["vkTechniques.bandhas.mula"]),
+					uddiyana: toBool(row["vkTechniques.bandhas.uddiyana"]),
+					jalandhara: toBool(row["vkTechniques.bandhas.jalandhara"]),
 					whenToApply: row["vkTechniques.bandhas.whenToApply"] || "none",
 				},
 				mudra: row["vkTechniques.mudra"] || "none",
@@ -131,10 +147,17 @@ async function seedBreathingPatterns() {
 			isSystemPattern: toBool(row["isSystemPattern"]),
 		}));
 
-		// Insert into database
-		await BreathingPattern.insertMany(breathingPatterns);
+		// Upsert by romanizationName — adds new patterns without overwriting existing ones
+		const ops = breathingPatterns.map((pattern) => ({
+			updateOne: {
+				filter: { romanizationName: pattern.romanizationName },
+				update: { $setOnInsert: pattern },
+				upsert: true,
+			},
+		}));
+		const result = await BreathingPattern.bulkWrite(ops);
 		console.log(
-			`✅ Seeded ${breathingPatterns.length} breathing patterns from CSV`,
+			`✅ Breathing patterns seeded: ${result.upsertedCount} inserted, ${result.matchedCount} already existed`,
 		);
 	} catch (error) {
 		console.error("❌ Error seeding breathing patterns:", error.message);

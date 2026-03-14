@@ -10,20 +10,19 @@
  * - Technical information (recommended breaths, modifications, contraindications)
  * - Teaching: step-by-step instructions, common mistakes, safety tips
  * - Experience: sensations, visualization, chakra balance
- * - Relationships between poses: counterpose, preparatory, transition
+ * - Relationships between poses: counterpose, preparatory, follow-up
  *
  * Key Features:
  * - VK-optimized: each pose knows which family it belongs to, its role, how many breaths
  * - Clear sidedness for asymmetric poses: L-R-L-R vs L-L-L-R-R-R
- * - Modifications by level: variations for each difficulty
+ * - Breath recommendations per level (beginner / intermediate / advanced)
  * - Fully documented for step-by-step tracking
  * - Indexes for efficient searches by family, difficulty, category
  *
  * Relationships:
  * - Referenced by: VinyasaKramaSequence.structure.corePoses
  * - Referenced by: Session.actualPractice.posesModified
- * - Self-reference: modifications (variations of the same pose)
- * - Self-reference: counterpose, preparatory, transition
+ * - Self-reference: counterpose (recommendedCounterposes), preparatory (preparatoryPoses), follow-up (followUpPoses)
  *
  * @example
  * // Create Utkatasana (Chair Pose)
@@ -433,6 +432,7 @@ poseSchema.index({ "vkCategory.primary": 1 });
 poseSchema.index({ "vkCategory.secondary": 1 });
 poseSchema.index({ "vkContext.appearsInFamilies": 1 });
 poseSchema.index({ "vkContext.roleInSequence": 1 });
+poseSchema.index({ "vkContext.appearsInFamilies": 1, difficulty: 1 }); // Most common query: poses by family + level
 poseSchema.index({ "sidedness.type": 1 });
 
 const Pose = mongoose.model("Pose", poseSchema);

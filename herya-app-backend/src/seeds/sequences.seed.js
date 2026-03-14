@@ -9,13 +9,6 @@ const VKSequence = require("../api/models/VinyasaKramaSequence.model");
  */
 async function seedSequences() {
 	try {
-		// Check if sequences already exist
-		const existingSequences = await VKSequence.countDocuments();
-		if (existingSequences > 0) {
-			console.log("⏭️  Sequences already seeded, skipping...");
-			return;
-		}
-
 		// Read CSV file
 		const csvPath = path.join(__dirname, "data", "sequences.csv");
 		const csvContent = fs.readFileSync(csvPath, "utf-8");
@@ -69,8 +62,18 @@ async function seedSequences() {
 				row.isSystemSequence !== false && row.isSystemSequence !== "false",
 		}));
 
-		await VKSequence.insertMany(sequences);
-		console.log(`✅ Seeded ${sequences.length} VK sequences from CSV`);
+		// Upsert by family+level — adds new sequences without overwriting existing ones
+		const ops = sequences.map((seq) => ({
+			updateOne: {
+				filter: { family: seq.family, level: seq.level },
+				update: { $setOnInsert: seq },
+				upsert: true,
+			},
+		}));
+		const result = await VKSequence.bulkWrite(ops);
+		console.log(
+			`✅ Sequences seeded: ${result.upsertedCount} inserted, ${result.matchedCount} already existed`,
+		);
 	} catch (error) {
 		console.error("❌ Error seeding sequences:", error.message);
 		throw error;

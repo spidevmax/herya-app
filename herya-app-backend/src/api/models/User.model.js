@@ -21,13 +21,12 @@
  * Relationships:
  * - One-to-Many: Sessions
  * - One-to-Many: JournalEntries
- * - Many-to-Many (via vkProgression): VinyasaKramaSequence
- *
+ * - Many-to-Many (via vkProgression): VKSequence
  * @example
  * // Create new user
  * const user = new User({
- *   name: "Juan García",
- *   email: "juan@example.com",
+ *   name: "John Doe",
+ *   email: "john@example.com",
  *   password: "SecurePass123", // Automatically hashed
  *   goals: ["reduce_stress", "improve_balance"],
  *   vkProgression: {
@@ -49,6 +48,7 @@ const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
 	{
+		// BASIC INFO
 		name: { type: String, trim: true, required: true, maxlength: 50 },
 		email: {
 			type: String,
@@ -139,24 +139,17 @@ const userSchema = new mongoose.Schema(
 
 		// PRACTICE PREFERENCES (VK-adapted)
 		preferences: {
-			// Instead of "yogaStyle", now it's practice intensity
 			practiceIntensity: {
 				type: String,
 				enum: ["gentle", "moderate", "vigorous"],
 				default: "moderate",
 			},
-
-			// Preferred session duration
-			preferredSessionDuration: { type: Number, default: 30 },
-
-			// Preferred time of day
-			preferredTimeOfDay: {
+			sessionDuration: { type: Number, default: 30 },
+			timeOfDay: {
 				type: String,
 				enum: ["morning", "afternoon", "evening", "anytime"],
 				default: "anytime",
 			},
-
-			// Therapeutic emphasis
 			therapeuticFocus: {
 				enabled: { type: Boolean, default: false },
 				targetAreas: [
@@ -174,22 +167,16 @@ const userSchema = new mongoose.Schema(
 						],
 					},
 				],
-				conditions: [{ type: String, trim: true }], // ej: "lower back pain"
+				conditions: [{ type: String, trim: true }], // e.g. "lower back pain"
 			},
-
-			// Meditative emphasis
 			meditativeEmphasis: {
 				type: Boolean,
 				default: false,
 			},
-
-			// Pranayama preference
 			pranayamaPreference: {
 				includeInPractice: { type: Boolean, default: true },
 				preferredDuration: { type: Number, default: 5 }, // minutes
 			},
-
-			// Notifications
 			notifications: {
 				enabled: { type: Boolean, default: true },
 				frequency: {
@@ -199,15 +186,11 @@ const userSchema = new mongoose.Schema(
 				},
 				reminderTime: { type: String, default: "09:00" }, // HH:mm format
 			},
-
-			// Language (for bilingual support)
 			language: {
 				type: String,
 				enum: ["en", "es"],
 				default: "en",
 			},
-
-			// UI preferences
 			uiPreferences: {
 				showSanskritNames: { type: Boolean, default: true },
 				audioGuidance: { type: Boolean, default: true },

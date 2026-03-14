@@ -3,7 +3,6 @@ const {
 	authenticateToken,
 	optionalAuth,
 } = require("../../middlewares/authorization.middleware");
-const asyncErrorWrapper = require("../../utils/asyncErrorWrapper");
 const {
 	handleValidationErrors,
 } = require("../../middlewares/validation.middleware");
@@ -41,6 +40,18 @@ const router = express.Router();
  *           type: string
  *         description: Search query
  *         example: standing mountain
+ *       - in: query
+ *         name: family
+ *         schema:
+ *           type: string
+ *           enum: [tadasana, standing_asymmetric, standing_symmetric, one_leg_standing, seated, supine, prone, inverted, meditative, bow_sequence, triangle_sequence, sun_salutation, vajrasana_variations, lotus_variations]
+ *         description: Optional filter by VK family
+ *       - in: query
+ *         name: difficulty
+ *         schema:
+ *           type: string
+ *           enum: [beginner, intermediate, advanced]
+ *         description: Optional filter by difficulty
  *     responses:
  *       200:
  *         description: Search results
@@ -57,7 +68,7 @@ router.get(
 	"/search",
 	searchSequencesValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(searchSequences),
+	searchSequences,
 );
 
 /**
@@ -82,11 +93,7 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/stats/recommended",
-	authenticateToken(),
-	asyncErrorWrapper(getRecommendedSequence),
-);
+router.get("/stats/recommended", authenticateToken(), getRecommendedSequence);
 
 /**
  * @swagger
@@ -102,7 +109,7 @@ router.get(
  *         required: true
  *         schema:
  *           type: string
- *         description: VK family identifier (e.g., "standing_mountain", "sitting", "inverted")
+ *         description: VK family identifier (e.g., "tadasana", "standing_asymmetric", "seated", "inverted")
  *     responses:
  *       200:
  *         description: Sequences in the family
@@ -120,7 +127,7 @@ router.get(
 	familyIdValidation,
 	handleValidationErrors,
 	optionalAuth,
-	asyncErrorWrapper(getSequencesByFamily),
+	getSequencesByFamily,
 );
 
 /**
@@ -136,7 +143,14 @@ router.get(
  *         name: family
  *         schema:
  *           type: string
+ *           enum: [tadasana, standing_asymmetric, standing_symmetric, one_leg_standing, seated, supine, prone, inverted, meditative, bow_sequence, triangle_sequence, sun_salutation, vajrasana_variations, lotus_variations]
  *         description: Filter by VK family
+ *       - in: query
+ *         name: level
+ *         schema:
+ *           type: integer
+ *           enum: [1, 2, 3]
+ *         description: Filter by progression level
  *       - in: query
  *         name: difficulty
  *         schema:
@@ -144,10 +158,10 @@ router.get(
  *           enum: [beginner, intermediate, advanced]
  *         description: Filter by difficulty
  *       - in: query
- *         name: duration
+ *         name: unlocked
  *         schema:
- *           type: integer
- *         description: Filter by duration in minutes
+ *           type: boolean
+ *         description: "If true and user is authenticated, only return sequences the user can access"
  *       - in: query
  *         name: page
  *         schema:
@@ -180,7 +194,7 @@ router.get(
 	getSequencesValidation,
 	handleValidationErrors,
 	optionalAuth,
-	asyncErrorWrapper(getSequences),
+	getSequences,
 );
 
 /**
@@ -216,7 +230,7 @@ router.get(
 	"/:id",
 	sequenceIdValidation,
 	handleValidationErrors,
-	asyncErrorWrapper(getSequenceById),
+	getSequenceById,
 );
 
 module.exports = router;

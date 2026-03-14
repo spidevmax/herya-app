@@ -30,19 +30,31 @@ async function seedUsers() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+			throw new Error(
+				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
+			);
 		}
 
-		// Valid intensity values matching model enum
+		// Valid values matching model enums
 		const validIntensity = ["gentle", "moderate", "vigorous"];
 		const validLanguage = ["en", "es"];
+		const validTimeOfDay = ["morning", "afternoon", "evening", "anytime"];
 
 		let count = 0;
 		for (const row of data) {
-			const intensity = validIntensity.includes(row.preferredIntensity)
-				? row.preferredIntensity
+			const intensity = validIntensity.includes(row.practiceIntensity)
+				? row.practiceIntensity
 				: "moderate";
-			const language = validLanguage.includes(row.language) ? row.language : "en";
+			const language = validLanguage.includes(row.language)
+				? row.language
+				: "en";
+			const timeOfDay = validTimeOfDay.includes(row.timeOfDay)
+				? row.timeOfDay
+				: "anytime";
+			const sessionDuration = parseInt(row.sessionDuration, 10) || 30;
+			const lastPracticeDate = row.lastPracticeDate
+				? new Date(row.lastPracticeDate)
+				: undefined;
 
 			const user = new User({
 				name: row.name,
@@ -58,6 +70,7 @@ async function seedUsers() {
 				totalSessions: parseInt(row.totalSessions, 10) || 0,
 				totalMinutes: parseInt(row.totalMinutes, 10) || 0,
 				currentStreak: parseInt(row.currentStreak, 10) || 0,
+				lastPracticeDate,
 				vkProgression: {
 					unlockedFamilies: ["tadasana"],
 					currentMainSequence: null,
@@ -65,6 +78,8 @@ async function seedUsers() {
 				},
 				preferences: {
 					practiceIntensity: intensity,
+					sessionDuration,
+					timeOfDay,
 					language,
 				},
 			});
