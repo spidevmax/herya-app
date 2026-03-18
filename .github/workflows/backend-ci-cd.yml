@@ -1,0 +1,67 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'herya-app-backend/**'
+      - '.github/workflows/backend-ci-cd.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'herya-app-backend/**'
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: herya-app-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: herya-app-backend
+
+      - name: Run linter (Biome)
+        run: npm run lint
+        working-directory: herya-app-backend
+
+      - name: Run tests
+        run: npm test
+        working-directory: herya-app-backend
+
+      - name: Build check
+        run: npm run check
+        working-directory: herya-app-backend
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Railway
+        uses: addnab/docker-run-action@v3
+        with:
+          image: railway/cli:latest
+          options: -e RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
+          run: |
+            railway up --service herya-app-backend
+
+      - name: Deployment notification
+        run: echo "✅ Backend deployed to Railway"
