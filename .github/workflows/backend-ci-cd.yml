@@ -1,4 +1,4 @@
-name: Backend CI/CD
+name: Backend CI
 
 on:
   push:
@@ -46,22 +46,3 @@ jobs:
       - name: Build check
         run: npm run check
         working-directory: herya-app-backend
-
-  deploy:
-    needs: ci
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Deploy to Railway
-        uses: addnab/docker-run-action@v3
-        with:
-          image: railway/cli:latest
-          options: -e RAILWAY_TOKEN=${{ secrets.RAILWAY_TOKEN }}
-          run: |
-            railway up --service herya-app-backend
-
-      - name: Deployment notification
-        run: echo "✅ Backend deployed to Railway"

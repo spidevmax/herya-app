@@ -99,7 +99,7 @@ const updateUserRole = async (req, res, next) => {
 		const user = await User.findByIdAndUpdate(
 			id,
 			{ role },
-			{ new: true },
+			{ returnDocument: "after" },
 		).select("-password");
 
 		if (!user) {
@@ -263,7 +263,7 @@ const updateVKSequence = async (req, res, next) => {
 		const { id } = req.params;
 
 		const sequence = await VKSequence.findByIdAndUpdate(id, req.body, {
-			new: true,
+			returnDocument: "after",
 			runValidators: true,
 		})
 			.populate("structure.corePoses.pose")
@@ -665,7 +665,7 @@ const updateBreathingPattern = async (req, res, next) => {
 		const { id } = req.params;
 
 		const pattern = await BreathingPattern.findByIdAndUpdate(id, req.body, {
-			new: true,
+			returnDocument: "after",
 			runValidators: true,
 		}).populate("vkContext.prerequisiteBreathing");
 

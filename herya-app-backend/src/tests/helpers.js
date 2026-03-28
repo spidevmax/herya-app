@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("../app");
+const User = require("../api/models/User.model");
 
 /**
  * Register a user and return { user, token }
@@ -41,4 +42,13 @@ const createSession = async (token, overrides = {}) => {
 	return res.body.data;
 };
 
-module.exports = { createUser, poseFactory, createSession };
+/**
+ * Register a user, promote to admin, and return { user, token }
+ */
+const createAdmin = async (overrides = {}) => {
+	const data = await createUser(overrides);
+	await User.findByIdAndUpdate(data.user._id, { role: "admin" });
+	return data;
+};
+
+module.exports = { createUser, createAdmin, poseFactory, createSession };
