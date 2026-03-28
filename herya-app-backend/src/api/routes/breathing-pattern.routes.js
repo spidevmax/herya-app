@@ -1,7 +1,5 @@
 const express = require("express");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 
 const {
 	getBreathingPatterns,
@@ -240,12 +238,7 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/",
-	getBreathingPatternsValidation,
-	handleValidationErrors,
-	getBreathingPatterns,
-);
+router.get("/", getBreathingPatternsValidation, handleValidationErrors, getBreathingPatterns);
 
 /**
  * @swagger
@@ -276,11 +269,6 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/:id",
-	breathingPatternIdValidation,
-	handleValidationErrors,
-	getBreathingPatternById,
-);
+router.get("/:id", breathingPatternIdValidation, handleValidationErrors, getBreathingPatternById);
 
 module.exports = router;

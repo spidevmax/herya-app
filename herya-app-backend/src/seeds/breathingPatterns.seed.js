@@ -21,9 +21,7 @@ async function seedBreathingPatterns() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(
-				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
-			);
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
 		// Helper: split pipe-separated string into array
@@ -37,8 +35,7 @@ async function seedBreathingPatterns() {
 				: [];
 
 		// Helper: coerce CSV boolean values (dynamicTyping may yield true/false or "true"/"false")
-		const toBool = (val) =>
-			val === true || val === "true" || val === 1 || val === "1";
+		const toBool = (val) => val === true || val === "true" || val === 1 || val === "1";
 
 		// Transform CSV data to BreathingPattern schema
 		const breathingPatterns = data.map((row) => ({
@@ -130,8 +127,7 @@ async function seedBreathingPatterns() {
 			vkContext: {
 				practicePhase: row["vkContext.practicePhase"]?.trim() || "opening",
 				recommendedBefore: toArray(row["vkContext.recommendedBefore"]),
-				progressionNotes:
-					row["vkContext.progressionNotes"]?.trim() || undefined,
+				progressionNotes: row["vkContext.progressionNotes"]?.trim() || undefined,
 			},
 
 			// UI/UX

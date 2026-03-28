@@ -28,9 +28,7 @@ async function seedJournalEntries() {
 		const sessions = await Session.find({ user: user._id });
 
 		if (sessions.length === 0) {
-			console.log(
-				"⚠️  No sessions found, skipping journal seeding (session is required)",
-			);
+			console.log("⚠️  No sessions found, skipping journal seeding (session is required)");
 			return;
 		}
 
@@ -46,9 +44,7 @@ async function seedJournalEntries() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(
-				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
-			);
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
 		// Valid mood values from JournalEntry schema (moodBefore and moodAfter have different enums)

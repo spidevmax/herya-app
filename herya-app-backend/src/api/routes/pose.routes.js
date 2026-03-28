@@ -1,7 +1,5 @@
 const express = require("express");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 
 const {
 	getPoses,
@@ -65,12 +63,7 @@ const posesRouter = express.Router();
  *       500:
  *         description: Server error
  */
-posesRouter.get(
-	"/search",
-	searchPosesValidation,
-	handleValidationErrors,
-	searchPoses,
-);
+posesRouter.get("/search", searchPosesValidation, handleValidationErrors, searchPoses);
 
 /**
  * @swagger
@@ -264,12 +257,7 @@ posesRouter.get("/", getPosesValidation, handleValidationErrors, getPoses);
  *       500:
  *         description: Server error
  */
-posesRouter.get(
-	"/:id/related",
-	poseIdValidation,
-	handleValidationErrors,
-	getRelatedPoses,
-);
+posesRouter.get("/:id/related", poseIdValidation, handleValidationErrors, getRelatedPoses);
 
 /**
  * @swagger

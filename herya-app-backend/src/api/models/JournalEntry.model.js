@@ -444,18 +444,10 @@ journalEntrySchema.virtual("moodImprovement").get(function () {
 		"irritated",
 	];
 
-	const beforePositive = this.moodBefore.filter((m) =>
-		positiveMoods.includes(m),
-	).length;
-	const beforeNegative = this.moodBefore.filter((m) =>
-		negativeMoods.includes(m),
-	).length;
-	const afterPositive = this.moodAfter.filter((m) =>
-		positiveMoods.includes(m),
-	).length;
-	const afterNegative = this.moodAfter.filter((m) =>
-		negativeMoods.includes(m),
-	).length;
+	const beforePositive = this.moodBefore.filter((m) => positiveMoods.includes(m)).length;
+	const beforeNegative = this.moodBefore.filter((m) => negativeMoods.includes(m)).length;
+	const afterPositive = this.moodAfter.filter((m) => positiveMoods.includes(m)).length;
+	const afterNegative = this.moodAfter.filter((m) => negativeMoods.includes(m)).length;
 
 	// Positive: gained positive moods and/or shed negative ones
 	return afterPositive - beforePositive + (beforeNegative - afterNegative);
@@ -515,17 +507,11 @@ journalEntrySchema
 // VALIDATION: Maximum 5 moods per entry
 journalEntrySchema
 	.path("moodBefore")
-	.validate(
-		(value) => value.length <= 5,
-		"Cannot select more than 5 moods before practice",
-	);
+	.validate((value) => value.length <= 5, "Cannot select more than 5 moods before practice");
 
 journalEntrySchema
 	.path("moodAfter")
-	.validate(
-		(value) => value.length <= 5,
-		"Cannot select more than 5 moods after practice",
-	);
+	.validate((value) => value.length <= 5, "Cannot select more than 5 moods after practice");
 
 // INDEXES
 journalEntrySchema.index({ user: 1, createdAt: -1 }); // User's journals chronological

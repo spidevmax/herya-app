@@ -249,15 +249,7 @@ const breathingPatternSchema = new mongoose.Schema(
 			// Mudras (Hand gestures)
 			mudra: {
 				type: String,
-				enum: [
-					"none",
-					"jnana",
-					"chin",
-					"vishnu",
-					"nasagra",
-					"bhairava",
-					"bhairavi",
-				],
+				enum: ["none", "jnana", "chin", "vishnu", "nasagra", "bhairava", "bhairavi"],
 				default: "none",
 			},
 		},
@@ -369,8 +361,7 @@ breathingPatternSchema.virtual("calculatedPattern").get(function () {
 			inhale: this.patternRatio.inhale * this.baseBreathDuration,
 			hold: this.patternRatio.hold * this.baseBreathDuration,
 			exhale: this.patternRatio.exhale * this.baseBreathDuration,
-			holdAfterExhale:
-				this.patternRatio.holdAfterExhale * this.baseBreathDuration,
+			holdAfterExhale: this.patternRatio.holdAfterExhale * this.baseBreathDuration,
 		};
 	}
 	return this.patternTime;
@@ -379,9 +370,7 @@ breathingPatternSchema.virtual("calculatedPattern").get(function () {
 // VIRTUAL: Total duration of one full breath cycle (inhale + hold + exhale + holdAfterExhale)
 breathingPatternSchema.virtual("totalCycleDuration").get(function () {
 	const pattern = this.calculatedPattern;
-	return (
-		pattern.inhale + pattern.hold + pattern.exhale + pattern.holdAfterExhale
-	);
+	return pattern.inhale + pattern.hold + pattern.exhale + pattern.holdAfterExhale;
 });
 
 // METHODS
@@ -436,9 +425,7 @@ breathingPatternSchema.pre("validate", async function () {
 		const { inhale, exhale } = this.patternRatio;
 
 		if (inhale === 0 && exhale === 0) {
-			throw new Error(
-				"Breathing pattern must have at least inhale or exhale > 0",
-			);
+			throw new Error("Breathing pattern must have at least inhale or exhale > 0");
 		}
 	}
 });
@@ -469,9 +456,6 @@ breathingPatternSchema.pre("validate", async function () {
 	}
 });
 
-const BreathingPattern = mongoose.model(
-	"BreathingPattern",
-	breathingPatternSchema,
-);
+const BreathingPattern = mongoose.model("BreathingPattern", breathingPatternSchema);
 
 module.exports = BreathingPattern;

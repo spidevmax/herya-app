@@ -25,16 +25,12 @@ const getBreathingPatternsValidation = [
 	query("energyEffect")
 		.optional()
 		.isIn(["calming", "energizing", "balancing", "cooling", "heating"])
-		.withMessage(
-			"Energy effect must be one of: calming, energizing, balancing, cooling, heating",
-		),
+		.withMessage("Energy effect must be one of: calming, energizing, balancing, cooling, heating"),
 
 	query("practicePhase")
 		.optional()
 		.isIn(["opening", "mid_practice", "closing", "anytime"])
-		.withMessage(
-			"Practice phase must be one of: opening, mid_practice, closing, anytime",
-		),
+		.withMessage("Practice phase must be one of: opening, mid_practice, closing, anytime"),
 
 	query("recommendedBefore")
 		.optional()
@@ -56,10 +52,7 @@ const getBreathingPatternsValidation = [
 		])
 		.withMessage("Invalid VK family for recommendedBefore"),
 
-	query("page")
-		.optional()
-		.isInt({ min: 1 })
-		.withMessage("Page must be a positive integer"),
+	query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
 
 	query("limit")
 		.optional()
@@ -98,14 +91,7 @@ const breathingPatternTechniqueValidation = [
 	param("technique")
 		.notEmpty()
 		.withMessage("Technique is required")
-		.isIn([
-			"nadishodhana",
-			"kapalabhati",
-			"bhastrika",
-			"ujjayi",
-			"bhramari",
-			"cooling",
-		])
+		.isIn(["nadishodhana", "kapalabhati", "bhastrika", "ujjayi", "bhramari", "cooling"])
 		.withMessage(
 			"Invalid breathing technique. Must be one of: nadishodhana, kapalabhati, bhastrika, ujjayi, bhramari, cooling",
 		),
@@ -129,21 +115,14 @@ const recommendedBreathingPatternValidation = [
 	query("goal")
 		.optional()
 		.isIn(["calm", "energize", "focus", "balance", "cool", "heat"])
-		.withMessage(
-			"Goal must be one of: calm, energize, focus, balance, cool, heat",
-		),
+		.withMessage("Goal must be one of: calm, energize, focus, balance, cool, heat"),
 
 	query("timeOfDay")
 		.optional()
 		.isIn(["morning", "afternoon", "evening", "night"])
-		.withMessage(
-			"Time of day must be one of: morning, afternoon, evening, night",
-		),
+		.withMessage("Time of day must be one of: morning, afternoon, evening, night"),
 
-	query("duration")
-		.optional()
-		.isInt({ min: 1 })
-		.withMessage("Duration must be a positive integer"),
+	query("duration").optional().isInt({ min: 1 }).withMessage("Duration must be a positive integer"),
 
 	query("userLevel")
 		.optional()

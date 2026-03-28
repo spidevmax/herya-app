@@ -67,17 +67,13 @@ const authenticateToken = (allowedRoles = []) => {
 		try {
 			const token = req.headers.authorization?.replace("Bearer ", "");
 			if (!token) {
-				return res
-					.status(401)
-					.json({ success: false, message: "Unauthorized: No token provided" });
+				return res.status(401).json({ success: false, message: "Unauthorized: No token provided" });
 			}
 
 			const decoded = verifyToken(token);
 			const user = await User.findById(decoded.id);
 			if (!user) {
-				return res
-					.status(401)
-					.json({ success: false, message: "Invalid token or user not found" });
+				return res.status(401).json({ success: false, message: "Invalid token or user not found" });
 			}
 
 			req.user = user;
@@ -92,9 +88,7 @@ const authenticateToken = (allowedRoles = []) => {
 
 			next();
 		} catch {
-			return res
-				.status(401)
-				.json({ success: false, message: "Invalid or expired token" });
+			return res.status(401).json({ success: false, message: "Invalid or expired token" });
 		}
 	};
 };
@@ -141,9 +135,7 @@ const authenticateToken = (allowedRoles = []) => {
  */
 const isAdmin = (req, res, next) => {
 	if (!req.user || req.user.role !== "admin") {
-		return res
-			.status(403)
-			.json({ success: false, message: "Access denied: Admin only" });
+		return res.status(403).json({ success: false, message: "Access denied: Admin only" });
 	}
 	next();
 };

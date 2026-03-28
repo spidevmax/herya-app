@@ -21,9 +21,7 @@ async function seedSequences() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(
-				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
-			);
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
 		// Helper: split pipe-separated string into array
@@ -58,8 +56,7 @@ async function seedSequences() {
 
 			// METADATA
 			tags: toArray(row.tags),
-			isSystemSequence:
-				row.isSystemSequence !== false && row.isSystemSequence !== "false",
+			isSystemSequence: row.isSystemSequence !== false && row.isSystemSequence !== "false",
 		}));
 
 		// Upsert by family+level — adds new sequences without overwriting existing ones

@@ -330,15 +330,7 @@ const poseSchema = new mongoose.Schema(
 
 		chakraRelated: {
 			type: String,
-			enum: [
-				"muladhara",
-				"svadhisthana",
-				"manipura",
-				"anahata",
-				"vishuddha",
-				"ajna",
-				"sahasrara",
-			],
+			enum: ["muladhara", "svadhisthana", "manipura", "anahata", "vishuddha", "ajna", "sahasrara"],
 		},
 
 		energyEffect: {

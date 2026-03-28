@@ -179,9 +179,7 @@ sessionSchema.pre("save", async function () {
 
 	// complete_practice requires completePractice with at least one sequence
 	if (sessionType === "complete_practice" && !hasCompletePractice) {
-		throw new Error(
-			"complete_practice requires at least one sequence in mainSequences",
-		);
+		throw new Error("complete_practice requires at least one sequence in mainSequences");
 	}
 
 	// vk_sequence must NOT include completePractice data
@@ -191,9 +189,7 @@ sessionSchema.pre("save", async function () {
 
 	// complete_practice must NOT include a direct vkSequence reference
 	if (sessionType === "complete_practice" && vkSequence) {
-		throw new Error(
-			"complete_practice uses completePractice.mainSequences, not vkSequence",
-		);
+		throw new Error("complete_practice uses completePractice.mainSequences, not vkSequence");
 	}
 });
 

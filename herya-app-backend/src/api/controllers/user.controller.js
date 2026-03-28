@@ -155,13 +155,7 @@ const updateMyProfile = async (req, res, next) => {
 		const userResponse = updatedUser.toObject();
 		delete userResponse.password;
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Profile updated successfully",
-			userResponse,
-		);
+		return sendResponse(res, 200, true, "Profile updated successfully", userResponse);
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -369,9 +363,7 @@ const getMyStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0
-				? Math.round(totalMinutes / recentSessions.length)
-				: 0;
+			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
 
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,

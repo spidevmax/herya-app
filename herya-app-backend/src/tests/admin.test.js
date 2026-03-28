@@ -56,9 +56,7 @@ describe("Admin — Authorization", () => {
 
 	it("returns 403 when a regular user tries to access admin routes", async () => {
 		const { token } = await createUser({ email: "regular@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/users`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/users`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(403);
 	});
 });
@@ -71,9 +69,7 @@ describe("Admin — GET /users", () => {
 		await createUser({ email: "user1@test.com" });
 		await createUser({ email: "user2@test.com" });
 
-		const res = await request(app)
-			.get(`${BASE}/users`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/users`).set("Authorization", `Bearer ${token}`);
 
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
@@ -90,7 +86,9 @@ describe("Admin — GET /users", () => {
 			.set("Authorization", `Bearer ${token}`);
 
 		expect(res.status).toBe(200);
-		res.body.data.users.forEach((u) => { expect(u.role).toBe("admin"); });
+		res.body.data.users.forEach((u) => {
+			expect(u.role).toBe("admin");
+		});
 	});
 
 	it("searches users by name", async () => {

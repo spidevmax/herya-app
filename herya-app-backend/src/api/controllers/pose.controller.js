@@ -195,13 +195,7 @@ const getPosesByCategory = async (req, res, next) => {
 			name: 1,
 		});
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			`Poses for ${category} retrieved successfully`,
-			poses,
-		);
+		return sendResponse(res, 200, true, `Poses for ${category} retrieved successfully`, poses);
 	} catch (error) {
 		return next(error);
 	}
@@ -384,13 +378,7 @@ const getPosesByVKFamily = async (req, res, next) => {
 			groupedPoses[role].push(pose);
 		});
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			`Poses for ${family} family retrieved`,
-			groupedPoses,
-		);
+		return sendResponse(res, 200, true, `Poses for ${family} family retrieved`, groupedPoses);
 	} catch (error) {
 		return next(error);
 	}

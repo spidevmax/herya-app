@@ -6,12 +6,8 @@ const {
 	getMyStats,
 } = require("../controllers/user.controller");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
-const {
-	authenticateToken,
-} = require("../../middlewares/authorization.middleware");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { authenticateToken } = require("../../middlewares/authorization.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 const {
 	updateProfileValidations,
 	changePasswordValidations,

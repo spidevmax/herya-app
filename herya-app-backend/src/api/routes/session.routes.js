@@ -7,12 +7,8 @@ const {
 	deleteSession,
 	getSessionStats,
 } = require("../controllers/session.controller");
-const {
-	authenticateToken,
-} = require("../../middlewares/authorization.middleware");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { authenticateToken } = require("../../middlewares/authorization.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 const {
 	createSessionValidations,
 	updateSessionValidations,
@@ -141,12 +137,7 @@ router.get("/stats", getSessionStats);
  *       500:
  *         description: Server error
  */
-router.get(
-	"/",
-	sessionPaginationValidation,
-	handleValidationErrors,
-	getSessions,
-);
+router.get("/", sessionPaginationValidation, handleValidationErrors, getSessions);
 
 /**
  * @swagger
@@ -259,12 +250,7 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.post(
-	"/",
-	createSessionValidations,
-	handleValidationErrors,
-	createSession,
-);
+router.post("/", createSessionValidations, handleValidationErrors, createSession);
 
 /**
  * @swagger
@@ -416,11 +402,6 @@ router.put(
  *       500:
  *         description: Server error
  */
-router.delete(
-	"/:id",
-	sessionIdValidation,
-	handleValidationErrors,
-	deleteSession,
-);
+router.delete("/:id", sessionIdValidation, handleValidationErrors, deleteSession);
 
 module.exports = router;

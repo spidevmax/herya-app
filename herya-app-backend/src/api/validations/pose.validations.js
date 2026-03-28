@@ -143,14 +143,9 @@ const getPosesValidation = [
 	query("sidedness")
 		.optional()
 		.isIn(["symmetric", "left_only", "right_only", "both_sides"])
-		.withMessage(
-			"Sidedness must be one of: symmetric, left_only, right_only, both_sides",
-		),
+		.withMessage("Sidedness must be one of: symmetric, left_only, right_only, both_sides"),
 
-	query("page")
-		.optional()
-		.isInt({ min: 1 })
-		.withMessage("Page must be a positive integer"),
+	query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
 
 	query("limit")
 		.optional()

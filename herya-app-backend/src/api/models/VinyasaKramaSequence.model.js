@@ -210,28 +210,12 @@ const vkSequenceSchema = new mongoose.Schema(
 				{
 					area: {
 						type: String,
-						enum: [
-							"spine",
-							"hips",
-							"shoulders",
-							"knees",
-							"ankles",
-							"wrists",
-							"core",
-							"neck",
-						],
+						enum: ["spine", "hips", "shoulders", "knees", "ankles", "wrists", "core", "neck"],
 						required: true,
 					},
 					action: {
 						type: String,
-						enum: [
-							"flexion",
-							"extension",
-							"rotation",
-							"lateral_flexion",
-							"strength",
-							"mobility",
-						],
+						enum: ["flexion", "extension", "rotation", "lateral_flexion", "strength", "mobility"],
 						required: true,
 					},
 				},
@@ -318,18 +302,11 @@ const vkSequenceSchema = new mongoose.Schema(
 // Uses async/throw pattern (Mongoose 9 compatible)
 vkSequenceSchema.pre("save", async function () {
 	if (this.structure?.corePoses && this.structure.corePoses.length > 0) {
-		const orders = this.structure.corePoses
-			.map((p) => p.order)
-			.sort((a, b) => a - b);
-		const expectedOrders = Array.from(
-			{ length: orders.length },
-			(_, i) => i + 1,
-		);
+		const orders = this.structure.corePoses.map((p) => p.order).sort((a, b) => a - b);
+		const expectedOrders = Array.from({ length: orders.length }, (_, i) => i + 1);
 
 		if (!orders.every((order, idx) => order === expectedOrders[idx])) {
-			throw new Error(
-				"corePoses orders must be consecutive starting from 1 (e.g., 1, 2, 3, 4...)",
-			);
+			throw new Error("corePoses orders must be consecutive starting from 1 (e.g., 1, 2, 3, 4...)");
 		}
 	}
 });
@@ -339,9 +316,7 @@ vkSequenceSchema.pre("save", async function () {
 	if (this.estimatedDuration) {
 		const { min, max } = this.estimatedDuration;
 		if (min && max && max < min) {
-			throw new Error(
-				"estimatedDuration.max must be greater than or equal to min",
-			);
+			throw new Error("estimatedDuration.max must be greater than or equal to min");
 		}
 	}
 });
