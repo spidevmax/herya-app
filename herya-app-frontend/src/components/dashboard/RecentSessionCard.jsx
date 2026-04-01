@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SESSION_TYPES, VK_FAMILY_MAP } from "../../utils/constants";
-import { format } from "../../utils/helpers";
+import { SESSION_TYPES, VK_FAMILY_MAP } from "@/utils/constants";
+import { format } from "@/utils/helpers";
 
 export default function RecentSessionCard({ session, index = 0 }) {
   const navigate = useNavigate();

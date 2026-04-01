@@ -61,7 +61,48 @@ const loginValidations = [
 	check("password").notEmpty().withMessage("Password is required"),
 ];
 
+const forgotPasswordValidations = [
+	check("email")
+		.trim()
+		.notEmpty()
+		.withMessage("Email is required")
+		.isEmail()
+		.withMessage("Please provide a valid email address")
+		.normalizeEmail(),
+
+	check("locale")
+		.optional()
+		.isIn(["es", "en"])
+		.withMessage("Locale must be either 'es' or 'en'"),
+];
+
+const resetPasswordValidations = [
+	check("token").trim().notEmpty().withMessage("Reset token is required"),
+
+	check("newPassword")
+		.notEmpty()
+		.withMessage("New password is required")
+		.isLength({ min: 8 })
+		.withMessage("Password must be at least 8 characters")
+		.matches(/[A-Z]/)
+		.withMessage("Password must contain at least one uppercase letter")
+		.matches(/[0-9]/)
+		.withMessage("Password must contain at least one number"),
+
+	check("confirmPassword")
+		.notEmpty()
+		.withMessage("Password confirmation is required")
+		.custom((value, { req }) => {
+			if (value !== req.body.newPassword) {
+				throw new Error("Passwords do not match");
+			}
+			return true;
+		}),
+];
+
 module.exports = {
 	registerValidations,
 	loginValidations,
+	forgotPasswordValidations,
+	resetPasswordValidations,
 };

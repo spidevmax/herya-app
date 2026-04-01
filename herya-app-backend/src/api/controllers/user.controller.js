@@ -155,7 +155,13 @@ const updateMyProfile = async (req, res, next) => {
 		const userResponse = updatedUser.toObject();
 		delete userResponse.password;
 
-		return sendResponse(res, 200, true, "Profile updated successfully", userResponse);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile updated successfully",
+			userResponse,
+		);
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -363,7 +369,9 @@ const getMyStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
+			recentSessions.length > 0
+				? Math.round(totalMinutes / recentSessions.length)
+				: 0;
 
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,
@@ -384,10 +392,133 @@ const getMyStats = async (req, res, next) => {
 	}
 };
 
+/**
+ * Controller: updateMyProfileImage
+ * --------------------------------
+ * Updates only the authenticated user's profile image.
+ *
+ * Workflow:
+ * 1. Requires an image file via multipart/form-data.
+ * 2. Finds the user by `req.user._id`.
+ * 3. Stores old image ID for cleanup.
+ * 4. Updates profileImageUrl and profileImageId with new image data.
+ * 5. Saves the user to the database.
+ * 6. Deletes the old image from Cloudinary after successful save.
+ * 7. Returns the updated user object without password.
+ *
+ * Error Handling:
+ * - 400 if no image file is provided.
+ * - 404 if the user is not found.
+ * - Cleans up new image from Cloudinary if database save fails.
+ */
+const updateMyProfileImage = async (req, res, next) => {
+	let imageUploaded = false;
+	let oldImageId = null;
+
+	try {
+		if (!req.file) {
+			throw createError(400, "No image file provided");
+		}
+
+		const user = await User.findById(req.user._id);
+		if (!user) {
+			throw createError(404, "User not found");
+		}
+
+		// Store old image ID for cleanup
+		oldImageId = user.profileImageId;
+
+		// Update profile image
+		user.profileImageUrl = req.file.path;
+		user.profileImageId = req.file.filename;
+		imageUploaded = true;
+
+		const updatedUser = await user.save();
+
+		// Delete old image only after successful save
+		if (oldImageId) {
+			await deleteImgCloudinary(oldImageId);
+		}
+
+		// Remove password from response
+		const userResponse = updatedUser.toObject();
+		delete userResponse.password;
+
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile image updated successfully",
+			userResponse,
+		);
+	} catch (error) {
+		// Clean up new image if save failed
+		if (imageUploaded && req.file?.filename) {
+			await deleteImgCloudinary(req.file.filename);
+		}
+		return next(error);
+	}
+};
+
+/**
+ * Controller: deleteMyProfileImage
+ * --------------------------------
+ * Deletes the authenticated user's profile image.
+ *
+ * Workflow:
+ * 1. Finds the user by `req.user._id`.
+ * 2. If user has a profile image:
+ *    - Deletes the image from Cloudinary
+ *    - Clears profileImageUrl and profileImageId from user record
+ *    - Saves the updated user to the database
+ * 3. Returns the updated user object without password.
+ *
+ * Error Handling:
+ * - 404 if the user is not found.
+ * - 400 if the user has no image to delete.
+ */
+const deleteMyProfileImage = async (req, res, next) => {
+	try {
+		const user = await User.findById(req.user._id);
+		if (!user) {
+			throw createError(404, "User not found");
+		}
+
+		if (!user.profileImageId) {
+			throw createError(400, "User has no profile image to delete");
+		}
+
+		// Delete image from Cloudinary
+		const oldImageId = user.profileImageId;
+		await deleteImgCloudinary(oldImageId);
+
+		// Clear image from user document
+		user.profileImageUrl = null;
+		user.profileImageId = null;
+		const updatedUser = await user.save();
+
+		// Remove password from response
+		const userResponse = updatedUser.toObject();
+		delete userResponse.password;
+
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile image deleted successfully",
+			userResponse,
+		);
+	} catch (error) {
+		return next(error);
+	}
+};
+
 module.exports = {
 	getMyProfile,
 	updateMyProfile,
 	updateMyPassword,
 	deleteMyAccount,
 	getMyStats,
+	updateMyProfileImage,
+	deleteMyProfileImage,
 };

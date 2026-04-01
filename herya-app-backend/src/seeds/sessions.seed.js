@@ -6,6 +6,78 @@ const User = require("../api/models/User.model");
 const VKSequence = require("../api/models/VinyasaKramaSequence.model");
 const BreathingPattern = require("../api/models/BreathingPattern.model");
 
+const DAY_IN_MS = 24 * 60 * 60 * 1000;
+
+function toUtcDayTimestamp(dateValue) {
+	const date = new Date(dateValue);
+	return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+}
+
+function calculateCurrentStreak(dates) {
+	if (dates.length === 0) {
+		return { currentStreak: 0, lastPracticeDate: undefined };
+	}
+
+	const uniqueDays = [];
+	let previousDay = null;
+
+	for (const sessionDate of dates) {
+		const utcDay = toUtcDayTimestamp(sessionDate);
+		if (utcDay !== previousDay) {
+			uniqueDays.push(utcDay);
+			previousDay = utcDay;
+		}
+	}
+
+	let currentStreak = 1;
+	for (let i = uniqueDays.length - 2; i >= 0; i--) {
+		if (uniqueDays[i + 1] - uniqueDays[i] === DAY_IN_MS) {
+			currentStreak += 1;
+		} else {
+			break;
+		}
+	}
+
+	return {
+		currentStreak,
+		lastPracticeDate: new Date(uniqueDays[uniqueDays.length - 1]),
+	};
+}
+
+async function rebuildUserPracticeStats() {
+	const users = await User.find({}, { _id: 1 }).lean();
+
+	for (const user of users) {
+		const completedSessions = await Session.find(
+			{ user: user._id, completed: true },
+			{ duration: 1, date: 1 },
+		)
+			.sort({ date: 1 })
+			.lean();
+
+		const totalSessions = completedSessions.length;
+		const totalMinutes = completedSessions.reduce(
+			(total, session) => total + (Number(session.duration) || 0),
+			0,
+		);
+		const { currentStreak, lastPracticeDate } = calculateCurrentStreak(
+			completedSessions.map((session) => session.date),
+		);
+
+		await User.updateOne(
+			{ _id: user._id },
+			{
+				$set: {
+					totalSessions,
+					totalMinutes,
+					currentStreak,
+					lastPracticeDate,
+				},
+			},
+		);
+	}
+}
+
 /**
  * Seed Sessions from CSV file.
  * Uses individual save() calls so the pre-save validation hook runs for each session.
@@ -40,7 +112,9 @@ async function seedSessions() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+			throw new Error(
+				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
+			);
 		}
 
 		let count = 0;
@@ -50,8 +124,13 @@ async function seedSessions() {
 			const sessionType = row.sessionType;
 
 			// Skip vk_sequence / complete_practice if no VKSequence was seeded
-			if (!sequence && (sessionType === "vk_sequence" || sessionType === "complete_practice")) {
-				console.log(`⚠️  Skipping '${sessionType}' session – no VK sequence found`);
+			if (
+				!sequence &&
+				(sessionType === "vk_sequence" || sessionType === "complete_practice")
+			) {
+				console.log(
+					`⚠️  Skipping '${sessionType}' session – no VK sequence found`,
+				);
 				continue;
 			}
 
@@ -84,6 +163,8 @@ async function seedSessions() {
 			count++;
 		}
 
+		await rebuildUserPracticeStats();
+
 		console.log(`✅ Seeded ${count} sessions from CSV`);
 	} catch (error) {
 		console.error("❌ Error seeding sessions:", error.message);
@@ -92,3 +173,4 @@ async function seedSessions() {
 }
 
 module.exports = seedSessions;
+module.exports.rebuildUserPracticeStats = rebuildUserPracticeStats;

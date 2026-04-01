@@ -44,11 +44,17 @@ const createSession = async (req, res, next) => {
 
 		// Validate required fields based on sessionType
 		if (sessionType === "vk_sequence" && !vkSequence) {
-			throw createError(400, "vkSequence is required for vk_sequence session type");
+			throw createError(
+				400,
+				"vkSequence is required for vk_sequence session type",
+			);
 		}
 
 		if (sessionType === "complete_practice" && !completePractice) {
-			throw createError(400, "completePractice is required for complete_practice session type");
+			throw createError(
+				400,
+				"completePractice is required for complete_practice session type",
+			);
 		}
 
 		if (!duration) {
@@ -71,6 +77,11 @@ const createSession = async (req, res, next) => {
 
 		const savedSession = await session.save();
 
+		// Keep user counters in sync when the session is created as completed.
+		if (savedSession.completed) {
+			await updateUserStats(req.user._id, savedSession);
+		}
+
 		// Populate references before returning
 		await savedSession.populate("vkSequence");
 		await savedSession.populate("completePractice.warmup");
@@ -78,7 +89,13 @@ const createSession = async (req, res, next) => {
 		await savedSession.populate("completePractice.cooldown");
 		await savedSession.populate("completePractice.pranayama");
 
-		return sendResponse(res, 201, true, "Session created successfully", savedSession);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"Session created successfully",
+			savedSession,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -113,7 +130,14 @@ const createSession = async (req, res, next) => {
  */
 const getSessions = async (req, res, next) => {
 	try {
-		const { page = 1, limit = 20, sessionType, completed, startDate, endDate } = req.query;
+		const {
+			page = 1,
+			limit = 20,
+			sessionType,
+			completed,
+			startDate,
+			endDate,
+		} = req.query;
 
 		// Build filter
 		const filter = { user: req.user._id };
@@ -200,7 +224,13 @@ const getSessionById = async (req, res, next) => {
 			throw createError(403, "You don't have access to this session");
 		}
 
-		return sendResponse(res, 200, true, "Session retrieved successfully", session);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Session retrieved successfully",
+			session,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -254,7 +284,13 @@ const updateSession = async (req, res, next) => {
 		const wasAlreadyCompleted = session.completed;
 
 		// Update allowed fields
-		const allowedUpdates = ["completed", "duration", "actualPractice", "vkFeedback", "notes"];
+		const allowedUpdates = [
+			"completed",
+			"duration",
+			"actualPractice",
+			"vkFeedback",
+			"notes",
+		];
 
 		allowedUpdates.forEach((field) => {
 			if (req.body[field] !== undefined) {
@@ -275,7 +311,13 @@ const updateSession = async (req, res, next) => {
 		await updatedSession.populate("completePractice.cooldown");
 		await updatedSession.populate("completePractice.pranayama");
 
-		return sendResponse(res, 200, true, "Session updated successfully", updatedSession);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Session updated successfully",
+			updatedSession,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -329,7 +371,8 @@ const deleteSession = async (req, res, next) => {
 			}
 			for (const voiceNote of journal.voiceNotes) {
 				try {
-					if (voiceNote.cloudinaryId) await deleteImgCloudinary(voiceNote.cloudinaryId);
+					if (voiceNote.cloudinaryId)
+						await deleteImgCloudinary(voiceNote.cloudinaryId);
 				} catch (_) {}
 			}
 			await JournalEntry.findByIdAndDelete(journal._id);
@@ -426,7 +469,9 @@ const getSessionStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
+			recentSessions.length > 0
+				? Math.round(totalMinutes / recentSessions.length)
+				: 0;
 
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,
@@ -465,33 +510,43 @@ async function updateUserStats(userId, session) {
 	user.totalSessions += 1;
 	user.totalMinutes += session.duration;
 
-	// Update last practice date
-	const today = new Date();
-	today.setHours(0, 0, 0, 0);
+	const MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
+	const toUtcDay = (value) => {
+		const date = new Date(value);
+		return Date.UTC(
+			date.getUTCFullYear(),
+			date.getUTCMonth(),
+			date.getUTCDate(),
+		);
+	};
 
-	const lastPractice = user.lastPracticeDate ? new Date(user.lastPracticeDate) : null;
-	if (lastPractice) {
-		lastPractice.setHours(0, 0, 0, 0);
-	}
+	const sessionDay = toUtcDay(session.date);
+	const lastPracticeDay = user.lastPracticeDate
+		? toUtcDay(user.lastPracticeDate)
+		: null;
 
-	// Calculate streak
-	if (!lastPractice) {
+	// Calculate streak using practice dates (not server-local "today").
+	if (!lastPracticeDay) {
 		user.currentStreak = 1;
 	} else {
-		const daysDiff = Math.floor((today - lastPractice) / (1000 * 60 * 60 * 24));
+		const daysDiff = Math.floor(
+			(sessionDay - lastPracticeDay) / MILLIS_PER_DAY,
+		);
 
-		if (daysDiff === 0) {
-			// Same day, no change
-		} else if (daysDiff === 1) {
-			// Consecutive day
+		if (daysDiff === 1) {
 			user.currentStreak += 1;
-		} else {
-			// Streak broken
+		} else if (daysDiff > 1) {
 			user.currentStreak = 1;
 		}
+		// daysDiff <= 0: same day or backdated session, keep streak unchanged.
 	}
 
-	user.lastPracticeDate = session.date;
+	if (
+		!user.lastPracticeDate ||
+		new Date(session.date) > new Date(user.lastPracticeDate)
+	) {
+		user.lastPracticeDate = session.date;
+	}
 
 	await user.save();
 }

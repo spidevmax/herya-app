@@ -65,6 +65,14 @@ const userSchema = new mongoose.Schema(
 			minlength: [8, "Password 8 characters minimum"],
 			select: false,
 		},
+		passwordResetToken: {
+			type: String,
+			select: false,
+		},
+		passwordResetExpires: {
+			type: Date,
+			select: false,
+		},
 		role: { type: String, enum: ["user", "admin"], default: "user" },
 		profileImageUrl: { type: String, trim: true },
 		profileImageId: { type: String, trim: true },
@@ -155,7 +163,16 @@ const userSchema = new mongoose.Schema(
 				targetAreas: [
 					{
 						type: String,
-						enum: ["spine", "hips", "shoulders", "knees", "ankles", "wrists", "core", "neck"],
+						enum: [
+							"spine",
+							"hips",
+							"shoulders",
+							"knees",
+							"ankles",
+							"wrists",
+							"core",
+							"neck",
+						],
 					},
 				],
 				conditions: [{ type: String, trim: true }], // e.g. "lower back pain"
@@ -181,6 +198,11 @@ const userSchema = new mongoose.Schema(
 				type: String,
 				enum: ["en", "es"],
 				default: "en",
+			},
+			theme: {
+				type: String,
+				enum: ["light", "dark"],
+				default: "light",
 			},
 			uiPreferences: {
 				showSanskritNames: { type: Boolean, default: true },
@@ -226,7 +248,11 @@ userSchema.methods.canAccessLevel = function (family, level) {
 };
 
 // METHOD: Mark sequence as completed
-userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) {
+userSchema.methods.markSequenceCompleted = function (
+	family,
+	level,
+	sequenceId,
+) {
 	const existingIndex = this.vkProgression.completedSequences.findIndex(
 		(seq) =>
 			seq.family === family &&

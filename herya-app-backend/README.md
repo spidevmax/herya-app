@@ -40,6 +40,7 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 | Framework | Express 5 |
 | Database | MongoDB + Mongoose 9 |
 | Auth | JWT (jsonwebtoken) + bcrypt |
+| Email | Nodemailer (SMTP) |
 | Image Storage | Cloudinary + Multer + multer-storage-cloudinary |
 | Validation | express-validator |
 | Rate Limiting | express-rate-limit |
@@ -134,10 +135,20 @@ Copy `.env.example` to `.env` and set the following:
 | `PORT` | Server port | `3000` |
 | `DB_URL` | MongoDB connection string | `mongodb+srv://user:pass@cluster.mongodb.net/herya` |
 | `FRONTEND_URL` | Frontend origin (CORS) | `http://localhost:5173` |
+| `BACKEND_URL` | Public backend URL (used for OAuth callback defaults) | `http://localhost:3000` |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID | `xxxxxxxxxxxx.apps.googleusercontent.com` |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | `GOCSPX-...` |
+| `GOOGLE_REDIRECT_URI` | Google OAuth callback URL | `http://localhost:3000/api/v1/auth/google/callback` |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | `mycloud` |
 | `CLOUDINARY_API_KEY` | Cloudinary API key | `123456789` |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret | `abc123...` |
 | `JWT_SECRET` | JWT signing secret | `openssl rand -base64 64` |
+| `SMTP_HOST` | SMTP server host for password reset emails | `smtp.sendgrid.net` |
+| `SMTP_PORT` | SMTP server port | `587` |
+| `SMTP_SECURE` | Use SMTPS (true for 465) | `false` |
+| `SMTP_USER` | SMTP username | `apikey` |
+| `SMTP_PASS` | SMTP password / API key | `SG.xxxxx` |
+| `SMTP_FROM` | Sender for reset emails | `Herya <no-reply@herya.app>` |
 
 ---
 
@@ -178,6 +189,12 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 |---|---|---|---|
 | POST | `/api/v1/auth/register` | — | Register a new user |
 | POST | `/api/v1/auth/login` | — | Login and receive JWT |
+| POST | `/api/v1/auth/forgot-password` | — | Request password reset email |
+| POST | `/api/v1/auth/reset-password` | — | Reset password with token |
+| GET | `/api/v1/auth/google` | — | Start Google OAuth flow |
+| GET | `/api/v1/auth/google/callback` | — | Google OAuth callback and redirect to frontend |
+| GET | `/api/v1/auth/me` | ✅ user | Get authenticated user profile from JWT |
+| POST | `/api/v1/auth/logout` | ✅ user | Logout (client-side token invalidation helper) |
 
 **Register body** (`multipart/form-data` or JSON):
 ```json
@@ -198,6 +215,16 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
   "password": "SecurePass123"
 }
 ```
+
+**Forgot password body:**
+```json
+{
+  "email": "johndoe@example.com",
+  "locale": "es"
+}
+```
+
+`locale` is optional and supports `es` or `en` to localize the reset email content.
 
 **Response includes:**
 ```json

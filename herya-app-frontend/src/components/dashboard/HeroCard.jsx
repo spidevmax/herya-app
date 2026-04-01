@@ -1,8 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Dumbbell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { LEVEL_LABELS, VK_FAMILY_MAP } from "../../utils/constants";
-import { Button } from "../ui";
+import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
+import { Button } from "@/components/ui";
 
 export default function HeroCard({ sequence, loading }) {
 	const navigate = useNavigate();
@@ -11,9 +11,23 @@ export default function HeroCard({ sequence, loading }) {
 
 	if (!sequence) {
 		return (
-			<div className="mx-4 rounded-3xl bg-gradient-to-br from-[#4A72FF] to-[#7B9FFF] p-6 text-white">
-				<h2 className="font-display text-2xl font-bold mb-2">Welcome! 🧘</h2>
-				<p className="text-white/80 text-sm mb-4">
+			<div
+				className="mx-4 rounded-3xl p-6 text-white"
+				style={{
+					background:
+						"linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
+				}}
+			>
+				<h2
+					className="text-2xl font-semibold mb-2"
+					style={{ fontFamily: '"DM Sans", sans-serif' }}
+				>
+					Welcome
+				</h2>
+				<p
+					className="text-white/80 text-sm font-medium mb-4"
+					style={{ fontFamily: '"DM Sans", sans-serif' }}
+				>
 					Start your first VK session to get personalised recommendations.
 				</p>
 				<Button
@@ -28,7 +42,7 @@ export default function HeroCard({ sequence, loading }) {
 	}
 
 	const family = VK_FAMILY_MAP[sequence.family] || {
-		color: "#4A72FF",
+		color: "var(--color-primary)",
 		emoji: "🧘",
 		label: sequence.family,
 	};
@@ -55,13 +69,22 @@ export default function HeroCard({ sequence, loading }) {
 				<div className="absolute right-4 top-1/2 -translate-y-1/2 text-8xl opacity-20 float select-none pointer-events-none">
 					{family.emoji}
 				</div>
-				<span className="inline-flex items-center gap-1 text-xs font-bold text-white/80 uppercase tracking-widest mb-3">
-					✨ Recommended for you
+				<span
+					className="inline-flex items-center gap-1 text-xs font-medium text-white/80 uppercase tracking-widest mb-3"
+					style={{ fontFamily: '"DM Sans", sans-serif' }}
+				>
+					Recommended for you
 				</span>
-				<h2 className="font-display text-2xl font-bold text-white leading-tight mb-1">
+				<h2
+					className="text-2xl font-semibold text-white leading-tight mb-1"
+					style={{ fontFamily: '"DM Sans", sans-serif' }}
+				>
 					{sequence.englishName}
 				</h2>
-				<p className="text-white/80 text-xs font-medium italic mb-4">
+				<p
+					className="text-white/80 text-xs font-medium italic mb-4"
+					style={{ fontFamily: '"DM Sans", sans-serif' }}
+				>
 					{sequence.sanskritName}
 				</p>
 				<div className="flex items-center gap-3 mb-5">
@@ -81,6 +104,7 @@ export default function HeroCard({ sequence, loading }) {
 					</div>
 				</div>
 				<button
+					type="button"
 					className="flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg"
 					style={{ color: family.color }}
 					onClick={(e) => {

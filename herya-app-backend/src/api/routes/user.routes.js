@@ -4,10 +4,16 @@ const {
 	deleteMyAccount,
 	updateMyPassword,
 	getMyStats,
+	updateMyProfileImage,
+	deleteMyProfileImage,
 } = require("../controllers/user.controller");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
-const { authenticateToken } = require("../../middlewares/authorization.middleware");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 const {
 	updateProfileValidations,
 	changePasswordValidations,
@@ -375,5 +381,68 @@ usersRouter.delete("/me", deleteMyAccount);
  *         description: Server error
  */
 usersRouter.get("/me/stats", getMyStats);
+
+/**
+ * @swagger
+ * /api/v1/users/me/image:
+ *   put:
+ *     summary: Update my profile image
+ *     description: Upload a new profile image (replaces existing image)
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *                 description: Profile image file
+ *     responses:
+ *       200:
+ *         description: Profile image updated successfully
+ *       400:
+ *         description: No image file provided
+ *       401:
+ *         description: Unauthorized - missing or invalid token
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+usersRouter.put(
+	"/me/image",
+	uploadUserImage.single("profileImage"),
+	updateMyProfileImage,
+);
+
+/**
+ * @swagger
+ * /api/v1/users/me/image:
+ *   delete:
+ *     summary: Delete my profile image
+ *     description: Remove the current user's profile image
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Profile image deleted successfully
+ *       400:
+ *         description: User has no profile image to delete
+ *       401:
+ *         description: Unauthorized - missing or invalid token
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Server error
+ */
+usersRouter.delete("/me/image", deleteMyProfileImage);
 
 module.exports = usersRouter;

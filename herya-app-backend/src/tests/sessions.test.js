@@ -13,7 +13,9 @@ describe("Sessions — GET /", () => {
 
 	it("returns an empty list for a new user", async () => {
 		const { token } = await createUser({ email: "sessionlist@test.com" });
-		const res = await request(app).get(BASE).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(BASE)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 		expect(Array.isArray(res.body.data.sessions)).toBe(true);
@@ -30,6 +32,84 @@ describe("Sessions — POST /", () => {
 		expect(res.status).toBe(201);
 		expect(res.body.data).toHaveProperty("sessionType", "meditation");
 		expect(res.body.data).toHaveProperty("duration", 30);
+	});
+
+	it("updates user counters when creating an already completed session", async () => {
+		const { token } = await createUser({
+			email: "sessioncreatecompleted@test.com",
+		});
+
+		const createRes = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({ ...SESSION_PAYLOAD, completed: true, duration: 45 });
+
+		expect(createRes.status).toBe(201);
+
+		const statsRes = await request(app)
+			.get(`${BASE}/stats`)
+			.set("Authorization", `Bearer ${token}`);
+
+		expect(statsRes.status).toBe(200);
+		expect(statsRes.body.data).toHaveProperty("totalSessions", 1);
+		expect(statsRes.body.data).toHaveProperty("totalMinutes", 45);
+		expect(statsRes.body.data).toHaveProperty("currentStreak", 1);
+	});
+
+	it("keeps existing streak when a completed backdated session is added", async () => {
+		const { token } = await createUser({
+			email: "sessionbackdatedstreak@test.com",
+		});
+
+		await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				...SESSION_PAYLOAD,
+				completed: true,
+				date: "2026-03-30T10:00:00.000Z",
+			});
+
+		await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				...SESSION_PAYLOAD,
+				completed: true,
+				date: "2026-03-31T10:00:00.000Z",
+			});
+
+		await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				...SESSION_PAYLOAD,
+				completed: true,
+				date: "2026-04-01T10:00:00.000Z",
+			});
+
+		const beforeBackdated = await request(app)
+			.get(`${BASE}/stats`)
+			.set("Authorization", `Bearer ${token}`);
+
+		expect(beforeBackdated.status).toBe(200);
+		expect(beforeBackdated.body.data).toHaveProperty("currentStreak", 3);
+
+		await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				...SESSION_PAYLOAD,
+				completed: true,
+				date: "2026-03-29T10:00:00.000Z",
+			});
+
+		const afterBackdated = await request(app)
+			.get(`${BASE}/stats`)
+			.set("Authorization", `Bearer ${token}`);
+
+		expect(afterBackdated.status).toBe(200);
+		expect(afterBackdated.body.data).toHaveProperty("currentStreak", 3);
 	});
 
 	it("returns 400 when required fields are missing", async () => {
@@ -50,7 +130,9 @@ describe("Sessions — GET /:id", () => {
 			.set("Authorization", `Bearer ${token}`)
 			.send(SESSION_PAYLOAD);
 		const id = create.body.data._id;
-		const res = await request(app).get(`${BASE}/${id}`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(`${BASE}/${id}`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("_id", id);
 	});
@@ -79,6 +161,34 @@ describe("Sessions — PUT /:id", () => {
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("duration", 60);
 	});
+
+	it("updates user counters when session transitions to completed", async () => {
+		const { token } = await createUser({ email: "sessiontransition@test.com" });
+
+		const create = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({ ...SESSION_PAYLOAD, completed: false, duration: 30 });
+
+		expect(create.status).toBe(201);
+
+		const id = create.body.data._id;
+		const update = await request(app)
+			.put(`${BASE}/${id}`)
+			.set("Authorization", `Bearer ${token}`)
+			.send({ completed: true, duration: 50 });
+
+		expect(update.status).toBe(200);
+
+		const statsRes = await request(app)
+			.get(`${BASE}/stats`)
+			.set("Authorization", `Bearer ${token}`);
+
+		expect(statsRes.status).toBe(200);
+		expect(statsRes.body.data).toHaveProperty("totalSessions", 1);
+		expect(statsRes.body.data).toHaveProperty("totalMinutes", 50);
+		expect(statsRes.body.data).toHaveProperty("currentStreak", 1);
+	});
 });
 
 describe("Sessions — DELETE /:id", () => {
@@ -89,7 +199,9 @@ describe("Sessions — DELETE /:id", () => {
 			.set("Authorization", `Bearer ${token}`)
 			.send(SESSION_PAYLOAD);
 		const id = create.body.data._id;
-		const res = await request(app).delete(`${BASE}/${id}`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.delete(`${BASE}/${id}`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 	});
 });
@@ -97,7 +209,9 @@ describe("Sessions — DELETE /:id", () => {
 describe("Sessions — GET /stats", () => {
 	it("returns session stats for the authenticated user", async () => {
 		const { token } = await createUser({ email: "sessionstats@test.com" });
-		const res = await request(app).get(`${BASE}/stats`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(`${BASE}/stats`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("totalSessions");
 	});

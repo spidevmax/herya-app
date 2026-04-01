@@ -1,7 +1,26 @@
-const { register, login } = require("../controllers/auth.controller");
-const { registerValidations, loginValidations } = require("../validations/auth.validations");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const {
+	register,
+	login,
+	me,
+	logout,
+	googleAuthStart,
+	googleAuthCallback,
+	requestPasswordReset,
+	resetPassword,
+} = require("../controllers/auth.controller");
+const {
+	registerValidations,
+	loginValidations,
+	forgotPasswordValidations,
+	resetPasswordValidations,
+} = require("../validations/auth.validations");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
 
 const authRouter = require("express").Router();
 
@@ -159,5 +178,23 @@ authRouter.post(
  *         description: Server error
  */
 authRouter.post("/login", loginValidations, handleValidationErrors, login);
+authRouter.post(
+	"/forgot-password",
+	forgotPasswordValidations,
+	handleValidationErrors,
+	requestPasswordReset,
+);
+authRouter.post(
+	"/reset-password",
+	resetPasswordValidations,
+	handleValidationErrors,
+	resetPassword,
+);
+
+authRouter.get("/google", googleAuthStart);
+authRouter.get("/google/callback", googleAuthCallback);
+
+authRouter.get("/me", authenticateToken(), me);
+authRouter.post("/logout", authenticateToken(), logout);
 
 module.exports = authRouter;

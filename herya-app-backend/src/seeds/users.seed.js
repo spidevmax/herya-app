@@ -30,7 +30,9 @@ async function seedUsers() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+			throw new Error(
+				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
+			);
 		}
 
 		// Valid values matching model enums
@@ -43,10 +45,13 @@ async function seedUsers() {
 			const intensity = validIntensity.includes(row.practiceIntensity)
 				? row.practiceIntensity
 				: "moderate";
-			const language = validLanguage.includes(row.language) ? row.language : "en";
-			const timeOfDay = validTimeOfDay.includes(row.timeOfDay) ? row.timeOfDay : "anytime";
+			const language = validLanguage.includes(row.language)
+				? row.language
+				: "en";
+			const timeOfDay = validTimeOfDay.includes(row.timeOfDay)
+				? row.timeOfDay
+				: "anytime";
 			const sessionDuration = parseInt(row.sessionDuration, 10) || 30;
-			const lastPracticeDate = row.lastPracticeDate ? new Date(row.lastPracticeDate) : undefined;
 
 			const user = new User({
 				name: row.name,
@@ -59,10 +64,11 @@ async function seedUsers() {
 							.map((g) => g.trim())
 							.filter(Boolean)
 					: [],
-				totalSessions: parseInt(row.totalSessions, 10) || 0,
-				totalMinutes: parseInt(row.totalMinutes, 10) || 0,
-				currentStreak: parseInt(row.currentStreak, 10) || 0,
-				lastPracticeDate,
+				// Keep stats derived from sessions, not from CSV hardcoded values.
+				totalSessions: 0,
+				totalMinutes: 0,
+				currentStreak: 0,
+				lastPracticeDate: undefined,
 				vkProgression: {
 					unlockedFamilies: ["tadasana"],
 					currentMainSequence: null,

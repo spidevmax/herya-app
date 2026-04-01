@@ -7,12 +7,10 @@ export function Card({ children, className = "", onClick, hover = true }) {
 		<motion.div
 			onClick={onClick}
 			whileHover={
-				hover && onClick
-					? { y: -2, boxShadow: "0 8px 32px rgba(74,114,255,0.16)" }
-					: {}
+				hover && onClick ? { y: -2, boxShadow: "var(--shadow-card-hover)" } : {}
 			}
 			whileTap={onClick ? { scale: 0.98 } : {}}
-			className={`bg-white rounded-2xl shadow-[0_2px_16px_rgba(74,114,255,0.08)] ${onClick ? "cursor-pointer" : ""} ${className}`}
+			className={`bg-white rounded-2xl shadow-[var(--shadow-card)] ${onClick ? "cursor-pointer" : ""} ${className}`}
 		>
 			{children}
 		</motion.div>
@@ -31,26 +29,30 @@ export function Button({
 }) {
 	const variants = {
 		primary:
-			"bg-[#4A72FF] text-white shadow-[0_4px_14px_rgba(74,114,255,0.35)] hover:bg-[#2952E3] active:scale-95",
+			"bg-[var(--color-primary)] text-white shadow-[var(--shadow-button)] hover:brightness-95 active:scale-95",
 		secondary:
-			"bg-[#FFB347] text-white shadow-[0_4px_14px_rgba(255,179,71,0.35)] hover:bg-[#E8922A] active:scale-95",
+			"bg-[var(--color-secondary)] text-white shadow-[var(--shadow-secondary)] hover:brightness-95 active:scale-95",
 		accent:
-			"bg-[#5DB075] text-white shadow-[0_4px_14px_rgba(93,176,117,0.35)] hover:bg-[#3D8A55] active:scale-95",
+			"bg-[var(--color-accent)] text-white shadow-[var(--shadow-accent)] hover:brightness-95 active:scale-95",
 		ghost:
-			"bg-transparent text-[#4A72FF] hover:bg-[#4A72FF]/10 active:scale-95",
+			"bg-transparent text-[var(--color-primary)] hover:bg-[color:var(--color-primary)/0.1] active:scale-95",
 		outline:
-			"border-2 border-[#E8E4DE] bg-white text-[#1A1A2E] hover:border-[#4A72FF] hover:text-[#4A72FF] active:scale-95",
+			"border-2 border-[var(--color-border)] bg-white text-[var(--color-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] active:scale-95",
 	};
 	const sizes = {
-		sm: "px-3 py-1.5 text-sm rounded-xl",
-		md: "px-5 py-2.5 text-sm rounded-2xl",
-		lg: "px-6 py-3.5 text-base rounded-2xl",
-		xl: "px-8 py-4 text-lg rounded-2xl",
+		sm: "px-3 py-1.5 text-sm rounded-lg",
+		md: "px-5 py-2.5 text-sm rounded-xl",
+		lg: "px-6 py-3.5 text-base rounded-xl",
+		xl: "px-8 py-4 text-lg rounded-xl",
 	};
+	const weightClass =
+		variant === "primary" || variant === "accent"
+			? "font-semibold"
+			: "font-medium";
 	return (
 		<button
 			disabled={disabled || loading}
-			className={`inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+			className={`inline-flex items-center justify-center gap-2 ${weightClass} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
 			{...props}
 		>
 			{loading ? <LoadingSpinner size={16} /> : children}
@@ -59,7 +61,7 @@ export function Button({
 }
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
-export function Badge({ children, color = "#4A72FF", className = "" }) {
+export function Badge({ children, color = "#5DB87F", className = "" }) {
 	return (
 		<span
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}
@@ -74,13 +76,13 @@ export function Badge({ children, color = "#4A72FF", className = "" }) {
 export function SkeletonCard({ lines = 3, className = "" }) {
 	return (
 		<div
-			className={`bg-white rounded-2xl p-4 space-y-3 shadow-[0_2px_16px_rgba(74,114,255,0.08)] ${className}`}
+			className={`bg-white rounded-2xl p-4 space-y-3 shadow-[var(--shadow-card)] ${className}`}
 		>
 			<div className="skeleton h-5 w-3/4 rounded-lg" />
-			{Array.from({ length: lines - 1 }).map((_, i) => (
+			{Array.from({ length: lines - 1 }, (_, idx) => idx + 1).map((lineNo) => (
 				<div
-					key={i}
-					className={`skeleton h-4 rounded-lg ${i === lines - 2 ? "w-1/2" : "w-full"}`}
+					key={`skeleton-line-${lineNo}`}
+					className={`skeleton h-4 rounded-lg ${lineNo === lines - 1 ? "w-1/2" : "w-full"}`}
 				/>
 			))}
 		</div>
@@ -97,6 +99,7 @@ export function LoadingSpinner({ size = 20, color = "currentColor" }) {
 			fill="none"
 			className="animate-spin"
 		>
+			<title>Loading</title>
 			<circle
 				cx="12"
 				cy="12"
@@ -115,7 +118,7 @@ export function LoadingSpinner({ size = 20, color = "currentColor" }) {
 export function EmptyState({
 	title,
 	description,
-	illustration = "🌱",
+	illustration = null,
 	action,
 }) {
 	return (
@@ -124,9 +127,11 @@ export function EmptyState({
 			animate={{ opacity: 1, y: 0 }}
 			className="flex flex-col items-center justify-center text-center py-16 px-6"
 		>
-			<motion.div className="text-6xl mb-4 float" animate={{}} style={{}}>
-				{illustration}
-			</motion.div>
+			{illustration ? (
+				<motion.div className="text-6xl mb-4 float" animate={{}} style={{}}>
+					{illustration}
+				</motion.div>
+			) : null}
 			<h3 className="font-display text-xl font-semibold text-[#1A1A2E] mb-2">
 				{title}
 			</h3>
@@ -139,11 +144,11 @@ export function EmptyState({
 }
 
 // ── ProgressBar ───────────────────────────────────────────────────────────────
-export function ProgressBar({ value, max, color = "#4A72FF", className = "" }) {
+export function ProgressBar({ value, max, color = "#5DB87F", className = "" }) {
 	const pct = Math.min(100, Math.round((value / max) * 100));
 	return (
 		<div
-			className={`w-full h-2 bg-[#E8E4DE] rounded-full overflow-hidden ${className}`}
+			className={`w-full h-2 bg-[#E8F4D0] rounded-full overflow-hidden ${className}`}
 		>
 			<motion.div
 				initial={{ width: 0 }}
@@ -162,7 +167,7 @@ export function CircleProgress({
 	max,
 	size = 64,
 	stroke = 6,
-	color = "#4A72FF",
+	color = "#5DB87F",
 	children,
 }) {
 	const r = (size - stroke) / 2;
@@ -174,12 +179,13 @@ export function CircleProgress({
 			style={{ width: size, height: size }}
 		>
 			<svg width={size} height={size} className="-rotate-90">
+				<title>Progress</title>
 				<circle
 					cx={size / 2}
 					cy={size / 2}
 					r={r}
 					fill="none"
-					stroke="#E8E4DE"
+					stroke="#E8F4D0"
 					strokeWidth={stroke}
 				/>
 				<motion.circle
@@ -202,3 +208,63 @@ export function CircleProgress({
 		</div>
 	);
 }
+
+// ── ConfirmModal ─────────────────────────────────────────────────────────────
+export const ConfirmModal = ({
+	open,
+	onClose,
+	onConfirm,
+	title,
+	description,
+	confirmLabel = "Confirmar",
+	cancelLabel = "Cancelar",
+	danger = false,
+	loading = false,
+}) => {
+	if (!open) return null;
+
+	return (
+		<div
+			className="fixed inset-0 z-50 flex items-center justify-center p-4"
+			role="dialog"
+			aria-modal="true"
+		>
+			<button
+				type="button"
+				aria-label="Cerrar modal"
+				className="absolute inset-0 bg-black/40"
+				onClick={loading ? undefined : onClose}
+			/>
+
+			<motion.div
+				initial={{ opacity: 0, y: 12, scale: 0.98 }}
+				animate={{ opacity: 1, y: 0, scale: 1 }}
+				transition={{ duration: 0.2, ease: "easeOut" }}
+				className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-[var(--shadow-card-hover)]"
+			>
+				<h3 className="font-display text-lg font-semibold text-[var(--color-text-primary)]">
+					{title}
+				</h3>
+				{description ? (
+					<p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+						{description}
+					</p>
+				) : null}
+
+				<div className="mt-6 flex justify-end gap-2">
+					<Button variant="outline" onClick={onClose} disabled={loading}>
+						{cancelLabel}
+					</Button>
+					<Button
+						variant={danger ? "secondary" : "primary"}
+						onClick={onConfirm}
+						disabled={loading}
+						loading={loading}
+					>
+						{confirmLabel}
+					</Button>
+				</div>
+			</motion.div>
+		</div>
+	);
+};

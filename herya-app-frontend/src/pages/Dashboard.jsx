@@ -1,59 +1,105 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
-import { getRecommendedSequence } from "../api/sequences.api";
-import { getSessions, getSessionStats } from "../api/sessions.api";
-import HeroCard from "../components/dashboard/HeroCard";
-import CalendarStrip from "../components/dashboard/CalendarStrip";
-import QuickActions from "../components/dashboard/QuickActions";
-import RecentSessionCard from "../components/dashboard/RecentSessionCard";
-import { SkeletonCard } from "../components/ui";
+import { getSessions, getSessionStats } from "@/api/sessions.api";
+import { getRecommendedSequence } from "@/api/sequences.api";
+import CalendarStrip from "@/components/dashboard/CalendarStrip";
+import HeroCard from "@/components/dashboard/HeroCard";
+import QuickActions from "@/components/dashboard/QuickActions";
+import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
+import { SkeletonCard } from "@/components/ui";
+import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Dashboard() {
-  const { user } = useAuth();
-  const [recommended, setRecommended] = useState(null);
-  const [sessions, setSessions] = useState([]);
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+	const { user } = useAuth();
+	const { t } = useLanguage();
+	const [recommended, setRecommended] = useState(null);
+	const [sessions, setSessions] = useState([]);
+	const [stats, setStats] = useState(null);
+	const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.allSettled([getRecommendedSequence(), getSessions({ limit: 5 }), getSessionStats()])
-      .then(([rec, sess, st]) => {
-        if (rec.status === "fulfilled") setRecommended(rec.value.data?.data || rec.value.data);
-        if (sess.status === "fulfilled") { const list = sess.value.data?.data || sess.value.data || []; setSessions(Array.isArray(list) ? list : []); }
-        if (st.status === "fulfilled") setStats(st.value.data?.data || st.value.data);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+	useEffect(() => {
+		Promise.allSettled([
+			getRecommendedSequence(),
+			getSessions({ limit: 5 }),
+			getSessionStats(),
+		])
+			.then(([rec, sess, st]) => {
+				if (rec.status === "fulfilled") {
+					// Backend returns { sequence, reason } — extract the sequence object
+					const payload = rec.value.data?.data || rec.value.data;
+					setRecommended(payload?.sequence ?? payload);
+				}
+				if (sess.status === "fulfilled") {
+					// Backend returns { sessions, pagination }
+					const payload = sess.value.data?.data || sess.value.data || {};
+					const list = payload.sessions ?? (Array.isArray(payload) ? payload : []);
+					setSessions(list);
+				}
+				if (st.status === "fulfilled")
+					setStats(st.value.data?.data || st.value.data);
+			})
+			.finally(() => setLoading(false));
+	}, []);
 
-  const sessionDates = sessions.map((s) => (s.date || s.createdAt || "").slice(0, 10));
-  const greeting = ["Good morning", "Good afternoon", "Good evening"][[0, 12, 17].findLastIndex((h) => new Date().getHours() >= h)];
+	const sessionDates = sessions.map((s) =>
+		(s.date || s.createdAt || "").slice(0, 10),
+	);
 
-  return (
-    <div className="flex flex-col gap-6 pt-4 pb-6">
-      <div className="flex items-center justify-between px-4">
-        <div>
-          <p className="text-[#9CA3AF] text-sm">{greeting},</p>
-          <h1 className="font-display text-2xl font-bold text-[#1A1A2E]">{user?.name?.split(" ")[0] ?? "Yogi"} 🙏</h1>
-        </div>
-        <motion.button whileTap={{ scale: 0.9 }} className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center text-[#6B7280]">
-          <Bell size={20} />
-        </motion.button>
-      </div>
+	const hour = new Date().getHours();
+	const greetingKey =
+		hour < 12 ? "dashboard.greeting_morning"
+		: hour < 17 ? "dashboard.greeting_afternoon"
+		: "dashboard.greeting_evening";
 
-      <CalendarStrip sessionDates={sessionDates} streak={stats?.currentStreak ?? 0} />
+	return (
+		<div className="flex flex-col gap-6 pt-4 pb-6">
+			<div className="flex items-center justify-between px-4">
+				<div>
+					<p
+						className="text-sm font-medium"
+						style={{ fontFamily: '"DM Sans", sans-serif', color: "var(--color-text-secondary)" }}
+					>
+						{t(greetingKey)},
+					</p>
+					<h1
+						className="text-2xl font-semibold"
+						style={{ fontFamily: '"DM Sans", sans-serif', color: "var(--color-primary)" }}
+					>
+						{user?.name?.split(" ")[0] ?? "Yogi"}
+					</h1>
+				</div>
+				<motion.button
+					whileTap={{ scale: 0.9 }}
+					className="w-11 h-11 rounded-full shadow-sm flex items-center justify-center"
+					style={{ backgroundColor: "var(--color-surface-card)", color: "var(--color-secondary)" }}
+				>
+					<Bell size={20} />
+				</motion.button>
+			</div>
 
-      <HeroCard sequence={recommended} loading={loading} />
+			<CalendarStrip sessionDates={sessionDates} streak={stats?.currentStreak ?? 0} />
 
-      <QuickActions />
+			<HeroCard sequence={recommended} loading={loading} />
 
-      {sessions.length > 0 && (
-        <div className="px-4 flex flex-col gap-3">
-          <h2 className="font-display text-lg font-semibold text-[#1A1A2E]">Recent Practice</h2>
-          {loading ? Array.from({ length: 3 }, (_, i) => <SkeletonCard key={i} />) : sessions.map((s, i) => <RecentSessionCard key={s._id} session={s} index={i} />)}
-        </div>
-      )}
-    </div>
-  );
+			<QuickActions />
+
+			{sessions.length > 0 && (
+				<div className="px-4 flex flex-col gap-3">
+					<h2
+						className="text-lg font-semibold"
+						style={{ fontFamily: '"DM Sans", sans-serif', color: "var(--color-primary)" }}
+					>
+						{t("dashboard.recent_practice")}
+					</h2>
+					{loading
+						? ["dash-s1", "dash-s2", "dash-s3"].map((k) => <SkeletonCard key={k} />)
+						: sessions.map((s, i) => (
+								<RecentSessionCard key={s._id} session={s} index={i} />
+							))}
+				</div>
+			)}
+		</div>
+	);
 }
