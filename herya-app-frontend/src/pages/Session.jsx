@@ -90,11 +90,30 @@ const normalizePoseEntries = (sequence, familyPoses) => {
 
 	return familyPoses || [];
 };
+
+const getPreferredSessionDuration = (user) => {
+	const raw = Number(user?.preferences?.sessionDuration);
+	if (!Number.isFinite(raw)) return 20;
+	if (raw < 5) return 5;
+	if (raw > 180) return 180;
+	return Math.round(raw);
+};
+
+const getPreferredBreathingEffect = (timeOfDay) => {
+	const map = {
+		morning: "energizing",
+		afternoon: "balancing",
+		evening: "calming",
+		anytime: "balancing",
+	};
+	return map[timeOfDay] || "balancing";
+};
+
 export default function Session() {
 	const { type } = useParams();
 	const [params] = useSearchParams();
 	const navigate = useNavigate();
-	const { refreshUser } = useAuth();
+	const { user, refreshUser } = useAuth();
 	const { t } = useLanguage();
 	const tr = (key, fallback, vars) => {
 		const value = t(key, vars);
@@ -103,7 +122,10 @@ export default function Session() {
 	const seqId = params.get("seq");
 
 	const [step, setStep] = useState("pre"); // pre | active | post | done
-	const [duration, setDuration] = useState(20);
+	const [duration, setDuration] = useState(() =>
+		getPreferredSessionDuration(user),
+	);
+	const [hasTouchedDuration, setHasTouchedDuration] = useState(false);
 	const [moodBefore, setMoodBefore] = useState([]);
 	const [moodAfter, setMoodAfter] = useState([]);
 	const [energyBefore, setEnergyBefore] = useState(5);
@@ -142,6 +164,11 @@ export default function Session() {
 	const sessionTypeLabel = sessionTypeLabelByType[type] || sessionType.label;
 	const isPranayama = type === "pranayama";
 	const isCompletePractice = type === "complete_practice";
+
+	useEffect(() => {
+		if (hasTouchedDuration) return;
+		setDuration(getPreferredSessionDuration(user));
+	}, [user, hasTouchedDuration]);
 
 	useEffect(() => {
 		if (seqId && !sequence && !sequenceLoading) {
@@ -219,14 +246,32 @@ export default function Session() {
 					(Array.isArray(breathPayload) ? breathPayload : []);
 
 				setCompleteSequences(Array.isArray(seqList) ? seqList : []);
-				setCompleteBreathing(Array.isArray(breathList) ? breathList : []);
+				const safeBreathList = Array.isArray(breathList) ? breathList : [];
+				setCompleteBreathing(safeBreathList);
+
+				if (!completePranayamaId && safeBreathList.length > 0) {
+					const preferredEffect = getPreferredBreathingEffect(
+						user?.preferences?.timeOfDay,
+					);
+					const recommended =
+						safeBreathList.find(
+							(item) => item?.energyEffect === preferredEffect,
+						) || safeBreathList[0];
+					if (recommended?._id) setCompletePranayamaId(recommended._id);
+				}
 			})
 			.catch(() => {
 				setCompleteSequences([]);
 				setCompleteBreathing([]);
 			})
 			.finally(() => setCompleteCatalogLoading(false));
-	}, [isCompletePractice, completeCatalogLoading, completeSequences.length]);
+	}, [
+		isCompletePractice,
+		completeCatalogLoading,
+		completeSequences.length,
+		completePranayamaId,
+		user,
+	]);
 
 	const findSequenceById = (id) =>
 		completeSequences.find((item) => item._id === id);
@@ -438,7 +483,10 @@ export default function Session() {
 										<button
 											type="button"
 											key={d}
-											onClick={() => setDuration(d)}
+											onClick={() => {
+												setHasTouchedDuration(true);
+												setDuration(d);
+											}}
 											className={
 												"px-4 py-2 rounded-xl text-sm font-semibold transition " +
 												(duration === d

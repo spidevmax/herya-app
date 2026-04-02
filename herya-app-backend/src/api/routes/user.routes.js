@@ -52,6 +52,9 @@ usersRouter.use(authenticateToken());
  *                   enum: [user, admin]
  *                 profileImageUrl:
  *                   type: string
+ *                 pronouns:
+ *                   type: string
+ *                   example: she/her
  *                 goals:
  *                   type: array
  *                   items:
@@ -113,6 +116,9 @@ usersRouter.get("/me", getMyProfile);
  *                 type: string
  *                 format: email
  *                 example: john@example.com
+ *               pronouns:
+ *                 type: string
+ *                 example: they/them
  *               goals:
  *                 type: array
  *                 items:

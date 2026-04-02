@@ -74,6 +74,7 @@ const userSchema = new mongoose.Schema(
 		role: { type: String, enum: ["user", "admin"], default: "user" },
 		profileImageUrl: { type: String, trim: true },
 		profileImageId: { type: String, trim: true },
+		pronouns: { type: String, trim: true, maxlength: 40 },
 
 		// VK-SPECIFIC GOALS
 		goals: [

@@ -7,4 +7,5 @@ export const updateProfileImage = (formData) =>
 		headers: { "Content-Type": "multipart/form-data" },
 	});
 export const deleteProfileImage = () => api.delete("/users/me/image");
+export const deleteMyAccount = () => api.delete("/users/me");
 export const getUserStats = () => api.get("/users/me/stats");

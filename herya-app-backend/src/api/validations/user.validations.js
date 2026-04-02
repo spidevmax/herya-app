@@ -26,6 +26,12 @@ const updateProfileValidations = [
 		.withMessage("Please provide a valid email address")
 		.normalizeEmail(),
 
+	check("pronouns")
+		.optional()
+		.trim()
+		.isLength({ max: 40 })
+		.withMessage("Pronouns must be 40 characters or less"),
+
 	check("goals").optional().isArray().withMessage("Goals must be an array"),
 
 	check("goals.*")

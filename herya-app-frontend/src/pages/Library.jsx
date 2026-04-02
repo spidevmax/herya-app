@@ -6,6 +6,7 @@ import { getBreathingPatterns } from "@/api/breathing.api";
 import { getPoses } from "@/api/poses.api";
 import { getSequences } from "@/api/sequences.api";
 import { EmptyState, SkeletonCard } from "@/components/ui";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 /* ─── Colour palettes per difficulty ─── */
@@ -419,9 +420,29 @@ function RetroCard({
 	);
 }
 
+const INTENSITY_DIFFICULTY_ORDER = {
+	gentle: ["beginner", "intermediate", "advanced"],
+	moderate: ["intermediate", "beginner", "advanced"],
+	vigorous: ["advanced", "intermediate", "beginner"],
+};
+
+const TIME_EFFECT_ORDER = {
+	morning: ["energizing", "balancing", "calming", "cooling", "heating"],
+	afternoon: ["balancing", "energizing", "calming", "cooling", "heating"],
+	evening: ["calming", "balancing", "cooling", "energizing", "heating"],
+	anytime: ["balancing", "calming", "energizing", "cooling", "heating"],
+};
+
+const getPreferredOrderIndex = (value, order, fallbackIndex = 99) => {
+	if (!value) return fallbackIndex;
+	const idx = order.indexOf(String(value));
+	return idx === -1 ? fallbackIndex : idx;
+};
+
 /* ─── Library page ─── */
 export default function Library() {
 	const navigate = useNavigate();
+	const { user } = useAuth();
 	const { t } = useLanguage();
 	const tr = (key, fallback) => {
 		const value = t(key);
@@ -593,6 +614,13 @@ export default function Library() {
 	const showDifficultyFilters =
 		tab === "all" || tab === "sequences" || tab === "poses";
 	const showEffectFilters = tab === "all" || tab === "breathing";
+	const preferredIntensity = user?.preferences?.practiceIntensity || "moderate";
+	const preferredTimeOfDay = user?.preferences?.timeOfDay || "anytime";
+	const difficultyOrder =
+		INTENSITY_DIFFICULTY_ORDER[preferredIntensity] ||
+		INTENSITY_DIFFICULTY_ORDER.moderate;
+	const effectOrder =
+		TIME_EFFECT_ORDER[preferredTimeOfDay] || TIME_EFFECT_ORDER.anytime;
 
 	const normalizedQuery = query.trim().toLowerCase();
 	const filteredItems = items.filter((item) => {
@@ -606,6 +634,45 @@ export default function Library() {
 			effectFilter === "all" ? true : item.energyEffect === effectFilter;
 
 		return textPass && difficultyPass && effectPass;
+	});
+
+	const prioritizedItems = [...filteredItems].sort((a, b) => {
+		const aKind = a.__kind || tab;
+		const bKind = b.__kind || tab;
+		const aDifficultyRank =
+			aKind === "sequences" || aKind === "poses"
+				? getPreferredOrderIndex(a.difficulty, difficultyOrder)
+				: 99;
+		const bDifficultyRank =
+			bKind === "sequences" || bKind === "poses"
+				? getPreferredOrderIndex(b.difficulty, difficultyOrder)
+				: 99;
+		if (aDifficultyRank !== bDifficultyRank)
+			return aDifficultyRank - bDifficultyRank;
+
+		const aEffectRank =
+			aKind === "breathing"
+				? getPreferredOrderIndex(a.energyEffect, effectOrder)
+				: 99;
+		const bEffectRank =
+			bKind === "breathing"
+				? getPreferredOrderIndex(b.energyEffect, effectOrder)
+				: 99;
+		if (aEffectRank !== bEffectRank) return aEffectRank - bEffectRank;
+
+		const aTitle = (
+			a.englishName ||
+			a.name ||
+			a.romanizationName ||
+			""
+		).toLowerCase();
+		const bTitle = (
+			b.englishName ||
+			b.name ||
+			b.romanizationName ||
+			""
+		).toLowerCase();
+		return aTitle.localeCompare(bTitle);
 	});
 
 	const isLoading = loading;
@@ -798,7 +865,7 @@ export default function Library() {
 								<SkeletonCard key={k} />
 							))}
 						</div>
-					) : filteredItems.length === 0 ? (
+					) : prioritizedItems.length === 0 ? (
 						<motion.div
 							key="empty"
 							initial={{ opacity: 0 }}
@@ -831,7 +898,7 @@ export default function Library() {
 							animate={{ opacity: 1 }}
 							className="flex flex-col gap-4"
 						>
-							{filteredItems.map((item, i) => (
+							{prioritizedItems.map((item, i) => (
 								<RetroCard
 									key={item._id || i}
 									item={item}

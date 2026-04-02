@@ -129,6 +129,10 @@ const updateMyProfile = async (req, res, next) => {
 			user.email = req.body.email.toLowerCase().trim();
 		}
 
+		if (req.body.pronouns !== undefined) {
+			user.pronouns = String(req.body.pronouns).trim();
+		}
+
 		// Update goals (array of strings)
 		if (req.body.goals) {
 			user.goals = req.body.goals;

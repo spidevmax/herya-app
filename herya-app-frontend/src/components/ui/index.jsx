@@ -1,4 +1,5 @@
 // Common UI primitives
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -223,11 +224,18 @@ export const ConfirmModal = ({
 	cancelLabel,
 	danger = false,
 	loading = false,
+	confirmPhrase,
 }) => {
 	const { t } = useLanguage();
+	const [phraseInput, setPhraseInput] = useState("");
 	const resolvedConfirmLabel = confirmLabel ?? t("ui.confirm");
 	const resolvedCancelLabel = cancelLabel ?? t("ui.cancel");
 	const closeAriaLabel = t("ui.close_modal");
+	const confirmBlocked = confirmPhrase ? phraseInput !== confirmPhrase : false;
+
+	useEffect(() => {
+		if (!open) setPhraseInput("");
+	}, [open]);
 
 	if (!open) return null;
 
@@ -248,7 +256,8 @@ export const ConfirmModal = ({
 				initial={{ opacity: 0, y: 12, scale: 0.98 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				transition={{ duration: 0.2, ease: "easeOut" }}
-				className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-[var(--shadow-card-hover)]"
+				className="relative w-full max-w-md rounded-2xl p-6 shadow-[var(--shadow-card-hover)]"
+				style={{ backgroundColor: "var(--color-surface-card)" }}
 			>
 				<h3 className="font-display text-lg font-semibold text-[var(--color-text-primary)]">
 					{title}
@@ -259,6 +268,26 @@ export const ConfirmModal = ({
 					</p>
 				) : null}
 
+				{confirmPhrase ? (
+					<div className="mt-4 space-y-1.5">
+						<p className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>
+							{t("ui.type_to_confirm", { phrase: confirmPhrase })}
+						</p>
+						<input
+							type="text"
+							value={phraseInput}
+							onChange={(e) => setPhraseInput(e.target.value)}
+							placeholder={confirmPhrase}
+							className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
+							style={{
+								backgroundColor: "var(--color-surface)",
+								borderColor: confirmBlocked ? "var(--color-border)" : "var(--color-danger)",
+								color: "var(--color-text-primary)",
+							}}
+						/>
+					</div>
+				) : null}
+
 				<div className="mt-6 flex justify-end gap-2">
 					<Button variant="outline" onClick={onClose} disabled={loading}>
 						{resolvedCancelLabel}
@@ -266,8 +295,9 @@ export const ConfirmModal = ({
 					<Button
 						variant={danger ? "secondary" : "primary"}
 						onClick={onConfirm}
-						disabled={loading}
+						disabled={loading || confirmBlocked}
 						loading={loading}
+						style={danger ? { backgroundColor: "var(--color-danger)", boxShadow: "none" } : {}}
 					>
 						{resolvedConfirmLabel}
 					</Button>
