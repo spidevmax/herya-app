@@ -144,6 +144,7 @@ export default function SequenceDetail() {
 						: [],
 		},
 	].filter((section) => section.items.length > 0);
+	const hasAssignedPoses = sequenceSections.length > 0;
 
 	return (
 		<div className="pb-6">
@@ -539,7 +540,7 @@ export default function SequenceDetail() {
 						</div>
 					)}
 
-					{sequenceSections.length > 0 && (
+					{hasAssignedPoses ? (
 						<div
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
@@ -623,6 +624,31 @@ export default function SequenceDetail() {
 									</div>
 								))}
 							</div>
+						</div>
+					) : (
+						<div
+							className="rounded-2xl p-5 border"
+							style={{
+								backgroundColor: "var(--color-surface-card)",
+								borderColor: `${family.color}33`,
+							}}
+						>
+							<h3
+								className="font-semibold mb-2 flex items-center gap-2"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								<BookOpen size={16} />
+								{t("sequence_detail.full_sequence")}
+							</h3>
+							<p
+								className="text-sm leading-relaxed"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								{tr(
+									"sequence_detail.no_poses_assigned",
+									"This sequence has no poses assigned yet in the backend data.",
+								)}
+							</p>
 						</div>
 					)}
 				</div>

@@ -6,6 +6,13 @@ const {
 	updateSession,
 	deleteSession,
 	getSessionStats,
+	startSession,
+	pauseSession,
+	advanceBlock,
+	completeGuidedSession,
+	abandonSession,
+	getActiveSession,
+	getPracticeAnalytics,
 } = require("../controllers/session.controller");
 const { authenticateToken } = require("../../middlewares/authorization.middleware");
 const { handleValidationErrors } = require("../../middlewares/validation.middleware");
@@ -71,6 +78,8 @@ router.use(authenticateToken());
  *         description: Server error
  */
 router.get("/stats", getSessionStats);
+router.get("/active/current", getActiveSession);
+router.get("/analytics/practice", getPracticeAnalytics);
 
 /**
  * @swagger
@@ -403,5 +412,12 @@ router.put(
  *         description: Server error
  */
 router.delete("/:id", sessionIdValidation, handleValidationErrors, deleteSession);
+
+// ── Guided Practice Flow ─────────────────────────────────────────────────────
+router.post("/:id/start", sessionIdValidation, handleValidationErrors, startSession);
+router.post("/:id/pause", sessionIdValidation, handleValidationErrors, pauseSession);
+router.post("/:id/advance-block", sessionIdValidation, handleValidationErrors, advanceBlock);
+router.post("/:id/complete", sessionIdValidation, handleValidationErrors, completeGuidedSession);
+router.post("/:id/abandon", sessionIdValidation, handleValidationErrors, abandonSession);
 
 module.exports = router;

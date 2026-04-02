@@ -1,7 +1,6 @@
 import { useLocation, Outlet, NavLink, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { BookOpen, Home, Leaf, Plus, Sparkles, User } from "lucide-react";
-import { useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import BottomNav from "./BottomNav";
 import PageTransition from "./PageTransition";
@@ -13,37 +12,9 @@ const NAV_ITEMS = [
 	{ to: "/profile", icon: User, labelKey: "nav.profile" },
 ];
 
-const FAB_ACTIONS = [
-	{
-		label: "fab.vk_sequence",
-		icon: Sparkles,
-		color: "var(--color-primary)",
-		to: "/session/vk_sequence",
-	},
-	{
-		label: "fab.pranayama",
-		icon: "PR",
-		color: "var(--color-secondary)",
-		to: "/session/pranayama",
-	},
-	{
-		label: "fab.meditation",
-		icon: "MD",
-		color: "var(--color-accent)",
-		to: "/session/meditation",
-	},
-	{
-		label: "fab.complete_practice",
-		icon: "FP",
-		color: "var(--color-primary-light)",
-		to: "/session/complete_practice",
-	},
-];
-
 function DesktopSidebar() {
 	const { t } = useLanguage();
 	const navigate = useNavigate();
-	const [fabOpen, setFabOpen] = useState(false);
 
 	return (
 		<aside
@@ -98,53 +69,16 @@ function DesktopSidebar() {
 				})}
 			</nav>
 
-			{/* FAB */}
-			<div className="relative">
-				<AnimatePresence>
-					{fabOpen && (
-						<div className="absolute bottom-14 left-0 right-0 flex flex-col gap-2 pb-2">
-							{FAB_ACTIONS.map((action, i) => (
-								<motion.button
-									key={action.to}
-									initial={{ opacity: 0, y: 10 }}
-									animate={{ opacity: 1, y: 0 }}
-									exit={{ opacity: 0, y: 5 }}
-									transition={{ delay: (FAB_ACTIONS.length - 1 - i) * 0.05 }}
-									onClick={() => {
-										setFabOpen(false);
-										navigate(action.to);
-									}}
-									className="flex items-center gap-2 px-3 py-2 rounded-xl text-white text-xs font-semibold"
-									style={{ backgroundColor: action.color }}
-								>
-									{typeof action.icon === "string" ? (
-										<span className="text-[10px] font-bold tracking-wide">
-											{action.icon}
-										</span>
-									) : (
-										<action.icon size={14} strokeWidth={2.4} />
-									)}
-									{t(action.label)}
-								</motion.button>
-							))}
-						</div>
-					)}
-				</AnimatePresence>
-				<button
-					type="button"
-					onClick={() => setFabOpen((o) => !o)}
-					className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-white font-semibold text-sm transition-all"
-					style={{ backgroundColor: "var(--color-primary)" }}
-				>
-					<motion.span
-						animate={{ rotate: fabOpen ? 45 : 0 }}
-						transition={{ duration: 0.2 }}
-					>
-						<Plus size={18} strokeWidth={2.5} />
-					</motion.span>
-					{t("fab.vk_sequence")}
-				</button>
-			</div>
+			{/* Start Practice button */}
+			<button
+				type="button"
+				onClick={() => navigate("/start-practice")}
+				className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-white font-semibold text-sm transition-all hover:brightness-95 active:scale-[0.97]"
+				style={{ backgroundColor: "var(--color-primary)" }}
+			>
+				<Plus size={18} strokeWidth={2.5} />
+				{t("practice.start_practice")}
+			</button>
 		</aside>
 	);
 }

@@ -65,6 +65,29 @@
  */
 const mongoose = require("mongoose");
 
+const plannedBlockSchema = new mongoose.Schema(
+	{
+		blockType: {
+			type: String,
+			enum: ["vk_sequence", "pranayama", "meditation"],
+			required: true,
+		},
+		label: { type: String, required: true },
+		durationMinutes: { type: Number, required: true, min: 1 },
+		order: { type: Number, required: true },
+		// Optional references depending on blockType
+		vkSequence: { type: mongoose.Schema.Types.ObjectId, ref: "VKSequence" },
+		breathingPattern: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "BreathingPattern",
+		},
+		meditationType: { type: String },
+		// Config data (pranayama pattern key, cycles, etc.)
+		config: { type: mongoose.Schema.Types.Mixed },
+	},
+	{ _id: true, versionKey: false },
+);
+
 const sessionSchema = new mongoose.Schema(
 	{
 		user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -73,6 +96,34 @@ const sessionSchema = new mongoose.Schema(
 			type: String,
 			enum: ["vk_sequence", "pranayama", "meditation", "complete_practice"],
 			required: true,
+		},
+
+		// Session lifecycle status
+		status: {
+			type: String,
+			enum: ["planned", "active", "paused", "completed", "abandoned"],
+			default: "planned",
+		},
+
+		// Planned blocks for guided practice
+		plannedBlocks: [plannedBlockSchema],
+
+		// Pre-practice check-in (optional)
+		checkIn: {
+			enabled: { type: Boolean, default: false },
+			mood: [{ type: String }],
+			energyLevel: { type: Number, min: 1, max: 10 },
+			intention: { type: String, maxlength: 200 },
+		},
+
+		// Timer tracking for pause/resume accuracy
+		timerData: {
+			startedAt: Date,
+			pausedAt: Date,
+			totalPausedMs: { type: Number, default: 0 },
+			currentBlockIndex: { type: Number, default: 0 },
+			blockStartedAt: Date,
+			blockPausedMs: { type: Number, default: 0 },
 		},
 
 		// For individual VK session
@@ -121,15 +172,14 @@ const sessionSchema = new mongoose.Schema(
 			},
 			meditation: {
 				duration: Number,
-				// NOTE: 'type' is a reserved Mongoose schema key.
-				// Using 'meditationType' avoids Mongoose treating this entire
-				// subdocument as a plain String field.
 				meditationType: String,
 			},
 		},
 
 		duration: { type: Number, required: true, min: 1 },
+		actualDuration: { type: Number }, // Real elapsed time (excluding pauses)
 		completed: { type: Boolean, default: false },
+		completionRate: { type: Number, min: 0, max: 100 }, // % of blocks completed
 		date: { type: Date, default: Date.now },
 
 		// VK-specific feedback
@@ -163,7 +213,11 @@ const sessionSchema = new mongoose.Schema(
 // completePractice is checked via mainSequences.length because Mongoose always initialises
 // the subdocument as an empty object (truthy), even when the field was never set.
 sessionSchema.pre("save", async function () {
-	const { sessionType, vkSequence, completePractice } = this;
+	const { sessionType, vkSequence, completePractice, plannedBlocks } = this;
+
+	// Block-based sessions carry references inside plannedBlocks — skip legacy checks
+	const isBlockBased = Array.isArray(plannedBlocks) && plannedBlocks.length > 0;
+	if (isBlockBased) return;
 
 	// A completePractice subdocument is considered "set" only when it has real content
 	const hasCompletePractice =
@@ -200,6 +254,7 @@ sessionSchema.index({ user: 1, sessionType: 1 });
 sessionSchema.index({ date: -1 });
 sessionSchema.index({ sessionType: 1 });
 sessionSchema.index({ completed: 1, date: -1 });
+sessionSchema.index({ user: 1, status: 1 });
 
 const Session = mongoose.model("Session", sessionSchema);
 

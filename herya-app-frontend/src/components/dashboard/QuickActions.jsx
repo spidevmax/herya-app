@@ -34,7 +34,7 @@ const ACTIONS = [
 		icon: Play,
 		color: "#FFB347",
 		bg: "#FFB34715",
-		to: "/session/complete_practice",
+		to: "/start-practice",
 	},
 ];
 

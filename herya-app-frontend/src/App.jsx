@@ -26,6 +26,7 @@ import Register from "@/pages/Register";
 import ResetPassword from "@/pages/ResetPassword";
 import SequenceDetail from "@/pages/SequenceDetail";
 import Session from "@/pages/Session";
+import StartPractice from "@/pages/StartPractice";
 import SessionDetail from "@/pages/SessionDetail";
 import SessionHistory from "@/pages/SessionHistory";
 
@@ -101,6 +102,7 @@ const AppRoutes = () => {
 						element={<LegacyBreathingDetailRedirect />}
 					/>
 
+					<Route path="/start-practice" element={<StartPractice />} />
 					<Route path="/session/:type" element={<Session />} />
 					<Route path="/sessions" element={<SessionHistory />} />
 					<Route path="/sessions/:id" element={<SessionDetail />} />

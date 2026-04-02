@@ -6,3 +6,15 @@ export const createSession = (data) => api.post("/sessions", data);
 export const updateSession = (id, data) => api.put(`/sessions/${id}`, data);
 export const deleteSession = (id) => api.delete(`/sessions/${id}`);
 export const getSessionStats = () => api.get("/sessions/stats");
+
+// Guided practice flow
+export const getActiveSession = () => api.get("/sessions/active/current");
+export const startSessionTimer = (id) => api.post(`/sessions/${id}/start`);
+export const pauseSessionTimer = (id) => api.post(`/sessions/${id}/pause`);
+export const advanceSessionBlock = (id, direction) =>
+	api.post(`/sessions/${id}/advance-block`, { direction });
+export const completeGuidedSession = (id, data) =>
+	api.post(`/sessions/${id}/complete`, data);
+export const abandonSession = (id) => api.post(`/sessions/${id}/abandon`);
+export const getPracticeAnalytics = () =>
+	api.get("/sessions/analytics/practice");

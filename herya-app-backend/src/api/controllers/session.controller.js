@@ -40,17 +40,18 @@ const { deleteImgCloudinary } = require("../../utils/deleteImage");
  */
 const createSession = async (req, res, next) => {
 	try {
-		const { sessionType, vkSequence, completePractice, duration } = req.body;
+		const { sessionType, vkSequence, completePractice, duration, plannedBlocks } = req.body;
+		const isBlockBased = Array.isArray(plannedBlocks) && plannedBlocks.length > 0;
 
-		// Validate required fields based on sessionType
-		if (sessionType === "vk_sequence" && !vkSequence) {
+		// Validate required fields based on sessionType (skip for block-based sessions)
+		if (!isBlockBased && sessionType === "vk_sequence" && !vkSequence) {
 			throw createError(
 				400,
 				"vkSequence is required for vk_sequence session type",
 			);
 		}
 
-		if (sessionType === "complete_practice" && !completePractice) {
+		if (!isBlockBased && sessionType === "complete_practice" && !completePractice) {
 			throw createError(
 				400,
 				"completePractice is required for complete_practice session type",
@@ -551,6 +552,291 @@ async function updateUserStats(userId, session) {
 	await user.save();
 }
 
+/**
+ * Controller: startSession
+ * Transitions a planned session to active status, recording the start time.
+ */
+const startSession = async (req, res, next) => {
+	try {
+		const session = await Session.findById(req.params.id);
+		if (!session) throw createError(404, "Session not found");
+		if (session.user.toString() !== req.user._id.toString())
+			throw createError(403, "Access denied");
+
+		if (session.status !== "planned" && session.status !== "paused")
+			throw createError(400, "Session cannot be started from current status");
+
+		const now = new Date();
+		session.status = "active";
+
+		if (!session.timerData.startedAt) {
+			session.timerData.startedAt = now;
+			session.timerData.blockStartedAt = now;
+		} else {
+			// Resuming from pause
+			const pausedMs = now - session.timerData.pausedAt;
+			session.timerData.totalPausedMs += pausedMs;
+			session.timerData.blockPausedMs += pausedMs;
+			session.timerData.pausedAt = undefined;
+		}
+
+		const saved = await session.save();
+		return sendResponse(res, 200, true, "Session started", saved);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: pauseSession
+ */
+const pauseSession = async (req, res, next) => {
+	try {
+		const session = await Session.findById(req.params.id);
+		if (!session) throw createError(404, "Session not found");
+		if (session.user.toString() !== req.user._id.toString())
+			throw createError(403, "Access denied");
+		if (session.status !== "active")
+			throw createError(400, "Only active sessions can be paused");
+
+		session.status = "paused";
+		session.timerData.pausedAt = new Date();
+		const saved = await session.save();
+		return sendResponse(res, 200, true, "Session paused", saved);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: advanceBlock
+ * Moves to the next or previous block in the session.
+ */
+const advanceBlock = async (req, res, next) => {
+	try {
+		const session = await Session.findById(req.params.id);
+		if (!session) throw createError(404, "Session not found");
+		if (session.user.toString() !== req.user._id.toString())
+			throw createError(403, "Access denied");
+
+		const { direction = "next" } = req.body;
+		const currentIdx = session.timerData.currentBlockIndex || 0;
+		const maxIdx = session.plannedBlocks.length - 1;
+
+		let newIdx;
+		if (direction === "next") {
+			newIdx = Math.min(currentIdx + 1, maxIdx);
+		} else {
+			newIdx = Math.max(currentIdx - 1, 0);
+		}
+
+		session.timerData.currentBlockIndex = newIdx;
+		session.timerData.blockStartedAt = new Date();
+		session.timerData.blockPausedMs = 0;
+
+		const saved = await session.save();
+		return sendResponse(res, 200, true, "Block advanced", saved);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: completeGuidedSession
+ * Finalises a guided session, calculating actual duration and completion rate.
+ */
+const completeGuidedSession = async (req, res, next) => {
+	try {
+		const session = await Session.findById(req.params.id);
+		if (!session) throw createError(404, "Session not found");
+		if (session.user.toString() !== req.user._id.toString())
+			throw createError(403, "Access denied");
+
+		const now = new Date();
+		const startedAt = session.timerData.startedAt || now;
+		let totalPausedMs = session.timerData.totalPausedMs || 0;
+
+		// If currently paused, add the last pause segment
+		if (session.status === "paused" && session.timerData.pausedAt) {
+			totalPausedMs += now - session.timerData.pausedAt;
+		}
+
+		const elapsedMs = now - startedAt - totalPausedMs;
+		const actualMinutes = Math.max(1, Math.round(elapsedMs / 60000));
+
+		const blocksCompleted = req.body.blocksCompleted ?? session.plannedBlocks.length;
+		const completionRate =
+			session.plannedBlocks.length > 0
+				? Math.round((blocksCompleted / session.plannedBlocks.length) * 100)
+				: 100;
+
+		session.status = "completed";
+		session.completed = true;
+		session.actualDuration = actualMinutes;
+		session.completionRate = completionRate;
+		if (req.body.notes) session.notes = req.body.notes;
+
+		const saved = await session.save();
+		await updateUserStats(req.user._id, saved);
+
+		return sendResponse(res, 200, true, "Session completed", saved);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: abandonSession
+ */
+const abandonSession = async (req, res, next) => {
+	try {
+		const session = await Session.findById(req.params.id);
+		if (!session) throw createError(404, "Session not found");
+		if (session.user.toString() !== req.user._id.toString())
+			throw createError(403, "Access denied");
+
+		session.status = "abandoned";
+		session.completed = false;
+
+		if (session.timerData.startedAt) {
+			const now = new Date();
+			let totalPausedMs = session.timerData.totalPausedMs || 0;
+			if (session.timerData.pausedAt) {
+				totalPausedMs += now - session.timerData.pausedAt;
+			}
+			session.actualDuration = Math.max(
+				1,
+				Math.round((now - session.timerData.startedAt - totalPausedMs) / 60000),
+			);
+		}
+
+		const blocksCompleted = session.timerData.currentBlockIndex || 0;
+		session.completionRate =
+			session.plannedBlocks.length > 0
+				? Math.round((blocksCompleted / session.plannedBlocks.length) * 100)
+				: 0;
+
+		const saved = await session.save();
+		return sendResponse(res, 200, true, "Session abandoned", saved);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: getActiveSession
+ * Returns the user's most recent active or paused session (for recovery).
+ */
+const getActiveSession = async (req, res, next) => {
+	try {
+		const session = await Session.findOne({
+			user: req.user._id,
+			status: { $in: ["active", "paused", "planned"] },
+		})
+			.sort({ updatedAt: -1 })
+			.populate("plannedBlocks.vkSequence")
+			.populate("plannedBlocks.breathingPattern");
+
+		return sendResponse(
+			res,
+			200,
+			true,
+			session ? "Active session found" : "No active session",
+			session,
+		);
+	} catch (error) {
+		return next(error);
+	}
+};
+
+/**
+ * Controller: getPracticeAnalytics
+ * Returns analytics: start vs finish rate, avg duration by type, most-used blocks, abandonment by phase.
+ */
+const getPracticeAnalytics = async (req, res, next) => {
+	try {
+		const userId = req.user._id;
+
+		const [totals, byType, blockUsage] = await Promise.all([
+			Session.aggregate([
+				{ $match: { user: userId } },
+				{
+					$group: {
+						_id: null,
+						total: { $sum: 1 },
+						completed: {
+							$sum: { $cond: [{ $eq: ["$status", "completed"] }, 1, 0] },
+						},
+						abandoned: {
+							$sum: { $cond: [{ $eq: ["$status", "abandoned"] }, 1, 0] },
+						},
+						avgDuration: { $avg: "$actualDuration" },
+					},
+				},
+			]),
+			Session.aggregate([
+				{ $match: { user: userId, status: "completed" } },
+				{
+					$group: {
+						_id: "$sessionType",
+						count: { $sum: 1 },
+						avgDuration: { $avg: "$actualDuration" },
+						avgCompletion: { $avg: "$completionRate" },
+					},
+				},
+			]),
+			Session.aggregate([
+				{ $match: { user: userId, status: "completed" } },
+				{ $unwind: "$plannedBlocks" },
+				{
+					$group: {
+						_id: {
+							blockType: "$plannedBlocks.blockType",
+							label: "$plannedBlocks.label",
+						},
+						count: { $sum: 1 },
+					},
+				},
+				{ $sort: { count: -1 } },
+				{ $limit: 10 },
+			]),
+		]);
+
+		const stats = totals[0] || {
+			total: 0,
+			completed: 0,
+			abandoned: 0,
+			avgDuration: 0,
+		};
+
+		return sendResponse(res, 200, true, "Analytics retrieved", {
+			completionRate:
+				stats.total > 0
+					? Math.round((stats.completed / stats.total) * 100)
+					: 0,
+			abandonmentRate:
+				stats.total > 0
+					? Math.round((stats.abandoned / stats.total) * 100)
+					: 0,
+			avgDuration: Math.round(stats.avgDuration || 0),
+			totalSessions: stats.total,
+			byType: byType.map((t) => ({
+				type: t._id,
+				count: t.count,
+				avgDuration: Math.round(t.avgDuration || 0),
+				avgCompletion: Math.round(t.avgCompletion || 0),
+			})),
+			mostUsedBlocks: blockUsage.map((b) => ({
+				blockType: b._id.blockType,
+				label: b._id.label,
+				count: b.count,
+			})),
+		});
+	} catch (error) {
+		return next(error);
+	}
+};
+
 module.exports = {
 	createSession,
 	getSessions,
@@ -558,4 +844,11 @@ module.exports = {
 	updateSession,
 	deleteSession,
 	getSessionStats,
+	startSession,
+	pauseSession,
+	advanceBlock,
+	completeGuidedSession,
+	abandonSession,
+	getActiveSession,
+	getPracticeAnalytics,
 };
