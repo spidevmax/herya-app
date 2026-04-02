@@ -24,7 +24,10 @@ const formatValue = (value) => {
 };
 
 const DetailBlock = ({ title, children }) => (
-	<div className="bg-white rounded-2xl p-4 shadow-[var(--shadow-card)]">
+	<div
+		className="rounded-2xl p-4 shadow-[var(--shadow-card)]"
+		style={{ backgroundColor: "var(--color-surface-card)" }}
+	>
 		<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
 			{title}
 		</h3>
@@ -222,27 +225,19 @@ export default function PoseDetail() {
 				)}
 
 				<DetailBlock title={t("pose_detail.details")}>
-					<div className="flex flex-wrap gap-2">
-						{formatValue(pose.category) && (
-							<Badge color="var(--color-info)">
-								{formatValue(pose.category)}
-							</Badge>
-						)}
-						{formatValue(pose.family) && (
-							<Badge color="var(--color-lavender)">
-								{formatValue(pose.family)}
-							</Badge>
-						)}
-						{pose.chakraRelated && (
-							<Badge color="var(--color-danger)">{pose.chakraRelated}</Badge>
-						)}
-						{pose.transitionType && (
-							<Badge color="var(--color-primary)">
-								{formatValue(pose.transitionType)}
-							</Badge>
-						)}
-					</div>
-					<div className="mt-4 grid grid-cols-1 gap-3 text-sm text-[var(--color-text-secondary)]">
+					{(pose.chakraRelated || pose.transitionType) && (
+						<div className="flex flex-wrap gap-2 mb-4">
+							{pose.chakraRelated && (
+								<Badge color="var(--color-danger)">{pose.chakraRelated}</Badge>
+							)}
+							{pose.transitionType && (
+								<Badge color="var(--color-primary)">
+									{formatValue(pose.transitionType)}
+								</Badge>
+							)}
+						</div>
+					)}
+					<div className="grid grid-cols-1 gap-3 text-sm text-[var(--color-text-secondary)]">
 						{recommendedBreaths && (
 							<p>
 								<b className="text-[var(--color-text-primary)]">
@@ -278,14 +273,6 @@ export default function PoseDetail() {
 					<DetailBlock title={t("pose_detail.aliases")}>
 						<p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
 							{aliases.join(", ")}
-						</p>
-					</DetailBlock>
-				)}
-
-				{pose.description && (
-					<DetailBlock title={t("pose_detail.description")}>
-						<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
-							{pose.description}
 						</p>
 					</DetailBlock>
 				)}

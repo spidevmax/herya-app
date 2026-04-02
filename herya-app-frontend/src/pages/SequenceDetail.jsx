@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, BookOpen, Play, Dumbbell } from "lucide-react";
+import { ChevronLeft, Clock, BookOpen, Dumbbell } from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
-import { Button, Badge, SkeletonCard } from "@/components/ui";
+import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function SequenceDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t } = useLanguage();
+	const tr = (key, fallback) => {
+		const value = t(key);
+		return value === key ? fallback : value;
+	};
 	const [seq, setSeq] = useState(null);
 	const [loading, setLoading] = useState(true);
 
@@ -29,15 +33,137 @@ export default function SequenceDetail() {
 			}
 		: null;
 
+	const getPoseName = (pose, fallback) =>
+		pose?.englishName || pose?.name || pose?.romanizationName || fallback;
+
+	const getPoseSubtitle = (pose) =>
+		pose?.romanizationName || pose?.sanskritName || null;
+
+	const buildPoseItem = (
+		pose,
+		fallbackOrder,
+		breaths = null,
+		instruction = null,
+	) => {
+		if (!pose && !instruction) return null;
+		const resolvedName =
+			typeof pose === "string"
+				? pose
+				: getPoseName(pose, `Pose ${fallbackOrder}`);
+		return {
+			id:
+				(typeof pose === "object" && pose?._id) ||
+				`pose-${fallbackOrder}-${resolvedName}`,
+			order: fallbackOrder,
+			name: resolvedName,
+			subtitle: typeof pose === "object" ? getPoseSubtitle(pose) : null,
+			breaths,
+			instruction,
+		};
+	};
+
+	const entrySteps = seq?.structure?.entry?.steps ?? [];
+	const orderedCorePoses = (seq?.structure?.corePoses ?? [])
+		.slice()
+		.sort((a, b) => (a?.order ?? 0) - (b?.order ?? 0));
+	const exitSteps = seq?.structure?.exit?.steps ?? [];
+	const prerequisites = Array.isArray(seq?.prerequisites)
+		? seq.prerequisites
+		: [];
+	const nextSteps = Array.isArray(seq?.nextSteps) ? seq.nextSteps : [];
+	const estimatedDuration = seq?.estimatedDuration ?? {};
+	const therapeuticFocus = seq?.therapeuticFocus ?? null;
+	const recommendedPranayama = seq?.recommendedPranayama?.pattern ?? null;
+
+	const getItemName = (item, fallback) => {
+		if (typeof item === "string") return item;
+		return (
+			item?.englishName || item?.name || item?.romanizationName || fallback
+		);
+	};
+
+	const sequenceSections = [
+		{
+			key: "entry",
+			label: t("sequence_detail.entry"),
+			items:
+				entrySteps.length > 0
+					? entrySteps
+							.map((step, index) =>
+								buildPoseItem(
+									step?.pose,
+									index + 1,
+									step?.breaths,
+									step?.instruction,
+								),
+							)
+							.filter(Boolean)
+					: seq?.structure?.entry?.fromPose
+						? [
+								buildPoseItem(seq.structure.entry.fromPose, 1, null, null),
+							].filter(Boolean)
+						: [],
+		},
+		{
+			key: "core",
+			label: t("sequence_detail.core_poses"),
+			items:
+				orderedCorePoses.length > 0
+					? orderedCorePoses
+							.map((entry, index) =>
+								buildPoseItem(
+									entry?.pose,
+									entry?.order ?? index + 1,
+									entry?.breaths,
+								),
+							)
+							.filter(Boolean)
+					: (seq?.keyPoses ?? [])
+							.map((pose, index) => buildPoseItem(pose, index + 1, null, null))
+							.filter(Boolean),
+		},
+		{
+			key: "exit",
+			label: t("sequence_detail.exit"),
+			items:
+				exitSteps.length > 0
+					? exitSteps
+							.map((step, index) =>
+								buildPoseItem(
+									step?.pose,
+									index + 1,
+									step?.breaths,
+									step?.instruction,
+								),
+							)
+							.filter(Boolean)
+					: seq?.structure?.exit?.toPose
+						? [buildPoseItem(seq.structure.exit.toPose, 1, null, null)].filter(
+								Boolean,
+							)
+						: [],
+		},
+	].filter((section) => section.items.length > 0);
+
 	return (
 		<div className="pb-6">
-			<div className="sticky top-0 z-10 bg-[#F8F7F4]/90 backdrop-blur-xl px-4 pt-4 pb-3 flex items-center gap-3">
+			<div
+				className="sticky top-0 z-10 backdrop-blur-xl px-4 pt-4 pb-3 flex items-center gap-3"
+				style={{
+					backgroundColor:
+						"color-mix(in srgb, var(--color-surface) 90%, transparent)",
+				}}
+			>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
-					className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm"
+					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
+					style={{ backgroundColor: "var(--color-surface-card)" }}
 				>
-					<ArrowLeft size={20} style={{ color: "var(--color-text-primary)" }} />
+					<ChevronLeft
+						size={20}
+						style={{ color: "var(--color-text-primary)" }}
+					/>
 				</button>
 				<h1
 					className="font-display text-lg font-semibold truncate"
@@ -113,7 +239,10 @@ export default function SequenceDetail() {
 					</motion.div>
 
 					{seq.description && (
-						<div className="bg-white rounded-2xl p-5">
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
 							<h3
 								className="font-semibold mb-2"
 								style={{ color: "var(--color-text-primary)" }}
@@ -129,37 +258,373 @@ export default function SequenceDetail() {
 						</div>
 					)}
 
-					{seq.keyPoses?.length > 0 && (
-						<div className="bg-white rounded-2xl p-5">
+					{(estimatedDuration.recommended ||
+						estimatedDuration.min ||
+						estimatedDuration.max ||
+						seq.level ||
+						seq.difficulty) && (
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
 							<h3
-								className="font-semibold mb-3 flex items-center gap-2"
+								className="font-semibold mb-3"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								<BookOpen size={16} /> {t("sequence_detail.key_poses")}
+								{tr("sequence_detail.details", "Details")}
+							</h3>
+							<div className="grid grid-cols-2 gap-2">
+								{seq.level ? (
+									<div
+										className="rounded-xl px-3 py-2"
+										style={{ backgroundColor: `${family.color}12` }}
+									>
+										<p
+											className="text-[10px] font-bold uppercase tracking-widest"
+											style={{ color: family.color }}
+										>
+											{tr("library.filter_level", "Level")}
+										</p>
+										<p
+											className="text-sm font-semibold mt-0.5"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{LEVEL_LABELS[seq.level] ?? seq.level}
+										</p>
+									</div>
+								) : null}
+								{seq.difficulty ? (
+									<div
+										className="rounded-xl px-3 py-2"
+										style={{ backgroundColor: `${family.color}12` }}
+									>
+										<p
+											className="text-[10px] font-bold uppercase tracking-widest"
+											style={{ color: family.color }}
+										>
+											{tr("library.filter_difficulty", "Difficulty")}
+										</p>
+										<p
+											className="text-sm font-semibold mt-0.5 capitalize"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{seq.difficulty}
+										</p>
+									</div>
+								) : null}
+								{estimatedDuration.recommended ||
+								estimatedDuration.min ||
+								estimatedDuration.max ? (
+									<div
+										className="rounded-xl px-3 py-2"
+										style={{ backgroundColor: `${family.color}12` }}
+									>
+										<p
+											className="text-[10px] font-bold uppercase tracking-widest"
+											style={{ color: family.color }}
+										>
+											{tr(
+												"sequence_detail.estimated_duration",
+												"Estimated duration",
+											)}
+										</p>
+										<p
+											className="text-sm font-semibold mt-0.5"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{estimatedDuration.recommended ??
+												estimatedDuration.min ??
+												"—"}
+											{estimatedDuration.max ? `-${estimatedDuration.max}` : ""}{" "}
+											{t("sequence_detail.minutes")}
+										</p>
+									</div>
+								) : null}
+								{seq.family ? (
+									<div
+										className="rounded-xl px-3 py-2"
+										style={{ backgroundColor: `${family.color}12` }}
+									>
+										<p
+											className="text-[10px] font-bold uppercase tracking-widest"
+											style={{ color: family.color }}
+										>
+											{tr("library.filter_family", "Family")}
+										</p>
+										<p
+											className="text-sm font-semibold mt-0.5 capitalize"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{seq.family.replace(/_/g, " ")}
+										</p>
+									</div>
+								) : null}
+							</div>
+						</div>
+					)}
+
+					{therapeuticFocus && (
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
+							<h3
+								className="font-semibold mb-3"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								{tr("sequence_detail.therapeutic_focus", "Therapeutic focus")}
+							</h3>
+							{therapeuticFocus.primaryBenefit ? (
+								<p
+									className="text-sm leading-relaxed"
+									style={{ color: "var(--color-text-secondary)" }}
+								>
+									<span
+										className="font-semibold"
+										style={{ color: family.color }}
+									>
+										{tr("sequence_detail.primary_benefit", "Primary benefit")}:
+									</span>
+									{therapeuticFocus.primaryBenefit}
+								</p>
+							) : null}
+							{Array.isArray(therapeuticFocus.targetConditions) &&
+							therapeuticFocus.targetConditions.length > 0 ? (
+								<div className="mt-3">
+									<p
+										className="text-xs font-bold uppercase tracking-widest mb-2"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
+										{tr(
+											"sequence_detail.target_conditions",
+											"Target conditions",
+										)}
+									</p>
+									<div className="flex flex-wrap gap-2">
+										{therapeuticFocus.targetConditions.map((condition) => (
+											<Badge
+												key={condition}
+												className="text-xs"
+												color={family.color}
+											>
+												{condition}
+											</Badge>
+										))}
+									</div>
+								</div>
+							) : null}
+							{Array.isArray(therapeuticFocus.contraindications) &&
+							therapeuticFocus.contraindications.length > 0 ? (
+								<div className="mt-3">
+									<p
+										className="text-xs font-bold uppercase tracking-widest mb-2"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
+										{tr(
+											"sequence_detail.contraindications",
+											"Contraindications",
+										)}
+									</p>
+									<ul className="flex flex-col gap-1.5">
+										{therapeuticFocus.contraindications.map((item) => (
+											<li
+												key={item}
+												className="text-sm"
+												style={{ color: "var(--color-text-secondary)" }}
+											>
+												• {item}
+											</li>
+										))}
+									</ul>
+								</div>
+							) : null}
+						</div>
+					)}
+
+					{recommendedPranayama && (
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
+							<h3
+								className="font-semibold mb-3"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								{tr(
+									"sequence_detail.recommended_pranayama",
+									"Recommended pranayama",
+								)}
+							</h3>
+							<p
+								className="text-sm leading-relaxed"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								{getItemName(
+									recommendedPranayama,
+									recommendedPranayama.englishName || recommendedPranayama.name,
+								)}
+							</p>
+						</div>
+					)}
+
+					{prerequisites.length > 0 && (
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
+							<h3
+								className="font-semibold mb-3"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								{tr("sequence_detail.prerequisites", "Prerequisites")}
 							</h3>
 							<div className="flex flex-wrap gap-2">
-								{seq.keyPoses.slice(0, 10).map((p) => (
-									<span
-										key={typeof p === "string" ? p : p._id || p.englishName}
-										className="px-3 py-1.5 rounded-xl text-xs font-medium"
-										style={{
-											backgroundColor: family.color + "15",
-											color: family.color,
-										}}
+								{prerequisites.map((item) => (
+									<Badge
+										key={item._id || item.englishName || item.name}
+										color={family.color}
 									>
-										{p.englishName || p}
-									</span>
+										{getItemName(item, t("library.card_default_item"))}
+									</Badge>
 								))}
 							</div>
 						</div>
 					)}
 
-					<Button
-						onClick={() => navigate("/session/vk_sequence?seq=" + seq._id)}
-						className="w-full text-base py-4"
-					>
-						<Play size={18} /> {t("sequence_detail.start")}
-					</Button>
+					{nextSteps.length > 0 && (
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
+							<h3
+								className="font-semibold mb-3"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								{tr("sequence_detail.next_steps", "Next steps")}
+							</h3>
+							<div className="flex flex-col gap-2">
+								{nextSteps.map((step) => {
+									const nextSequence = step?.sequence || step;
+									return (
+										<div
+											key={
+												nextSequence._id ||
+												nextSequence.englishName ||
+												nextSequence.name
+											}
+											className="rounded-xl px-3 py-2 border"
+											style={{ borderColor: `${family.color}33` }}
+										>
+											<p
+												className="text-sm font-semibold"
+												style={{ color: "var(--color-text-primary)" }}
+											>
+												{getItemName(
+													nextSequence,
+													t("library.card_default_item"),
+												)}
+											</p>
+											{step?.whenToUse ? (
+												<p
+													className="text-xs mt-1"
+													style={{ color: "var(--color-text-secondary)" }}
+												>
+													{step.whenToUse}
+												</p>
+											) : null}
+										</div>
+									);
+								})}
+							</div>
+						</div>
+					)}
+
+					{sequenceSections.length > 0 && (
+						<div
+							className="rounded-2xl p-5"
+							style={{ backgroundColor: "var(--color-surface-card)" }}
+						>
+							<h3
+								className="font-semibold mb-3 flex items-center gap-2"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								<BookOpen size={16} /> {t("sequence_detail.full_sequence")}
+							</h3>
+							<p
+								className="text-xs font-medium mb-4"
+								style={{ color: "var(--color-text-muted)" }}
+							>
+								{t("sequence_detail.postures_count", {
+									n: sequenceSections.reduce(
+										(sum, section) => sum + section.items.length,
+										0,
+									),
+								})}
+							</p>
+							<div className="flex flex-col gap-4">
+								{sequenceSections.map((section) => (
+									<div key={section.key} className="flex flex-col gap-2">
+										<h4
+											className="text-xs font-bold uppercase tracking-widest"
+											style={{ color: "var(--color-text-secondary)" }}
+										>
+											{section.label}
+										</h4>
+										<ol className="flex flex-col gap-2">
+											{section.items.map((pose) => (
+												<li
+													key={pose.id}
+													className="rounded-xl px-3 py-2 border flex items-center justify-between gap-3"
+													style={{
+														borderColor: `${family.color}33`,
+														backgroundColor: `${family.color}0F`,
+													}}
+												>
+													<div className="min-w-0">
+														<p
+															className="text-sm font-semibold truncate"
+															style={{ color: "var(--color-text-primary)" }}
+														>
+															{pose.order}. {pose.name}
+														</p>
+														{pose.subtitle && pose.subtitle !== pose.name ? (
+															<p
+																className="text-xs truncate"
+																style={{ color: "var(--color-text-secondary)" }}
+															>
+																{pose.subtitle}
+															</p>
+														) : null}
+														{pose.instruction ? (
+															<p
+																className="text-xs mt-1"
+																style={{ color: "var(--color-text-muted)" }}
+															>
+																{pose.instruction}
+															</p>
+														) : null}
+													</div>
+													{typeof pose.breaths === "number" ? (
+														<span
+															className="text-xs font-semibold px-2 py-1 rounded-lg"
+															style={{
+																backgroundColor: `${family.color}22`,
+																color: family.color,
+															}}
+														>
+															{t("sequence_detail.breaths", {
+																n: pose.breaths,
+															})}
+														</span>
+													) : null}
+												</li>
+											))}
+										</ol>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
 				</div>
 			)}
 		</div>

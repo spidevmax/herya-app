@@ -12,22 +12,10 @@ import {
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
-const DIFFICULTY_OPTIONS = [
-	{ key: "", label: "Todas", color: "var(--color-info)" },
-	{ key: "beginner", label: "Principiante", color: "var(--color-success)" },
-	{ key: "intermediate", label: "Intermedio", color: "var(--color-warning)" },
-	{ key: "advanced", label: "Avanzado", color: "var(--color-danger)" },
-];
-
 const DIFF_COLORS = {
 	beginner: "var(--color-success)",
 	intermediate: "var(--color-warning)",
 	advanced: "var(--color-danger)",
-};
-const DIFF_LABELS = {
-	beginner: "Principiante",
-	intermediate: "Intermedio",
-	advanced: "Avanzado",
 };
 
 const normalizeList = (value) => {
@@ -43,7 +31,12 @@ const formatValue = (value) => {
 	return String(value);
 };
 
-function PoseCard({ pose, index, onClick }) {
+function PoseCard({ pose, index, onClick, t }) {
+	const diffLabels = {
+		beginner: t("library.beginner"),
+		intermediate: t("library.intermediate"),
+		advanced: t("library.advanced"),
+	};
 	const category = Array.isArray(pose.vkCategory?.primary)
 		? pose.vkCategory.primary.join(", ")
 		: typeof pose.vkCategory?.primary === "string"
@@ -112,7 +105,7 @@ function PoseCard({ pose, index, onClick }) {
 						<Badge
 							color={DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"}
 						>
-							{DIFF_LABELS[pose.difficulty] ?? pose.difficulty}
+							{diffLabels[pose.difficulty] ?? pose.difficulty}
 						</Badge>
 					)}
 					{category && <Badge color="var(--color-info)">{category}</Badge>}
@@ -122,7 +115,7 @@ function PoseCard({ pose, index, onClick }) {
 					{breathingCue && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Respira:
+								{t("library.poses_breathe")}
 							</span>{" "}
 							{breathingCue}
 						</p>
@@ -130,7 +123,7 @@ function PoseCard({ pose, index, onClick }) {
 					{targetMuscles.length > 0 && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Músculos:
+								{t("library.poses_muscles")}
 							</span>{" "}
 							{targetMuscles.join(", ")}
 						</p>
@@ -138,7 +131,7 @@ function PoseCard({ pose, index, onClick }) {
 					{jointFocus.length > 0 && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Articulaciones:
+								{t("library.poses_joints")}
 							</span>{" "}
 							{jointFocus.join(", ")}
 						</p>
@@ -146,7 +139,7 @@ function PoseCard({ pose, index, onClick }) {
 					{drishti && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Drishti:
+								{t("library.poses_drishti")}
 							</span>{" "}
 							{drishti}
 						</p>
@@ -154,7 +147,7 @@ function PoseCard({ pose, index, onClick }) {
 					{energyEffect && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Energía:
+								{t("library.poses_energy")}
 							</span>{" "}
 							{energyEffect}
 						</p>
@@ -162,7 +155,7 @@ function PoseCard({ pose, index, onClick }) {
 					{sidedness && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Lado:
+								{t("library.poses_side")}
 							</span>{" "}
 							{sidedness}
 						</p>
@@ -170,7 +163,7 @@ function PoseCard({ pose, index, onClick }) {
 					{secondary.length > 0 && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Tipo:
+								{t("library.poses_type")}
 							</span>{" "}
 							{secondary.join(", ")}
 						</p>
@@ -178,7 +171,7 @@ function PoseCard({ pose, index, onClick }) {
 					{contraindications.length > 0 && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								Precauciones:
+								{t("library.poses_cautions")}
 							</span>{" "}
 							{contraindications.join(" · ")}
 						</p>
@@ -207,6 +200,13 @@ export default function Poses() {
 	const [query, setQuery] = useState("");
 	const [difficulty, setDifficulty] = useState("");
 	const debounceRef = useRef(null);
+
+	const DIFFICULTY_OPTIONS = [
+		{ key: "", label: t("library.poses_all_difficulties"), color: "var(--color-info)" },
+		{ key: "beginner", label: t("library.beginner"), color: "var(--color-success)" },
+		{ key: "intermediate", label: t("library.intermediate"), color: "var(--color-warning)" },
+		{ key: "advanced", label: t("library.advanced"), color: "var(--color-danger)" },
+	];
 
 	const fetchPoses = useCallback(() => {
 		setLoading(true);
@@ -293,6 +293,7 @@ export default function Poses() {
 							key={p._id}
 							pose={p}
 							index={i}
+							t={t}
 							onClick={() => navigate(`/poses/${p._id}`)}
 						/>
 					))

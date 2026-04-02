@@ -13,7 +13,8 @@ export function Card({ children, className = "", onClick, hover = true }) {
 				hover && onClick ? { y: -2, boxShadow: "var(--shadow-card-hover)" } : {}
 			}
 			whileTap={onClick ? { scale: 0.98 } : {}}
-			className={`bg-white rounded-2xl shadow-[var(--shadow-card)] ${onClick ? "cursor-pointer" : ""} ${className}`}
+			className={`rounded-2xl shadow-[var(--shadow-card)] ${onClick ? "cursor-pointer" : ""} ${className}`}
+			style={{ backgroundColor: "var(--color-surface-card)" }}
 		>
 			{children}
 		</motion.div>
@@ -69,7 +70,7 @@ export function Button({
 		ghost:
 			"bg-transparent text-[var(--color-primary)] hover:bg-[color:var(--color-primary)/0.1] active:scale-95",
 		outline:
-			"border-2 border-[var(--color-border)] bg-white text-[var(--color-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] active:scale-95",
+			"border-2 border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] active:scale-95",
 	};
 	const sizes = {
 		sm: "px-3 py-1.5 text-sm rounded-lg",
@@ -239,7 +240,8 @@ export function Badge({ children, color = "#5DB87F", className = "" }) {
 export function SkeletonCard({ lines = 3, className = "" }) {
 	return (
 		<div
-			className={`bg-white rounded-2xl p-4 space-y-3 shadow-[var(--shadow-card)] ${className}`}
+			className={`rounded-2xl p-4 space-y-3 shadow-[var(--shadow-card)] ${className}`}
+			style={{ backgroundColor: "var(--color-surface-card)" }}
 		>
 			<div className="skeleton h-5 w-3/4 rounded-lg" />
 			{Array.from({ length: lines - 1 }, (_, idx) => idx + 1).map((lineNo) => (
@@ -296,11 +298,13 @@ export function EmptyState({
 					{illustration}
 				</motion.div>
 			) : null}
-			<h3 className="font-display text-xl font-semibold text-[#1A1A2E] mb-2">
+			<h3 className="font-display text-xl font-semibold mb-2 text-[var(--color-text-primary)]">
 				{title}
 			</h3>
 			{description && (
-				<p className="text-[#6B7280] text-sm max-w-xs mb-6">{description}</p>
+				<p className="text-[var(--color-text-secondary)] text-sm max-w-xs mb-6">
+					{description}
+				</p>
 			)}
 			{action}
 		</motion.div>
@@ -312,7 +316,8 @@ export function ProgressBar({ value, max, color = "#5DB87F", className = "" }) {
 	const pct = Math.min(100, Math.round((value / max) * 100));
 	return (
 		<div
-			className={`w-full h-2 bg-[#E8F4D0] rounded-full overflow-hidden ${className}`}
+			className={`w-full h-2 rounded-full overflow-hidden ${className}`}
+			style={{ backgroundColor: "var(--color-border-soft)" }}
 		>
 			<motion.div
 				initial={{ width: 0 }}
@@ -350,7 +355,7 @@ export function CircleProgress({
 					cy={size / 2}
 					r={r}
 					fill="none"
-					stroke="#E8F4D0"
+					stroke="var(--color-border-soft)"
 					strokeWidth={stroke}
 				/>
 				<motion.circle

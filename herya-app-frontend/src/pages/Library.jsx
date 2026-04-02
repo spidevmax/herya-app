@@ -9,416 +9,71 @@ import { EmptyState, SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
-/* ─── Colour palettes per difficulty ─── */
 const PALETTE = {
 	beginner: {
-		bg: "#E8F5E9",
-		border: "#4CAF50",
-		badge: "#4CAF50",
-		stars: "#4CAF50",
-		statBg: "#C8E6C9",
-		dark: {
-			bg: "#1B2E1B",
-			border: "#4CAF50",
-			badge: "#4CAF50",
-			statBg: "#1F3320",
-		},
+		bg: "var(--color-tone-success-bg)",
+		border: "var(--color-success)",
+		statBg:
+			"color-mix(in srgb, var(--color-success) 16%, var(--color-surface-card))",
 	},
 	intermediate: {
-		bg: "#FFF8E1",
-		border: "#FF9800",
-		badge: "#FF9800",
-		stars: "#FF9800",
-		statBg: "#FFE0B2",
-		dark: {
-			bg: "#2E2200",
-			border: "#FF9800",
-			badge: "#FF9800",
-			statBg: "#3A2B00",
-		},
+		bg: "var(--color-tone-warning-bg)",
+		border: "var(--color-warning)",
+		statBg:
+			"color-mix(in srgb, var(--color-warning) 16%, var(--color-surface-card))",
 	},
 	advanced: {
-		bg: "#FCE4EC",
-		border: "#E91E63",
-		badge: "#E91E63",
-		stars: "#E91E63",
-		statBg: "#F8BBD9",
-		dark: {
-			bg: "#2E0018",
-			border: "#E91E63",
-			badge: "#E91E63",
-			statBg: "#3A001E",
-		},
+		bg: "var(--color-tone-danger-bg)",
+		border: "var(--color-danger)",
+		statBg:
+			"color-mix(in srgb, var(--color-danger) 16%, var(--color-surface-card))",
 	},
 	default: {
-		bg: "#EDE7F6",
-		border: "#7C3AED",
-		badge: "#7C3AED",
-		stars: "#7C3AED",
-		statBg: "#D1C4E9",
-		dark: {
-			bg: "#1A0A2E",
-			border: "#9F67FF",
-			badge: "#9F67FF",
-			statBg: "#22103A",
-		},
+		bg: "var(--color-tone-info-bg)",
+		border: "var(--color-primary)",
+		statBg:
+			"color-mix(in srgb, var(--color-primary) 16%, var(--color-surface-card))",
 	},
 };
 
 const BREATHING_PALETTE = {
 	calming: {
-		bg: "#E3F2FD",
-		border: "#2196F3",
-		statBg: "#BBDEFB",
-		dark: { bg: "#0A1929", border: "#2196F3", statBg: "#0D2137" },
+		bg: "var(--color-tone-info-bg)",
+		border: "var(--color-info)",
+		statBg:
+			"color-mix(in srgb, var(--color-info) 16%, var(--color-surface-card))",
 	},
 	energizing: {
-		bg: "#FFF3E0",
-		border: "#FF5722",
-		statBg: "#FFCCBC",
-		dark: { bg: "#2A0E00", border: "#FF5722", statBg: "#321500" },
+		bg: "var(--color-tone-warning-bg)",
+		border: "var(--color-warning)",
+		statBg:
+			"color-mix(in srgb, var(--color-warning) 16%, var(--color-surface-card))",
 	},
 	balancing: {
-		bg: "#F3E5F5",
-		border: "#9C27B0",
-		statBg: "#E1BEE7",
-		dark: { bg: "#1A0024", border: "#9C27B0", statBg: "#21002D" },
+		bg: "var(--color-tone-primary-bg)",
+		border: "var(--color-primary)",
+		statBg:
+			"color-mix(in srgb, var(--color-primary) 16%, var(--color-surface-card))",
 	},
 	cooling: {
-		bg: "#E0F7FA",
-		border: "#00BCD4",
-		statBg: "#B2EBF2",
-		dark: { bg: "#00181C", border: "#00BCD4", statBg: "#001F24" },
+		bg: "var(--color-tone-info-bg)",
+		border: "var(--color-info)",
+		statBg:
+			"color-mix(in srgb, var(--color-info) 16%, var(--color-surface-card))",
 	},
 	heating: {
-		bg: "#FBE9E7",
-		border: "#FF3D00",
-		statBg: "#FFCCBC",
-		dark: { bg: "#2A0600", border: "#FF3D00", statBg: "#330800" },
+		bg: "var(--color-tone-danger-bg)",
+		border: "var(--color-danger)",
+		statBg:
+			"color-mix(in srgb, var(--color-danger) 16%, var(--color-surface-card))",
 	},
 	default: {
-		bg: "#E8EAF6",
-		border: "#3F51B5",
-		statBg: "#C5CAE9",
-		dark: { bg: "#070B29", border: "#3F51B5", statBg: "#0B1033" },
+		bg: "var(--color-tone-info-bg)",
+		border: "var(--color-primary)",
+		statBg:
+			"color-mix(in srgb, var(--color-primary) 16%, var(--color-surface-card))",
 	},
 };
-
-function getPalette(item, type, isDark) {
-	if (type === "breathing") {
-		const p = BREATHING_PALETTE[item.energyEffect] ?? BREATHING_PALETTE.default;
-		return isDark ? { ...p, ...p.dark } : p;
-	}
-	const p = PALETTE[item.difficulty] ?? PALETTE.default;
-	return isDark ? { ...p, ...p.dark } : p;
-}
-
-function diffStars(difficulty) {
-	const map = { beginner: 1, intermediate: 2, advanced: 3 };
-	return map[difficulty] ?? 1;
-}
-
-function Stars({ count, color }) {
-	return (
-		<span className="text-sm tracking-tight" style={{ color }}>
-			{"★".repeat(count)}
-			{"☆".repeat(3 - count)}
-		</span>
-	);
-}
-
-function StatBox({ value, label, bg, color }) {
-	return (
-		<div
-			className="flex flex-col items-center justify-center rounded-xl px-2 py-1.5 min-w-[44px]"
-			style={{ backgroundColor: bg }}
-		>
-			<span
-				className="text-sm font-bold leading-none"
-				style={{ color, fontFamily: '"Fredoka", sans-serif' }}
-			>
-				{value}
-			</span>
-			<span
-				className="text-[8px] font-semibold uppercase tracking-wide mt-0.5 leading-none"
-				style={{ color }}
-			>
-				{label}
-			</span>
-		</div>
-	);
-}
-
-function collectSearchText(value, seen = new Set()) {
-	if (value == null) return "";
-	if (typeof value === "string" || typeof value === "number")
-		return String(value);
-	if (typeof value !== "object" || seen.has(value)) return "";
-
-	seen.add(value);
-
-	if (Array.isArray(value)) {
-		return value.map((entry) => collectSearchText(entry, seen)).join(" ");
-	}
-
-	return Object.values(value)
-		.map((entry) => collectSearchText(entry, seen))
-		.filter(Boolean)
-		.join(" ");
-}
-
-function svgDataUri(svg) {
-	return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
-function getMonogram(text, fallback) {
-	const cleaned = String(text || "")
-		.replace(/[^\p{L}\p{N}]+/gu, " ")
-		.trim();
-	if (!cleaned) return fallback;
-	return cleaned
-		.split(/\s+/)
-		.slice(0, 2)
-		.map((part) => part[0])
-		.join("")
-		.toUpperCase();
-}
-
-function getTabIconSrc(tabKey) {
-	const config = {
-		sequences: { bg: "#5DB87F", fg: "#FFFFFF", label: "VK" },
-		poses: { bg: "#4A72FF", fg: "#FFFFFF", label: "AS" },
-		breathing: { bg: "#FF8A3D", fg: "#FFFFFF", label: "PR" },
-	}[tabKey] ?? { bg: "#7C3AED", fg: "#FFFFFF", label: "LB" };
-
-	return svgDataUri(`
-		<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40" fill="none">
-			<rect x="2" y="2" width="36" height="36" rx="12" fill="${config.bg}"/>
-			<rect x="2" y="2" width="36" height="36" rx="12" fill="white" fill-opacity="0.08"/>
-			<text x="20" y="24" text-anchor="middle" font-family="DM Sans, Arial, sans-serif" font-size="12" font-weight="700" fill="${config.fg}">${config.label}</text>
-		</svg>
-	`);
-}
-
-function getItemIconSrc(item, type, title) {
-	const fallbackLabel =
-		type === "sequences" ? "VK" : type === "poses" ? "AS" : "PR";
-	const monogram = getMonogram(title, fallbackLabel);
-	const palette =
-		type === "sequences"
-			? { a: "#5DB87F", b: "#A9E5C0" }
-			: type === "poses"
-				? { a: "#4A72FF", b: "#97B2FF" }
-				: { a: "#FF8A3D", b: "#FFC08F" };
-
-	const accent = item.image ? "#ffffff" : "#ffffff";
-
-	return svgDataUri(`
-		<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none">
-			<defs>
-				<linearGradient id="g" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse">
-					<stop stop-color="${palette.a}"/>
-					<stop offset="1" stop-color="${palette.b}"/>
-				</linearGradient>
-			</defs>
-			<rect width="160" height="160" rx="32" fill="url(#g)"/>
-			<circle cx="120" cy="36" r="18" fill="white" fill-opacity="0.16"/>
-			<circle cx="38" cy="124" r="24" fill="white" fill-opacity="0.12"/>
-			<text x="80" y="92" text-anchor="middle" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="800" fill="${accent}">${monogram}</text>
-		</svg>
-	`);
-}
-
-/* ─── Retro Trading Card ─── */
-function RetroCard({
-	item,
-	type,
-	index,
-	onClick,
-	isDark,
-	typeLabel,
-	fallbackItemLabel,
-}) {
-	const pal = getPalette(item, type, isDark);
-
-	const title =
-		item.englishName || item.name || item.romanizationName || fallbackItemLabel;
-	const subtitle =
-		item.romanizationName || item.sanskritName || item.romanizedName || "";
-	const cardNum = String(index + 1).padStart(3, "0");
-
-	const iconSrc = getItemIconSrc(item, type, title);
-
-	/* Stats row */
-	let stats = [];
-	if (type === "sequences") {
-		stats = [
-			{ value: item.level ?? "—", label: "LVL" },
-			{
-				value:
-					item.estimatedDuration?.recommended ??
-					item.estimatedDuration?.min ??
-					"—",
-				label: "MIN",
-			},
-			{
-				value: (item.family ?? "VK")
-					.replace(/_/g, " ")
-					.slice(0, 4)
-					.toUpperCase(),
-				label: "FAM",
-			},
-		];
-	} else if (type === "poses") {
-		const breaths =
-			item.recommendedBreaths?.beginner?.min ??
-			item.recommendedBreaths?.beginner ??
-			"—";
-		stats = [
-			{ value: breaths, label: "BRTH" },
-			{
-				value: item.sidedness?.type === "symmetric" ? "SYM" : "ASYM",
-				label: "SIDE",
-			},
-			{
-				value: (item.vkCategory?.primary ?? "—").slice(0, 4).toUpperCase(),
-				label: "CAT",
-			},
-		];
-	} else if (type === "breathing") {
-		const r = item.patternRatio ?? {};
-		stats = [
-			{ value: `${r.inhale ?? 1}:${r.exhale ?? 1}`, label: "RATIO" },
-			{ value: item.baseBreathDuration ?? "—", label: "SEC" },
-			{
-				value: (item.energyEffect ?? "—").slice(0, 4).toUpperCase(),
-				label: "FX",
-			},
-		];
-	}
-
-	const borderColor = pal.border;
-	const stars =
-		type !== "breathing"
-			? diffStars(item.difficulty)
-			: item.difficulty === "advanced"
-				? 3
-				: item.difficulty === "intermediate"
-					? 2
-					: 1;
-
-	return (
-		<motion.button
-			type="button"
-			initial={{ opacity: 0, y: 10 }}
-			animate={{ opacity: 1, y: 0 }}
-			transition={{ delay: index * 0.04 }}
-			whileTap={{ scale: 0.97 }}
-			onClick={onClick}
-			className="w-full text-left"
-		>
-			{/* Card outer — thick border, retro style */}
-			<div
-				className="rounded-3xl overflow-hidden"
-				style={{
-					border: `4px solid ${borderColor}`,
-					backgroundColor: pal.bg,
-					boxShadow: `4px 4px 0px ${borderColor}`,
-				}}
-			>
-				{/* Top strip: type label + stars */}
-				<div
-					className="flex items-center justify-between px-3 py-1.5"
-					style={{ backgroundColor: borderColor }}
-				>
-					<span
-						className="text-[10px] font-black uppercase tracking-[0.12em] text-white"
-						style={{ fontFamily: '"Fredoka", sans-serif' }}
-					>
-						{typeLabel}
-					</span>
-					<Stars count={stars} color="white" />
-				</div>
-
-				{/* Main body: icon area + info */}
-				<div className="flex items-stretch gap-0">
-					{/* Illustration block */}
-					<div
-						className="flex items-center justify-center text-5xl flex-shrink-0"
-						style={{
-							width: 88,
-							minHeight: 88,
-							backgroundColor: `${borderColor}22`,
-							borderRight: `3px solid ${borderColor}`,
-						}}
-					>
-						<img
-							src={item.image || iconSrc}
-							alt={title}
-							className="w-full h-full object-cover"
-						/>
-					</div>
-
-					{/* Text area */}
-					<div className="flex-1 px-3 py-2.5 flex flex-col justify-center gap-0.5">
-						<h3
-							className="font-black text-base leading-tight truncate"
-							style={{
-								color: borderColor,
-								fontFamily: '"Fredoka", sans-serif',
-							}}
-						>
-							{title}
-						</h3>
-						{subtitle && subtitle !== title && (
-							<p
-								className="text-xs italic truncate font-medium"
-								style={{ color: `${borderColor}bb` }}
-							>
-								{subtitle}
-							</p>
-						)}
-						{item.description && (
-							<p
-								className="text-[11px] leading-snug mt-1 line-clamp-2"
-								style={{ color: isDark ? "#aaa" : "#555" }}
-							>
-								{item.description}
-							</p>
-						)}
-					</div>
-				</div>
-
-				{/* Bottom strip: stats + card number */}
-				<div
-					className="flex items-center justify-between px-3 py-2 gap-2"
-					style={{
-						borderTop: `3px solid ${borderColor}`,
-						backgroundColor: `${borderColor}11`,
-					}}
-				>
-					<div className="flex gap-1.5">
-						{stats.map((s) => (
-							<StatBox
-								key={s.label}
-								value={s.value}
-								label={s.label}
-								bg={pal.statBg}
-								color={borderColor}
-							/>
-						))}
-					</div>
-					<span
-						className="text-[10px] font-black tracking-wider flex-shrink-0"
-						style={{ color: borderColor, fontFamily: '"Fredoka", sans-serif' }}
-					>
-						NO.{cardNum}
-					</span>
-				</div>
-			</div>
-		</motion.button>
-	);
-}
 
 const INTENSITY_DIFFICULTY_ORDER = {
 	gentle: ["beginner", "intermediate", "advanced"],
@@ -433,13 +88,280 @@ const TIME_EFFECT_ORDER = {
 	anytime: ["balancing", "calming", "energizing", "cooling", "heating"],
 };
 
-const getPreferredOrderIndex = (value, order, fallbackIndex = 99) => {
-	if (!value) return fallbackIndex;
-	const idx = order.indexOf(String(value));
-	return idx === -1 ? fallbackIndex : idx;
+const getPalette = (item, type) => {
+	if (type === "breathing") {
+		return BREATHING_PALETTE[item.energyEffect] ?? BREATHING_PALETTE.default;
+	}
+
+	return PALETTE[item.difficulty] ?? PALETTE.default;
 };
 
-/* ─── Library page ─── */
+const getPreferredOrderIndex = (value, order, fallbackIndex = 99) => {
+	if (!value) return fallbackIndex;
+	const index = order.indexOf(String(value));
+	return index === -1 ? fallbackIndex : index;
+};
+
+const collectSearchText = (item) =>
+	[
+		item.englishName,
+		item.name,
+		item.sanskritName,
+		item.romanizationName,
+		item.romanizedName,
+		item.description,
+		item.family,
+		item.energyEffect,
+		item.difficulty,
+		item.level,
+	]
+		.filter(Boolean)
+		.join(" ");
+
+const getMonogram = (title) =>
+	String(title || "")
+		.trim()
+		.split(/\s+/)
+		.slice(0, 2)
+		.map((part) => part[0])
+		.join("")
+		.toUpperCase();
+
+const getSequencePoseCount = (item) => {
+	if (Array.isArray(item.keyPoses)) return item.keyPoses.length;
+	if (Array.isArray(item.structure?.corePoses))
+		return item.structure.corePoses.length;
+	return null;
+};
+
+const getTypeLabel = (type, t) => {
+	if (type === "sequences")
+		return t("library.card_type_sequence", "VK Sequence");
+	if (type === "poses") return t("library.card_type_pose", "Asana");
+	if (type === "breathing")
+		return t("library.card_type_breathing", "Pranayama");
+	return t("library.card_type_default", "Library");
+};
+
+const getCardTitle = (item, fallbackItemLabel) =>
+	item.englishName || item.name || item.romanizationName || fallbackItemLabel;
+
+const getCardSubtitle = (item) =>
+	item.romanizationName || item.sanskritName || item.romanizedName || "";
+
+function StatBox({ value, label, bg, color }) {
+	return (
+		<div
+			className="flex flex-col items-center justify-center rounded-xl px-2 py-1.5 min-w-[44px]"
+			style={{ backgroundColor: bg }}
+		>
+			<span
+				className="text-sm font-bold leading-none"
+				style={{ color, fontFamily: '"Fredoka", sans-serif' }}
+			>
+				{value}
+			</span>
+			<span
+				className="text-[9px] font-black uppercase tracking-[0.12em] mt-0.5"
+				style={{ color }}
+			>
+				{label}
+			</span>
+		</div>
+	);
+}
+
+function RetroCard({
+	item,
+	type,
+	index,
+	onClick,
+	typeLabel,
+	fallbackItemLabel,
+}) {
+	const palette = getPalette(item, type);
+	const borderColor = palette.border;
+	const title = getCardTitle(item, fallbackItemLabel);
+	const subtitle = getCardSubtitle(item);
+	const monogram = getMonogram(title) || typeLabel.slice(0, 2).toUpperCase();
+	const imageSrc = item.image;
+	const stats =
+		type === "sequences"
+			? [
+					{ value: item.level ?? "—", label: "LEVEL" },
+					{
+						value: item.family
+							? String(item.family).replace(/_/g, " ").toUpperCase()
+							: "—",
+						label: "FAMILY",
+					},
+					{ value: getSequencePoseCount(item) ?? "—", label: "POSES" },
+				]
+			: type === "poses"
+				? [
+						{ value: item.difficulty ?? "—", label: "LEVEL" },
+						{ value: item.poseType ?? item.category ?? "—", label: "TYPE" },
+					]
+				: [
+						{ value: item.energyEffect ?? "—", label: "EFFECT" },
+						{ value: item.breathType ?? item.category ?? "—", label: "TYPE" },
+					];
+
+	return (
+		<motion.button
+			type="button"
+			onClick={onClick}
+			whileHover={{ y: -3, scale: 1.01 }}
+			whileTap={{ scale: 0.985 }}
+			className="relative w-full text-left rounded-[28px] overflow-hidden transition-shadow duration-200"
+			style={{ boxShadow: "0 14px 0 rgba(0,0,0,0.08)" }}
+		>
+			<div
+				className="overflow-hidden rounded-[28px] border-4"
+				style={{ backgroundColor: palette.bg, borderColor }}
+			>
+				<div className="flex items-stretch">
+					<div
+						className="flex items-center justify-center flex-shrink-0"
+						style={{
+							width: 88,
+							minHeight: 88,
+							backgroundColor: `${borderColor}18`,
+							borderRight: `3px solid ${borderColor}`,
+						}}
+					>
+						{imageSrc ? (
+							<img
+								src={imageSrc}
+								alt={title}
+								className="w-full h-full object-cover"
+							/>
+						) : (
+							<div
+								className="w-full h-full flex items-center justify-center text-2xl font-black"
+								style={{
+									color: borderColor,
+									fontFamily: '"Fredoka", sans-serif',
+								}}
+							>
+								{monogram || "?"}
+							</div>
+						)}
+					</div>
+
+					<div className="flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-center gap-0.5">
+						<div className="flex items-start justify-between gap-2">
+							<div className="min-w-0">
+								<p
+									className="text-[10px] font-black uppercase tracking-[0.12em]"
+									style={{ color: borderColor }}
+								>
+									{typeLabel}
+								</p>
+								<h3
+									className="font-black text-base leading-tight truncate"
+									style={{
+										color: borderColor,
+										fontFamily: '"Fredoka", sans-serif',
+									}}
+								>
+									{title}
+								</h3>
+							</div>
+							<span
+								className="rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em]"
+								style={{
+									color: borderColor,
+									backgroundColor: `${borderColor}16`,
+								}}
+							>
+								#{index + 1}
+							</span>
+						</div>
+						{subtitle && subtitle !== title && (
+							<p
+								className="text-xs italic truncate font-medium"
+								style={{ color: `${borderColor}bb` }}
+							>
+								{subtitle}
+							</p>
+						)}
+						{item.description && (
+							<p
+								className="text-xs leading-snug mt-1 line-clamp-2"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								{item.description}
+							</p>
+						)}
+					</div>
+				</div>
+
+				<div
+					className="flex items-center justify-between px-3 py-2 gap-2"
+					style={{
+						borderTop: `3px solid ${borderColor}`,
+						backgroundColor: `${borderColor}11`,
+					}}
+				>
+					<div className="flex gap-1.5 flex-wrap">
+						{stats.map((stat) => (
+							<StatBox
+								key={stat.label}
+								value={stat.value}
+								label={stat.label}
+								bg={palette.statBg}
+								color={borderColor}
+							/>
+						))}
+					</div>
+				</div>
+			</div>
+		</motion.button>
+	);
+}
+
+const getCardType = (item, fallbackType) => item.__kind || fallbackType;
+
+const filterByQuery = (item, query) => {
+	if (query.length < 2) return true;
+	return collectSearchText(item).toLowerCase().includes(query);
+};
+
+const filterByDifficulty = (item, difficultyFilter) =>
+	difficultyFilter === "all" ? true : item.difficulty === difficultyFilter;
+
+const filterByEffect = (item, effectFilter) =>
+	effectFilter === "all" ? true : item.energyEffect === effectFilter;
+
+const sortItems = (items, type, difficultyOrder, effectOrder) =>
+	[...items].sort((a, b) => {
+		const aDifficultyRank =
+			type === "sequences" || type === "poses"
+				? getPreferredOrderIndex(a.difficulty, difficultyOrder)
+				: 99;
+		const bDifficultyRank =
+			type === "sequences" || type === "poses"
+				? getPreferredOrderIndex(b.difficulty, difficultyOrder)
+				: 99;
+		if (aDifficultyRank !== bDifficultyRank)
+			return aDifficultyRank - bDifficultyRank;
+
+		const aEffectRank =
+			type === "breathing"
+				? getPreferredOrderIndex(a.energyEffect, effectOrder)
+				: 99;
+		const bEffectRank =
+			type === "breathing"
+				? getPreferredOrderIndex(b.energyEffect, effectOrder)
+				: 99;
+		if (aEffectRank !== bEffectRank) return aEffectRank - bEffectRank;
+
+		const aTitle = getCardTitle(a, "").toLowerCase();
+		const bTitle = getCardTitle(b, "").toLowerCase();
+		return aTitle.localeCompare(bTitle);
+	});
+
 export default function Library() {
 	const navigate = useNavigate();
 	const { user } = useAuth();
@@ -448,26 +370,26 @@ export default function Library() {
 		const value = t(key);
 		return value === key ? fallback : value;
 	};
+
 	const [tab, setTab] = useState("all");
 	const [sequences, setSequences] = useState([]);
 	const [poses, setPoses] = useState([]);
 	const [breathing, setBreathing] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
+	const [hasFetched, setHasFetched] = useState(false);
 	const [query, setQuery] = useState("");
+	const [debouncedQuery, setDebouncedQuery] = useState("");
 	const [difficultyFilter, setDifficultyFilter] = useState("all");
 	const [effectFilter, setEffectFilter] = useState("all");
 
-	/* Detect dark mode from html class */
-	const [isDark, setIsDark] = useState(() =>
-		document.documentElement.classList.contains("dark"),
-	);
 	useEffect(() => {
-		const obs = new MutationObserver(() =>
-			setIsDark(document.documentElement.classList.contains("dark")),
-		);
-		obs.observe(document.documentElement, { attributeFilter: ["class"] });
-		return () => obs.disconnect();
-	}, []);
+		const timeoutId = window.setTimeout(() => {
+			setDebouncedQuery(query.trim().toLowerCase());
+		}, 220);
+
+		return () => window.clearTimeout(timeoutId);
+	}, [query]);
 
 	useEffect(() => {
 		if (!tab) return;
@@ -476,108 +398,52 @@ export default function Library() {
 		setEffectFilter("all");
 	}, [tab]);
 
-	const allTabLabel = tr("library.tabs_all", "All");
-	const difficultyLabel = (option) => {
-		const labels = {
-			all: tr("library.filters_all_difficulties", "All difficulties"),
-			beginner: tr("library.beginner", "Beginner"),
-			intermediate: tr("library.intermediate", "Intermediate"),
-			advanced: tr("library.advanced", "Advanced"),
-		};
-		return labels[option] ?? option.charAt(0).toUpperCase() + option.slice(1);
-	};
-	const effectLabel = (option) => {
-		const labels = {
-			all: tr("library.filters_all_effects", "All effects"),
-			calming: tr("library.effects.calming", "Calming"),
-			energizing: tr("library.effects.energizing", "Energizing"),
-			balancing: tr("library.effects.balancing", "Balancing"),
-			cooling: tr("library.effects.cooling", "Cooling"),
-			heating: tr("library.effects.heating", "Heating"),
-		};
-		return labels[option] ?? option;
-	};
-	const cardTypeLabel = (type) => {
-		if (type === "sequences")
-			return tr("library.card_type_sequence", "VK Sequence");
-		if (type === "poses") return tr("library.card_type_pose", "Asana");
-		if (type === "breathing")
-			return tr("library.card_type_breathing", "Pranayama");
-		return tr("library.card_type_default", "Library");
-	};
+	useEffect(() => {
+		if (hasFetched) return;
+		setLoading(true);
+		setError(false);
 
-	const TABS = [
+		Promise.all([
+			getSequences({ limit: 50 }),
+			getPoses({ limit: 60 }),
+			getBreathingPatterns({ limit: 50 }),
+		])
+			.then(([seqRes, poseRes, breathRes]) => {
+				const seqPayload = seqRes.data?.data || seqRes.data || {};
+				const posePayload = poseRes.data?.data || poseRes.data || {};
+				const breathPayload = breathRes.data?.data || breathRes.data || {};
+
+				const seqList =
+					seqPayload.sequences ?? (Array.isArray(seqPayload) ? seqPayload : []);
+				const poseList =
+					posePayload.poses ?? (Array.isArray(posePayload) ? posePayload : []);
+				const breathList =
+					breathPayload.patterns ??
+					(Array.isArray(breathPayload) ? breathPayload : []);
+
+				setSequences(Array.isArray(seqList) ? seqList : []);
+				setPoses(Array.isArray(poseList) ? poseList : []);
+				setBreathing(Array.isArray(breathList) ? breathList : []);
+				setHasFetched(true);
+			})
+			.catch(() => {
+				setSequences([]);
+				setPoses([]);
+				setBreathing([]);
+				setError(true);
+			})
+			.finally(() => setLoading(false));
+	}, [hasFetched]);
+
+	const allTabLabel = tr("library.tabs_all", "All");
+	const tabs = [
 		{ key: "all", label: allTabLabel },
-		{ key: "sequences", label: t("library.tabs_sequences") },
-		{ key: "poses", label: t("library.tabs_poses") },
-		{ key: "breathing", label: t("library.tabs_breathing") },
+		{ key: "sequences", label: t("library.tabs_sequences", "Sequences") },
+		{ key: "poses", label: t("library.tabs_poses", "Poses") },
+		{ key: "breathing", label: t("library.tabs_breathing", "Breathing") },
 	];
 
-	useEffect(() => {
-		setLoading(true);
-
-		if (tab === "all") {
-			Promise.all([
-				getSequences({ limit: 50 }),
-				getPoses({ limit: 60 }),
-				getBreathingPatterns({ limit: 50 }),
-			])
-				.then(([seqRes, poseRes, breathRes]) => {
-					const seqPayload = seqRes.data?.data || seqRes.data || {};
-					const posePayload = poseRes.data?.data || poseRes.data || {};
-					const breathPayload = breathRes.data?.data || breathRes.data || {};
-
-					const seqList =
-						seqPayload.sequences ??
-						(Array.isArray(seqPayload) ? seqPayload : []);
-					const poseList =
-						posePayload.poses ??
-						(Array.isArray(posePayload) ? posePayload : []);
-					const breathList =
-						breathPayload.patterns ??
-						(Array.isArray(breathPayload) ? breathPayload : []);
-
-					setSequences(Array.isArray(seqList) ? seqList : []);
-					setPoses(Array.isArray(poseList) ? poseList : []);
-					setBreathing(Array.isArray(breathList) ? breathList : []);
-				})
-				.catch(() => {
-					setSequences([]);
-					setPoses([]);
-					setBreathing([]);
-				})
-				.finally(() => setLoading(false));
-		} else if (tab === "sequences") {
-			getSequences({ limit: 50 })
-				.then((r) => {
-					const payload = r.data?.data || r.data || {};
-					const list =
-						payload.sequences ?? (Array.isArray(payload) ? payload : []);
-					setSequences(Array.isArray(list) ? list : []);
-				})
-				.catch(() => setSequences([]))
-				.finally(() => setLoading(false));
-		} else if (tab === "poses") {
-			getPoses({ limit: 60 })
-				.then((r) => {
-					const payload = r.data?.data || r.data || {};
-					const list = payload.poses ?? (Array.isArray(payload) ? payload : []);
-					setPoses(Array.isArray(list) ? list : []);
-				})
-				.catch(() => setPoses([]))
-				.finally(() => setLoading(false));
-		} else if (tab === "breathing") {
-			getBreathingPatterns({ limit: 50 })
-				.then((r) => {
-					const payload = r.data?.data || r.data || {};
-					const list =
-						payload.patterns ?? (Array.isArray(payload) ? payload : []);
-					setBreathing(Array.isArray(list) ? list : []);
-				})
-				.catch(() => setBreathing([]))
-				.finally(() => setLoading(false));
-		}
-	}, [tab]);
+	const cardTypeLabel = (type) => getTypeLabel(type, t);
 
 	const items =
 		tab === "sequences"
@@ -591,6 +457,7 @@ export default function Library() {
 							...poses.map((item) => ({ ...item, __kind: "poses" })),
 							...breathing.map((item) => ({ ...item, __kind: "breathing" })),
 						];
+
 	const difficultyOptions = [
 		"all",
 		...Array.from(
@@ -611,6 +478,7 @@ export default function Library() {
 			),
 		),
 	];
+
 	const showDifficultyFilters =
 		tab === "all" || tab === "sequences" || tab === "poses";
 	const showEffectFilters = tab === "all" || tab === "breathing";
@@ -622,95 +490,67 @@ export default function Library() {
 	const effectOrder =
 		TIME_EFFECT_ORDER[preferredTimeOfDay] || TIME_EFFECT_ORDER.anytime;
 
-	const normalizedQuery = query.trim().toLowerCase();
-	const filteredItems = items.filter((item) => {
-		const textPass =
-			normalizedQuery.length < 2
-				? true
-				: collectSearchText(item).toLowerCase().includes(normalizedQuery);
-		const difficultyPass =
-			difficultyFilter === "all" ? true : item.difficulty === difficultyFilter;
-		const effectPass =
-			effectFilter === "all" ? true : item.energyEffect === effectFilter;
-
-		return textPass && difficultyPass && effectPass;
-	});
-
-	const prioritizedItems = [...filteredItems].sort((a, b) => {
-		const aKind = a.__kind || tab;
-		const bKind = b.__kind || tab;
-		const aDifficultyRank =
-			aKind === "sequences" || aKind === "poses"
-				? getPreferredOrderIndex(a.difficulty, difficultyOrder)
-				: 99;
-		const bDifficultyRank =
-			bKind === "sequences" || bKind === "poses"
-				? getPreferredOrderIndex(b.difficulty, difficultyOrder)
-				: 99;
-		if (aDifficultyRank !== bDifficultyRank)
-			return aDifficultyRank - bDifficultyRank;
-
-		const aEffectRank =
-			aKind === "breathing"
-				? getPreferredOrderIndex(a.energyEffect, effectOrder)
-				: 99;
-		const bEffectRank =
-			bKind === "breathing"
-				? getPreferredOrderIndex(b.energyEffect, effectOrder)
-				: 99;
-		if (aEffectRank !== bEffectRank) return aEffectRank - bEffectRank;
-
-		const aTitle = (
-			a.englishName ||
-			a.name ||
-			a.romanizationName ||
-			""
-		).toLowerCase();
-		const bTitle = (
-			b.englishName ||
-			b.name ||
-			b.romanizationName ||
-			""
-		).toLowerCase();
-		return aTitle.localeCompare(bTitle);
-	});
-
-	const isLoading = loading;
+	const filteredItems = items.filter(
+		(item) =>
+			filterByQuery(item, debouncedQuery) &&
+			filterByDifficulty(item, difficultyFilter) &&
+			filterByEffect(item, effectFilter),
+	);
+	const prioritizedItems = sortItems(
+		filteredItems,
+		tab,
+		difficultyOrder,
+		effectOrder,
+	);
+	const groupedItems =
+		tab === "all"
+			? ["sequences", "poses", "breathing"].map((groupType) => {
+					const groupItems = prioritizedItems.filter(
+						(item) => getCardType(item, tab) === groupType,
+					);
+					return {
+						type: groupType,
+						label: cardTypeLabel(groupType),
+						count: groupItems.length,
+						items: groupItems,
+					};
+				})
+			: [];
 
 	const handleCardClick = (item, type) => {
 		if (type === "sequences") navigate(`/library/sequence/${item._id}`);
-		else if (type === "poses") navigate(`/poses/${item._id}`);
-		else if (type === "breathing") navigate(`/breathing/${item._id}`);
-		else if (item.__kind === "sequences")
-			navigate(`/library/sequence/${item._id}`);
-		else if (item.__kind === "poses") navigate(`/poses/${item._id}`);
-		else if (item.__kind === "breathing") navigate(`/breathing/${item._id}`);
+		else if (type === "poses") navigate(`/library/pose/${item._id}`);
+		else if (type === "breathing") navigate(`/library/breathing/${item._id}`);
 	};
 
 	const emptyTitle =
 		tab === "sequences"
-			? t("library.empty_sequences")
+			? t("library.empty_sequences", "No sequences yet")
 			: tab === "poses"
-				? t("library.empty_poses")
-				: t("library.empty_patterns");
+				? t("library.empty_poses", "No poses yet")
+				: t("library.empty_patterns", "No patterns yet");
 	const emptyHint =
 		tab === "sequences"
-			? t("library.empty_sequences_hint")
+			? t("library.empty_sequences_hint", "Try another filter or search term.")
 			: tab === "poses"
-				? t("library.empty_poses_hint")
-				: t("library.empty_patterns_hint");
+				? t("library.empty_poses_hint", "Try another filter or search term.")
+				: t(
+						"library.empty_patterns_hint",
+						"Try another filter or search term.",
+					);
 	const noResultsHint = tr("library.no_results", "No results found");
 	const clearFiltersLabel = tr("library.clear_filters", "Clear filters");
-
-	const handleTabChange = (nextTab) => {
-		if (nextTab === tab) return;
-		setLoading(true);
-		setTab(nextTab);
-	};
+	const errorTitle = tr("library.error_title", "Could not load content");
+	const errorHint = tr(
+		"library.error_hint",
+		"Check your connection and try again.",
+	);
+	const retryLabel = tr("library.retry", "Retry");
+	const resultCount = prioritizedItems.length;
+	const resultCountLabel = tr("library.result_count", "{n} items");
 
 	return (
 		<div className="flex flex-col pt-4 pb-6 gap-4">
-			{/* Header */}
 			<div className="px-4">
 				<h1
 					className="text-3xl font-bold mb-1"
@@ -719,44 +559,48 @@ export default function Library() {
 						fontFamily: '"Fredoka", sans-serif',
 					}}
 				>
-					{t("library.title")}
+					{t("library.title", "Library")}
 				</h1>
+				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+					{tr(
+						"library.subtitle",
+						"Explore and study sequences, poses, and pranayama.",
+					)}
+				</p>
 			</div>
 
-			{/* Tabs */}
-			<div className="flex gap-2 px-4 overflow-x-auto pb-1">
-				{TABS.map((tb) => (
+			<div
+				className="flex gap-2 px-4 overflow-x-auto pb-1"
+				role="tablist"
+				aria-label={t("library.title", "Library")}
+			>
+				{tabs.map((tabItem) => (
 					<button
-						key={tb.key}
+						key={tabItem.key}
 						type="button"
-						onClick={() => handleTabChange(tb.key)}
+						role="tab"
+						aria-selected={tab === tabItem.key}
+						onClick={() => setTab(tabItem.key)}
 						className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all border-2"
 						style={{
 							backgroundColor:
-								tab === tb.key
+								tab === tabItem.key
 									? "var(--color-secondary)"
 									: "var(--color-surface-card)",
-							color: tab === tb.key ? "white" : "var(--color-text-secondary)",
+							color:
+								tab === tabItem.key ? "white" : "var(--color-text-secondary)",
 							borderColor:
-								tab === tb.key
+								tab === tabItem.key
 									? "var(--color-secondary)"
 									: "var(--color-border)",
 							fontFamily: '"DM Sans", sans-serif',
 						}}
 					>
-						{tb.key !== "all" ? (
-							<img
-								src={getTabIconSrc(tb.key)}
-								alt=""
-								className="inline-block w-4 h-4 mr-2 align-[-2px]"
-							/>
-						) : null}
-						{tb.label}
+						{tabItem.label}
 					</button>
 				))}
 			</div>
 
-			{/* Search */}
 			<div className="px-4">
 				<div className="relative">
 					<Search
@@ -767,7 +611,7 @@ export default function Library() {
 					<input
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
-						placeholder={t("library.search")}
+						placeholder={t("library.search", "Search the library")}
 						className="w-full pl-11 pr-4 py-2.5 rounded-2xl text-sm font-medium focus:outline-none transition border-2"
 						style={{
 							backgroundColor: "var(--color-surface-card)",
@@ -775,14 +619,9 @@ export default function Library() {
 							color: "var(--color-text-primary)",
 							fontFamily: '"DM Sans", sans-serif',
 						}}
-						onFocus={(e) => {
-							e.target.style.borderColor = "var(--color-primary)";
-						}}
-						onBlur={(e) => {
-							e.target.style.borderColor = "var(--color-border)";
-						}}
 					/>
 				</div>
+
 				<div className="mt-3 flex flex-col gap-2">
 					{showDifficultyFilters ? (
 						<div className="flex gap-2 overflow-x-auto pb-1">
@@ -790,6 +629,7 @@ export default function Library() {
 								<button
 									key={`difficulty-${option}`}
 									type="button"
+									aria-pressed={difficultyFilter === option}
 									onClick={() => setDifficultyFilter(option)}
 									className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border"
 									style={{
@@ -804,17 +644,21 @@ export default function Library() {
 										borderColor: "var(--color-border)",
 									}}
 								>
-									{difficultyLabel(option)}
+									{option === "all"
+										? tr("library.filters_all_difficulties", "All difficulties")
+										: option.charAt(0).toUpperCase() + option.slice(1)}
 								</button>
 							))}
 						</div>
 					) : null}
+
 					{showEffectFilters && effectOptions.length > 1 ? (
 						<div className="flex gap-2 overflow-x-auto pb-1">
 							{effectOptions.map((option) => (
 								<button
 									key={`effect-${option}`}
 									type="button"
+									aria-pressed={effectFilter === option}
 									onClick={() => setEffectFilter(option)}
 									className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border"
 									style={{
@@ -829,11 +673,14 @@ export default function Library() {
 										borderColor: "var(--color-border)",
 									}}
 								>
-									{effectLabel(option)}
+									{option === "all"
+										? tr("library.filters_all_effects", "All effects")
+										: option.charAt(0).toUpperCase() + option.slice(1)}
 								</button>
 							))}
 						</div>
 					) : null}
+
 					{(difficultyFilter !== "all" || effectFilter !== "all") && (
 						<button
 							type="button"
@@ -841,9 +688,7 @@ export default function Library() {
 								setDifficultyFilter("all");
 								setEffectFilter("all");
 							}}
-							aria-label={clearFiltersLabel}
-							title={clearFiltersLabel}
-							className="self-start w-8 h-8 rounded-full border flex items-center justify-center"
+							className="self-start h-8 rounded-full border flex items-center justify-center gap-1.5 px-3 text-xs font-semibold"
 							style={{
 								backgroundColor: "var(--color-surface-card)",
 								color: "var(--color-text-secondary)",
@@ -851,20 +696,55 @@ export default function Library() {
 							}}
 						>
 							<X size={14} />
+							{clearFiltersLabel}
 						</button>
 					)}
 				</div>
 			</div>
 
-			{/* Content */}
-			<div className="px-4 flex-1">
+			{!loading && !error && resultCount > 0 && (
+				<div className="px-4">
+					<p
+						className="text-xs font-medium"
+						style={{ color: "var(--color-text-muted)" }}
+					>
+						{resultCountLabel.replace("{n}", String(resultCount))}
+					</p>
+				</div>
+			)}
+
+			<div className="px-4 flex-1" role="tabpanel">
 				<AnimatePresence mode="wait">
-					{isLoading ? (
+					{loading ? (
 						<div key="loading" className="flex flex-col gap-4">
-							{["s1", "s2", "s3"].map((k) => (
-								<SkeletonCard key={k} />
+							{["s1", "s2", "s3"].map((key) => (
+								<SkeletonCard key={key} />
 							))}
 						</div>
+					) : error ? (
+						<motion.div
+							key="error"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+						>
+							<EmptyState
+								title={errorTitle}
+								description={errorHint}
+								action={
+									<button
+										type="button"
+										onClick={() => {
+											setError(false);
+											setHasFetched(false);
+										}}
+										className="mt-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+										style={{ backgroundColor: "var(--color-primary)" }}
+									>
+										{retryLabel}
+									</button>
+								}
+							/>
+						</motion.div>
 					) : prioritizedItems.length === 0 ? (
 						<motion.div
 							key="empty"
@@ -872,22 +752,9 @@ export default function Library() {
 							animate={{ opacity: 1 }}
 						>
 							<EmptyState
-								illustration={
-									<img
-										src={svgDataUri(`
-											<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" fill="none">
-												<rect width="120" height="120" rx="28" fill="#E8F4D0"/>
-												<circle cx="52" cy="52" r="22" stroke="#5DB87F" stroke-width="8"/>
-												<path d="M68 68L86 86" stroke="#5DB87F" stroke-width="8" stroke-linecap="round"/>
-											</svg>
-									`)}
-										alt=""
-										className="w-20 h-20"
-									/>
-								}
 								title={emptyTitle}
 								description={
-									normalizedQuery.length >= 2 ? noResultsHint : emptyHint
+									debouncedQuery.length >= 2 ? noResultsHint : emptyHint
 								}
 							/>
 						</motion.div>
@@ -896,20 +763,67 @@ export default function Library() {
 							key="content"
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1 }}
-							className="flex flex-col gap-4"
+							className="flex flex-col gap-6"
 						>
-							{prioritizedItems.map((item, i) => (
-								<RetroCard
-									key={item._id || i}
-									item={item}
-									type={item.__kind || tab}
-									index={i}
-									isDark={isDark}
-									typeLabel={cardTypeLabel(item.__kind || tab)}
-									fallbackItemLabel={tr("library.card_default_item", "Item")}
-									onClick={() => handleCardClick(item, item.__kind || tab)}
-								/>
-							))}
+							{tab === "all" ? (
+								groupedItems.map((group) =>
+									group.count > 0 ? (
+										<div key={group.type} className="flex flex-col gap-3">
+											<div className="flex items-center justify-between px-1">
+												<h2
+													className="text-sm font-bold uppercase tracking-widest"
+													style={{ color: "var(--color-text-secondary)" }}
+												>
+													{group.label}
+												</h2>
+												<span
+													className="text-xs font-medium"
+													style={{ color: "var(--color-text-muted)" }}
+												>
+													{group.count}
+												</span>
+											</div>
+											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+												{group.items.map((item, itemIndex) => (
+													<RetroCard
+														key={item._id || `${group.type}-${itemIndex}`}
+														item={item}
+														type={getCardType(item, tab)}
+														index={itemIndex}
+														typeLabel={cardTypeLabel(getCardType(item, tab))}
+														fallbackItemLabel={tr(
+															"library.card_default_item",
+															"Item",
+														)}
+														onClick={() =>
+															handleCardClick(item, getCardType(item, tab))
+														}
+													/>
+												))}
+											</div>
+										</div>
+									) : null,
+								)
+							) : (
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+									{prioritizedItems.map((item, itemIndex) => (
+										<RetroCard
+											key={item._id || `item-${itemIndex}`}
+											item={item}
+											type={getCardType(item, tab)}
+											index={itemIndex}
+											typeLabel={cardTypeLabel(getCardType(item, tab))}
+											fallbackItemLabel={tr(
+												"library.card_default_item",
+												"Item",
+											)}
+											onClick={() =>
+												handleCardClick(item, getCardType(item, tab))
+											}
+										/>
+									))}
+								</div>
+							)}
 						</motion.div>
 					)}
 				</AnimatePresence>

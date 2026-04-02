@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ChevronLeft, Wind } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { getBreathingPatternById } from "@/api/breathing.api";
-import { Button, SkeletonCard } from "@/components/ui";
+import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
 const DIFF_COLORS = {
@@ -106,7 +105,7 @@ export default function BreathingDetail() {
 		: null;
 
 	return (
-		<div className="flex flex-col pb-32">
+		<div className="flex flex-col pb-10">
 			{/* Hero banner */}
 			<div
 				className="relative px-4 pt-12 pb-8 flex flex-col items-center gap-3"
@@ -283,8 +282,11 @@ export default function BreathingDetail() {
 							{t("breathing_detail.instructions")}
 						</h3>
 						<ol className="flex flex-col gap-3">
-							{instructions.map((step) => (
-								<li key={`step-${step}`} className="flex items-start gap-3">
+							{instructions.map((step, i) => (
+								<li
+									key={`step-${String(step).slice(0, 40)}-${String(step).length}`}
+									className="flex items-start gap-3"
+								>
 									<span
 										className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
 										style={{ backgroundColor: "var(--color-primary)" }}
@@ -303,21 +305,6 @@ export default function BreathingDetail() {
 					</div>
 				)}
 			</div>
-
-			{/* CTA */}
-			<motion.div
-				initial={{ y: 80 }}
-				animate={{ y: 0 }}
-				className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[540px] px-4"
-			>
-				<Button
-					size="lg"
-					className="w-full flex items-center justify-center gap-2"
-					onClick={() => navigate("/session/pranayama")}
-				>
-					<Wind size={18} /> {t("session.begin")}
-				</Button>
-			</motion.div>
 		</div>
 	);
 }

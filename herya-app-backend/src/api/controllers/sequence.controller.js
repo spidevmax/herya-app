@@ -48,7 +48,12 @@ const getSequences = async (req, res, next) => {
 		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
 
 		const sequences = await VKSequence.find(filter)
+			.populate("structure.entry.fromPose")
+			.populate("structure.entry.steps.pose")
 			.populate("structure.corePoses.pose")
+			.populate("structure.corePoses.counterpose.pose")
+			.populate("structure.exit.toPose")
+			.populate("structure.exit.steps.pose")
 			.populate("prerequisites")
 			.populate("nextSteps.sequence")
 			.populate("recommendedPranayama.pattern")
