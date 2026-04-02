@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
+import { BookOpen, Home, Leaf, Plus, Sparkles, User } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function BottomNav() {
@@ -18,10 +18,30 @@ export default function BottomNav() {
 	];
 
 	const fabActions = [
-		{ label: t("fab.vk_sequence"), icon: "VK", color: "var(--color-primary)", to: "/session/vk_sequence" },
-		{ label: t("fab.pranayama"), icon: "PR", color: "var(--color-secondary)", to: "/session/pranayama" },
-		{ label: t("fab.meditation"), icon: "MD", color: "var(--color-accent)", to: "/session/meditation" },
-		{ label: t("fab.complete_practice"), icon: "FP", color: "var(--color-primary-light)", to: "/session/complete_practice" },
+		{
+			label: t("fab.vk_sequence"),
+			icon: Sparkles,
+			color: "var(--color-primary)",
+			to: "/session/vk_sequence",
+		},
+		{
+			label: t("fab.pranayama"),
+			icon: "PR",
+			color: "var(--color-secondary)",
+			to: "/session/pranayama",
+		},
+		{
+			label: t("fab.meditation"),
+			icon: "MD",
+			color: "var(--color-accent)",
+			to: "/session/meditation",
+		},
+		{
+			label: t("fab.complete_practice"),
+			icon: "FP",
+			color: "var(--color-primary-light)",
+			to: "/session/complete_practice",
+		},
 	];
 
 	return (
@@ -48,11 +68,23 @@ export default function BottomNav() {
 								animate={{ opacity: 1, y: 0, scale: 1 }}
 								exit={{ opacity: 0, y: 10, scale: 0.8 }}
 								transition={{ delay: (fabActions.length - 1 - i) * 0.06 }}
-								onClick={() => { setFabOpen(false); navigate(action.to); }}
+								onClick={() => {
+									setFabOpen(false);
+									navigate(action.to);
+								}}
 								className="flex items-center gap-3 px-5 py-2.5 rounded-2xl text-white font-semibold text-sm shadow-lg"
-								style={{ backgroundColor: action.color, fontFamily: '"DM Sans", sans-serif' }}
+								style={{
+									backgroundColor: action.color,
+									fontFamily: '"DM Sans", sans-serif',
+								}}
 							>
-								<span className="text-[10px] font-semibold tracking-[0.08em]">{action.icon}</span>
+								{typeof action.icon === "string" ? (
+									<span className="text-[10px] font-semibold tracking-[0.08em]">
+										{action.icon}
+									</span>
+								) : (
+									<action.icon size={14} strokeWidth={2.4} />
+								)}
 								{action.label}
 							</motion.button>
 						))}
@@ -63,7 +95,8 @@ export default function BottomNav() {
 			<nav
 				className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[540px] border-t z-40 backdrop-blur-xl"
 				style={{
-					backgroundColor: "color-mix(in srgb, var(--color-surface-card) 90%, transparent)",
+					backgroundColor:
+						"color-mix(in srgb, var(--color-surface-card) 90%, transparent)",
 					borderColor: "var(--color-border)",
 				}}
 			>
@@ -81,7 +114,10 @@ export default function BottomNav() {
 										boxShadow: "0 6px 24px rgba(107, 142, 95, 0.3)",
 									}}
 								>
-									<motion.div animate={{ rotate: fabOpen ? 45 : 0 }} transition={{ duration: 0.2 }}>
+									<motion.div
+										animate={{ rotate: fabOpen ? 45 : 0 }}
+										transition={{ duration: 0.2 }}
+									>
 										<Plus size={26} strokeWidth={2.5} />
 									</motion.div>
 								</motion.button>
@@ -95,7 +131,9 @@ export default function BottomNav() {
 								end={item.to === "/"}
 								className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl transition-all duration-200"
 								style={({ isActive }) => ({
-									color: isActive ? "var(--color-primary)" : "var(--color-text-muted)",
+									color: isActive
+										? "var(--color-primary)"
+										: "var(--color-text-muted)",
 								})}
 							>
 								{({ isActive }) => (
@@ -109,7 +147,9 @@ export default function BottomNav() {
 										<span
 											className="text-[10px] font-semibold tracking-wide"
 											style={{
-												color: isActive ? "var(--color-primary)" : "var(--color-text-muted)",
+												color: isActive
+													? "var(--color-primary)"
+													: "var(--color-text-muted)",
 												fontFamily: '"DM Sans", sans-serif',
 											}}
 										>

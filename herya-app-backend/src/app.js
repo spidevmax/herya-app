@@ -15,6 +15,7 @@ const sequencesRouter = require("./api/routes/sequence.routes");
 
 const NODE_ENV = process.env.NODE_ENV || "development";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const DISABLE_RATE_LIMITS = process.env.DISABLE_RATE_LIMITS !== "false";
 
 const app = express();
 
@@ -45,7 +46,7 @@ const authLimiter = rateLimit({
 		success: false,
 		message: "Too many requests, please try again later.",
 	},
-	skip: () => NODE_ENV === "test",
+	skip: () => NODE_ENV === "test" || DISABLE_RATE_LIMITS,
 });
 
 const apiLimiter = rateLimit({
@@ -57,13 +58,15 @@ const apiLimiter = rateLimit({
 		success: false,
 		message: "Too many requests, please try again later.",
 	},
-	skip: () => NODE_ENV === "test",
+	skip: () => NODE_ENV === "test" || DISABLE_RATE_LIMITS,
 });
 
 // === Swagger Documentation (skip in test to avoid JSDoc parsing overhead) ===
 if (NODE_ENV !== "test") {
 	if (NODE_ENV === "production" && !process.env.FRONTEND_URL) {
-		console.warn("⚠️  FRONTEND_URL not defined in production. CORS may not work correctly.");
+		console.warn(
+			"⚠️  FRONTEND_URL not defined in production. CORS may not work correctly.",
+		);
 	}
 	const { swaggerUiMiddleware, swaggerUiSetup } = require("./config/swagger");
 	app.use("/api-docs", swaggerUiMiddleware, swaggerUiSetup);
@@ -99,13 +102,13 @@ app.use("/api/v1/sessions", apiLimiter, sessionsRouter);
 app.use("/api/v1/sequences", apiLimiter, sequencesRouter);
 
 // === Error Handling ===
-app.use((req, res, next) => {
+app.use((_req, _res, next) => {
 	const error = new Error("Route Not Found");
 	error.status = 404;
 	next(error);
 });
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
 	const status = err.status || 500;
 	const message = err.message || "Internal Server Error";
 

@@ -360,7 +360,7 @@ export default function JournalForm() {
 										<img
 											key={`photo-${url.slice(-8)}`}
 											src={url}
-											alt={`Entry ${i + 1}`}
+											alt={t("journal_form.photo_alt", { n: i + 1 })}
 											className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
 										/>
 									);

@@ -9,13 +9,12 @@ const { createError } = require("../../utils/createError");
 /**
  * Controller: getMyProfile
  * ------------------------
- * Retrieves the authenticated user's profile with populated VK progression data.
+ * Retrieves the authenticated user's profile.
  *
  * Workflow:
  * 1. Uses `req.user._id` (set by authenticateToken middleware) to find the current user in the database.
  * 2. Excludes the password field using `.select("-password")`.
- * 3. Populates vkProgression references to get full sequence data.
- * 4. Returns a 200 response with the user's complete profile including VK progression details.
+ * 3. Returns a 200 response with the user's profile data.
  *
  * Error Handling:
  * - Throws 404 if the user cannot be found.
@@ -23,22 +22,28 @@ const { createError } = require("../../utils/createError");
  *
  * Notes:
  * - Requires `authenticateToken` middleware to ensure `req.user` is available.
- * - Populates currentMainSequence and completedSequences with full Sequence objects.
+ * - Keeps practice-history fields internal to the account record.
  * - Ideal for displaying personal information on a “My Profile” page.
  */
 
 const getMyProfile = async (req, res, next) => {
 	try {
-		const user = await User.findById(req.user._id)
-			.select("-password")
-			.populate("vkProgression.currentMainSequence.sequenceId")
-			.populate("vkProgression.completedSequences.sequenceId");
+		const user = await User.findById(req.user._id).select("-password");
 
 		if (!user) {
 			throw createError(404, "User not found");
 		}
 
-		return sendResponse(res, 200, true, "Profile retrieved successfully", user);
+		const userResponse = user.toObject();
+		delete userResponse.vkProgression;
+
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile retrieved successfully",
+			userResponse,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -54,7 +59,7 @@ const getMyProfile = async (req, res, next) => {
  * 2. Prevents changes to restricted fields:
  *    - Cannot change `role` (throws 403).
  *    - Cannot change `password` here (must use `/users/change-password`).
- *    - Cannot change `vkProgression` (system-managed, throws 403).
+ *    - Cannot change practice-history metadata directly (throws 403).
  * 3. Updates allowed fields: `name`, `email`, `goals`, `preferences`, and profile image.
  * 4. Validates email uniqueness (checks no other user has that email).
  * 5. If a new image is uploaded, deletes the old one from Cloudinary after successful save.
@@ -98,7 +103,7 @@ const updateMyProfile = async (req, res, next) => {
 		if (req.body.vkProgression) {
 			throw createError(
 				403,
-				"VK progression is managed by the system and cannot be changed manually",
+				"Practice history is managed by the system and cannot be changed manually",
 			);
 		}
 
@@ -131,10 +136,34 @@ const updateMyProfile = async (req, res, next) => {
 
 		// Update preferences (object)
 		if (req.body.preferences) {
-			user.preferences = {
-				...user.preferences,
-				...req.body.preferences,
-			};
+			const preferences = req.body.preferences;
+
+			if (preferences.practiceIntensity) {
+				user.set(
+					"preferences.practiceIntensity",
+					preferences.practiceIntensity,
+				);
+			}
+
+			if (preferences.sessionDuration !== undefined) {
+				user.set("preferences.sessionDuration", preferences.sessionDuration);
+			}
+
+			if (preferences.timeOfDay) {
+				user.set("preferences.timeOfDay", preferences.timeOfDay);
+			}
+
+			if (preferences.notifications) {
+				user.set("preferences.notifications", preferences.notifications);
+			}
+
+			if (preferences.language) {
+				user.set("preferences.language", preferences.language);
+			}
+
+			if (preferences.theme) {
+				user.set("preferences.theme", preferences.theme);
+			}
 		}
 
 		// Handle profile image update
@@ -311,7 +340,7 @@ const deleteMyAccount = async (req, res, next) => {
  *    - Sessions per week (breaks down across 4 weeks)
  *    - Most practiced VK families (top 5, sorted by frequency)
  *    - Average session duration
- * 4. Extracts VK progression data (unlockedFamilies, completedSequencesCount, currentSequence).
+ * 4. Extracts practice history metrics for dashboard use.
  * 5. Returns comprehensive stats object for dashboard/analytics.
  *
  * Error Handling:
@@ -381,11 +410,7 @@ const getMyStats = async (req, res, next) => {
 			sessionsPerWeek,
 			mostPracticedFamilies,
 			avgDuration,
-			vkProgression: {
-				unlockedFamilies: user.vkProgression.unlockedFamilies,
-				completedSequencesCount: user.vkProgression.completedSequences.length,
-				currentSequence: user.vkProgression.currentMainSequence,
-			},
+			completedSequencesCount: user.vkProgression.completedSequences.length,
 		});
 	} catch (error) {
 		return next(error);

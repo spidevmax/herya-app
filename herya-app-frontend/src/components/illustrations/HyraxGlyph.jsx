@@ -1,3 +1,5 @@
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function HyraxGlyph({
 	size = 96,
 	background = "var(--color-tone-warning-bg)",
@@ -6,6 +8,7 @@ export default function HyraxGlyph({
 	outline = "var(--color-text-primary)",
 	className = "",
 }) {
+	const { t } = useLanguage();
 	return (
 		<svg
 			width={size}
@@ -13,9 +16,9 @@ export default function HyraxGlyph({
 			viewBox="0 0 120 120"
 			className={className}
 			role="img"
-			aria-label="Hyrax illustration"
+			aria-label={t("ui.hyrax_illustration")}
 		>
-			<title>Hyrax illustration</title>
+			<title>{t("ui.hyrax_illustration")}</title>
 			<rect x="4" y="4" width="112" height="112" rx="24" fill={background} />
 			<ellipse
 				cx="59"

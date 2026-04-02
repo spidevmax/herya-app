@@ -1,9 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, CheckCircle, Clock } from "lucide-react";
+import {
+	ArrowLeft,
+	CheckCircle,
+	Clock,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
 import { createSession } from "@/api/sessions.api";
+import { getBreathingPatterns } from "@/api/breathing.api";
+import { getSequences } from "@/api/sequences.api";
+import { getSequenceById } from "@/api/sequences.api";
+import { getPosesByFamily, getPoses } from "@/api/poses.api";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import PranayamaMetronome from "@/components/session/PranayamaMetronome";
 import { Button } from "@/components/ui";
 import { SESSION_TYPES } from "@/utils/constants";
@@ -18,11 +29,77 @@ const MOOD_OPTIONS = [
 	"grateful",
 	"anxious",
 ];
+
+const MEDITATION_OPTIONS = [
+	{
+		value: "guided",
+		labelKey: "session.meditation_types.guided",
+		fallback: "Guided",
+	},
+	{
+		value: "silent",
+		labelKey: "session.meditation_types.silent",
+		fallback: "Silent",
+	},
+	{
+		value: "breath_awareness",
+		labelKey: "session.meditation_types.breath_awareness",
+		fallback: "Breath awareness",
+	},
+	{
+		value: "mantra",
+		labelKey: "session.meditation_types.mantra",
+		fallback: "Mantra",
+	},
+	{
+		value: "visualization",
+		labelKey: "session.meditation_types.visualization",
+		fallback: "Visualization",
+	},
+];
+
+const normalizeFamilyKey = (family) => {
+	if (!family) return "";
+	const raw = String(family).trim().toLowerCase();
+	const normalized = raw.replace(/\s+/g, "_").replace(/-/g, "_");
+	const aliases = {
+		bow: "bow_sequence",
+		triangle: "triangle_sequence",
+		sun: "sun_salutation",
+		vajrasana: "vajrasana_variations",
+		lotus: "lotus_variations",
+	};
+	return aliases[normalized] || normalized;
+};
+
+const normalizePoseEntries = (sequence, familyPoses) => {
+	const embedded = sequence?.structure?.corePoses
+		?.map((entry) => entry?.pose || entry)
+		?.filter(Boolean)
+		?.filter((pose) => {
+			if (typeof pose === "string") return pose.trim().length > 0;
+			return Boolean(
+				pose?._id || pose?.englishName || pose?.name || pose?.romanizationName,
+			);
+		});
+
+	if (embedded?.length) return embedded;
+
+	const keyPoses = (sequence?.keyPoses || []).filter(Boolean);
+	if (keyPoses.length) return keyPoses;
+
+	return familyPoses || [];
+};
 export default function Session() {
 	const { type } = useParams();
 	const [params] = useSearchParams();
 	const navigate = useNavigate();
 	const { refreshUser } = useAuth();
+	const { t } = useLanguage();
+	const tr = (key, fallback, vars) => {
+		const value = t(key, vars);
+		return value === key ? fallback : value;
+	};
 	const seqId = params.get("seq");
 
 	const [step, setStep] = useState("pre"); // pre | active | post | done
@@ -33,13 +110,144 @@ export default function Session() {
 	const [energyAfter, setEnergyAfter] = useState(5);
 	const [notes, setNotes] = useState("");
 	const [saving, setSaving] = useState(false);
+	const [sequence, setSequence] = useState(null);
+	const [sequenceLoading, setSequenceLoading] = useState(false);
+	const [familyPoses, setFamilyPoses] = useState([]);
+	const [familyPosesLoading, setFamilyPosesLoading] = useState(false);
+	const [completeSequences, setCompleteSequences] = useState([]);
+	const [completeBreathing, setCompleteBreathing] = useState([]);
+	const [completeCatalogLoading, setCompleteCatalogLoading] = useState(false);
+	const [completeWarmupId, setCompleteWarmupId] = useState("");
+	const [completeMainIds, setCompleteMainIds] = useState([]);
+	const [completeCooldownId, setCompleteCooldownId] = useState("");
+	const [completePranayamaId, setCompletePranayamaId] = useState("");
+	const [completeMeditationType, setCompleteMeditationType] = useState(
+		MEDITATION_OPTIONS[0].value,
+	);
+	const [completeMeditationDuration, setCompleteMeditationDuration] =
+		useState(10);
+	const [currentPoseIndex, setCurrentPoseIndex] = useState(0);
 
 	const sessionType = SESSION_TYPES.find((s) => s.value === type) || {
-		label: "Practice",
+		label: tr("session.practice_fallback_label", "Practice"),
 		icon: "🧘",
 		color: "var(--color-primary)",
 	};
+	const sessionTypeLabelByType = {
+		vk_sequence: tr("fab.vk_sequence", "VK Sequence"),
+		pranayama: tr("fab.pranayama", "Pranayama"),
+		meditation: tr("fab.meditation", "Meditation"),
+		complete_practice: tr("fab.complete_practice", "Complete Practice"),
+	};
+	const sessionTypeLabel = sessionTypeLabelByType[type] || sessionType.label;
 	const isPranayama = type === "pranayama";
+	const isCompletePractice = type === "complete_practice";
+
+	useEffect(() => {
+		if (seqId && !sequence && !sequenceLoading) {
+			setSequenceLoading(true);
+			getSequenceById(seqId)
+				.then((r) => {
+					const seq = r.data?.data || r.data;
+					setSequence(seq);
+				})
+				.catch((err) => {
+					console.error("Error loading sequence:", err);
+					setSequence(null);
+				})
+				.finally(() => setSequenceLoading(false));
+		}
+	}, [seqId, sequence, sequenceLoading]);
+
+	const practicePoses = normalizePoseEntries(sequence, familyPoses);
+
+	useEffect(() => {
+		if (!sequence?.family) return;
+
+		const hasUsableEmbeddedPoses =
+			normalizePoseEntries(sequence, []).length > 0;
+
+		if (hasUsableEmbeddedPoses || familyPoses.length > 0 || familyPosesLoading)
+			return;
+
+		const family = normalizeFamilyKey(sequence.family);
+		if (!family) return;
+
+		setFamilyPosesLoading(true);
+		getPosesByFamily(family)
+			.then((r) => {
+				const payload = r.data?.data || r.data || {};
+				const grouped = Array.isArray(payload)
+					? payload
+					: Object.values(payload).flat().filter(Boolean);
+				if (Array.isArray(grouped) && grouped.length > 0) {
+					setFamilyPoses(grouped);
+					return;
+				}
+
+				return getPoses({ vkFamily: family, limit: 100 }).then((fallback) => {
+					const poses =
+						fallback.data?.data?.poses || fallback.data?.poses || [];
+					setFamilyPoses(Array.isArray(poses) ? poses : []);
+				});
+			})
+			.catch(() => setFamilyPoses([]))
+			.finally(() => setFamilyPosesLoading(false));
+	}, [sequence, familyPoses.length, familyPosesLoading]);
+
+	useEffect(() => {
+		if (
+			!isCompletePractice ||
+			completeCatalogLoading ||
+			completeSequences.length > 0
+		) {
+			return;
+		}
+
+		setCompleteCatalogLoading(true);
+		Promise.all([
+			getSequences({ limit: 100 }),
+			getBreathingPatterns({ limit: 100 }),
+		])
+			.then(([seqRes, breathRes]) => {
+				const seqPayload = seqRes.data?.data || seqRes.data || {};
+				const breathPayload = breathRes.data?.data || breathRes.data || {};
+				const seqList =
+					seqPayload.sequences ?? (Array.isArray(seqPayload) ? seqPayload : []);
+				const breathList =
+					breathPayload.patterns ??
+					(Array.isArray(breathPayload) ? breathPayload : []);
+
+				setCompleteSequences(Array.isArray(seqList) ? seqList : []);
+				setCompleteBreathing(Array.isArray(breathList) ? breathList : []);
+			})
+			.catch(() => {
+				setCompleteSequences([]);
+				setCompleteBreathing([]);
+			})
+			.finally(() => setCompleteCatalogLoading(false));
+	}, [isCompletePractice, completeCatalogLoading, completeSequences.length]);
+
+	const findSequenceById = (id) =>
+		completeSequences.find((item) => item._id === id);
+	const findBreathingById = (id) =>
+		completeBreathing.find((item) => item._id === id);
+	const toggleMainSequence = (id) => {
+		setCompleteMainIds((prev) =>
+			prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id],
+		);
+	};
+	const completeSelectedWarmup = findSequenceById(completeWarmupId);
+	const completeSelectedCooldown = findSequenceById(completeCooldownId);
+	const completeSelectedMain = completeMainIds
+		.map(findSequenceById)
+		.filter(Boolean);
+	const completeSelectedPranayama = findBreathingById(completePranayamaId);
+	const completeSelectedMeditation =
+		MEDITATION_OPTIONS.find(
+			(option) => option.value === completeMeditationType,
+		) || MEDITATION_OPTIONS[0];
+	const getMeditationLabel = (option) => tr(option.labelKey, option.fallback);
 
 	const toggleMood = (setList, mood) => {
 		setList((prev) =>
@@ -54,6 +262,19 @@ export default function Session() {
 	const handleComplete = async () => {
 		setSaving(true);
 		try {
+			const completePractice = isCompletePractice
+				? {
+						...(completeWarmupId ? { warmup: completeWarmupId } : {}),
+						mainSequences: completeMainIds,
+						...(completeCooldownId ? { cooldown: completeCooldownId } : {}),
+						...(completePranayamaId ? { pranayama: completePranayamaId } : {}),
+						meditation: {
+							duration: completeMeditationDuration,
+							meditationType: completeMeditationType,
+						},
+					}
+				: undefined;
+
 			const payload = {
 				sessionType: type,
 				duration,
@@ -62,7 +283,11 @@ export default function Session() {
 				moodAfter,
 				energyLevel: { before: energyBefore, after: energyAfter },
 				notes,
-				...(seqId ? { vkSequence: seqId } : {}),
+				...(isCompletePractice
+					? { completePractice }
+					: seqId
+						? { vkSequence: seqId }
+						: {}),
 			};
 			await createSession(payload);
 			await refreshUser();
@@ -73,6 +298,21 @@ export default function Session() {
 			setSaving(false);
 		}
 	};
+
+	const currentPose = practicePoses[currentPoseIndex];
+	const currentPoseName =
+		(typeof currentPose === "string" ? currentPose : null) ||
+		currentPose?.englishName ||
+		currentPose?.name ||
+		currentPose?.romanizationName ||
+		tr("session.pose_fallback", "Pose");
+	const currentPoseSanskrit =
+		typeof currentPose === "object"
+			? currentPose?.sanskritName || currentPose?.romanizedName
+			: null;
+	const currentPoseDescription =
+		typeof currentPose === "object" ? currentPose?.description : null;
+	const canStartPractice = !isCompletePractice || completeMainIds.length > 0;
 
 	if (step === "done") {
 		return (
@@ -91,15 +331,15 @@ export default function Session() {
 						color: "var(--color-text-primary)",
 					}}
 				>
-					Practice Complete
+					{t("session.done_title")}
 				</h2>
 				<p
 					className="text-[#6B7280] text-center text-sm font-medium"
 					style={{ fontFamily: '"DM Sans", sans-serif' }}
 				>
-					Great work. Your session has been saved.
+					{t("session.done_subtitle")}
 				</p>
-				<Button onClick={() => navigate("/")}>Back to Home</Button>
+				<Button onClick={() => navigate("/")}>{t("session.back_home")}</Button>
 			</div>
 		);
 	}
@@ -121,7 +361,7 @@ export default function Session() {
 						color: "var(--color-text-primary)",
 					}}
 				>
-					{sessionType.label}
+					{sessionTypeLabel}
 				</h1>
 			</div>
 
@@ -142,14 +382,14 @@ export default function Session() {
 									color: "var(--color-text-primary)",
 								}}
 							>
-								Before you begin
+								{t("session.pre_title")}
 							</h2>
 							<div className="bg-white rounded-2xl p-5">
 								<p
 									className="text-sm font-medium text-[#1A1A2E] mb-3"
 									style={{ fontFamily: '"DM Sans", sans-serif' }}
 								>
-									How are you feeling? (pick up to 3)
+									{t("session.pre_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
 									{MOOD_OPTIONS.map((m) => (
@@ -164,7 +404,7 @@ export default function Session() {
 													: "bg-[#F8F7F4] text-[#6B7280]")
 											}
 										>
-											{m}
+											{t(`session.moods.${m}`)}
 										</button>
 									))}
 								</div>
@@ -174,7 +414,7 @@ export default function Session() {
 									className="text-sm font-medium text-[#1A1A2E] mb-3"
 									style={{ fontFamily: '"DM Sans", sans-serif' }}
 								>
-									Energy level: {energyBefore}/10
+									{t("session.pre_energy", { n: energyBefore })}
 								</p>
 								<input
 									type="range"
@@ -190,7 +430,8 @@ export default function Session() {
 									className="text-sm font-medium text-[#1A1A2E] mb-3 flex items-center gap-2"
 									style={{ fontFamily: '"DM Sans", sans-serif' }}
 								>
-									<Clock size={16} /> Duration: {duration} min
+									<Clock size={16} />{" "}
+									{t("session.pre_duration", { n: duration })}
 								</p>
 								<div className="flex gap-2 flex-wrap">
 									{[15, 20, 30, 45, 60, 90].map((d) => (
@@ -210,7 +451,12 @@ export default function Session() {
 									))}
 								</div>
 							</div>
-							<Button onClick={() => setStep("active")}>Begin Practice</Button>
+							<Button
+								onClick={() => setStep("active")}
+								disabled={!canStartPractice}
+							>
+								{t("session.begin")}
+							</Button>
 						</motion.div>
 					)}
 
@@ -224,6 +470,220 @@ export default function Session() {
 						>
 							{isPranayama ? (
 								<PranayamaMetronome />
+							) : isCompletePractice ? (
+								<div className="w-full flex flex-col gap-4">
+									<div className="rounded-2xl bg-white p-5 text-center">
+										<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-2">
+											{t("fab.complete_practice")}
+										</p>
+										<h3
+											className="text-xl font-semibold text-[#1A1A2E] mb-2"
+											style={{ fontFamily: '"DM Sans", sans-serif' }}
+										>
+											{completeSelectedMain.length > 0
+												? tr(
+														"session.complete_ready_title",
+														"Your practice plan is ready",
+													)
+												: tr(
+														"session.complete_choose_main_title",
+														"Choose at least one main sequence",
+													)}
+										</h3>
+										<p className="text-sm text-[#6B7280]">
+											{completeSelectedMain.length > 0
+												? tr(
+														"session.complete_ready_hint",
+														"Follow the structure you built: warmup, main sequences, pranayama, and meditation.",
+													)
+												: tr(
+														"session.complete_choose_main_hint",
+														"Go back and select the main sequence(s) you want to practice.",
+													)}
+										</p>
+									</div>
+
+									{completeSelectedWarmup && (
+										<div className="rounded-2xl bg-white p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+												{tr("session.complete_warmup", "Warmup")}
+											</p>
+											<p className="text-sm font-medium text-[#1A1A2E]">
+												{completeSelectedWarmup.englishName}
+											</p>
+										</div>
+									)}
+
+									{completeSelectedMain.length > 0 && (
+										<div className="rounded-2xl bg-white p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-2">
+												{tr(
+													"session.complete_main_sequences",
+													"Main sequences",
+												)}
+											</p>
+											<div className="flex flex-wrap gap-2">
+												{completeSelectedMain.map((item) => (
+													<span
+														key={item._id}
+														className="px-3 py-1.5 rounded-xl bg-[#F8F7F4] text-sm font-medium text-[#1A1A2E] border border-[#E5E7EB]"
+													>
+														{item.englishName}
+													</span>
+												))}
+											</div>
+										</div>
+									)}
+
+									{completeSelectedCooldown && (
+										<div className="rounded-2xl bg-white p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+												{tr("session.complete_cooldown", "Cooldown")}
+											</p>
+											<p className="text-sm font-medium text-[#1A1A2E]">
+												{completeSelectedCooldown.englishName}
+											</p>
+										</div>
+									)}
+
+									{completeSelectedPranayama && (
+										<div className="rounded-2xl bg-white p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+												{t("fab.pranayama")}
+											</p>
+											<p className="text-sm font-medium text-[#1A1A2E]">
+												{completeSelectedPranayama.romanizationName}
+											</p>
+										</div>
+									)}
+
+									<div className="rounded-2xl bg-white p-4">
+										<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+											{t("fab.meditation")}
+										</p>
+										<p className="text-sm font-medium text-[#1A1A2E]">
+											{getMeditationLabel(completeSelectedMeditation)} ·{" "}
+											{completeMeditationDuration} min
+										</p>
+									</div>
+								</div>
+							) : seqId && (sequenceLoading || familyPosesLoading) ? (
+								<div className="w-full text-center py-16">
+									<div className="text-6xl mb-4">⏳</div>
+									<p
+										className="text-xl font-semibold text-[#1A1A2E]"
+										style={{ fontFamily: '"DM Sans", sans-serif' }}
+									>
+										{tr("session.loading_sequence", "Loading sequence...")}
+									</p>
+								</div>
+							) : seqId && sequence && practicePoses.length > 0 ? (
+								<>
+									<div className="w-full">
+										<p
+											className="text-xs font-medium text-[#6B7280] uppercase tracking-widest text-center mb-3"
+											style={{ fontFamily: '"DM Sans", sans-serif' }}
+										>
+											{tr(
+												"session.pose_progress",
+												"Pose {current} of {total}",
+												{
+													current: currentPoseIndex + 1,
+													total: practicePoses.length,
+												},
+											)}
+										</p>
+										<motion.div
+											key={`pose-${currentPoseIndex}`}
+											initial={{ opacity: 0, y: 10 }}
+											animate={{ opacity: 1, y: 0 }}
+											transition={{ duration: 0.3 }}
+											className="bg-white rounded-2xl p-6 text-center"
+										>
+											<div className="text-6xl mb-4">
+												{currentPose?.icon || "🧘"}
+											</div>
+											<h3
+												className="text-xl font-semibold text-[#1A1A2E] mb-2"
+												style={{ fontFamily: '"DM Sans", sans-serif' }}
+											>
+												{currentPoseName}
+											</h3>
+											{currentPoseSanskrit && (
+												<p
+													className="text-sm italic text-[#9CA3AF] mb-4"
+													style={{ fontFamily: '"DM Sans", sans-serif' }}
+												>
+													{currentPoseSanskrit}
+												</p>
+											)}
+											{currentPoseDescription && (
+												<p
+													className="text-sm text-[#6B7280] mt-4"
+													style={{ fontFamily: '"DM Sans", sans-serif' }}
+												>
+													{currentPoseDescription}
+												</p>
+											)}
+										</motion.div>
+
+										<div className="flex justify-between items-center mt-6 gap-2">
+											<button
+												type="button"
+												onClick={() =>
+													setCurrentPoseIndex(Math.max(0, currentPoseIndex - 1))
+												}
+												disabled={currentPoseIndex === 0}
+												className="w-10 h-10 rounded-full bg-[#F8F7F4] flex items-center justify-center disabled:opacity-30"
+											>
+												<ChevronLeft size={20} />
+											</button>
+											<div className="flex-1 flex justify-center gap-1">
+												{practicePoses.map((pose, idx) => (
+													<button
+														key={`pose-dot-${typeof pose === "string" ? pose : pose._id || idx}`}
+														type="button"
+														onClick={() => setCurrentPoseIndex(idx)}
+														className={
+															"w-2 h-2 rounded-full transition " +
+															(idx === currentPoseIndex
+																? "bg-[#4A72FF] w-6"
+																: "bg-[#D1D5DB]")
+														}
+													/>
+												))}
+											</div>
+											<button
+												type="button"
+												onClick={() =>
+													setCurrentPoseIndex(
+														Math.min(
+															practicePoses.length - 1,
+															currentPoseIndex + 1,
+														),
+													)
+												}
+												disabled={currentPoseIndex === practicePoses.length - 1}
+												className="w-10 h-10 rounded-full bg-[#F8F7F4] flex items-center justify-center disabled:opacity-30"
+											>
+												<ChevronRight size={20} />
+											</button>
+										</div>
+									</div>
+								</>
+							) : seqId && sequence && practicePoses.length === 0 ? (
+								<div className="w-full text-center py-16">
+									<div className="text-6xl mb-4">📋</div>
+									<p
+										className="text-xl font-semibold text-[#1A1A2E]"
+										style={{ fontFamily: '"DM Sans", sans-serif' }}
+									>
+										{tr(
+											"session.no_poses_in_sequence",
+											"No poses found in this sequence",
+										)}
+									</p>
+								</div>
 							) : (
 								<div className="text-center py-16">
 									<div className="text-7xl mb-4">{sessionType.icon}</div>
@@ -231,22 +691,222 @@ export default function Session() {
 										className="text-xl font-semibold text-[#1A1A2E]"
 										style={{ fontFamily: '"DM Sans", sans-serif' }}
 									>
-										Practice in Progress
+										{t("session.active_title")}
 									</p>
 									<p
 										className="text-[#9CA3AF] text-sm font-medium mt-2"
 										style={{ fontFamily: '"DM Sans", sans-serif' }}
 									>
-										{duration} minutes
+										{tr("session.active_minutes", "{n} minutes", {
+											n: duration,
+										})}
 									</p>
 								</div>
 							)}
 							<Button onClick={() => setStep("post")} className="w-full">
-								Finish Practice
+								{t("session.finish")}
 							</Button>
 						</motion.div>
 					)}
 
+					{isCompletePractice && (
+						<div className="bg-white rounded-2xl p-5 flex flex-col gap-4">
+							<div>
+								<p
+									className="text-sm font-medium text-[#1A1A2E] mb-3"
+									style={{ fontFamily: '"DM Sans", sans-serif' }}
+								>
+									{tr(
+										"session.complete_builder_title",
+										"Build your complete practice",
+									)}
+								</p>
+								{completeCatalogLoading ? (
+									<p className="text-sm text-[#6B7280]">
+										{tr(
+											"session.complete_loading_catalog",
+											"Loading sequences and pranayama...",
+										)}
+									</p>
+								) : (
+									<div className="flex flex-col gap-4">
+										<div className="space-y-2">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+												{tr(
+													"session.complete_warmup_sequence",
+													"Warmup sequence",
+												)}
+											</p>
+											<select
+												value={completeWarmupId}
+												onChange={(e) => setCompleteWarmupId(e.target.value)}
+												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+											>
+												<option value="">
+													{tr(
+														"session.complete_select_warmup",
+														"Select warmup",
+													)}
+												</option>
+												{completeSequences.map((item) => (
+													<option key={item._id} value={item._id}>
+														{item.englishName} · {tr("session.level", "Level")}{" "}
+														{item.level}
+													</option>
+												))}
+											</select>
+										</div>
+
+										<div className="space-y-2">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+												{tr(
+													"session.complete_main_sequences",
+													"Main sequences",
+												)}
+											</p>
+											<div className="max-h-44 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-[#F8F7F4] p-3 flex flex-col gap-2">
+												{completeSequences.map((item) => (
+													<button
+														type="button"
+														key={item._id}
+														onClick={() => toggleMainSequence(item._id)}
+														className={
+															"w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition " +
+															(completeMainIds.includes(item._id)
+																? "bg-[#4A72FF] text-white"
+																: "bg-white text-[#1A1A2E]")
+														}
+													>
+														{item.englishName} · {item.family}
+													</button>
+												))}
+											</div>
+										</div>
+
+										<div className="space-y-2">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+												{tr(
+													"session.complete_cooldown_sequence",
+													"Cooldown sequence",
+												)}
+											</p>
+											<select
+												value={completeCooldownId}
+												onChange={(e) => setCompleteCooldownId(e.target.value)}
+												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+											>
+												<option value="">
+													{tr(
+														"session.complete_select_cooldown",
+														"Select cooldown",
+													)}
+												</option>
+												{completeSequences.map((item) => (
+													<option key={item._id} value={item._id}>
+														{item.englishName} · {tr("session.level", "Level")}{" "}
+														{item.level}
+													</option>
+												))}
+											</select>
+										</div>
+
+										<div className="space-y-2">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+												{t("fab.pranayama")}
+											</p>
+											<select
+												value={completePranayamaId}
+												onChange={(e) => setCompletePranayamaId(e.target.value)}
+												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+											>
+												<option value="">
+													{tr("session.complete_no_pranayama", "No pranayama")}
+												</option>
+												{completeBreathing.map((item) => (
+													<option key={item._id} value={item._id}>
+														{item.romanizationName}
+													</option>
+												))}
+											</select>
+										</div>
+
+										<div className="space-y-2">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+												{t("fab.meditation")}
+											</p>
+											<select
+												value={completeMeditationType}
+												onChange={(e) =>
+													setCompleteMeditationType(e.target.value)
+												}
+												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+											>
+												{MEDITATION_OPTIONS.map((option) => (
+													<option key={option.value} value={option.value}>
+														{getMeditationLabel(option)}
+													</option>
+												))}
+											</select>
+											<div>
+												<p className="text-sm font-medium text-[#1A1A2E] mb-2">
+													{tr(
+														"session.complete_meditation_duration",
+														"Meditation duration",
+													)}
+													: {completeMeditationDuration} min
+												</p>
+												<input
+													type="range"
+													min={5}
+													max={30}
+													step={5}
+													value={completeMeditationDuration}
+													onChange={(e) =>
+														setCompleteMeditationDuration(+e.target.value)
+													}
+													className="w-full accent-[#5DB075]"
+												/>
+											</div>
+										</div>
+									</div>
+								)}
+							</div>
+
+							{completeMainIds.length > 0 && (
+								<div className="rounded-2xl bg-[#F8F7F4] p-4 text-sm text-[#1A1A2E]">
+									<p className="font-semibold mb-2">
+										{tr("session.complete_plan_title", "Your plan")}
+									</p>
+									<p>
+										{tr("session.complete_warmup", "Warmup")}:{" "}
+										{completeSelectedWarmup?.englishName ||
+											tr("session.none", "None")}
+									</p>
+									<p>
+										{tr("session.complete_main", "Main")}:{" "}
+										{completeSelectedMain
+											.map((item) => item.englishName)
+											.join(" · ")}
+									</p>
+									<p>
+										{tr("session.complete_cooldown", "Cooldown")}:{" "}
+										{completeSelectedCooldown?.englishName ||
+											tr("session.none", "None")}
+									</p>
+									<p>
+										{t("fab.pranayama")}:{" "}
+										{completeSelectedPranayama?.romanizationName ||
+											tr("session.none", "None")}
+									</p>
+									<p>
+										{t("fab.meditation")}:{" "}
+										{getMeditationLabel(completeSelectedMeditation)} ·{" "}
+										{completeMeditationDuration} min
+									</p>
+								</div>
+							)}
+						</div>
+					)}
 					{step === "post" && (
 						<motion.div
 							key="post"
@@ -259,14 +919,14 @@ export default function Session() {
 								className="text-xl font-semibold text-[#1A1A2E]"
 								style={{ fontFamily: '"DM Sans", sans-serif' }}
 							>
-								How do you feel now?
+								{t("session.post_title")}
 							</h2>
 							<div className="bg-white rounded-2xl p-5">
 								<p
 									className="text-sm font-medium text-[#1A1A2E] mb-3"
 									style={{ fontFamily: '"DM Sans", sans-serif' }}
 								>
-									Mood after (pick up to 3)
+									{t("session.post_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
 									{MOOD_OPTIONS.map((m) => (
@@ -281,7 +941,7 @@ export default function Session() {
 													: "bg-[#F8F7F4] text-[#6B7280]")
 											}
 										>
-											{m}
+											{t(`session.moods.${m}`)}
 										</button>
 									))}
 								</div>
@@ -291,7 +951,7 @@ export default function Session() {
 									className="text-sm font-medium text-[#1A1A2E] mb-3"
 									style={{ fontFamily: '"DM Sans", sans-serif' }}
 								>
-									Energy after: {energyAfter}/10
+									{t("session.post_energy", { n: energyAfter })}
 								</p>
 								<input
 									type="range"
@@ -307,18 +967,18 @@ export default function Session() {
 									className="text-sm font-medium text-[#1A1A2E] mb-3"
 									style={{ fontFamily: '"DM Sans", sans-serif' }}
 								>
-									Notes (optional)
+									{t("session.post_notes")}
 								</p>
 								<textarea
 									value={notes}
 									onChange={(e) => setNotes(e.target.value)}
 									rows={3}
-									placeholder="How was your practice today?"
+									placeholder={t("session.post_notes_placeholder")}
 									className="w-full text-sm text-[#1A1A2E] placeholder-[#9CA3AF] bg-[#F8F7F4] rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[#5DB075] resize-none"
 								/>
 							</div>
 							<Button onClick={handleComplete} disabled={saving}>
-								{saving ? "Saving…" : "Save Session"}
+								{saving ? t("session.saving") : t("session.save")}
 							</Button>
 						</motion.div>
 					)}

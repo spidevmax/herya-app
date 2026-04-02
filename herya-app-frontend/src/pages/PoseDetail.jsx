@@ -1,20 +1,36 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ChevronLeft, Play } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
-import { Badge, Button, SkeletonCard } from "@/components/ui";
+import { Badge, SkeletonCard } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 
 const DIFF_COLORS = {
 	beginner: "var(--color-info)",
 	intermediate: "var(--color-warning)",
 	advanced: "var(--color-danger)",
 };
-const DIFF_LABELS = {
-	beginner: "Principiante",
-	intermediate: "Intermedio",
-	advanced: "Avanzado",
+const normalizeList = (value) => {
+	if (Array.isArray(value)) return value.filter(Boolean);
+	if (typeof value === "string" && value.trim()) return [value.trim()];
+	return [];
 };
+
+const formatValue = (value) => {
+	if (value == null || value === "") return null;
+	if (Array.isArray(value)) return value.filter(Boolean).join(", ");
+	if (typeof value === "string") return value.replace(/_/g, " ");
+	return String(value);
+};
+
+const DetailBlock = ({ title, children }) => (
+	<div className="bg-white rounded-2xl p-4 shadow-[var(--shadow-card)]">
+		<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
+			{title}
+		</h3>
+		{children}
+	</div>
+);
 
 function RelatedPoseChip({ pose, onClick }) {
 	return (
@@ -44,6 +60,7 @@ function RelatedPoseChip({ pose, onClick }) {
 export default function PoseDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [pose, setPose] = useState(null);
 	const [related, setRelated] = useState(null);
 	const [loading, setLoading] = useState(true);
@@ -77,29 +94,45 @@ export default function PoseDetail() {
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
 				<span className="text-5xl mb-3">😕</span>
 				<p className="font-display text-lg font-bold text-[var(--color-text-primary)]">
-					Postura no encontrada
+					{t("pose_detail.not_found")}
 				</p>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
 					className="mt-4 text-[var(--color-info)] text-sm font-semibold"
 				>
-					Volver
+					{t("pose_detail.back")}
 				</button>
 			</div>
 		);
 	}
 
-	const benefits = pose.benefits ?? [];
-	const instructions =
-		(pose.instructions ?? pose.description) ? [pose.description] : [];
+	const diffLabels = {
+		beginner: t("library.beginner"),
+		intermediate: t("library.intermediate"),
+		advanced: t("library.advanced"),
+	};
+
+	const benefits = normalizeList(pose.benefits);
+	const contraindications = normalizeList(pose.contraindications);
+	const targetMuscles = normalizeList(pose.targetMuscles);
+	const jointFocus = normalizeList(pose.jointFocus);
+	const commonMistakes = normalizeList(pose.commonMistakes);
+	const props = normalizeList(pose.props);
+	const aliases = normalizeList(pose.alias);
+	const setupSteps = normalizeList(pose.instructions?.setup);
+	const alignmentSteps = normalizeList(pose.instructions?.alignment);
+	const modificationSteps = normalizeList(pose.instructions?.modifications);
+	const exitSteps = normalizeList(pose.instructions?.exit);
+	const keyPoints = normalizeList(pose.alignmentDetails?.keyPoints);
+	const recommendedBreaths = pose.recommendedBreaths?.[pose.difficulty];
 	// Backend keys: preparatoryPoses, followUpPoses, counterposes
 	const preparatory = related?.preparatoryPoses ?? [];
 	const followUp = related?.followUpPoses ?? [];
 	const counterposes = related?.counterposes ?? [];
 
 	return (
-		<div className="flex flex-col pb-32">
+		<div className="flex flex-col pb-10">
 			{/* Hero image */}
 			<div className="relative h-64 bg-[var(--color-tone-info-bg)]">
 				{pose.image ? (
@@ -151,23 +184,32 @@ export default function PoseDetail() {
 									DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"
 								}
 							>
-								{DIFF_LABELS[pose.difficulty] ?? pose.difficulty}
+								{diffLabels[pose.difficulty] ?? pose.difficulty}
 							</Badge>
 						)}
 						{pose.category && (
 							<Badge color="var(--color-info)">
-								{pose.category.replace(/_/g, " ")}
+								{typeof pose.category === "string"
+									? pose.category.replace(/_/g, " ")
+									: Array.isArray(pose.category)
+										? pose.category.join(", ")
+										: String(pose.category)}
 							</Badge>
 						)}
 						{pose.family && (
 							<Badge color="var(--color-lavender)">
-								{pose.family.replace(/_/g, " ")}
+								{typeof pose.family === "string"
+									? pose.family.replace(/_/g, " ")
+									: String(pose.family)}
 							</Badge>
 						)}
 						{pose.drishti && (
 							<Badge color="var(--color-warning)">
-								Drishti: {pose.drishti}
+								{t("pose_detail.drishti")}: {pose.drishti}
 							</Badge>
+						)}
+						{pose.energyEffect && (
+							<Badge color="var(--color-success)">{pose.energyEffect}</Badge>
 						)}
 					</div>
 				</div>
@@ -179,12 +221,101 @@ export default function PoseDetail() {
 					</p>
 				)}
 
-				{/* Benefits */}
+				<DetailBlock title={t("pose_detail.details")}>
+					<div className="flex flex-wrap gap-2">
+						{formatValue(pose.category) && (
+							<Badge color="var(--color-info)">
+								{formatValue(pose.category)}
+							</Badge>
+						)}
+						{formatValue(pose.family) && (
+							<Badge color="var(--color-lavender)">
+								{formatValue(pose.family)}
+							</Badge>
+						)}
+						{pose.chakraRelated && (
+							<Badge color="var(--color-danger)">{pose.chakraRelated}</Badge>
+						)}
+						{pose.transitionType && (
+							<Badge color="var(--color-primary)">
+								{formatValue(pose.transitionType)}
+							</Badge>
+						)}
+					</div>
+					<div className="mt-4 grid grid-cols-1 gap-3 text-sm text-[var(--color-text-secondary)]">
+						{recommendedBreaths && (
+							<p>
+								<b className="text-[var(--color-text-primary)]">
+									{t("pose_detail.breathing")}:
+								</b>{" "}
+								{recommendedBreaths.min} - {recommendedBreaths.max}{" "}
+								{t("pose_detail.breaths")}
+							</p>
+						)}
+						{pose.sidedness?.type && (
+							<p>
+								<b className="text-[var(--color-text-primary)]">
+									{t("pose_detail.sidedness")}:
+								</b>{" "}
+								{formatValue(pose.sidedness.type)}
+								{pose.sidedness.breathsPerSide
+									? ` · ${pose.sidedness.breathsPerSide} ${t("pose_detail.breaths_per_side")}`
+									: ""}
+							</p>
+						)}
+						{formatValue(pose.breathingCue) && (
+							<p>
+								<b className="text-[var(--color-text-primary)]">
+									{t("pose_detail.breathe")}
+								</b>{" "}
+								{formatValue(pose.breathingCue)}
+							</p>
+						)}
+					</div>
+				</DetailBlock>
+
+				{aliases.length > 0 && (
+					<DetailBlock title={t("pose_detail.aliases")}>
+						<p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+							{aliases.join(", ")}
+						</p>
+					</DetailBlock>
+				)}
+
+				{pose.description && (
+					<DetailBlock title={t("pose_detail.description")}>
+						<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
+							{pose.description}
+						</p>
+					</DetailBlock>
+				)}
+
+				{targetMuscles.length > 0 && (
+					<DetailBlock title={t("pose_detail.target_muscles")}>
+						<div className="flex flex-wrap gap-2">
+							{targetMuscles.map((muscle) => (
+								<Badge key={`muscle-${muscle}`} color="var(--color-success)">
+									{muscle}
+								</Badge>
+							))}
+						</div>
+					</DetailBlock>
+				)}
+
+				{jointFocus.length > 0 && (
+					<DetailBlock title={t("pose_detail.joints")}>
+						<div className="flex flex-wrap gap-2">
+							{jointFocus.map((joint) => (
+								<Badge key={`joint-${joint}`} color="var(--color-warning)">
+									{joint}
+								</Badge>
+							))}
+						</div>
+					</DetailBlock>
+				)}
+
 				{benefits.length > 0 && (
-					<div className="bg-[var(--color-tone-info-bg)] rounded-2xl p-4">
-						<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
-							Beneficios
-						</h3>
+					<DetailBlock title={t("pose_detail.benefits")}>
 						<ul className="flex flex-col gap-2">
 							{benefits.map((b) => (
 								<li
@@ -198,28 +329,166 @@ export default function PoseDetail() {
 								</li>
 							))}
 						</ul>
-					</div>
+					</DetailBlock>
 				)}
 
-				{/* Instructions */}
-				{instructions.length > 0 && (
-					<div>
-						<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
-							Instrucciones
-						</h3>
-						<ol className="flex flex-col gap-3">
-							{instructions.map((step, i) => (
-								<li key={`step-${step}`} className="flex items-start gap-3">
-									<span className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-										{i + 1}
-									</span>
-									<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed flex-1">
-										{step}
+				{(setupSteps.length > 0 ||
+					alignmentSteps.length > 0 ||
+					modificationSteps.length > 0 ||
+					exitSteps.length > 0 ||
+					keyPoints.length > 0) && (
+					<DetailBlock title={t("pose_detail.instructions")}>
+						<div className="flex flex-col gap-4">
+							{setupSteps.length > 0 && (
+								<div>
+									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+										{t("pose_detail.setup")}
 									</p>
+									<ol className="flex flex-col gap-3">
+										{setupSteps.map((step, i) => (
+											<li
+												key={`setup-${step}`}
+												className="flex items-start gap-3"
+											>
+												<span className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+													{i + 1}
+												</span>
+												<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed flex-1">
+													{step}
+												</p>
+											</li>
+										))}
+									</ol>
+								</div>
+							)}
+							{alignmentSteps.length > 0 && (
+								<div>
+									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+										{t("pose_detail.alignment")}
+									</p>
+									<ul className="flex flex-col gap-2">
+										{alignmentSteps.map((step) => (
+											<li
+												key={`alignment-${step}`}
+												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+											>
+												<span className="text-[var(--color-success)] mt-0.5 flex-shrink-0">
+													•
+												</span>
+												<span>{step}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+							{modificationSteps.length > 0 && (
+								<div>
+									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+										{t("pose_detail.modifications")}
+									</p>
+									<ul className="flex flex-col gap-2">
+										{modificationSteps.map((step) => (
+											<li
+												key={`mod-${step}`}
+												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+											>
+												<span className="text-[var(--color-warning)] mt-0.5 flex-shrink-0">
+													•
+												</span>
+												<span>{step}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+							{exitSteps.length > 0 && (
+								<div>
+									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+										{t("pose_detail.exit")}
+									</p>
+									<ul className="flex flex-col gap-2">
+										{exitSteps.map((step) => (
+											<li
+												key={`exit-${step}`}
+												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+											>
+												<span className="text-[var(--color-danger)] mt-0.5 flex-shrink-0">
+													•
+												</span>
+												<span>{step}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+							{keyPoints.length > 0 && (
+								<div>
+									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+										{t("pose_detail.alignment_details")}
+									</p>
+									<ul className="flex flex-col gap-2">
+										{keyPoints.map((point) => (
+											<li
+												key={`key-point-${point?.area || point?.instruction || String(point)}`}
+												className="text-sm text-[var(--color-text-secondary)] leading-relaxed"
+											>
+												{formatValue(point?.area)}
+												{point?.instruction ? `: ${point.instruction}` : ""}
+											</li>
+										))}
+									</ul>
+								</div>
+							)}
+						</div>
+					</DetailBlock>
+				)}
+
+				{contraindications.length > 0 && (
+					<DetailBlock title={t("pose_detail.contraindications")}>
+						<ul className="flex flex-col gap-2">
+							{contraindications.map((item) => (
+								<li
+									key={`contra-${item}`}
+									className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+								>
+									<span className="text-[var(--color-danger)] mt-0.5 flex-shrink-0">
+										•
+									</span>
+									<span>{item}</span>
 								</li>
 							))}
-						</ol>
-					</div>
+						</ul>
+					</DetailBlock>
+				)}
+
+				{commonMistakes.length > 0 && (
+					<DetailBlock title={t("pose_detail.common_mistakes")}>
+						<ul className="flex flex-col gap-2">
+							{commonMistakes.map((item) => (
+								<li
+									key={`mistake-${item}`}
+									className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+								>
+									<span className="text-[var(--color-warning)] mt-0.5 flex-shrink-0">
+										•
+									</span>
+									<span>{item}</span>
+								</li>
+							))}
+						</ul>
+					</DetailBlock>
+				)}
+
+				{props.length > 0 && (
+					<DetailBlock title={t("pose_detail.props")}>
+						<div className="flex flex-wrap gap-2">
+							{props.map((item) => (
+								<Badge key={`prop-${item}`} color="var(--color-primary)">
+									{item}
+								</Badge>
+							))}
+						</div>
+					</DetailBlock>
 				)}
 
 				{/* Related poses */}
@@ -228,13 +497,13 @@ export default function PoseDetail() {
 					counterposes.length > 0) && (
 					<div>
 						<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
-							Posturas relacionadas
+							{t("pose_detail.related_poses")}
 						</h3>
 						<div className="flex flex-col gap-4">
 							{preparatory.length > 0 && (
 								<div>
 									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
-										Preparación
+										{t("pose_detail.preparation")}
 									</p>
 									<div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
 										{preparatory.map((p) => (
@@ -250,7 +519,7 @@ export default function PoseDetail() {
 							{followUp.length > 0 && (
 								<div>
 									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
-										Continuación
+										{t("pose_detail.continuation")}
 									</p>
 									<div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
 										{followUp.map((p) => (
@@ -266,7 +535,7 @@ export default function PoseDetail() {
 							{counterposes.length > 0 && (
 								<div>
 									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
-										Contraposturas
+										{t("pose_detail.counterposes")}
 									</p>
 									<div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
 										{counterposes.map((p) => (
@@ -283,21 +552,6 @@ export default function PoseDetail() {
 					</div>
 				)}
 			</div>
-
-			{/* CTA sticky */}
-			<motion.div
-				initial={{ y: 80 }}
-				animate={{ y: 0 }}
-				className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4"
-			>
-				<Button
-					size="lg"
-					className="w-full flex items-center justify-center gap-2"
-					onClick={() => navigate("/session/vk_sequence")}
-				>
-					<Play size={18} /> Iniciar práctica
-				</Button>
-			</motion.div>
 		</div>
 	);
 }

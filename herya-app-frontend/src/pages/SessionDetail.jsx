@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Trash2 } from "lucide-react";
 import { getSessionById, deleteSession } from "@/api/sessions.api";
 import { ConfirmModal, SkeletonCard, Badge } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
 
@@ -10,20 +11,33 @@ const TYPE_CONFIG = {
 	vk_sequence: {
 		emoji: "🧘",
 		color: "var(--color-primary)",
-		label: "Secuencia VK",
+		labelKey: "fab.vk_sequence",
+		fallback: "VK Sequence",
 	},
-	pranayama: { emoji: "💨", color: "var(--color-primary)", label: "Pranayama" },
-	meditation: { emoji: "🌿", color: "var(--color-info)", label: "Meditación" },
+	pranayama: {
+		emoji: "💨",
+		color: "var(--color-primary)",
+		labelKey: "fab.pranayama",
+		fallback: "Pranayama",
+	},
+	meditation: {
+		emoji: "🌿",
+		color: "var(--color-info)",
+		labelKey: "fab.meditation",
+		fallback: "Meditation",
+	},
 	complete_practice: {
 		emoji: "⭐",
 		color: "var(--color-warning)",
-		label: "Práctica completa",
+		labelKey: "fab.complete_practice",
+		fallback: "Complete Practice",
 	},
 };
 
 export default function SessionDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [session, setSession] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [showDelete, setShowDelete] = useState(false);
@@ -61,14 +75,14 @@ export default function SessionDetail() {
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
 				<span className="text-5xl mb-3">😕</span>
 				<p className="font-display text-lg font-bold text-[var(--color-text-primary)]">
-					Sesión no encontrada
+					{t("session_detail.not_found")}
 				</p>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
 					className="mt-4 text-[var(--color-primary)] text-sm font-semibold"
 				>
-					Volver
+					{t("session_detail.back")}
 				</button>
 			</div>
 		);
@@ -79,6 +93,11 @@ export default function SessionDetail() {
 		color: "var(--color-primary)",
 		label: session.sessionType,
 	};
+	const sessionTypeLabel =
+		cfg.label ||
+		(cfg.labelKey ? t(cfg.labelKey) : "") ||
+		cfg.fallback ||
+		session.sessionType;
 	const family = session.vkFamily
 		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
 		: null;
@@ -104,7 +123,7 @@ export default function SessionDetail() {
 							color: "var(--color-text-primary)",
 						}}
 					>
-						Detalle de sesión
+						{t("session_detail.title")}
 					</h1>
 				</div>
 				<button
@@ -130,7 +149,7 @@ export default function SessionDetail() {
 							className="font-display text-xl font-bold"
 							style={{ fontFamily: '"Fredoka", sans-serif' }}
 						>
-							{cfg.label}
+							{sessionTypeLabel}
 						</p>
 						{family && <p className="text-white/80 text-sm">{family.label}</p>}
 						<p className="text-white/70 text-xs mt-1">
@@ -146,14 +165,18 @@ export default function SessionDetail() {
 							<p className="font-bold text-2xl text-[var(--color-text-primary)]">
 								{session.duration ?? "—"}
 							</p>
-							<p className="text-[var(--color-text-muted)] text-xs">minutos</p>
+							<p className="text-[var(--color-text-muted)] text-xs">
+								{t("session_detail.minutes")}
+							</p>
 						</div>
 						<div className="text-center">
 							<p className="font-bold text-2xl text-[var(--color-text-primary)]">
 								{session.completed ? "✓" : "—"}
 							</p>
 							<p className="text-[var(--color-text-muted)] text-xs">
-								{session.completed ? "Completada" : "En progreso"}
+								{session.completed
+									? t("session_detail.completed")
+									: t("session_detail.in_progress")}
 							</p>
 						</div>
 					</div>
@@ -163,17 +186,17 @@ export default function SessionDetail() {
 				{(session.moodBefore?.length > 0 || session.moodAfter?.length > 0) && (
 					<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
 						<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
-							Estado de ánimo
+							{t("session_detail.mood")}
 						</p>
 						{session.moodBefore?.length > 0 && (
 							<div className="mb-2">
 								<p className="text-xs text-[var(--color-text-muted)] mb-1">
-									Antes
+									{t("session_detail.before")}
 								</p>
 								<div className="flex gap-1.5 flex-wrap">
 									{session.moodBefore.map((m) => (
 										<Badge key={m} color="var(--color-primary)">
-											{m}
+											{t(`session.moods.${m}`)}
 										</Badge>
 									))}
 								</div>
@@ -182,12 +205,12 @@ export default function SessionDetail() {
 						{session.moodAfter?.length > 0 && (
 							<div>
 								<p className="text-xs text-[var(--color-text-muted)] mb-1">
-									Después
+									{t("session_detail.after")}
 								</p>
 								<div className="flex gap-1.5 flex-wrap">
 									{session.moodAfter.map((m) => (
 										<Badge key={m} color="var(--color-primary)">
-											{m}
+											{t(`session.moods.${m}`)}
 										</Badge>
 									))}
 								</div>
@@ -200,7 +223,7 @@ export default function SessionDetail() {
 				{session.notes && (
 					<div className="bg-[var(--color-surface-card)] rounded-2xl p-4">
 						<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
-							Notas
+							{t("session_detail.notes")}
 						</p>
 						<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
 							{session.notes}
@@ -212,7 +235,7 @@ export default function SessionDetail() {
 				{session.vkFeedback && (
 					<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
 						<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
-							Feedback Vinyasa Krama
+							{t("session_detail.vk_feedback")}
 						</p>
 						<div className="flex flex-col gap-2">
 							{Object.entries(session.vkFeedback).map(([k, v]) => (
@@ -247,9 +270,9 @@ export default function SessionDetail() {
 				open={showDelete}
 				onClose={() => setShowDelete(false)}
 				onConfirm={handleDelete}
-				title="¿Eliminar sesión?"
-				description="Esta acción no se puede deshacer."
-				confirmLabel="Eliminar"
+				title={t("session_detail.delete_title")}
+				description={t("session_detail.delete_description")}
+				confirmLabel={t("session_detail.delete_confirm")}
 				danger
 				loading={deleting}
 			/>

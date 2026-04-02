@@ -3,12 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 import { requestPasswordReset } from "@/api/auth.api";
 
 export default function Login() {
 	const navigate = useNavigate();
 	const { login } = useAuth();
+	const { t } = useLanguage();
 	const [form, setForm] = useState({ email: "", password: "" });
 	const [showPw, setShowPw] = useState(false);
 	const [error, setError] = useState("");
@@ -17,6 +19,7 @@ export default function Login() {
 	const [forgotEmail, setForgotEmail] = useState("");
 	const [forgotLoading, setForgotLoading] = useState(false);
 	const [forgotMessage, setForgotMessage] = useState("");
+	const [forgotStatus, setForgotStatus] = useState("");
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -26,7 +29,7 @@ export default function Login() {
 			await login(form);
 			navigate("/");
 		} catch (err) {
-			setError(err?.response?.data?.message || "Invalid credentials");
+			setError(err?.response?.data?.message || t("login.error"));
 		} finally {
 			setLoading(false);
 		}
@@ -36,18 +39,22 @@ export default function Login() {
 		e.preventDefault();
 		setForgotLoading(true);
 		setForgotMessage("");
+		setForgotStatus("");
 		try {
 			await requestPasswordReset({ email: forgotEmail });
-			setForgotMessage("Check your email for reset instructions");
+			setForgotMessage(t("forgot_password.success"));
+			setForgotStatus("success");
 			setTimeout(() => {
 				setShowForgot(false);
 				setForgotEmail("");
 				setForgotMessage("");
+				setForgotStatus("");
 			}, 2000);
 		} catch (err) {
 			setForgotMessage(
-				err?.response?.data?.message || "Error sending reset email",
+				err?.response?.data?.message || t("forgot_password.error"),
 			);
+			setForgotStatus("error");
 		} finally {
 			setForgotLoading(false);
 		}
@@ -76,7 +83,7 @@ export default function Login() {
 										color: "var(--color-text-primary)",
 									}}
 								>
-									Sign in
+									{t("login.submit")}
 								</h1>
 								<p
 									className="mt-2 text-sm font-medium"
@@ -85,7 +92,7 @@ export default function Login() {
 										color: "var(--color-text-secondary)",
 									}}
 								>
-									Access your practice dashboard.
+									{t("login.subtitle")}
 								</p>
 							</div>
 
@@ -113,7 +120,7 @@ export default function Login() {
 										type="email"
 										autoComplete="email"
 										required
-										placeholder="Email"
+										placeholder={t("login.email_placeholder")}
 										value={form.email}
 										onChange={(e) =>
 											setForm((f) => ({ ...f, email: e.target.value }))
@@ -135,7 +142,7 @@ export default function Login() {
 										type={showPw ? "text" : "password"}
 										autoComplete="current-password"
 										required
-										placeholder="Password"
+										placeholder={t("login.password")}
 										value={form.password}
 										onChange={(e) =>
 											setForm((f) => ({ ...f, password: e.target.value }))
@@ -166,7 +173,7 @@ export default function Login() {
 											fontFamily: '"DM Sans", sans-serif',
 										}}
 									>
-										Forgot password?
+										{t("login.forgot_password")}
 									</button>
 								</div>
 
@@ -175,7 +182,7 @@ export default function Login() {
 									disabled={loading}
 									className="mt-1 w-full"
 								>
-									{loading ? "Signing in..." : "Sign in"}
+									{loading ? t("login.submitting") : t("login.submit")}
 								</Button>
 							</form>
 
@@ -186,13 +193,13 @@ export default function Login() {
 									color: "var(--color-text-secondary)",
 								}}
 							>
-								Don&apos;t have an account?{" "}
+								{t("login.no_account")}{" "}
 								<Link
 									to="/register"
 									className="font-semibold hover:underline"
 									style={{ color: "var(--color-primary)" }}
 								>
-									Create one
+									{t("login.register_link")}
 								</Link>
 							</p>
 						</>
@@ -207,7 +214,7 @@ export default function Login() {
 									fontFamily: '"DM Sans", sans-serif',
 								}}
 							>
-								<ArrowLeft size={16} /> Back to sign in
+								<ArrowLeft size={16} /> {t("forgot_password.back_to_login")}
 							</button>
 							<h2
 								className="text-2xl font-semibold"
@@ -216,7 +223,7 @@ export default function Login() {
 									color: "var(--color-text-primary)",
 								}}
 							>
-								Reset password
+								{t("forgot_password.title")}
 							</h2>
 							<p
 								className="mt-2 mb-6 text-sm font-medium"
@@ -225,7 +232,7 @@ export default function Login() {
 									color: "var(--color-text-secondary)",
 								}}
 							>
-								Enter your email and we will send a reset link.
+								{t("forgot_password.subtitle")}
 							</p>
 
 							{forgotMessage && (
@@ -233,13 +240,11 @@ export default function Login() {
 									className="mb-4 rounded-xl px-4 py-3 text-sm font-medium text-center"
 									style={{
 										backgroundColor:
-											forgotMessage.includes("Check") ||
-											forgotMessage.includes("sent")
+											forgotStatus === "success"
 												? "var(--color-info)"
 												: "var(--color-error-bg)",
 										color:
-											forgotMessage.includes("Check") ||
-											forgotMessage.includes("sent")
+											forgotStatus === "success"
 												? "white"
 												: "var(--color-error-text)",
 										fontFamily: '"DM Sans", sans-serif',
@@ -263,7 +268,7 @@ export default function Login() {
 										type="email"
 										autoComplete="email"
 										required
-										placeholder="Email"
+										placeholder={t("forgot_password.email_placeholder")}
 										value={forgotEmail}
 										onChange={(e) => setForgotEmail(e.target.value)}
 										className="w-full rounded-xl border bg-[var(--color-surface)] py-3 pl-10 pr-4 text-sm font-medium text-[var(--color-text-primary)] outline-none transition focus:ring-2"
@@ -278,7 +283,9 @@ export default function Login() {
 									disabled={forgotLoading}
 									className="w-full"
 								>
-									{forgotLoading ? "Sending..." : "Send reset link"}
+									{forgotLoading
+										? t("forgot_password.submitting")
+										: t("forgot_password.submit")}
 								</Button>
 							</form>
 						</>

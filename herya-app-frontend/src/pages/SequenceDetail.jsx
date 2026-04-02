@@ -5,10 +5,12 @@ import { ArrowLeft, Clock, BookOpen, Play, Dumbbell } from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
 import { Button, Badge, SkeletonCard } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function SequenceDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [seq, setSeq] = useState(null);
 	const [loading, setLoading] = useState(true);
 
@@ -44,7 +46,7 @@ export default function SequenceDetail() {
 						color: "var(--color-text-primary)",
 					}}
 				>
-					{loading ? "Loading…" : seq?.englishName}
+					{loading ? t("sequence_detail.loading") : seq?.englishName}
 				</h1>
 			</div>
 
@@ -56,7 +58,7 @@ export default function SequenceDetail() {
 				</div>
 			) : !seq ? (
 				<div className="px-4 mt-8 text-center text-[#9CA3AF]">
-					Sequence not found
+					{t("sequence_detail.not_found")}
 				</div>
 			) : (
 				<div className="px-4 flex flex-col gap-5 mt-2">
@@ -92,7 +94,8 @@ export default function SequenceDetail() {
 							{seq.estimatedDuration?.recommended && (
 								<Badge className="text-white bg-white/20 border-0">
 									<Clock size={12} />
-									{seq.estimatedDuration.recommended} min
+									{seq.estimatedDuration.recommended}{" "}
+									{t("sequence_detail.minutes")}
 								</Badge>
 							)}
 							{seq.level && (
@@ -115,7 +118,7 @@ export default function SequenceDetail() {
 								className="font-semibold mb-2"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								About
+								{t("sequence_detail.about")}
 							</h3>
 							<p
 								className="text-sm leading-relaxed"
@@ -132,7 +135,7 @@ export default function SequenceDetail() {
 								className="font-semibold mb-3 flex items-center gap-2"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								<BookOpen size={16} /> Key Poses
+								<BookOpen size={16} /> {t("sequence_detail.key_poses")}
 							</h3>
 							<div className="flex flex-wrap gap-2">
 								{seq.keyPoses.slice(0, 10).map((p) => (
@@ -155,7 +158,7 @@ export default function SequenceDetail() {
 						onClick={() => navigate("/session/vk_sequence?seq=" + seq._id)}
 						className="w-full text-base py-4"
 					>
-						<Play size={18} /> Start This Practice
+						<Play size={18} /> {t("sequence_detail.start")}
 					</Button>
 				</div>
 			)}

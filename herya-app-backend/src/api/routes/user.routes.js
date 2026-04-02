@@ -28,7 +28,7 @@ usersRouter.use(authenticateToken());
  * /api/v1/users/me:
  *   get:
  *     summary: Get my profile
- *     description: Retrieve current authenticated user's profile information, including VK progression and preferences
+ *     description: Retrieve current authenticated user's profile information and preferences
  *     tags:
  *       - Users
  *     security:
@@ -66,39 +66,6 @@ usersRouter.use(authenticateToken());
  *                 lastPracticeDate:
  *                   type: string
  *                   format: date-time
- *                 vkProgression:
- *                   type: object
- *                   properties:
- *                     currentMainSequence:
- *                       type: object
- *                       properties:
- *                         family:
- *                           type: string
- *                         level:
- *                           type: integer
- *                           enum: [1, 2, 3]
- *                         sequenceId:
- *                           type: string
- *                     completedSequences:
- *                       type: array
- *                       items:
- *                         type: object
- *                         properties:
- *                           family:
- *                             type: string
- *                           level:
- *                             type: integer
- *                           sequenceId:
- *                             type: string
- *                           completedAt:
- *                             type: string
- *                             format: date-time
- *                           sessionCount:
- *                             type: integer
- *                     unlockedFamilies:
- *                       type: array
- *                       items:
- *                         type: string
  *                 preferences:
  *                   type: object
  *                   properties:
@@ -127,7 +94,7 @@ usersRouter.get("/me", getMyProfile);
  * /api/v1/users/me:
  *   put:
  *     summary: Update my profile
- *     description: Update current user's profile information and optional profile image. vkProgression is system-managed and cannot be changed here.
+ *     description: Update current user's profile information and optional profile image. Practice history metadata is system-managed and cannot be changed here.
  *     tags:
  *       - Users
  *     security:
@@ -167,32 +134,6 @@ usersRouter.get("/me", getMyProfile);
  *                     type: string
  *                     enum: [morning, afternoon, evening, anytime]
  *                     example: morning
- *                   therapeuticFocus:
- *                     type: object
- *                     properties:
- *                       enabled:
- *                         type: boolean
- *                       targetAreas:
- *                         type: array
- *                         items:
- *                           type: string
- *                           enum: [spine, hips, shoulders, knees, ankles, wrists, core, neck]
- *                       conditions:
- *                         type: array
- *                         items:
- *                           type: string
- *                         description: Free-text conditions (e.g. "lower back pain")
- *                   meditativeEmphasis:
- *                     type: boolean
- *                     description: Whether to emphasise meditative aspects of practice
- *                   pranayamaPreference:
- *                     type: object
- *                     properties:
- *                       includeInPractice:
- *                         type: boolean
- *                       preferredDuration:
- *                         type: integer
- *                         description: Preferred pranayama duration in minutes
  *                   notifications:
  *                     type: object
  *                     properties:
@@ -208,15 +149,10 @@ usersRouter.get("/me", getMyProfile);
  *                     type: string
  *                     enum: [en, es]
  *                     example: es
- *                   uiPreferences:
- *                     type: object
- *                     properties:
- *                       showSanskritNames:
- *                         type: boolean
- *                       audioGuidance:
- *                         type: boolean
- *                       visualMetronome:
- *                         type: boolean
+ *                   theme:
+ *                     type: string
+ *                     enum: [light, dark]
+ *                     example: dark
  *               profileImage:
  *                 type: string
  *                 format: binary
@@ -229,7 +165,7 @@ usersRouter.get("/me", getMyProfile);
  *       401:
  *         description: Unauthorized - missing or invalid token
  *       403:
- *         description: Forbidden - attempted to change role, password, or vkProgression
+ *         description: Forbidden - attempted to change role, password, or practice history metadata
  *       404:
  *         description: User not found
  *       500:
@@ -355,24 +291,6 @@ usersRouter.delete("/me", deleteMyAccount);
  *                 avgDuration:
  *                   type: integer
  *                   description: Average session duration in minutes (last 4 weeks)
- *                 vkProgression:
- *                   type: object
- *                   properties:
- *                     unlockedFamilies:
- *                       type: array
- *                       items:
- *                         type: string
- *                     completedSequencesCount:
- *                       type: integer
- *                     currentSequence:
- *                       type: object
- *                       properties:
- *                         family:
- *                           type: string
- *                         level:
- *                           type: integer
- *                         sequenceId:
- *                           type: string
  *       401:
  *         description: Unauthorized - missing or invalid token
  *       404:

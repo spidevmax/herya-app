@@ -31,7 +31,10 @@ const getAllUsers = async (req, res, next) => {
 		if (role) filter.role = role;
 
 		if (search) {
-			filter.$or = [{ name: new RegExp(search, "i") }, { email: new RegExp(search, "i") }];
+			filter.$or = [
+				{ name: new RegExp(search, "i") },
+				{ email: new RegExp(search, "i") },
+			];
 		}
 
 		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
@@ -93,9 +96,11 @@ const updateUserRole = async (req, res, next) => {
 			throw createError(400, "Invalid role. Must be 'user' or 'admin'");
 		}
 
-		const user = await User.findByIdAndUpdate(id, { role }, { returnDocument: "after" }).select(
-			"-password",
-		);
+		const user = await User.findByIdAndUpdate(
+			id,
+			{ role },
+			{ returnDocument: "after" },
+		).select("-password");
 
 		if (!user) {
 			throw createError(404, "User not found");
@@ -215,7 +220,13 @@ const createVKSequence = async (req, res, next) => {
 		await savedSequence.populate("prerequisites");
 		await savedSequence.populate("recommendedPranayama.pattern");
 
-		return sendResponse(res, 201, true, "VK Sequence created successfully", savedSequence);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"VK Sequence created successfully",
+			savedSequence,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -263,7 +274,13 @@ const updateVKSequence = async (req, res, next) => {
 			throw createError(404, "VK Sequence not found");
 		}
 
-		return sendResponse(res, 200, true, "VK Sequence updated successfully", sequence);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"VK Sequence updated successfully",
+			sequence,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -301,7 +318,10 @@ const deleteVKSequence = async (req, res, next) => {
 		const sessionCount = await Session.countDocuments({ vkSequence: id });
 
 		if (sessionCount > 0) {
-			throw createError(400, `Cannot delete: Sequence is used in ${sessionCount} sessions`);
+			throw createError(
+				400,
+				`Cannot delete: Sequence is used in ${sessionCount} sessions`,
+			);
 		}
 
 		const sequence = await VKSequence.findByIdAndDelete(id);
@@ -310,7 +330,13 @@ const deleteVKSequence = async (req, res, next) => {
 			throw createError(404, "VK Sequence not found");
 		}
 
-		return sendResponse(res, 200, true, "VK Sequence deleted successfully", null);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"VK Sequence deleted successfully",
+			null,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -480,7 +506,13 @@ const updatePose = async (req, res, next) => {
 		await updatedPose.populate("preparatoryPoses");
 		await updatedPose.populate("followUpPoses");
 
-		return sendResponse(res, 200, true, "Pose updated successfully", updatedPose);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Pose updated successfully",
+			updatedPose,
+		);
 	} catch (error) {
 		// Clean up newly uploaded images on error
 		for (const imageId of uploadedImages) {
@@ -526,7 +558,10 @@ const deletePose = async (req, res, next) => {
 		});
 
 		if (sequenceCount > 0) {
-			throw createError(400, `Cannot delete: Pose is used in ${sequenceCount} sequences`);
+			throw createError(
+				400,
+				`Cannot delete: Pose is used in ${sequenceCount} sequences`,
+			);
 		}
 
 		const pose = await Pose.findById(id);
@@ -587,7 +622,13 @@ const createBreathingPattern = async (req, res, next) => {
 
 		await savedPattern.populate("vkContext.prerequisiteBreathing");
 
-		return sendResponse(res, 201, true, "Breathing pattern created successfully", savedPattern);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"Breathing pattern created successfully",
+			savedPattern,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -632,7 +673,13 @@ const updateBreathingPattern = async (req, res, next) => {
 			throw createError(404, "Breathing pattern not found");
 		}
 
-		return sendResponse(res, 200, true, "Breathing pattern updated successfully", pattern);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Breathing pattern updated successfully",
+			pattern,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -671,7 +718,10 @@ const deleteBreathingPattern = async (req, res, next) => {
 		});
 
 		if (sessionCount > 0) {
-			throw createError(400, `Cannot delete: Pattern is used in ${sessionCount} sessions`);
+			throw createError(
+				400,
+				`Cannot delete: Pattern is used in ${sessionCount} sessions`,
+			);
 		}
 
 		const pattern = await BreathingPattern.findByIdAndDelete(id);
@@ -680,7 +730,13 @@ const deleteBreathingPattern = async (req, res, next) => {
 			throw createError(404, "Breathing pattern not found");
 		}
 
-		return sendResponse(res, 200, true, "Breathing pattern deleted successfully", null);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Breathing pattern deleted successfully",
+			null,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -835,14 +891,14 @@ const getDashboardStats = async (_, res, next) => {
  * 1. Finds user by ID.
  * 2. Aggregates completed sessions by type (count + totalMinutes per type).
  * 3. Counts total journal entries for the user.
- * 4. Reads VK progression data from user document.
+ * 4. Reads practice-history data from user document.
  * 5. Fetches 10 most recent sessions with populated sequences.
  *
  * Response:
  * - user: Basic profile + practice totals
  * - sessionsByType: Array of { _id: type, count, totalMinutes }
  * - journalCount: number
- * - vkProgression: { completedSequences, unlockedFamilies, currentLevel }
+ * - practiceHistory: { completedSequencesCount }
  * - recentSessions: Array of last 10 sessions
  *
  * Error Handling:
@@ -875,9 +931,8 @@ const getUserAnalytics = async (req, res, next) => {
 		// Journal entry count
 		const journalCount = await JournalEntry.countDocuments({ user: user._id });
 
-		// VK progression
+		// Practice history
 		const completedSequences = user.vkProgression.completedSequences.length;
-		const unlockedFamilies = user.vkProgression.unlockedFamilies.length;
 
 		// Recent activity
 		const recentSessions = await Session.find({ user: user._id })
@@ -897,10 +952,8 @@ const getUserAnalytics = async (req, res, next) => {
 			},
 			sessionsByType,
 			journalCount,
-			vkProgression: {
-				completedSequences,
-				unlockedFamilies,
-				currentLevel: user.vkProgression.currentMainSequence,
+			practiceHistory: {
+				completedSequencesCount: completedSequences,
 			},
 			recentSessions,
 		});

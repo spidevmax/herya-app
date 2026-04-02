@@ -106,7 +106,6 @@ const findOrCreateGoogleUser = async (profile) => {
 			vkProgression: {
 				currentMainSequence: null,
 				completedSequences: [],
-				unlockedFamilies: ["tadasana"],
 			},
 		});
 	} else if (!user.profileImageUrl && profile.picture) {
@@ -129,7 +128,7 @@ const findOrCreateGoogleUser = async (profile) => {
  * 4. If user exists, deletes any uploaded image from Cloudinary and throws a 400 error.
  * 5. Creates a new User instance from `req.body`.
  * 6. If a profile image is uploaded, stores the Cloudinary URL and public ID.
- * 7. Initializes VK progression with Tadasana family unlocked (all users start here).
+ * 7. Initializes internal practice-history metadata.
  * 8. Saves the user to the database.
  * 9. Generates JWT token for immediate authentication.
  * 10. Removes password from response and returns 201 with user data and token.
@@ -145,7 +144,7 @@ const findOrCreateGoogleUser = async (profile) => {
  * - Email uniqueness is enforced both in the schema and manually checked here for better UX feedback.
  * - The imageUploaded flag prevents duplicate image deletion attempts.
  * - Profile image is optional during registration.
- * - New users start with Tadasana family unlocked by default.
+ * - Practice history metadata is stored internally and not exposed as an access gate.
  * - Returns both user data and token for immediate login (improved UX).
  */
 
@@ -175,11 +174,10 @@ const register = async (req, res, next) => {
 			imageUploaded = true;
 		}
 
-		// Initialize VK progression with Tadasana unlocked (all users start here)
+		// Initialize internal practice-history metadata
 		user.vkProgression = {
 			currentMainSequence: null,
 			completedSequences: [],
-			unlockedFamilies: ["tadasana"], // Everyone starts with Tadasana
 		};
 
 		const userDB = await user.save();

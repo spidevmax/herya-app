@@ -3,11 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 
 export default function Register() {
 	const navigate = useNavigate();
 	const { register } = useAuth();
+	const { t } = useLanguage();
 	const [form, setForm] = useState({
 		name: "",
 		email: "",
@@ -24,7 +26,7 @@ export default function Register() {
 		setError("");
 
 		if (form.password !== form.passwordConfirm) {
-			setError("Passwords don't match");
+			setError(t("register.password_mismatch"));
 			return;
 		}
 
@@ -37,7 +39,7 @@ export default function Register() {
 			});
 			navigate("/");
 		} catch (err) {
-			setError(err?.response?.data?.message || "Registration failed");
+			setError(err?.response?.data?.message || t("register.error"));
 		} finally {
 			setLoading(false);
 		}
@@ -64,7 +66,7 @@ export default function Register() {
 								color: "var(--color-text-primary)",
 							}}
 						>
-							Create account
+							{t("register.heading")}
 						</h1>
 						<p
 							className="mt-2 text-sm font-medium"
@@ -73,7 +75,7 @@ export default function Register() {
 								color: "var(--color-text-secondary)",
 							}}
 						>
-							Start your practice journey.
+							{t("register.subtitle")}
 						</p>
 					</div>
 
@@ -101,7 +103,7 @@ export default function Register() {
 								type="text"
 								autoComplete="name"
 								required
-								placeholder="Full name"
+								placeholder={t("register.full_name")}
 								value={form.name}
 								onChange={(e) =>
 									setForm((f) => ({ ...f, name: e.target.value }))
@@ -123,7 +125,7 @@ export default function Register() {
 								type="email"
 								autoComplete="email"
 								required
-								placeholder="Email"
+								placeholder={t("login.email_placeholder")}
 								value={form.email}
 								onChange={(e) =>
 									setForm((f) => ({ ...f, email: e.target.value }))
@@ -145,7 +147,7 @@ export default function Register() {
 								type={showPw ? "text" : "password"}
 								autoComplete="new-password"
 								required
-								placeholder="Password"
+								placeholder={t("register.password_placeholder")}
 								value={form.password}
 								onChange={(e) =>
 									setForm((f) => ({ ...f, password: e.target.value }))
@@ -175,7 +177,7 @@ export default function Register() {
 								type={showConfirmPw ? "text" : "password"}
 								autoComplete="new-password"
 								required
-								placeholder="Confirm password"
+								placeholder={t("register.confirm_password")}
 								value={form.passwordConfirm}
 								onChange={(e) =>
 									setForm((f) => ({ ...f, passwordConfirm: e.target.value }))
@@ -197,7 +199,7 @@ export default function Register() {
 						</div>
 
 						<Button type="submit" disabled={loading} className="mt-1 w-full">
-							{loading ? "Creating account..." : "Create account"}
+							{loading ? t("register.submitting") : t("register.heading")}
 						</Button>
 					</form>
 
@@ -208,13 +210,13 @@ export default function Register() {
 							color: "var(--color-text-secondary)",
 						}}
 					>
-						Already have an account?{" "}
+						{t("register.have_account")}{" "}
 						<Link
 							to="/login"
 							className="font-semibold hover:underline"
 							style={{ color: "var(--color-primary)" }}
 						>
-							Sign in
+							{t("register.login_link")}
 						</Link>
 					</p>
 				</motion.div>

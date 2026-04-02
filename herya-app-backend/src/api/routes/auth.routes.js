@@ -29,7 +29,7 @@ const authRouter = require("express").Router();
  * /api/v1/auth/register:
  *   post:
  *     summary: Register a new user account
- *     description: Create a new user account. Returns a JWT token for immediate authentication. All new users start with the Tadasana family unlocked.
+ *     description: Create a new user account. Returns a JWT token for immediate authentication.
  *     tags:
  *       - Authentication
  *     requestBody:

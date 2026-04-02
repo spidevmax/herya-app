@@ -1,5 +1,6 @@
 // Common UI primitives
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
 export function Card({ children, className = "", onClick, hover = true }) {
@@ -91,6 +92,7 @@ export function SkeletonCard({ lines = 3, className = "" }) {
 
 // ── LoadingSpinner ────────────────────────────────────────────────────────────
 export function LoadingSpinner({ size = 20, color = "currentColor" }) {
+	const { t } = useLanguage();
 	return (
 		<svg
 			width={size}
@@ -99,7 +101,7 @@ export function LoadingSpinner({ size = 20, color = "currentColor" }) {
 			fill="none"
 			className="animate-spin"
 		>
-			<title>Loading</title>
+			<title>{t("ui.loading")}</title>
 			<circle
 				cx="12"
 				cy="12"
@@ -170,6 +172,7 @@ export function CircleProgress({
 	color = "#5DB87F",
 	children,
 }) {
+	const { t } = useLanguage();
 	const r = (size - stroke) / 2;
 	const circ = 2 * Math.PI * r;
 	const pct = Math.min(1, value / max);
@@ -179,7 +182,7 @@ export function CircleProgress({
 			style={{ width: size, height: size }}
 		>
 			<svg width={size} height={size} className="-rotate-90">
-				<title>Progress</title>
+				<title>{t("ui.progress")}</title>
 				<circle
 					cx={size / 2}
 					cy={size / 2}
@@ -216,11 +219,16 @@ export const ConfirmModal = ({
 	onConfirm,
 	title,
 	description,
-	confirmLabel = "Confirmar",
-	cancelLabel = "Cancelar",
+	confirmLabel,
+	cancelLabel,
 	danger = false,
 	loading = false,
 }) => {
+	const { t } = useLanguage();
+	const resolvedConfirmLabel = confirmLabel ?? t("ui.confirm");
+	const resolvedCancelLabel = cancelLabel ?? t("ui.cancel");
+	const closeAriaLabel = t("ui.close_modal");
+
 	if (!open) return null;
 
 	return (
@@ -231,7 +239,7 @@ export const ConfirmModal = ({
 		>
 			<button
 				type="button"
-				aria-label="Cerrar modal"
+				aria-label={closeAriaLabel}
 				className="absolute inset-0 bg-black/40"
 				onClick={loading ? undefined : onClose}
 			/>
@@ -253,7 +261,7 @@ export const ConfirmModal = ({
 
 				<div className="mt-6 flex justify-end gap-2">
 					<Button variant="outline" onClick={onClose} disabled={loading}>
-						{cancelLabel}
+						{resolvedCancelLabel}
 					</Button>
 					<Button
 						variant={danger ? "secondary" : "primary"}
@@ -261,7 +269,7 @@ export const ConfirmModal = ({
 						disabled={loading}
 						loading={loading}
 					>
-						{confirmLabel}
+						{resolvedConfirmLabel}
 					</Button>
 				</div>
 			</motion.div>

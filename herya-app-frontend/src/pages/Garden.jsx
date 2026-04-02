@@ -5,11 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { getJournalEntries } from "@/api/journalEntries.api";
 import FlowerGarden from "@/components/garden/FlowerGarden";
 import { EmptyState } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { MOOD_COLORS } from "@/utils/constants";
 
 export default function Garden() {
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [entries, setEntries] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [selected, setSelected] = useState(null);
@@ -19,7 +21,8 @@ export default function Garden() {
 			.then((r) => {
 				// Backend returns { journals, pagination }
 				const payload = r.data?.data || r.data || {};
-				const list = payload.journals ?? (Array.isArray(payload) ? payload : []);
+				const list =
+					payload.journals ?? (Array.isArray(payload) ? payload : []);
 				setEntries(list);
 			})
 			.catch(() => setEntries([]))
@@ -37,14 +40,16 @@ export default function Garden() {
 							color: "var(--color-primary)",
 						}}
 					>
-						Your Garden
+						{t("garden.title")}
 					</h1>
 					<p
 						className="text-sm"
 						style={{ color: "var(--color-text-secondary)" }}
 					>
-						{entries.length} journal{" "}
-						{entries.length !== 1 ? "entries" : "entry"}
+						{entries.length}{" "}
+						{entries.length !== 1
+							? t("garden.entries_plural")
+							: t("garden.entries_singular")}
 					</p>
 				</div>
 				<button
@@ -61,15 +66,15 @@ export default function Garden() {
 			) : entries.length === 0 ? (
 				<EmptyState
 					icon={<BookOpen size={36} />}
-					title="Your garden is empty"
-					description="Complete sessions and add journal entries to grow your garden"
+					title={t("garden.empty_title")}
+					description={t("garden.empty_hint")}
 					className="mx-4"
 				/>
 			) : (
 				<div className="px-4">
 					<FlowerGarden entries={entries} onFlowerClick={setSelected} />
 					<p className="text-center text-[#9CA3AF] text-xs mt-3">
-						Tap a flower to see the entry
+						{t("garden.tap_hint")}
 					</p>
 				</div>
 			)}

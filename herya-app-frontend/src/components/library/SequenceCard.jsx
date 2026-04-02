@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { Clock, Lock, ChevronRight } from "lucide-react";
+import { Clock, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { VK_FAMILY_MAP } from "@/utils/constants";
 import { Badge } from "@/components/ui";
 
-export default function SequenceCard({ sequence, index = 0, unlocked = true }) {
+export default function SequenceCard({ sequence, index = 0 }) {
 	const navigate = useNavigate();
 	const family = VK_FAMILY_MAP[sequence.family] || {
 		color: "#4A72FF",
@@ -17,13 +17,8 @@ export default function SequenceCard({ sequence, index = 0, unlocked = true }) {
 			initial={{ opacity: 0, y: 16 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: index * 0.07 }}
-			onClick={() => unlocked && navigate("/library/sequence/" + sequence._id)}
-			className={
-				"flex bg-white rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(74,114,255,0.08)] transition-transform " +
-				(unlocked
-					? "cursor-pointer active:scale-[0.98]"
-					: "opacity-60 cursor-not-allowed")
-			}
+			onClick={() => navigate("/library/sequence/" + sequence._id)}
+			className="flex bg-white rounded-2xl overflow-hidden shadow-[0_2px_16px_rgba(74,114,255,0.08)] transition-transform cursor-pointer active:scale-[0.98]"
 		>
 			<div
 				className="w-1.5 flex-shrink-0"
@@ -34,11 +29,7 @@ export default function SequenceCard({ sequence, index = 0, unlocked = true }) {
 					className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
 					style={{ backgroundColor: family.color + "15" }}
 				>
-					{unlocked ? (
-						family.emoji
-					) : (
-						<Lock size={20} style={{ color: family.color }} />
-					)}
+					{family.emoji}
 				</div>
 				<div className="flex-1 min-w-0">
 					<div className="flex items-start gap-2 mb-1">

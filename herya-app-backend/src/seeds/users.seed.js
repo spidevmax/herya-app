@@ -70,7 +70,6 @@ async function seedUsers() {
 				currentStreak: 0,
 				lastPracticeDate: undefined,
 				vkProgression: {
-					unlockedFamilies: ["tadasana"],
 					currentMainSequence: null,
 					completedSequences: [],
 				},

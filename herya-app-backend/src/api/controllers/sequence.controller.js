@@ -17,25 +17,23 @@ const VKSequence = VinyasaKramaSequence;
  * - difficulty: Optional, filter by difficulty
  * - page: Optional, page number (default: 1)
  * - limit: Optional, results per page (default: 20)
- * - unlocked: Optional, for authenticated users to filter accessible sequences
+ * - unlocked: Deprecated, ignored for compatibility
  *
  * Workflow:
  * 1. Builds filter from query parameters
- * 2. For authenticated users with unlocked="true", checks accessibility
- * 3. Applies pagination
- * 4. Returns sequences with pagination metadata
+ * 2. Applies pagination
+ * 3. Returns sequences with pagination metadata
  *
  * Error Handling:
  * - Database errors passed to next(error)
  *
  * Notes:
- * - Level 1 is always accessible
- * - Higher levels require user.canAccessLevel() check
+ * - All levels are accessible
  * - Sorted by family, then level
  */
 const getSequences = async (req, res, next) => {
 	try {
-		const { family, level, difficulty, page = 1, limit = 20, unlocked } = req.query;
+		const { family, level, difficulty, page = 1, limit = 20 } = req.query;
 
 		// Build filter
 		const filter = {};
@@ -44,14 +42,7 @@ const getSequences = async (req, res, next) => {
 		if (level) filter.level = parseInt(level, 10);
 		if (difficulty) filter.difficulty = difficulty;
 
-		// Handle unlocked sequences for authenticated users
-		// canAccessLevel() returns a boolean, so we probe each level to find the highest accessible one
-		if (unlocked === "true" && req.user && family) {
-			let maxAccessibleLevel = 1;
-			if (req.user.canAccessLevel(family, 3)) maxAccessibleLevel = 3;
-			else if (req.user.canAccessLevel(family, 2)) maxAccessibleLevel = 2;
-			filter.level = { $lte: maxAccessibleLevel };
-		}
+		// Level gating is disabled: return all requested sequences regardless of user progression.
 
 		// Pagination
 		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
@@ -122,7 +113,13 @@ const getSequenceById = async (req, res, next) => {
 			throw createError(404, "Sequence not found");
 		}
 
-		return sendResponse(res, 200, true, "Sequence retrieved successfully", sequence);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Sequence retrieved successfully",
+			sequence,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -136,8 +133,7 @@ const getSequenceById = async (req, res, next) => {
  * Workflow:
  * 1. Finds all sequences in the specified family.
  * 2. Sorts by level (1, 2, 3).
- * 3. For authenticated users, marks which sequences are unlocked.
- * 4. Returns organized list.
+ * 3. Returns organized list.
  *
  * Error Handling:
  * - 400: Invalid family name
@@ -145,7 +141,7 @@ const getSequenceById = async (req, res, next) => {
  *
  * Notes:
  * - Useful for showing progression path within a family.
- * - Client can display locked/unlocked UI based on user progression.
+ * - Client can display all sequences without gating.
  */
 const getSequencesByFamily = async (req, res, next) => {
 	try {
@@ -176,22 +172,12 @@ const getSequencesByFamily = async (req, res, next) => {
 			.populate("structure.corePoses.pose")
 			.sort({ level: 1 });
 
-		// Mark which sequences are accessible if user is authenticated
-		let sequencesWithAccess = sequences;
-		if (req.user) {
-			sequencesWithAccess = sequences.map((seq) => {
-				const seqObj = seq.toObject();
-				seqObj.isAccessible = seq.level === 1 || req.user.canAccessLevel(family, seq.level);
-				return seqObj;
-			});
-		}
-
 		return sendResponse(
 			res,
 			200,
 			true,
 			`Sequences for ${family} retrieved successfully`,
-			sequencesWithAccess,
+			sequences,
 		);
 	} catch (error) {
 		return next(error);
@@ -262,11 +248,12 @@ const getRecommendedSequence = async (req, res, next) => {
 				.limit(3)
 				.populate("vkSequence");
 
-			const recentFamilies = recentSessions.map((s) => s.vkSequence?.family).filter(Boolean);
+			const recentFamilies = recentSessions
+				.map((s) => s.vkSequence?.family)
+				.filter(Boolean);
 
 			recommendedSequence = await VKSequence.findOne({
 				"therapeuticFocus.anatomicalFocus.area": mostProblematicArea,
-				level: { $lte: 2 }, // Keep it accessible
 				family: { $nin: recentFamilies }, // Avoid recent families
 			}).populate("structure.corePoses.pose");
 
@@ -294,10 +281,16 @@ const getRecommendedSequence = async (req, res, next) => {
 			}
 		}
 
-		return sendResponse(res, 200, true, "Recommendation generated successfully", {
-			sequence: recommendedSequence,
-			reason,
-		});
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Recommendation generated successfully",
+			{
+				sequence: recommendedSequence,
+				reason,
+			},
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -349,7 +342,13 @@ const searchSequences = async (req, res, next) => {
 			.sort({ score: { $meta: "textScore" } })
 			.limit(20);
 
-		return sendResponse(res, 200, true, `Found ${sequences.length} sequences`, sequences);
+		return sendResponse(
+			res,
+			200,
+			true,
+			`Found ${sequences.length} sequences`,
+			sequences,
+		);
 	} catch (error) {
 		return next(error);
 	}

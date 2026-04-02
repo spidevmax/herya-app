@@ -25,6 +25,7 @@ import {
 	Badge,
 } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 const TABS = [
 	{ key: "dashboard", label: "Dashboard" },
@@ -208,6 +209,7 @@ function ContentSection({ title, items, loading, color }) {
 
 export default function Admin() {
 	const { user } = useAuth();
+	const { t } = useLanguage();
 	const navigate = useNavigate();
 	const [tab, setTab] = useState("dashboard");
 
@@ -364,19 +366,19 @@ export default function Admin() {
 				{tab === "content" && (
 					<div className="flex flex-col gap-4">
 						<ContentSection
-							title="Posturas"
+							title={t("admin.content_poses")}
 							items={poses}
 							loading={contentLoading}
 							color="var(--color-primary)"
 						/>
 						<ContentSection
-							title="Secuencias VK"
+							title={t("admin.content_sequences")}
 							items={sequences}
 							loading={contentLoading}
 							color="var(--color-primary)"
 						/>
 						<ContentSection
-							title="Patrones de respiración"
+							title={t("admin.content_breathing")}
 							items={patterns}
 							loading={contentLoading}
 							color="var(--color-info)"

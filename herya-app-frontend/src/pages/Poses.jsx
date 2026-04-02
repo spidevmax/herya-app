@@ -2,14 +2,15 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
-import { getPoses, searchPoses } from '@/api/poses.api';
+import { getPoses, searchPoses } from "@/api/poses.api";
 import {
 	SearchBar,
 	FilterChips,
 	SkeletonCard,
 	EmptyState,
 	Badge,
-} from '@/components/ui';
+} from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 
 const DIFFICULTY_OPTIONS = [
 	{ key: "", label: "Todas", color: "var(--color-info)" },
@@ -29,7 +30,50 @@ const DIFF_LABELS = {
 	advanced: "Avanzado",
 };
 
+const normalizeList = (value) => {
+	if (Array.isArray(value)) return value.filter(Boolean);
+	if (typeof value === "string" && value.trim()) return [value.trim()];
+	return [];
+};
+
+const formatValue = (value) => {
+	if (value == null || value === "") return null;
+	if (Array.isArray(value)) return value.filter(Boolean).join(", ");
+	if (typeof value === "string") return value.replace(/_/g, " ");
+	return String(value);
+};
+
 function PoseCard({ pose, index, onClick }) {
+	const category = Array.isArray(pose.vkCategory?.primary)
+		? pose.vkCategory.primary.join(", ")
+		: typeof pose.vkCategory?.primary === "string"
+			? pose.vkCategory.primary.replace(/_/g, " ")
+			: null;
+	const secondary = normalizeList(pose.vkCategory?.secondary)
+		.slice(0, 2)
+		.map((item) => item.replace(/_/g, " "));
+	const family =
+		typeof pose.family === "string" ? pose.family.replace(/_/g, " ") : null;
+	const benefits = Array.isArray(pose.benefits)
+		? pose.benefits.slice(0, 2)
+		: typeof pose.benefits === "string"
+			? [pose.benefits]
+			: [];
+	const targetMuscles = normalizeList(pose.targetMuscles).slice(0, 3);
+	const jointFocus = normalizeList(pose.jointFocus).slice(0, 2);
+	const breathingCue = pose.breathingCue
+		? formatValue(pose.breathingCue)
+		: null;
+	const drishti = pose.drishti ? formatValue(pose.drishti) : null;
+	const energyEffect = pose.energyEffect
+		? formatValue(pose.energyEffect)
+		: null;
+	const sidedness = pose.sidedness?.type
+		? formatValue(pose.sidedness.type)
+		: null;
+	const contraindications = normalizeList(pose.contraindications).slice(0, 2);
+	const description = pose.description || "";
+
 	return (
 		<motion.button
 			type="button"
@@ -37,10 +81,10 @@ function PoseCard({ pose, index, onClick }) {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: Math.min(index * 0.03, 0.3) }}
 			onClick={onClick}
-			className="bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] rounded-2xl p-4 flex items-center gap-4 shadow-[var(--shadow-card)] w-full text-left"
+			className="bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] rounded-2xl p-4 flex items-start gap-4 shadow-[var(--shadow-card)] w-full text-left"
 		>
 			<div
-				className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden"
+				className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5"
 				style={{
 					background:
 						"linear-gradient(135deg, color-mix(in srgb, var(--color-info) 14%, transparent), color-mix(in srgb, var(--color-success) 14%, transparent))",
@@ -57,13 +101,13 @@ function PoseCard({ pose, index, onClick }) {
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
-				<p className="font-semibold text-[var(--color-text-primary)] text-sm truncate">
+				<p className="font-semibold text-[var(--color-text-primary)] text-sm leading-snug">
 					{pose.name}
 				</p>
-				<p className="text-[var(--color-text-muted)] text-xs italic truncate">
+				<p className="text-[var(--color-text-muted)] text-xs italic mt-0.5">
 					{pose.romanizationName}
 				</p>
-				<div className="flex gap-1.5 mt-1.5 flex-wrap">
+				<div className="flex gap-1.5 mt-2 flex-wrap">
 					{pose.difficulty && (
 						<Badge
 							color={DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"}
@@ -71,12 +115,85 @@ function PoseCard({ pose, index, onClick }) {
 							{DIFF_LABELS[pose.difficulty] ?? pose.difficulty}
 						</Badge>
 					)}
-					{pose.vkCategory?.primary && (
-						<Badge color="var(--color-info)">
-							{pose.vkCategory.primary.replace(/_/g, " ")}
-						</Badge>
+					{category && <Badge color="var(--color-info)">{category}</Badge>}
+					{family && <Badge color="var(--color-lavender)">{family}</Badge>}
+				</div>
+				<div className="mt-3 flex flex-col gap-2 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">
+					{breathingCue && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Respira:
+							</span>{" "}
+							{breathingCue}
+						</p>
+					)}
+					{targetMuscles.length > 0 && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Músculos:
+							</span>{" "}
+							{targetMuscles.join(", ")}
+						</p>
+					)}
+					{jointFocus.length > 0 && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Articulaciones:
+							</span>{" "}
+							{jointFocus.join(", ")}
+						</p>
+					)}
+					{drishti && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Drishti:
+							</span>{" "}
+							{drishti}
+						</p>
+					)}
+					{energyEffect && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Energía:
+							</span>{" "}
+							{energyEffect}
+						</p>
+					)}
+					{sidedness && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Lado:
+							</span>{" "}
+							{sidedness}
+						</p>
+					)}
+					{secondary.length > 0 && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Tipo:
+							</span>{" "}
+							{secondary.join(", ")}
+						</p>
+					)}
+					{contraindications.length > 0 && (
+						<p>
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Precauciones:
+							</span>{" "}
+							{contraindications.join(" · ")}
+						</p>
 					)}
 				</div>
+				{description && (
+					<p className="mt-3 text-xs leading-relaxed text-[var(--color-text-secondary)] line-clamp-2">
+						{description}
+					</p>
+				)}
+				{benefits.length > 0 && (
+					<p className="mt-2 text-[11px] leading-relaxed text-[var(--color-text-muted)]">
+						{benefits.join(" · ")}
+					</p>
+				)}
 			</div>
 		</motion.button>
 	);
@@ -84,6 +201,7 @@ function PoseCard({ pose, index, onClick }) {
 
 export default function Poses() {
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [poses, setPoses] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [query, setQuery] = useState("");
@@ -142,13 +260,13 @@ export default function Poses() {
 						/>
 					</button>
 					<h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
-						Posturas
+						{t("library.tabs_poses")}
 					</h1>
 				</div>
 				<SearchBar
 					value={query}
 					onChange={setQuery}
-					placeholder="Buscar postura…"
+					placeholder={t("library.search")}
 				/>
 			</div>
 
@@ -166,8 +284,8 @@ export default function Poses() {
 				) : poses.length === 0 ? (
 					<EmptyState
 						illustration="🧘"
-						title="Sin posturas"
-						description="Prueba con otros filtros o búsqueda"
+						title={t("library.empty_poses")}
+						description={t("library.empty_poses_hint")}
 					/>
 				) : (
 					poses.map((p, i) => (

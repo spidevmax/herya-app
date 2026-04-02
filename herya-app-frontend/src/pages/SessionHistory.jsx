@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getSessions } from "@/api/sessions.api";
 import { FilterChips, SkeletonCard, EmptyState } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
 
@@ -83,6 +84,7 @@ function SessionCard({ session, index, onClick }) {
 
 export default function SessionHistory() {
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [sessions, setSessions] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [type, setType] = useState("");
@@ -130,7 +132,7 @@ export default function SessionHistory() {
 							color: "var(--color-text-primary)",
 						}}
 					>
-						Historial
+						{t("session_history.title")}
 					</h1>
 				</div>
 				<FilterChips
@@ -149,8 +151,8 @@ export default function SessionHistory() {
 				) : sessions.length === 0 ? (
 					<EmptyState
 						illustration="📋"
-						title="Sin sesiones"
-						description="Empieza tu primera práctica"
+						title={t("session_history.empty_title")}
+						description={t("session_history.empty_hint")}
 					/>
 				) : (
 					sessions.map((s, i) => (
@@ -169,7 +171,7 @@ export default function SessionHistory() {
 						onClick={() => setPage((p) => p + 1)}
 						className="w-full py-3 rounded-2xl border border-[var(--color-border-soft)] text-[var(--color-primary)] text-sm font-semibold mt-2"
 					>
-						Cargar más
+						{t("session_history.load_more")}
 					</button>
 				)}
 			</div>

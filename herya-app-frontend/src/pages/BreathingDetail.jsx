@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, Play, Wind } from "lucide-react";
+import { ChevronLeft, Wind } from "lucide-react";
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { Button, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -61,7 +61,10 @@ export default function BreathingDetail() {
 	if (loading) {
 		return (
 			<div className="px-4 pt-4 flex flex-col gap-4">
-				<div className="h-48 rounded-3xl animate-pulse" style={{ backgroundColor: "var(--color-surface-card)" }} />
+				<div
+					className="h-48 rounded-3xl animate-pulse"
+					style={{ backgroundColor: "var(--color-surface-card)" }}
+				/>
 				<SkeletonCard />
 				<SkeletonCard />
 			</div>
@@ -72,11 +75,22 @@ export default function BreathingDetail() {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
 				<span className="text-5xl mb-3">😕</span>
-				<p className="text-lg font-bold" style={{ color: "var(--color-text-primary)", fontFamily: '"Fredoka", sans-serif' }}>
-					{t("library.tabs_breathing")} — not found
+				<p
+					className="text-lg font-bold"
+					style={{
+						color: "var(--color-text-primary)",
+						fontFamily: '"Fredoka", sans-serif',
+					}}
+				>
+					{t("breathing_detail.not_found")}
 				</p>
-				<button type="button" onClick={() => navigate(-1)} className="mt-4 text-sm font-semibold" style={{ color: "var(--color-primary)" }}>
-					← {t("sequence_detail.loading")}
+				<button
+					type="button"
+					onClick={() => navigate(-1)}
+					className="mt-4 text-sm font-semibold"
+					style={{ color: "var(--color-primary)" }}
+				>
+					← {t("breathing_detail.back")}
 				</button>
 			</div>
 		);
@@ -96,20 +110,28 @@ export default function BreathingDetail() {
 			{/* Hero banner */}
 			<div
 				className="relative px-4 pt-12 pb-8 flex flex-col items-center gap-3"
-				style={{ background: `linear-gradient(135deg, ${diffColor}22, ${diffColor}08)` }}
+				style={{
+					background: `linear-gradient(135deg, ${diffColor}22, ${diffColor}08)`,
+				}}
 			>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
 					className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
-					style={{ backgroundColor: "var(--color-surface-card)", color: "var(--color-text-primary)" }}
+					style={{
+						backgroundColor: "var(--color-surface-card)",
+						color: "var(--color-text-primary)",
+					}}
 				>
 					<ChevronLeft size={20} />
 				</button>
 
 				<div
 					className="w-24 h-24 rounded-3xl flex items-center justify-center text-5xl border-4 shadow-lg"
-					style={{ backgroundColor: "var(--color-surface-card)", borderColor: diffColor }}
+					style={{
+						backgroundColor: "var(--color-surface-card)",
+						borderColor: diffColor,
+					}}
 				>
 					{energyEmoji}
 				</div>
@@ -117,12 +139,18 @@ export default function BreathingDetail() {
 				<div className="text-center">
 					<h1
 						className="text-2xl font-bold"
-						style={{ color: "var(--color-text-primary)", fontFamily: '"Fredoka", sans-serif' }}
+						style={{
+							color: "var(--color-text-primary)",
+							fontFamily: '"Fredoka", sans-serif',
+						}}
 					>
 						{pattern.romanizationName}
 					</h1>
 					{pattern.iastName && (
-						<p className="text-sm italic" style={{ color: "var(--color-text-secondary)" }}>
+						<p
+							className="text-sm italic"
+							style={{ color: "var(--color-text-secondary)" }}
+						>
 							{pattern.iastName}
 						</p>
 					)}
@@ -143,7 +171,10 @@ export default function BreathingDetail() {
 					{pattern.energyEffect && (
 						<span
 							className="px-3 py-1 rounded-full text-xs font-semibold border"
-							style={{ borderColor: "var(--color-border)", color: "var(--color-text-secondary)" }}
+							style={{
+								borderColor: "var(--color-border)",
+								color: "var(--color-text-secondary)",
+							}}
 						>
 							{energyEmoji} {pattern.energyEffect}
 						</span>
@@ -154,26 +185,55 @@ export default function BreathingDetail() {
 			<div className="px-4 pt-5 flex flex-col gap-5">
 				{/* Description */}
 				{pattern.description && (
-					<p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
+					<p
+						className="text-sm leading-relaxed"
+						style={{ color: "var(--color-text-secondary)" }}
+					>
 						{pattern.description}
 					</p>
 				)}
 
 				{/* Ratio visual */}
 				{ratioStr && (
-					<div className="rounded-3xl p-5" style={{ backgroundColor: "var(--color-surface-card)" }}>
-						<p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: "var(--color-text-muted)" }}>
-							{t("pranayama.inhale")} · {t("pranayama.hold")} · {t("pranayama.exhale")} · Hold
+					<div
+						className="rounded-3xl p-5"
+						style={{ backgroundColor: "var(--color-surface-card)" }}
+					>
+						<p
+							className="text-xs font-bold uppercase tracking-widest mb-4"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{t("pranayama.inhale")} · {t("pranayama.hold")} ·{" "}
+							{t("pranayama.exhale")} · {t("pranayama.hold")}
 						</p>
 						<div className="flex justify-around">
-							<RatioBox label={t("pranayama.inhale")} value={ratio.inhale ?? 1} color="var(--color-primary)" />
-							<RatioBox label={t("pranayama.hold")} value={ratio.hold ?? 0} color="var(--color-secondary)" />
-							<RatioBox label={t("pranayama.exhale")} value={ratio.exhale ?? 1} color="var(--color-accent)" />
-							<RatioBox label="Hold" value={ratio.holdAfterExhale ?? 0} color="var(--color-info)" />
+							<RatioBox
+								label={t("pranayama.inhale")}
+								value={ratio.inhale ?? 1}
+								color="var(--color-primary)"
+							/>
+							<RatioBox
+								label={t("pranayama.hold")}
+								value={ratio.hold ?? 0}
+								color="var(--color-secondary)"
+							/>
+							<RatioBox
+								label={t("pranayama.exhale")}
+								value={ratio.exhale ?? 1}
+								color="var(--color-accent)"
+							/>
+							<RatioBox
+								label={t("pranayama.hold")}
+								value={ratio.holdAfterExhale ?? 0}
+								color="var(--color-info)"
+							/>
 						</div>
 						<p
 							className="text-center mt-4 text-lg font-bold"
-							style={{ color: "var(--color-text-primary)", fontFamily: '"Fredoka", sans-serif' }}
+							style={{
+								color: "var(--color-text-primary)",
+								fontFamily: '"Fredoka", sans-serif',
+							}}
 						>
 							{ratioStr}
 						</p>
@@ -182,13 +242,26 @@ export default function BreathingDetail() {
 
 				{/* Benefits */}
 				{benefits.length > 0 && (
-					<div className="rounded-2xl p-4" style={{ backgroundColor: "var(--color-surface-card)" }}>
-						<h3 className="font-bold mb-3" style={{ color: "var(--color-text-primary)", fontFamily: '"Fredoka", sans-serif' }}>
-							Beneficios
+					<div
+						className="rounded-2xl p-4"
+						style={{ backgroundColor: "var(--color-surface-card)" }}
+					>
+						<h3
+							className="font-bold mb-3"
+							style={{
+								color: "var(--color-text-primary)",
+								fontFamily: '"Fredoka", sans-serif',
+							}}
+						>
+							{t("breathing_detail.benefits")}
 						</h3>
 						<ul className="flex flex-col gap-2">
 							{benefits.map((b) => (
-								<li key={b} className="flex items-start gap-2 text-sm" style={{ color: "var(--color-text-secondary)" }}>
+								<li
+									key={b}
+									className="flex items-start gap-2 text-sm"
+									style={{ color: "var(--color-text-secondary)" }}
+								>
 									<span style={{ color: "var(--color-primary)" }}>✓</span>
 									{b}
 								</li>
@@ -200,19 +273,28 @@ export default function BreathingDetail() {
 				{/* Step-by-step instructions */}
 				{instructions.length > 0 && (
 					<div>
-						<h3 className="font-bold mb-3" style={{ color: "var(--color-text-primary)", fontFamily: '"Fredoka", sans-serif' }}>
-							Instrucciones
+						<h3
+							className="font-bold mb-3"
+							style={{
+								color: "var(--color-text-primary)",
+								fontFamily: '"Fredoka", sans-serif',
+							}}
+						>
+							{t("breathing_detail.instructions")}
 						</h3>
 						<ol className="flex flex-col gap-3">
-							{instructions.map((step, i) => (
-								<li key={`step-${i}`} className="flex items-start gap-3">
+							{instructions.map((step) => (
+								<li key={`step-${step}`} className="flex items-start gap-3">
 									<span
 										className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
 										style={{ backgroundColor: "var(--color-primary)" }}
 									>
 										{i + 1}
 									</span>
-									<p className="text-sm leading-relaxed flex-1" style={{ color: "var(--color-text-secondary)" }}>
+									<p
+										className="text-sm leading-relaxed flex-1"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
 										{step}
 									</p>
 								</li>
