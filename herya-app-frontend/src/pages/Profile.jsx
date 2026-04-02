@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Camera, LogOut } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	deleteMyAccount,
 	updateProfile,
@@ -9,7 +9,6 @@ import {
 import { Button, ConfirmModal, LoadingSpinner } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
 
 const GOAL_OPTIONS = [
 	"increase_flexibility",
@@ -116,15 +115,13 @@ function Toggle({ id, checked, onChange }) {
 
 export default function Profile() {
 	const { user, logout, updateUser } = useAuth();
-	const { t, setLanguage } = useLanguage();
-	const { setTheme } = useTheme();
+	const { t } = useLanguage();
 	const [savingProfile, setSavingProfile] = useState(false);
 	const [saveSuccess, setSaveSuccess] = useState(false);
 	const [uploadingPhoto, setUploadingPhoto] = useState(false);
 	const [deletingAccount, setDeletingAccount] = useState(false);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 	const [draft, setDraft] = useState(() => createInitialDraft(user));
-	const languageRequestId = useRef(0);
 	const fileInputRef = useRef(null);
 
 	useEffect(() => {
@@ -168,18 +165,6 @@ export default function Profile() {
 				: [...values, value];
 			return next;
 		});
-	};
-
-	const handleLanguageChange = async (newLang) => {
-		const requestId = ++languageRequestId.current;
-		setLanguage(newLang);
-		setPreference("preferences.language", newLang);
-		const response = await updateProfile({
-			preferences: { language: newLang },
-		});
-		const updatedUser = response?.data?.data || response?.data;
-		if (updatedUser && requestId === languageRequestId.current)
-			updateUser(updatedUser);
 	};
 
 	const handleSaveProfile = async () => {
@@ -583,7 +568,7 @@ export default function Profile() {
 									<select
 										value={draft.preferences.language}
 										onChange={(event) =>
-											handleLanguageChange(event.target.value)
+											setPreference("preferences.language", event.target.value)
 										}
 										className="w-full rounded-xl px-4 py-3 border outline-none"
 										style={inputStyle}
@@ -601,11 +586,9 @@ export default function Profile() {
 									</span>
 									<select
 										value={draft.preferences.theme}
-										onChange={(event) => {
-											const value = event.target.value;
-											setPreference("preferences.theme", value);
-											setTheme(value);
-										}}
+										onChange={(event) =>
+											setPreference("preferences.theme", event.target.value)
+										}
 										className="w-full rounded-xl px-4 py-3 border outline-none"
 										style={inputStyle}
 									>
