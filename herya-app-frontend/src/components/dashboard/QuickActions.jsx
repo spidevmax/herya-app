@@ -1,31 +1,36 @@
 import { motion } from "framer-motion";
 import { BookOpen, Leaf, Play, Wind } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 const ACTIONS = [
 	{
-		label: "Library",
+		key: "library",
+		labelKey: "nav.library",
 		icon: BookOpen,
 		color: "#4A72FF",
 		bg: "#4A72FF15",
 		to: "/library",
 	},
 	{
-		label: "Garden",
+		key: "garden",
+		labelKey: "dashboard.quick_garden",
 		icon: Leaf,
 		color: "#5DB075",
 		bg: "#5DB07515",
 		to: "/garden",
 	},
 	{
-		label: "Pranayama",
+		key: "pranayama",
+		labelKey: "fab.pranayama",
 		icon: Wind,
 		color: "#9B5DE5",
 		bg: "#9B5DE515",
 		to: "/session/pranayama",
 	},
 	{
-		label: "Practice",
+		key: "practice",
+		labelKey: "dashboard.quick_start",
 		icon: Play,
 		color: "#FFB347",
 		bg: "#FFB34715",
@@ -33,19 +38,43 @@ const ACTIONS = [
 	},
 ];
 
-export default function QuickActions() {
+/** Reorder quick actions based on user preferences — no new data required. */
+function getOrderedActions(user) {
+	const timeOfDay = user?.preferences?.timeOfDay;
+	const goals = Array.isArray(user?.goals) ? user.goals : [];
+	const wantsMeditation =
+		goals.includes("breath_awareness") || goals.includes("meditation_focus");
+
+	if (timeOfDay === "morning" || wantsMeditation) {
+		return [
+			...ACTIONS.filter((a) => a.key === "pranayama"),
+			...ACTIONS.filter((a) => a.key === "practice"),
+			...ACTIONS.filter((a) => a.key !== "pranayama" && a.key !== "practice"),
+		];
+	}
+	if (timeOfDay === "evening") {
+		return [
+			...ACTIONS.filter((a) => a.key === "practice"),
+			...ACTIONS.filter((a) => a.key === "pranayama"),
+			...ACTIONS.filter((a) => a.key !== "practice" && a.key !== "pranayama"),
+		];
+	}
+	return ACTIONS;
+}
+
+export default function QuickActions({ user }) {
 	const navigate = useNavigate();
+	const { t } = useLanguage();
+	const actions = getOrderedActions(user);
+
 	return (
-		<div>
-			<h3 className="text-sm font-bold text-[#6B7280] mb-3 px-4 uppercase tracking-wider">
-				Quick Start
-			</h3>
-			<div className="grid grid-cols-4 gap-2 px-4">
-				{ACTIONS.map((a, i) => {
+		<div className="px-4 sm:px-6">
+			<div className="grid grid-cols-4 gap-2">
+				{actions.map((a, i) => {
 					const Icon = a.icon;
 					return (
 						<motion.button
-							key={a.to}
+							key={a.key}
 							initial={{ opacity: 0, y: 12 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: i * 0.07 }}
@@ -59,7 +88,7 @@ export default function QuickActions() {
 								className="text-[11px] font-semibold"
 								style={{ color: a.color }}
 							>
-								{a.label}
+								{t(a.labelKey)}
 							</span>
 						</motion.button>
 					);

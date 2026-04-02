@@ -1,5 +1,6 @@
-import { useMemo } from "react";
 import { motion } from "framer-motion";
+import { useMemo } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 import { DAY_LABELS } from "@/utils/constants";
 
 function getCalendarDays(sessionDates = []) {
@@ -21,25 +22,44 @@ function getCalendarDays(sessionDates = []) {
 	});
 }
 
-export default function CalendarStrip({ sessionDates = [], streak = 0 }) {
+export default function CalendarStrip({
+	sessionDates = [],
+	streak = 0,
+	weekSessions = null,
+}) {
+	const { t } = useLanguage();
 	const days = useMemo(() => getCalendarDays(sessionDates), [sessionDates]);
+
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-3 px-4">
+			<div className="flex items-center justify-between mb-3 px-4 sm:px-6">
 				<span
-					className="text-sm font-semibold"
-					style={{ color: "var(--color-text-secondary)" }}
+					className="text-[11px] font-bold uppercase tracking-[0.1em]"
+					style={{ color: "var(--color-text-muted)" }}
 				>
-					Your Practice
+					{t("dashboard.practice_label")}
 				</span>
-				<span
-					className="flex items-center gap-1 font-bold text-sm"
-					style={{ color: "var(--color-secondary)" }}
-				>
-					{streak} day streak
-				</span>
+				<div className="flex items-center gap-2">
+					{weekSessions !== null && weekSessions > 0 && (
+						<span
+							className="text-xs font-medium px-2 py-0.5 rounded-full"
+							style={{
+								backgroundColor: "var(--color-surface)",
+								color: "var(--color-text-secondary)",
+							}}
+						>
+							{t("dashboard.sessions_this_week", { n: weekSessions })}
+						</span>
+					)}
+					<span
+						className="font-bold text-sm"
+						style={{ color: "var(--color-secondary)" }}
+					>
+						{t("dashboard.day_streak", { n: streak })}
+					</span>
+				</div>
 			</div>
-			<div className="flex gap-2 overflow-x-auto px-4 pb-1">
+			<div className="flex gap-2 overflow-x-auto px-4 sm:px-6 pb-1">
 				{days.map((d, i) => (
 					<motion.div
 						key={d.iso}
@@ -49,10 +69,12 @@ export default function CalendarStrip({ sessionDates = [], streak = 0 }) {
 						className="flex-shrink-0 flex flex-col items-center gap-1 w-10"
 					>
 						<span
-							className={
-								"text-[10px] font-semibold " +
-								(d.isToday ? "text-[#4A72FF]" : "text-[#9CA3AF]")
-							}
+							className="text-[10px] font-semibold"
+							style={{
+								color: d.isToday
+									? "var(--color-primary)"
+									: "var(--color-text-muted)",
+							}}
 						>
 							{d.label}
 						</span>
@@ -69,7 +91,7 @@ export default function CalendarStrip({ sessionDates = [], streak = 0 }) {
 										? "white"
 										: "var(--color-text-secondary)",
 								boxShadow: d.isToday
-									? "0 4px 12px rgba(93, 184, 127, 0.4)"
+									? "0 4px 12px rgba(78,139,106,0.35)"
 									: "none",
 							}}
 						>

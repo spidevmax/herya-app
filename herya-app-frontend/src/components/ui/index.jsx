@@ -1,6 +1,7 @@
 // Common UI primitives
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Search, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
@@ -18,6 +19,35 @@ export function Card({ children, className = "", onClick, hover = true }) {
 		</motion.div>
 	);
 }
+
+// ── SearchBar ────────────────────────────────────────────────────────────────
+export const SearchBar = ({ value, onChange, placeholder = "Search..." }) => {
+	return (
+		<div className="relative">
+			<Search
+				size={18}
+				className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+			/>
+			<input
+				type="search"
+				value={value}
+				onChange={(e) => onChange(e.target.value)}
+				placeholder={placeholder}
+				className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] py-3 pl-11 pr-11 text-sm text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
+			/>
+			{value ? (
+				<button
+					type="button"
+					onClick={() => onChange("")}
+					aria-label="Clear search"
+					className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
+				>
+					<X size={16} />
+				</button>
+			) : null}
+		</div>
+	);
+};
 
 // ── Button ────────────────────────────────────────────────────────────────────
 export function Button({
@@ -61,6 +91,137 @@ export function Button({
 		</button>
 	);
 }
+
+// ── StatCard ──────────────────────────────────────────────────────────────────
+export const StatCard = ({
+	icon,
+	label,
+	value,
+	color = "var(--color-primary)",
+}) => {
+	return (
+		<div
+			className="rounded-xl p-3 flex flex-col gap-2"
+			style={{
+				backgroundColor: `${color}15`,
+				borderLeft: `3px solid ${color}`,
+			}}
+		>
+			<div className="flex items-center gap-2" style={{ color }}>
+				{icon}
+				<p className="text-xs font-medium text-[var(--color-text-secondary)]">
+					{label}
+				</p>
+			</div>
+			<p
+				className="text-xl font-bold"
+				style={{ color: "var(--color-text-primary)" }}
+			>
+				{value}
+			</p>
+		</div>
+	);
+};
+
+// ── TabBar ────────────────────────────────────────────────────────────────────
+export const TabBar = ({ tabs, active, onSelect, className = "" }) => {
+	return (
+		<div
+			className={`flex gap-2 border-b border-[var(--color-border)] ${className}`}
+		>
+			{tabs.map((tab) => {
+				const tabId = tab.id ?? tab.key;
+				return (
+					<button
+						type="button"
+						key={tabId}
+						onClick={() => onSelect(tabId)}
+						className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+							active === tabId
+								? "border-[var(--color-primary)] text-[var(--color-primary)]"
+								: "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+						}`}
+					>
+						{tab.label}
+					</button>
+				);
+			})}
+		</div>
+	);
+};
+
+// ── MoodSelector ──────────────────────────────────────────────────────────────
+const MOOD_EMOJIS = {
+	energized: "⚡",
+	calm: "🌙",
+	focused: "🎯",
+	tired: "😴",
+	stiff: "🪨",
+	peaceful: "🕉️",
+	grateful: "🙏",
+	anxious: "🌀",
+};
+
+export const MoodSelector = ({ value, onChange, label }) => {
+	const { t } = useLanguage();
+	const moods = Object.keys(MOOD_EMOJIS);
+
+	return (
+		<div className="flex flex-col gap-3">
+			{label && (
+				<p className="text-sm font-medium text-[var(--color-text-primary)]">
+					{label}
+				</p>
+			)}
+			<div className="grid grid-cols-4 gap-2">
+				{moods.map((mood) => (
+					<motion.button
+						key={mood}
+						type="button"
+						onClick={() => onChange(mood)}
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}
+						className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
+							value === mood
+								? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
+								: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+						}`}
+					>
+						<span className="text-2xl mb-1">{MOOD_EMOJIS[mood]}</span>
+						<span>{t(`session.moods.${mood}`)}</span>
+					</motion.button>
+				))}
+			</div>
+		</div>
+	);
+};
+
+// ── FilterChips ───────────────────────────────────────────────────────────────
+export const FilterChips = ({ options, selected, onSelect }) => {
+	return (
+		<div className="flex gap-2 flex-wrap">
+			{options.map((option) => (
+				<motion.button
+					key={option.key}
+					type="button"
+					onClick={() => onSelect(option.key)}
+					whileHover={{ scale: 1.05 }}
+					whileTap={{ scale: 0.95 }}
+					className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+						selected === option.key
+							? "text-white shadow-[var(--shadow-card)]"
+							: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+					}`}
+					style={
+						selected === option.key ? { backgroundColor: option.color } : {}
+					}
+				>
+					{option.label}
+				</motion.button>
+			))}
+		</div>
+	);
+};
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
 export function Badge({ children, color = "#5DB87F", className = "" }) {
@@ -270,7 +431,10 @@ export const ConfirmModal = ({
 
 				{confirmPhrase ? (
 					<div className="mt-4 space-y-1.5">
-						<p className="text-xs font-medium" style={{ color: "var(--color-text-muted)" }}>
+						<p
+							className="text-xs font-medium"
+							style={{ color: "var(--color-text-muted)" }}
+						>
 							{t("ui.type_to_confirm", { phrase: confirmPhrase })}
 						</p>
 						<input
@@ -281,7 +445,9 @@ export const ConfirmModal = ({
 							className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
 							style={{
 								backgroundColor: "var(--color-surface)",
-								borderColor: confirmBlocked ? "var(--color-border)" : "var(--color-danger)",
+								borderColor: confirmBlocked
+									? "var(--color-border)"
+									: "var(--color-danger)",
 								color: "var(--color-text-primary)",
 							}}
 						/>
@@ -297,7 +463,11 @@ export const ConfirmModal = ({
 						onClick={onConfirm}
 						disabled={loading || confirmBlocked}
 						loading={loading}
-						style={danger ? { backgroundColor: "var(--color-danger)", boxShadow: "none" } : {}}
+						style={
+							danger
+								? { backgroundColor: "var(--color-danger)", boxShadow: "none" }
+								: {}
+						}
 					>
 						{resolvedConfirmLabel}
 					</Button>

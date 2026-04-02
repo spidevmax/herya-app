@@ -1,18 +1,20 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Clock, Dumbbell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
 import { Button } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
+import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
 
-export default function HeroCard({ sequence, loading }) {
+export default function HeroCard({ sequence, reason, loading }) {
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 
-	if (loading) return <div className="mx-4 rounded-3xl h-52 skeleton" />;
+	if (loading) return <div className="mx-4 sm:mx-6 rounded-3xl h-52 skeleton" />;
 
 	if (!sequence) {
 		return (
 			<div
-				className="mx-4 rounded-3xl p-6 text-white"
+				className="mx-4 sm:mx-6 rounded-3xl p-6 text-white"
 				style={{
 					background:
 						"linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
@@ -20,22 +22,19 @@ export default function HeroCard({ sequence, loading }) {
 			>
 				<h2
 					className="text-2xl font-semibold mb-2"
-					style={{ fontFamily: '"DM Sans", sans-serif' }}
+					style={{ fontFamily: '"Fredoka", sans-serif' }}
 				>
-					Welcome
+					{t("dashboard.welcome_title")}
 				</h2>
-				<p
-					className="text-white/80 text-sm font-medium mb-4"
-					style={{ fontFamily: '"DM Sans", sans-serif' }}
-				>
-					Start your first VK session to get personalised recommendations.
+				<p className="text-white/80 text-sm font-medium mb-4">
+					{t("hero.welcome_hint")}
 				</p>
 				<Button
 					variant="ghost"
 					className="text-white border border-white/40 hover:bg-white/20"
 					onClick={() => navigate("/library")}
 				>
-					Explore Library <ArrowRight size={16} />
+					{t("hero.explore")} <ArrowRight size={16} />
 				</Button>
 			</div>
 		);
@@ -51,40 +50,34 @@ export default function HeroCard({ sequence, loading }) {
 		<motion.div
 			initial={{ opacity: 0, scale: 0.96 }}
 			animate={{ opacity: 1, scale: 1 }}
-			className="mx-4 rounded-3xl overflow-hidden cursor-pointer"
-			onClick={() => navigate("/library/sequence/" + sequence._id)}
+			className="mx-4 sm:mx-6 rounded-3xl overflow-hidden cursor-pointer"
+			onClick={() => navigate(`/library/sequence/${sequence._id}`)}
 			whileTap={{ scale: 0.98 }}
 		>
 			<div
 				className="p-6 relative overflow-hidden"
 				style={{
-					background:
-						"linear-gradient(135deg, " +
-						family.color +
-						", " +
-						family.color +
-						"CC)",
+					background: `linear-gradient(135deg, ${family.color}, ${family.color}CC)`,
 				}}
 			>
 				<div className="absolute right-4 top-1/2 -translate-y-1/2 text-8xl opacity-20 float select-none pointer-events-none">
 					{family.emoji}
 				</div>
-				<span
-					className="inline-flex items-center gap-1 text-xs font-medium text-white/80 uppercase tracking-widest mb-3"
-					style={{ fontFamily: '"DM Sans", sans-serif' }}
-				>
-					Recommended for you
+				<span className="inline-flex items-center gap-1 text-xs font-medium text-white/80 uppercase tracking-widest mb-1">
+					{t("dashboard.recommended")}
 				</span>
+				{reason ? (
+					<p className="text-white/60 text-[11px] mb-2 italic">{reason}</p>
+				) : (
+					<div className="mb-2" />
+				)}
 				<h2
 					className="text-2xl font-semibold text-white leading-tight mb-1"
-					style={{ fontFamily: '"DM Sans", sans-serif' }}
+					style={{ fontFamily: '"Fredoka", sans-serif' }}
 				>
 					{sequence.englishName}
 				</h2>
-				<p
-					className="text-white/80 text-xs font-medium italic mb-4"
-					style={{ fontFamily: '"DM Sans", sans-serif' }}
-				>
+				<p className="text-white/80 text-xs font-medium italic mb-4">
 					{sequence.sanskritName}
 				</p>
 				<div className="flex items-center gap-3 mb-5">
@@ -109,10 +102,10 @@ export default function HeroCard({ sequence, loading }) {
 					style={{ color: family.color }}
 					onClick={(e) => {
 						e.stopPropagation();
-						navigate("/session/vk_sequence?seq=" + sequence._id);
+						navigate(`/session/vk_sequence?seq=${sequence._id}`);
 					}}
 				>
-					Start Practice <ArrowRight size={16} />
+					{t("hero.start")} <ArrowRight size={16} />
 				</button>
 			</div>
 		</motion.div>
