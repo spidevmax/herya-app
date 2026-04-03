@@ -7,6 +7,17 @@ import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
 
+const toUniqueMoodTokens = (moods, prefix) => {
+	const seen = {};
+	return moods.map((mood) => {
+		seen[mood] = (seen[mood] ?? 0) + 1;
+		return {
+			mood,
+			key: `${prefix}-${mood}-${seen[mood]}`,
+		};
+	});
+};
+
 const TYPE_CONFIG = {
 	vk_sequence: {
 		emoji: "🧘",
@@ -87,6 +98,12 @@ export default function SessionDetail() {
 			</div>
 		);
 	}
+
+	const moodBeforeTokens = toUniqueMoodTokens(
+		session.moodBefore ?? [],
+		"before",
+	);
+	const moodAfterTokens = toUniqueMoodTokens(session.moodAfter ?? [], "after");
 
 	const cfg = TYPE_CONFIG[session.sessionType] ?? {
 		emoji: "🧘",
@@ -194,9 +211,9 @@ export default function SessionDetail() {
 									{t("session_detail.before")}
 								</p>
 								<div className="flex gap-1.5 flex-wrap">
-									{session.moodBefore.map((m) => (
-										<Badge key={m} color="var(--color-primary)">
-											{t(`session.moods.${m}`)}
+									{moodBeforeTokens.map(({ mood, key }) => (
+										<Badge key={key} color="var(--color-primary)">
+											{t(`session.moods.${mood}`)}
 										</Badge>
 									))}
 								</div>
@@ -208,9 +225,9 @@ export default function SessionDetail() {
 									{t("session_detail.after")}
 								</p>
 								<div className="flex gap-1.5 flex-wrap">
-									{session.moodAfter.map((m) => (
-										<Badge key={m} color="var(--color-primary)">
-											{t(`session.moods.${m}`)}
+									{moodAfterTokens.map(({ mood, key }) => (
+										<Badge key={key} color="var(--color-primary)">
+											{t(`session.moods.${mood}`)}
 										</Badge>
 									))}
 								</div>

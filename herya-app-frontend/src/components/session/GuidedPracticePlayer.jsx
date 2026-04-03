@@ -52,14 +52,16 @@ export default function GuidedPracticePlayer({
 			});
 		}, 5000);
 		return () => clearInterval(id);
-	}, [timer.isRunning, timer.currentBlockIndex, timer.globalElapsedSec, onSaveProgress]);
+	}, [
+		timer.isRunning,
+		timer.currentBlockIndex,
+		timer.globalElapsedSec,
+		onSaveProgress,
+	]);
 
 	// Play sound on block change
 	useEffect(() => {
-		if (
-			timer.currentBlockIndex !== prevBlockRef.current &&
-			timer.isRunning
-		) {
+		if (timer.currentBlockIndex !== prevBlockRef.current && timer.isRunning) {
 			prevBlockRef.current = timer.currentBlockIndex;
 			try {
 				if (!blockChangeAudioRef.current) {
@@ -74,10 +76,7 @@ export default function GuidedPracticePlayer({
 				osc.frequency.value = 528;
 				osc.type = "sine";
 				gain.gain.setValueAtTime(0.15, ctx.currentTime);
-				gain.gain.exponentialRampToValueAtTime(
-					0.001,
-					ctx.currentTime + 0.8,
-				);
+				gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
 				osc.start(ctx.currentTime);
 				osc.stop(ctx.currentTime + 0.8);
 			} catch {
@@ -106,8 +105,7 @@ export default function GuidedPracticePlayer({
 	const nextBlock = blocks[timer.currentBlockIndex + 1] || null;
 	const blockColor =
 		BLOCK_TYPE_COLORS[currentBlock?.blockType] || "var(--color-primary)";
-	const blockIcon =
-		BLOCK_TYPE_ICONS[currentBlock?.blockType] || "🧘";
+	const blockIcon = BLOCK_TYPE_ICONS[currentBlock?.blockType] || "🧘";
 
 	return (
 		<div className="flex flex-col gap-5 pt-2 pb-4">
@@ -153,7 +151,11 @@ export default function GuidedPracticePlayer({
 			<div className="flex justify-center gap-1.5">
 				{blocks.map((block, idx) => (
 					<button
-						key={block.order ?? idx}
+						key={
+							block.id ??
+							block._id ??
+							`block-${block.order ?? block.label ?? block.blockType}`
+						}
 						type="button"
 						onClick={() => timer.goToBlock(idx)}
 						className="transition-all rounded-full"
@@ -329,11 +331,7 @@ export default function GuidedPracticePlayer({
 
 			{/* Finish / Abandon */}
 			<div className="flex gap-2 pt-2">
-				<Button
-					variant="ghost"
-					className="flex-1"
-					onClick={handleAbandon}
-				>
+				<Button variant="ghost" className="flex-1" onClick={handleAbandon}>
 					<Square size={14} />
 					{t("practice.end_session")}
 				</Button>

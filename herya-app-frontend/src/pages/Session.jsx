@@ -689,7 +689,7 @@ export default function Session() {
 											<div className="flex-1 flex justify-center gap-1">
 												{practicePoses.map((pose, idx) => (
 													<button
-														key={`pose-dot-${typeof pose === "string" ? pose : pose._id || idx}`}
+														key={`pose-dot-${typeof pose === "string" ? pose : pose._id || pose.id || pose.englishName || pose.name}`}
 														type="button"
 														onClick={() => setCurrentPoseIndex(idx)}
 														className={

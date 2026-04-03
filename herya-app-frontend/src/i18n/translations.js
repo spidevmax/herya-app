@@ -13,6 +13,7 @@ export const translations = {
 			home: "Home",
 			library: "Library",
 			journal: "Journal",
+			garden: "Garden",
 			profile: "Profile",
 		},
 		fab: {
@@ -587,6 +588,7 @@ export const translations = {
 			home: "Inicio",
 			library: "Biblioteca",
 			journal: "Diario",
+			garden: "Jardin",
 			profile: "Perfil",
 		},
 		fab: {
@@ -1073,7 +1075,8 @@ export const translations = {
 		practice: {
 			start_practice: "Iniciar Práctica",
 			select_type_title: "¿Qué quieres practicar?",
-			select_type_subtitle: "Elige un tipo de práctica para construir tu sesión",
+			select_type_subtitle:
+				"Elige un tipo de práctica para construir tu sesión",
 			type_vk_sequence: "Vinyasa Krama",
 			type_vk_sequence_desc: "Secuencias y posturas",
 			type_pranayama: "Pranayama",

@@ -48,8 +48,12 @@ export default function PostPracticeJournal({
 	};
 
 	const handleSave = () => {
+		const normalizedMoodBefore =
+			checkInData?.mood?.length > 0 ? checkInData.mood : ["focused"];
+		const normalizedMoodAfter = moodAfter.length > 0 ? moodAfter : ["calm"];
+
 		onSave({
-			moodAfter,
+			moodAfter: normalizedMoodAfter,
 			energyLevel: {
 				before: checkInData?.energyLevel || 5,
 				after: energyAfter,
@@ -61,8 +65,8 @@ export default function PostPracticeJournal({
 			physicalSensations: physicalSensations.join(", "),
 			emotionalNotes,
 			gratitude,
-			learnings,
-			moodBefore: checkInData?.mood || [],
+			insights: learnings,
+			moodBefore: normalizedMoodBefore,
 		});
 	};
 

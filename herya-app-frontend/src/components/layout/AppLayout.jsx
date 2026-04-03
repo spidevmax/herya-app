@@ -8,7 +8,7 @@ import PageTransition from "./PageTransition";
 const NAV_ITEMS = [
 	{ to: "/", icon: Home, labelKey: "nav.home" },
 	{ to: "/library", icon: BookOpen, labelKey: "nav.library" },
-	{ to: "/garden", icon: Leaf, labelKey: "nav.journal" },
+	{ to: "/garden", icon: Leaf, labelKey: "nav.garden" },
 	{ to: "/profile", icon: User, labelKey: "nav.profile" },
 ];
 

@@ -786,7 +786,14 @@ export default function Library() {
 											<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 												{group.items.map((item, itemIndex) => (
 													<RetroCard
-														key={item._id || `${group.type}-${itemIndex}`}
+														key={
+															item._id ||
+															item.id ||
+															item.slug ||
+															item.englishName ||
+															item.name ||
+															item.title
+														}
 														item={item}
 														type={getCardType(item, tab)}
 														index={itemIndex}
@@ -808,7 +815,14 @@ export default function Library() {
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									{prioritizedItems.map((item, itemIndex) => (
 										<RetroCard
-											key={item._id || `item-${itemIndex}`}
+											key={
+												item._id ||
+												item.id ||
+												item.slug ||
+												item.englishName ||
+												item.name ||
+												item.title
+											}
 											item={item}
 											type={getCardType(item, tab)}
 											index={itemIndex}

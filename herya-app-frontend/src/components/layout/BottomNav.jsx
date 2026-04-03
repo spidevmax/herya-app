@@ -11,7 +11,7 @@ export default function BottomNav() {
 		{ to: "/", icon: Home, label: t("nav.home") },
 		{ to: "/library", icon: BookOpen, label: t("nav.library") },
 		null,
-		{ to: "/garden", icon: Leaf, label: t("nav.journal") },
+		{ to: "/garden", icon: Leaf, label: t("nav.garden") },
 		{ to: "/profile", icon: User, label: t("nav.profile") },
 	];
 

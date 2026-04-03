@@ -42,7 +42,12 @@ export default function FlowerGarden({ entries = [], onFlowerClick }) {
 			{placed.map(({ entry, cx, cy, size, emoji, primaryMood }, idx) => (
 				<motion.button
 					type="button"
-					key={entry._id || (entry.createdAt ?? entry.date ?? primaryMood)}
+					key={
+						entry._id ??
+						entry.id ??
+						entry.session ??
+						`${entry.createdAt ?? entry.date ?? primaryMood}`
+					}
 					className="absolute transform -translate-x-1/2 -translate-y-1/2"
 					style={{ left: cx + "%", top: cy + "%", fontSize: size - 8 }}
 					initial={{ scale: 0, rotate: -20 }}
