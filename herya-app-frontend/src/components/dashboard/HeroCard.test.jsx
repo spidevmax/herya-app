@@ -50,13 +50,14 @@ const sanitizeMotionProps = (props) => {
 vi.mock("framer-motion", () => ({
 	motion: {
 		div: ({ children, onClick, ...props }) => (
-			<div
+			<button
+				type="button"
 				{...sanitizeMotionProps(props)}
 				data-testid="motion-div"
 				onClick={onClick}
 			>
 				{children}
-			</div>
+			</button>
 		),
 	},
 }));

@@ -36,6 +36,17 @@ export const translations = {
 			register_link: "Register",
 			error: "Invalid credentials",
 		},
+		auth_callback: {
+			completing: "Completing sign-in...",
+			back_to_login: "Back to login",
+			errors: {
+				missing_google_code: "Google code was not received.",
+				google_auth_failed: "Could not complete Google sign-in.",
+				social_auth_failed: "Social sign-in failed.",
+				missing_auth_token: "Authentication token was not received.",
+				create_session_failed: "Could not create session.",
+			},
+		},
 		forgot_password: {
 			title: "Reset your password",
 			subtitle: "Enter your email and we will generate a reset link.",
@@ -226,6 +237,9 @@ export const translations = {
 				calm: "calm",
 				focused: "focused",
 				tired: "tired",
+				stressed: "stressed",
+				happy: "happy",
+				restless: "restless",
 				stiff: "stiff",
 				peaceful: "peaceful",
 				grateful: "grateful",
@@ -597,6 +611,90 @@ export const translations = {
 			error_create_session: "Could not create session. Please try again.",
 			error_save_journal: "Could not save journal. Please try again.",
 		},
+		guided: {
+			// General
+			guided: "Guided",
+			free: "Free",
+			mode_guided: "Guided mode",
+			mode_free: "Free mode",
+			play: "Play",
+			pause: "Pause",
+			reset: "Reset",
+
+			// Safety
+			safety_warning: "Contraindications",
+			contraindications: "Contraindications",
+
+			// Sequence picker
+			search_sequences: "Search sequences...",
+			preview_sequence: "Preview sequence",
+			poses_count: "poses",
+			no_poses_data: "No pose data available",
+
+			// Breathing picker
+			search_patterns: "Search patterns...",
+			cycles: "Cycles",
+			ratio: "Ratio",
+			estimated_duration: "Estimated duration",
+			cycle_config: "Cycle configuration",
+
+			// Pose player
+			pose: "Pose",
+			prev_pose: "Previous pose",
+			next_pose: "Next pose",
+			repeat_pose: "Repeat",
+			side_left: "Left side",
+			side_right: "Right side",
+			drishti: "Drishti",
+			breathe_steadily: "Breathe steadily and deeply",
+			show_instructions: "Show instructions",
+			hide_instructions: "Hide instructions",
+			setup: "Setup",
+			exit_pose: "Exit",
+			teaching_cues: "Teaching cues",
+			target_muscles: "Target muscles",
+			no_alignment_data: "No alignment data available",
+			no_mistakes_data: "No common mistakes listed",
+			no_benefits_data: "No benefits listed",
+
+			// Tabs
+			tab_alignment: "Alignment",
+			tab_breathing: "Breathing",
+			tab_mistakes: "Mistakes",
+			tab_benefits: "Benefits",
+
+			// Cycle breathing player
+			cycle_progress: "Cycle {current} of {total}",
+			pause_between: "Rest",
+
+			// Meditation player
+			phase_intro: "Intro",
+			phase_main: "Main",
+			phase_close: "Close",
+			bell_interval: "Bell interval",
+			bell_off: "Off",
+			bell_every: "Bell every {n} min",
+
+			// Meditation instructions
+			meditation_intro: "Introduction",
+			meditation_main: "Practice",
+			meditation_close: "Closing",
+			meditation_silence: "Sit in stillness. Follow your breath.",
+			meditation_guided_intro: "Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
+			meditation_guided_main: "Let your attention rest on the natural rhythm of your breath. When your mind wanders, gently bring it back without judgment.",
+			meditation_guided_close: "Begin to deepen your breath. Gently bring awareness back to your body. When you're ready, open your eyes.",
+			meditation_breath_intro: "Settle into your posture. Let your spine be tall and your shoulders relaxed. Begin to notice the natural flow of your breath.",
+			meditation_breath_main: "Observe each inhale and exhale. Notice where you feel the breath most — nostrils, chest, or belly. Simply observe without changing.",
+			meditation_breath_close: "Slowly widen your awareness from the breath to your whole body. Take a deep breath in and gently open your eyes.",
+			meditation_mantra_intro: "Find your center. Choose a mantra or intention that resonates with you today. It can be a single word or short phrase.",
+			meditation_mantra_main: "Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
+			meditation_mantra_close: "Let the mantra fade naturally. Sit in the silence it leaves. When ready, return to the room.",
+			meditation_viz_intro: "Close your eyes and take several cleansing breaths. Allow your mind to become a calm, clear space for visualization.",
+			meditation_viz_main: "Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
+			meditation_viz_close: "Let the image gently fade. Carry the feeling of peace with you as you return to the present moment.",
+			meditation_silent_intro: "Settle into stillness. There are no instructions to follow. Simply be present with whatever arises.",
+			meditation_silent_close: "Gently bring your awareness back. Notice sounds around you, the feeling of your body. Open your eyes when ready.",
+		},
 	},
 
 	es: {
@@ -635,6 +733,17 @@ export const translations = {
 			no_account: "¿Sin cuenta?",
 			register_link: "Regístrate",
 			error: "Credenciales incorrectas",
+		},
+		auth_callback: {
+			completing: "Completando inicio de sesión...",
+			back_to_login: "Volver al login",
+			errors: {
+				missing_google_code: "No se recibió el código de Google.",
+				google_auth_failed: "No se pudo completar el acceso con Google.",
+				social_auth_failed: "Error de autenticación social.",
+				missing_auth_token: "No se recibió token de autenticación.",
+				create_session_failed: "No se pudo crear la sesión.",
+			},
 		},
 		forgot_password: {
 			title: "Restablece tu contraseña",
@@ -826,6 +935,9 @@ export const translations = {
 				calm: "tranquila",
 				focused: "concentrada",
 				tired: "cansada",
+				stressed: "estresada",
+				happy: "feliz",
+				restless: "inquieta",
 				stiff: "tensa",
 				peaceful: "en paz",
 				grateful: "agradecida",
@@ -1197,6 +1309,90 @@ export const translations = {
 			resume: "Reanudar",
 			error_create_session: "No se pudo crear la sesión. Inténtalo de nuevo.",
 			error_save_journal: "No se pudo guardar el diario. Inténtalo de nuevo.",
+		},
+		guided: {
+			// General
+			guided: "Guiado",
+			free: "Libre",
+			mode_guided: "Modo guiado",
+			mode_free: "Modo libre",
+			play: "Reproducir",
+			pause: "Pausar",
+			reset: "Reiniciar",
+
+			// Safety
+			safety_warning: "Contraindicaciones",
+			contraindications: "Contraindicaciones",
+
+			// Sequence picker
+			search_sequences: "Buscar secuencias...",
+			preview_sequence: "Vista previa",
+			poses_count: "posturas",
+			no_poses_data: "Sin datos de posturas",
+
+			// Breathing picker
+			search_patterns: "Buscar patrones...",
+			cycles: "Ciclos",
+			ratio: "Ratio",
+			estimated_duration: "Duración estimada",
+			cycle_config: "Configuración de ciclos",
+
+			// Pose player
+			pose: "Postura",
+			prev_pose: "Postura anterior",
+			next_pose: "Siguiente postura",
+			repeat_pose: "Repetir",
+			side_left: "Lado izquierdo",
+			side_right: "Lado derecho",
+			drishti: "Drishti",
+			breathe_steadily: "Respira de forma estable y profunda",
+			show_instructions: "Ver instrucciones",
+			hide_instructions: "Ocultar instrucciones",
+			setup: "Preparación",
+			exit_pose: "Salida",
+			teaching_cues: "Indicaciones",
+			target_muscles: "Músculos objetivo",
+			no_alignment_data: "Sin datos de alineación disponibles",
+			no_mistakes_data: "Sin errores comunes listados",
+			no_benefits_data: "Sin beneficios listados",
+
+			// Tabs
+			tab_alignment: "Alineación",
+			tab_breathing: "Respiración",
+			tab_mistakes: "Errores",
+			tab_benefits: "Beneficios",
+
+			// Cycle breathing player
+			cycle_progress: "Ciclo {current} de {total}",
+			pause_between: "Descanso",
+
+			// Meditation player
+			phase_intro: "Intro",
+			phase_main: "Principal",
+			phase_close: "Cierre",
+			bell_interval: "Intervalo de campana",
+			bell_off: "Sin",
+			bell_every: "Campana cada {n} min",
+
+			// Meditation instructions
+			meditation_intro: "Introducción",
+			meditation_main: "Práctica",
+			meditation_close: "Cierre",
+			meditation_silence: "Siéntate en quietud. Sigue tu respiración.",
+			meditation_guided_intro: "Encuentra una posición sentada cómoda. Cierra suavemente los ojos. Toma tres respiraciones profundas para llegar a este momento.",
+			meditation_guided_main: "Deja que tu atención descanse en el ritmo natural de tu respiración. Cuando tu mente divague, tráela de vuelta suavemente sin juicio.",
+			meditation_guided_close: "Comienza a profundizar tu respiración. Trae suavemente la conciencia de vuelta a tu cuerpo. Cuando estés listo, abre los ojos.",
+			meditation_breath_intro: "Acomódate en tu postura. Deja que tu columna esté erguida y tus hombros relajados. Comienza a notar el flujo natural de tu respiración.",
+			meditation_breath_main: "Observa cada inhalación y exhalación. Nota dónde sientes más la respiración — fosas nasales, pecho o abdomen. Simplemente observa sin cambiar.",
+			meditation_breath_close: "Lentamente amplía tu conciencia de la respiración a todo tu cuerpo. Toma una respiración profunda y abre suavemente los ojos.",
+			meditation_mantra_intro: "Encuentra tu centro. Elige un mantra o intención que resuene contigo hoy. Puede ser una sola palabra o una frase corta.",
+			meditation_mantra_main: "Repite silenciosamente tu mantra con cada exhalación. Deja que la vibración de las palabras se asiente en tu conciencia.",
+			meditation_mantra_close: "Deja que el mantra se desvanezca naturalmente. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
+			meditation_viz_intro: "Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
+			meditation_viz_main: "Imagina una luz cálida y sanadora rodeándote. Con cada respiración, deja que disuelva la tensión y te llene de paz.",
+			meditation_viz_close: "Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
+			meditation_silent_intro: "Acomódate en la quietud. No hay instrucciones que seguir. Simplemente estate presente con lo que surja.",
+			meditation_silent_close: "Trae suavemente tu conciencia de vuelta. Nota los sonidos a tu alrededor, la sensación de tu cuerpo. Abre los ojos cuando estés listo.",
 		},
 	},
 };

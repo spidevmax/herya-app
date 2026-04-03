@@ -21,7 +21,9 @@ async function seedBreathingPatterns() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+			throw new Error(
+				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
+			);
 		}
 
 		// Helper: split pipe-separated string into array
@@ -35,29 +37,30 @@ async function seedBreathingPatterns() {
 				: [];
 
 		// Helper: coerce CSV boolean values (dynamicTyping may yield true/false or "true"/"false")
-		const toBool = (val) => val === true || val === "true" || val === 1 || val === "1";
+		const toBool = (val) =>
+			val === true || val === "true" || val === 1 || val === "1";
 
 		// Transform CSV data to BreathingPattern schema
 		const breathingPatterns = data.map((row) => ({
 			// IDENTIFICATION
-			romanizationName: row["romanizationName"]?.trim(),
-			iastName: row["iastName"]?.trim(),
-			sanskritName: row["sanskritName"]?.trim(),
-			alias: toArray(row["alias"]),
-			description: row["description"]?.trim(),
+			romanizationName: row.romanizationName?.trim(),
+			iastName: row.iastName?.trim(),
+			sanskritName: row.sanskritName?.trim(),
+			alias: toArray(row.alias),
+			description: row.description?.trim(),
 
 			// CLASSIFICATION
-			difficulty: row["difficulty"]?.trim() || "beginner",
+			difficulty: row.difficulty?.trim() || "beginner",
 
 			// BREATHING PATTERN
-			patternType: row["patternType"]?.trim() || "ratio_based",
+			patternType: row.patternType?.trim() || "ratio_based",
 			patternRatio: {
 				inhale: row["patternRatio.inhale"] ?? 1,
 				hold: row["patternRatio.hold"] ?? 0,
 				exhale: row["patternRatio.exhale"] ?? 1,
 				holdAfterExhale: row["patternRatio.holdAfterExhale"] ?? 0,
 			},
-			baseBreathDuration: row["baseBreathDuration"] ?? 5,
+			baseBreathDuration: row.baseBreathDuration ?? 5,
 
 			// RECOMMENDED PRACTICE
 			recommendedPractice: {
@@ -119,28 +122,29 @@ async function seedBreathingPatterns() {
 			},
 
 			// BENEFITS AND CONTRAINDICATIONS
-			benefits: toArray(row["benefits"]),
-			contraindications: toArray(row["contraindications"]),
-			warnings: row["warnings"]?.trim() || undefined,
+			benefits: toArray(row.benefits),
+			contraindications: toArray(row.contraindications),
+			warnings: row.warnings?.trim() || undefined,
 
 			// VK CONTEXT
 			vkContext: {
 				practicePhase: row["vkContext.practicePhase"]?.trim() || "opening",
 				recommendedBefore: toArray(row["vkContext.recommendedBefore"]),
-				progressionNotes: row["vkContext.progressionNotes"]?.trim() || undefined,
+				progressionNotes:
+					row["vkContext.progressionNotes"]?.trim() || undefined,
 			},
 
 			// UI/UX
-			visualType: row["visualType"]?.trim() || "circle",
-			soundCue: row["soundCue"]?.trim() || "bell",
+			visualType: row.visualType?.trim() || "circle",
+			soundCue: row.soundCue?.trim() || "bell",
 
 			// EFFECTS
-			energyEffect: row["energyEffect"]?.trim() || "balancing",
-			bestTimeOfDay: toArray(row["bestTimeOfDay"]),
+			energyEffect: row.energyEffect?.trim() || "balancing",
+			bestTimeOfDay: toArray(row.bestTimeOfDay),
 
 			// METADATA
-			tags: toArray(row["tags"]),
-			isSystemPattern: toBool(row["isSystemPattern"]),
+			tags: toArray(row.tags),
+			isSystemPattern: toBool(row.isSystemPattern),
 		}));
 
 		// Upsert by romanizationName — adds new patterns without overwriting existing ones

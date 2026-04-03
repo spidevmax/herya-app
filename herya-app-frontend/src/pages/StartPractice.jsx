@@ -10,6 +10,8 @@ import {
 	completeGuidedSession,
 	abandonSession,
 } from "@/api/sessions.api";
+import { getSequenceById } from "@/api/sequences.api";
+import { getBreathingPatternById } from "@/api/breathing.api";
 import { createJournalEntry } from "@/api/journalEntries.api";
 import useSessionPersistence from "@/hooks/useSessionPersistence";
 import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
@@ -52,6 +54,10 @@ export default function StartPractice() {
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState(null);
 
+	// Guided data: fetched sequence/pattern objects keyed by ID
+	const [sequencesData, setSequencesData] = useState({});
+	const [patternsData, setPatternsData] = useState({});
+
 	// Check-in state (optional)
 	const [checkInEnabled, setCheckInEnabled] = useState(false);
 	const [checkInMood, setCheckInMood] = useState([]);
@@ -60,6 +66,55 @@ export default function StartPractice() {
 
 	// Recovery banner
 	const [showRecovery, setShowRecovery] = useState(!!persistence.recovered);
+
+	// Fetch full sequence/pattern data for guided blocks before starting practice
+	const fetchGuidedData = useCallback(async (orderedBlocks) => {
+		const seqIds = [
+			...new Set(
+				orderedBlocks
+					.filter((b) => b.blockType === "vk_sequence" && b.guided && b.vkSequence)
+					.map((b) => b.vkSequence),
+			),
+		];
+		const patIds = [
+			...new Set(
+				orderedBlocks
+					.filter(
+						(b) => b.blockType === "pranayama" && b.guided && b.breathingPattern,
+					)
+					.map((b) => b.breathingPattern),
+			),
+		];
+
+		const results = await Promise.allSettled([
+			...seqIds.map((id) =>
+				getSequenceById(id).then((r) => ({
+					type: "sequence",
+					id,
+					data: r.data?.data || r.data,
+				})),
+			),
+			...patIds.map((id) =>
+				getBreathingPatternById(id).then((r) => ({
+					type: "pattern",
+					id,
+					data: r.data?.data || r.data,
+				})),
+			),
+		]);
+
+		const seqs = {};
+		const pats = {};
+		for (const result of results) {
+			if (result.status === "fulfilled") {
+				const { type, id, data } = result.value;
+				if (type === "sequence") seqs[id] = data;
+				else pats[id] = data;
+			}
+		}
+		setSequencesData(seqs);
+		setPatternsData(pats);
+	}, []);
 
 	const handleSelectType = (type) => {
 		setPracticeType(type);
@@ -90,23 +145,30 @@ export default function StartPractice() {
 	const createAndStartSession = async (orderedBlocks, minutes, checkIn) => {
 		setError(null);
 		try {
-			const payload = {
-				sessionType: practiceType,
-				duration: minutes,
-				plannedBlocks: orderedBlocks,
-				status: "planned",
-				...(checkIn ? { checkIn } : {}),
-			};
+			// Fetch guided data in parallel with session creation
+			const [, sessionRes] = await Promise.all([
+				fetchGuidedData(orderedBlocks),
+				(async () => {
+					const payload = {
+						sessionType: practiceType,
+						duration: minutes,
+						plannedBlocks: orderedBlocks,
+						status: "planned",
+						...(checkIn ? { checkIn } : {}),
+					};
 
-			const res = await createSession(payload);
-			const session = res.data?.data || res.data;
-			const id = session._id;
-			setSessionId(id);
+					const res = await createSession(payload);
+					const session = res.data?.data || res.data;
+					const id = session._id;
+					setSessionId(id);
 
-			await startSessionTimer(id);
+					await startSessionTimer(id);
+					return { id };
+				})(),
+			]);
 
 			persistence.saveSession({
-				sessionId: id,
+				sessionId: sessionRes.id,
 				practiceType,
 				blocks: orderedBlocks,
 				totalMinutes: minutes,
@@ -183,16 +245,20 @@ export default function StartPractice() {
 		}
 	};
 
-	const handleRecoverSession = () => {
+	const handleRecoverSession = useCallback(async () => {
 		const r = persistence.recovered;
 		if (!r) return;
 		setPracticeType(r.practiceType);
 		setBlocks(r.blocks || []);
 		setTotalMinutes(r.totalMinutes || 0);
 		setSessionId(r.sessionId);
+
+		// Fetch guided data for recovered blocks
+		await fetchGuidedData(r.blocks || []);
+
 		setPhase("practice");
 		setShowRecovery(false);
-	};
+	}, [persistence.recovered, fetchGuidedData]);
 
 	const toggleCheckInMood = (mood) => {
 		setCheckInMood((prev) =>
@@ -516,6 +582,8 @@ export default function StartPractice() {
 						>
 							<GuidedPracticePlayer
 								blocks={blocks}
+								sequencesData={sequencesData}
+								patternsData={patternsData}
 								onComplete={handleComplete}
 								onAbandon={handleAbandon}
 								onSaveProgress={handleSaveProgress}

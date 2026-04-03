@@ -1,6 +1,6 @@
 const User = require("../models/User.model");
 const bcrypt = require("bcrypt");
-const crypto = require("crypto");
+const crypto = require("node:crypto");
 const { generateToken } = require("../../utils/token");
 const { deleteImgCloudinary } = require("../../utils/deleteImage");
 const { sendResponse } = require("../../utils/sendResponse");

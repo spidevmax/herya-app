@@ -46,13 +46,23 @@ export default function HeroCard({ sequence, reason, loading }) {
 		emoji: null,
 		label: sequence.family,
 	};
+	const handleCardClick = () => navigate(`/library/sequence/${sequence._id}`);
+	const handleCardKeyDown = (event) => {
+		if (event.key === "Enter" || event.key === " ") {
+			event.preventDefault();
+			handleCardClick();
+		}
+	};
 
 	return (
 		<motion.div
 			initial={{ opacity: 0, scale: 0.96 }}
 			animate={{ opacity: 1, scale: 1 }}
 			className="mx-4 sm:mx-6 rounded-3xl overflow-hidden cursor-pointer"
-			onClick={() => navigate(`/library/sequence/${sequence._id}`)}
+			onClick={handleCardClick}
+			onKeyDown={handleCardKeyDown}
+			role="button"
+			tabIndex={0}
 			whileTap={{ scale: 0.98 }}
 		>
 			<div

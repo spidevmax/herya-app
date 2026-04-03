@@ -1,16 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from '@/context/AuthContext';
-
-const ERROR_MESSAGES = {
-	missing_google_code: "No se recibio el codigo de Google.",
-	google_auth_failed: "No se pudo completar el acceso con Google.",
-};
+import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AuthCallback() {
 	const navigate = useNavigate();
 	const [params] = useSearchParams();
 	const { loginWithToken } = useAuth();
+	const { t } = useLanguage();
 	const [error, setError] = useState("");
 
 	const token = useMemo(() => params.get("token"), [params]);
@@ -18,15 +15,22 @@ export default function AuthCallback() {
 
 	useEffect(() => {
 		let cancelled = false;
+		const errorMessages = {
+			missing_google_code: t("auth_callback.errors.missing_google_code"),
+			google_auth_failed: t("auth_callback.errors.google_auth_failed"),
+		};
 
 		const completeLogin = async () => {
 			if (authError) {
-				setError(ERROR_MESSAGES[authError] || "Error de autenticacion social.");
+				setError(
+					errorMessages[authError] ||
+						t("auth_callback.errors.social_auth_failed"),
+				);
 				return;
 			}
 
 			if (!token) {
-				setError("No se recibio token de autenticacion.");
+				setError(t("auth_callback.errors.missing_auth_token"));
 				return;
 			}
 
@@ -37,7 +41,7 @@ export default function AuthCallback() {
 				}
 			} catch {
 				if (!cancelled) {
-					setError("No se pudo crear la sesion.");
+					setError(t("auth_callback.errors.create_session_failed"));
 				}
 			}
 		};
@@ -47,7 +51,7 @@ export default function AuthCallback() {
 		return () => {
 			cancelled = true;
 		};
-	}, [authError, loginWithToken, navigate, token]);
+	}, [authError, loginWithToken, navigate, t, token]);
 
 	return (
 		<div className="min-h-dvh flex items-center justify-center px-6">
@@ -62,14 +66,14 @@ export default function AuthCallback() {
 							onClick={() => navigate("/login", { replace: true })}
 							className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold"
 						>
-							Volver al login
+							{t("auth_callback.back_to_login")}
 						</button>
 					</>
 				) : (
 					<>
 						<div className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin" />
 						<p className="text-[var(--color-text-primary)] text-sm font-semibold">
-							Completando inicio de sesion...
+							{t("auth_callback.completing")}
 						</p>
 					</>
 				)}

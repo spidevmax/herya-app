@@ -82,8 +82,50 @@ const plannedBlockSchema = new mongoose.Schema(
 			ref: "BreathingPattern",
 		},
 		meditationType: { type: String },
-		// Config data (pranayama pattern key, cycles, etc.)
-		config: { type: mongoose.Schema.Types.Mixed },
+
+		// Guided mode toggle
+		guided: { type: Boolean, default: true },
+
+		// User level for this block (affects pose variants, breath counts, safety)
+		level: {
+			type: String,
+			enum: ["beginner", "intermediate", "advanced"],
+			default: "beginner",
+		},
+
+		// Config data (type-specific settings)
+		config: {
+			// Pranayama config
+			cycles: { type: Number, min: 1, max: 100 },
+			customRatio: {
+				inhale: { type: Number, min: 0, max: 20 },
+				hold: { type: Number, min: 0, max: 20 },
+				exhale: { type: Number, min: 0, max: 20 },
+				holdAfterExhale: { type: Number, min: 0, max: 20 },
+			},
+			pauseBetweenCycles: { type: Number, min: 0, max: 30, default: 0 },
+			soundCue: {
+				type: String,
+				enum: ["bell", "tone", "none"],
+				default: "bell",
+			},
+			hapticFeedback: { type: Boolean, default: true },
+
+			// VK config
+			showAlignment: { type: Boolean, default: true },
+			showBreathing: { type: Boolean, default: true },
+			autoAdvancePoses: { type: Boolean, default: true },
+
+			// Meditation config
+			bellInterval: { type: Number, min: 0, default: 0 },
+			bellAtStart: { type: Boolean, default: true },
+			bellAtEnd: { type: Boolean, default: true },
+			guidanceType: {
+				type: String,
+				enum: ["text", "audio", "none"],
+				default: "text",
+			},
+		},
 	},
 	{ _id: true, versionKey: false },
 );
