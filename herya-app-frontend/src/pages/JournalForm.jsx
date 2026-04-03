@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, ChevronLeft } from "lucide-react";
+import { Camera, Check, ChevronLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -156,9 +156,7 @@ export default function JournalForm() {
 	return (
 		<>
 			<AnimatePresence>
-				{success && (
-					<SuccessOverlay onDone={() => navigate("/journal")} t={t} />
-				)}
+				{success && <SuccessOverlay onDone={() => navigate("/garden")} t={t} />}
 			</AnimatePresence>
 
 			<div className="flex flex-col pt-4 pb-28">
@@ -337,7 +335,7 @@ export default function JournalForm() {
 							{t("journal_form.photos")}
 						</h3>
 						<label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--color-border-soft)] p-6 transition hover:border-[var(--color-primary)]">
-							<span className="text-3xl">📷</span>
+							<Camera size={32} style={{ color: "var(--color-primary)" }} />
 							<p className="text-sm text-[var(--color-text-secondary)]">
 								{t("journal_form.photos_hint")}
 							</p>

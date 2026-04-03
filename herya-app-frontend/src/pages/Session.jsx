@@ -4,9 +4,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
 	ArrowLeft,
 	CheckCircle,
+	ClipboardList,
 	Clock,
 	ChevronLeft,
 	ChevronRight,
+	Hourglass,
+	PersonStanding,
+	Wind,
+	Leaf,
+	Star,
 } from "lucide-react";
 import { createSession } from "@/api/sessions.api";
 import { getBreathingPatterns } from "@/api/breathing.api";
@@ -152,9 +158,16 @@ export default function Session() {
 
 	const sessionType = SESSION_TYPES.find((s) => s.value === type) || {
 		label: tr("session.practice_fallback_label", "Practice"),
-		icon: "🧘",
+		icon: null,
 		color: "var(--color-primary)",
 	};
+	const SESSION_TYPE_ICON_MAP = {
+		vk_sequence: PersonStanding,
+		pranayama: Wind,
+		meditation: Leaf,
+		complete_practice: Star,
+	};
+	const SessionTypeIcon = SESSION_TYPE_ICON_MAP[type] || PersonStanding;
 	const sessionTypeLabelByType = {
 		vk_sequence: tr("fab.vk_sequence", "VK Sequence"),
 		pranayama: tr("fab.pranayama", "Pranayama"),
@@ -617,7 +630,12 @@ export default function Session() {
 								</div>
 							) : seqId && (sequenceLoading || familyPosesLoading) ? (
 								<div className="w-full text-center py-16">
-									<div className="text-6xl mb-4">⏳</div>
+									<div className="mb-4 flex justify-center">
+										<Hourglass
+											size={56}
+											style={{ color: "var(--color-primary)" }}
+										/>
+									</div>
 									<p
 										className="text-xl font-semibold text-[#1A1A2E]"
 										style={{ fontFamily: '"DM Sans", sans-serif' }}
@@ -649,7 +667,10 @@ export default function Session() {
 											className="bg-white rounded-2xl p-6 text-center"
 										>
 											<div className="text-6xl mb-4">
-												{currentPose?.icon || "🧘"}
+												<PersonStanding
+													size={56}
+													style={{ color: "var(--color-primary)" }}
+												/>
 											</div>
 											<h3
 												className="text-xl font-semibold text-[#1A1A2E] mb-2"
@@ -721,7 +742,12 @@ export default function Session() {
 								</>
 							) : seqId && sequence && practicePoses.length === 0 ? (
 								<div className="w-full text-center py-16">
-									<div className="text-6xl mb-4">📋</div>
+									<div className="mb-4 flex justify-center">
+										<ClipboardList
+											size={56}
+											style={{ color: "var(--color-primary)" }}
+										/>
+									</div>
 									<p
 										className="text-xl font-semibold text-[#1A1A2E]"
 										style={{ fontFamily: '"DM Sans", sans-serif' }}
@@ -734,7 +760,12 @@ export default function Session() {
 								</div>
 							) : (
 								<div className="text-center py-16">
-									<div className="text-7xl mb-4">{sessionType.icon}</div>
+									<div className="mb-4 flex justify-center">
+										<SessionTypeIcon
+											size={64}
+											style={{ color: "var(--color-primary)" }}
+										/>
+									</div>
 									<p
 										className="text-xl font-semibold text-[#1A1A2E]"
 										style={{ fontFamily: '"DM Sans", sans-serif' }}

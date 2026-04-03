@@ -1,5 +1,13 @@
 import { motion } from "framer-motion";
-import { CheckCircle, Clock, XCircle } from "lucide-react";
+import {
+	CheckCircle,
+	Clock,
+	Leaf,
+	PersonStanding,
+	Star,
+	Wind,
+	XCircle,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SESSION_TYPES, VK_FAMILY_MAP } from "@/utils/constants";
 import { format } from "@/utils/helpers";
@@ -9,7 +17,16 @@ export default function RecentSessionCard({ session, index = 0 }) {
 	const family = session.vkSequence?.family
 		? VK_FAMILY_MAP[session.vkSequence.family]
 		: null;
-	const sessionType = SESSION_TYPES.find((s) => s.value === session.sessionType);
+	const sessionType = SESSION_TYPES.find(
+		(s) => s.value === session.sessionType,
+	);
+	const TYPE_ICON_MAP = {
+		vk_sequence: PersonStanding,
+		pranayama: Wind,
+		meditation: Leaf,
+		complete_practice: Star,
+	};
+	const SessionTypeIcon = TYPE_ICON_MAP[session.sessionType] || PersonStanding;
 	const color = family?.color || "var(--color-primary)";
 
 	return (
@@ -29,7 +46,11 @@ export default function RecentSessionCard({ session, index = 0 }) {
 				className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
 				style={{ backgroundColor: `${color}20` }}
 			>
-				{family?.emoji || sessionType?.icon || "🧘"}
+				{family?.emoji ? (
+					<span className="text-xl">{family.emoji}</span>
+				) : (
+					<SessionTypeIcon size={20} strokeWidth={2.2} style={{ color }} />
+				)}
 			</div>
 			<div className="flex-1 min-w-0">
 				<p
@@ -38,10 +59,7 @@ export default function RecentSessionCard({ session, index = 0 }) {
 				>
 					{session.vkSequence?.englishName || sessionType?.label || "Session"}
 				</p>
-				<p
-					className="text-xs"
-					style={{ color: "var(--color-text-muted)" }}
-				>
+				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
 					{format.date(session.date || session.createdAt)}
 				</p>
 			</div>

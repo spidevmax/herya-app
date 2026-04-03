@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, Clock, BookOpen, Dumbbell } from "lucide-react";
+import {
+	BookOpen,
+	ChevronLeft,
+	Clock,
+	Dumbbell,
+	PersonStanding,
+} from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
 import { Badge, SkeletonCard } from "@/components/ui";
@@ -28,7 +34,7 @@ export default function SequenceDetail() {
 	const family = seq
 		? VK_FAMILY_MAP[seq.family] || {
 				color: "var(--color-primary)",
-				emoji: "🧘",
+				emoji: null,
 				label: seq.family,
 			}
 		: null;
@@ -202,8 +208,16 @@ export default function SequenceDetail() {
 								"AA)",
 						}}
 					>
-						<div className="absolute right-4 bottom-4 text-8xl opacity-20 float select-none">
-							{family.emoji}
+						<div className="absolute right-4 bottom-4 opacity-20 float select-none">
+							{family.emoji ? (
+								<span className="text-8xl">{family.emoji}</span>
+							) : (
+								<PersonStanding
+									size={88}
+									strokeWidth={1.8}
+									className="text-white"
+								/>
+							)}
 						</div>
 						<span className="text-white/80 text-xs font-bold uppercase tracking-widest">
 							{family.label}

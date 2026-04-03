@@ -1,7 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+	ClipboardList,
+	ChevronLeft,
+	ChevronRight,
+	Leaf,
+	PersonStanding,
+	Star,
+	Wind,
+} from "lucide-react";
 import { getSessions } from "@/api/sessions.api";
 import { FilterChips, SkeletonCard, EmptyState } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -22,14 +30,14 @@ const TYPE_OPTIONS = [
 
 const TYPE_CONFIG = {
 	vk_sequence: {
-		emoji: "🧘",
+		icon: PersonStanding,
 		color: "var(--color-primary)",
 		label: "Secuencia VK",
 	},
-	pranayama: { emoji: "💨", color: "var(--color-primary)", label: "Pranayama" },
-	meditation: { emoji: "🌿", color: "var(--color-info)", label: "Meditación" },
+	pranayama: { icon: Wind, color: "var(--color-primary)", label: "Pranayama" },
+	meditation: { icon: Leaf, color: "var(--color-info)", label: "Meditación" },
 	complete_practice: {
-		emoji: "⭐",
+		icon: Star,
 		color: "var(--color-warning)",
 		label: "Práctica completa",
 	},
@@ -37,10 +45,11 @@ const TYPE_CONFIG = {
 
 function SessionCard({ session, index, onClick }) {
 	const cfg = TYPE_CONFIG[session.sessionType] ?? {
-		emoji: "🧘",
+		icon: PersonStanding,
 		color: "var(--color-primary)",
 		label: session.sessionType,
 	};
+	const TypeIcon = cfg.icon || PersonStanding;
 	const family = session.vkFamily
 		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
 		: null;
@@ -57,7 +66,11 @@ function SessionCard({ session, index, onClick }) {
 				className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
 				style={{ backgroundColor: `${cfg.color}15` }}
 			>
-				{family?.emoji ?? cfg.emoji}
+				{family?.emoji ? (
+					<span className="text-2xl">{family.emoji}</span>
+				) : (
+					<TypeIcon size={24} strokeWidth={2.2} style={{ color: cfg.color }} />
+				)}
 			</div>
 			<div className="flex-1 min-w-0">
 				<p className="font-semibold text-[var(--color-text-primary)] text-sm truncate">
@@ -150,7 +163,12 @@ export default function SessionHistory() {
 					["s1", "s2", "s3", "s4"].map((k) => <SkeletonCard key={k} />)
 				) : sessions.length === 0 ? (
 					<EmptyState
-						illustration="📋"
+						icon={
+							<ClipboardList
+								size={52}
+								style={{ color: "var(--color-primary)" }}
+							/>
+						}
 						title={t("session_history.empty_title")}
 						description={t("session_history.empty_hint")}
 					/>

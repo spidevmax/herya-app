@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Clock, Dumbbell } from "lucide-react";
+import { ArrowRight, Clock, Dumbbell, PersonStanding } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -9,7 +9,8 @@ export default function HeroCard({ sequence, reason, loading }) {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 
-	if (loading) return <div className="mx-4 sm:mx-6 rounded-3xl h-52 skeleton" />;
+	if (loading)
+		return <div className="mx-4 sm:mx-6 rounded-3xl h-52 skeleton" />;
 
 	if (!sequence) {
 		return (
@@ -42,7 +43,7 @@ export default function HeroCard({ sequence, reason, loading }) {
 
 	const family = VK_FAMILY_MAP[sequence.family] || {
 		color: "var(--color-primary)",
-		emoji: "🧘",
+		emoji: null,
 		label: sequence.family,
 	};
 
@@ -60,8 +61,16 @@ export default function HeroCard({ sequence, reason, loading }) {
 					background: `linear-gradient(135deg, ${family.color}, ${family.color}CC)`,
 				}}
 			>
-				<div className="absolute right-4 top-1/2 -translate-y-1/2 text-8xl opacity-20 float select-none pointer-events-none">
-					{family.emoji}
+				<div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 float select-none pointer-events-none">
+					{family.emoji ? (
+						<span className="text-8xl">{family.emoji}</span>
+					) : (
+						<PersonStanding
+							size={88}
+							strokeWidth={1.8}
+							className="text-white"
+						/>
+					)}
 				</div>
 				<span className="inline-flex items-center gap-1 text-xs font-medium text-white/80 uppercase tracking-widest mb-1">
 					{t("dashboard.recommended")}

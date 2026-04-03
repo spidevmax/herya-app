@@ -162,15 +162,15 @@ export const translations = {
 			poses_cautions: "Cautions:",
 		},
 		hero: {
-			welcome: "Welcome! 🧘",
+			welcome: "Welcome!",
 			welcome_hint:
 				"Start your first VK session to get personalised recommendations.",
 			explore: "Explore Library",
-			recommended: "✨ Recommended for you",
+			recommended: "Recommended for you",
 			start: "Start Practice",
 		},
 		session: {
-			done_title: "Practice Complete! 🌟",
+			done_title: "Practice Complete!",
 			done_subtitle: "Great work. Your session has been saved.",
 			back_home: "Back to Home",
 			practice_fallback_label: "Practice",
@@ -424,7 +424,7 @@ export const translations = {
 			},
 		},
 		garden: {
-			title: "Your Garden 🌻",
+			title: "Your Garden",
 			entries_plural: "journal entries",
 			entries_singular: "journal entry",
 			trends: "Emotional trends",
@@ -438,7 +438,7 @@ export const translations = {
 			view_entry: "View full entry",
 		},
 		journal: {
-			title: "Journal 📔",
+			title: "Journal",
 			entries_plural: "entries",
 			entries_singular: "entry",
 			empty_title: "Your journal is empty",
@@ -451,6 +451,13 @@ export const translations = {
 			empty_title: "No sessions",
 			empty_hint: "Start your first practice",
 			load_more: "Load more",
+		},
+		not_found: {
+			title: "Page Not Found",
+			description: "The page you are looking for does not exist or was moved.",
+			go_home: "Go to Home",
+			go_library: "Go to Library",
+			go_back: "Go Back",
 		},
 		admin: {
 			content_poses: "Poses",
@@ -737,15 +744,15 @@ export const translations = {
 			poses_cautions: "Precauciones:",
 		},
 		hero: {
-			welcome: "¡Bienvenida! 🧘",
+			welcome: "¡Bienvenida!",
 			welcome_hint:
 				"Empieza tu primera sesión VK para obtener recomendaciones personalizadas.",
 			explore: "Explorar biblioteca",
-			recommended: "✨ Recomendado para ti",
+			recommended: "Recomendado para ti",
 			start: "Empezar práctica",
 		},
 		session: {
-			done_title: "¡Práctica completada! 🌟",
+			done_title: "¡Práctica completada!",
 			done_subtitle: "Buen trabajo. Tu sesión ha sido guardada.",
 			back_home: "Volver al inicio",
 			practice_fallback_label: "Práctica",
@@ -999,7 +1006,7 @@ export const translations = {
 			},
 		},
 		garden: {
-			title: "Tu Jardín 🌻",
+			title: "Tu Jardín",
 			entries_plural: "entradas de diario",
 			entries_singular: "entrada de diario",
 			trends: "Tendencias emocionales",
@@ -1013,7 +1020,7 @@ export const translations = {
 			view_entry: "Ver entrada completa",
 		},
 		journal: {
-			title: "Diario 📔",
+			title: "Diario",
 			entries_plural: "entradas",
 			entries_singular: "entrada",
 			empty_title: "Tu diario está vacío",
@@ -1026,6 +1033,13 @@ export const translations = {
 			empty_title: "Sin sesiones",
 			empty_hint: "Empieza tu primera práctica",
 			load_more: "Cargar más",
+		},
+		not_found: {
+			title: "Pagina no encontrada",
+			description: "La pagina que buscas no existe o fue movida.",
+			go_home: "Ir a Inicio",
+			go_library: "Ir a Biblioteca",
+			go_back: "Volver",
 		},
 		admin: {
 			content_poses: "Posturas",

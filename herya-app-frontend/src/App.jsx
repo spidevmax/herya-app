@@ -14,11 +14,11 @@ import AuthCallback from "@/pages/AuthCallback";
 import Dashboard from "@/pages/Dashboard";
 import ForgotPassword from "@/pages/ForgotPassword";
 import Garden from "@/pages/Garden";
-import Journal from "@/pages/Journal";
 import JournalForm from "@/pages/JournalForm";
 import BreathingDetail from "@/pages/BreathingDetail";
 import Library from "@/pages/Library";
 import Login from "@/pages/Login";
+import NotFound from "@/pages/NotFound";
 import PoseDetail from "@/pages/PoseDetail";
 import Poses from "@/pages/Poses";
 import Profile from "@/pages/Profile";
@@ -108,7 +108,7 @@ const AppRoutes = () => {
 					<Route path="/sessions/:id" element={<SessionDetail />} />
 
 					<Route path="/garden" element={<Garden />} />
-					<Route path="/journal" element={<Journal />} />
+					<Route path="/journal" element={<Navigate replace to="/garden" />} />
 					<Route path="/journal/new" element={<JournalForm />} />
 					<Route path="/journal/:id/edit" element={<JournalForm />} />
 
@@ -126,7 +126,7 @@ const AppRoutes = () => {
 					<Route index element={<Admin />} />
 				</Route>
 
-				<Route path="*" element={<Navigate to="/" replace />} />
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</>
 	);

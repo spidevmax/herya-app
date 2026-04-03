@@ -7,6 +7,9 @@ import {
 	SkipBack,
 	Square,
 	ChevronRight,
+	Leaf,
+	PersonStanding,
+	Wind,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button, ProgressBar, CircleProgress } from "@/components/ui";
@@ -25,9 +28,9 @@ const BLOCK_TYPE_COLORS = {
 };
 
 const BLOCK_TYPE_ICONS = {
-	vk_sequence: "🧘",
-	pranayama: "💨",
-	meditation: "🌿",
+	vk_sequence: PersonStanding,
+	pranayama: Wind,
+	meditation: Leaf,
 };
 
 export default function GuidedPracticePlayer({
@@ -105,7 +108,7 @@ export default function GuidedPracticePlayer({
 	const nextBlock = blocks[timer.currentBlockIndex + 1] || null;
 	const blockColor =
 		BLOCK_TYPE_COLORS[currentBlock?.blockType] || "var(--color-primary)";
-	const blockIcon = BLOCK_TYPE_ICONS[currentBlock?.blockType] || "🧘";
+	const BlockIcon = BLOCK_TYPE_ICONS[currentBlock?.blockType] || PersonStanding;
 
 	return (
 		<div className="flex flex-col gap-5 pt-2 pb-4">
@@ -199,7 +202,13 @@ export default function GuidedPracticePlayer({
 							})}
 						</p>
 
-						<div className="text-5xl mb-3">{blockIcon}</div>
+						<div className="mb-3 flex justify-center">
+							<BlockIcon
+								size={44}
+								strokeWidth={2.2}
+								style={{ color: blockColor }}
+							/>
+						</div>
 
 						<h3
 							className="text-xl font-semibold mb-1"

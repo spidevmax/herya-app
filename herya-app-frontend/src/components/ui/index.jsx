@@ -1,7 +1,18 @@
 // Common UI primitives
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, X } from "lucide-react";
+import {
+	BedSingle,
+	Circle,
+	Heart,
+	Leaf,
+	Moon,
+	Search,
+	Target,
+	Wind,
+	X,
+	Zap,
+} from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
@@ -152,20 +163,20 @@ export const TabBar = ({ tabs, active, onSelect, className = "" }) => {
 };
 
 // ── MoodSelector ──────────────────────────────────────────────────────────────
-const MOOD_EMOJIS = {
-	energized: "⚡",
-	calm: "🌙",
-	focused: "🎯",
-	tired: "😴",
-	stiff: "🪨",
-	peaceful: "🕉️",
-	grateful: "🙏",
-	anxious: "🌀",
+const MOOD_ICONS = {
+	energized: Zap,
+	calm: Moon,
+	focused: Target,
+	tired: BedSingle,
+	stiff: Circle,
+	peaceful: Leaf,
+	grateful: Heart,
+	anxious: Wind,
 };
 
 export const MoodSelector = ({ value, onChange, label }) => {
 	const { t } = useLanguage();
-	const moods = Object.keys(MOOD_EMOJIS);
+	const moods = Object.keys(MOOD_ICONS);
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -175,23 +186,28 @@ export const MoodSelector = ({ value, onChange, label }) => {
 				</p>
 			)}
 			<div className="grid grid-cols-4 gap-2">
-				{moods.map((mood) => (
-					<motion.button
-						key={mood}
-						type="button"
-						onClick={() => onChange(mood)}
-						whileHover={{ scale: 1.05 }}
-						whileTap={{ scale: 0.95 }}
-						className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
-							value === mood
-								? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
-								: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
-						}`}
-					>
-						<span className="text-2xl mb-1">{MOOD_EMOJIS[mood]}</span>
-						<span>{t(`session.moods.${mood}`)}</span>
-					</motion.button>
-				))}
+				{moods.map((mood) => {
+					const MoodIcon = MOOD_ICONS[mood] || Circle;
+					return (
+						<motion.button
+							key={mood}
+							type="button"
+							onClick={() => onChange(mood)}
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
+							className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
+								value === mood
+									? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
+									: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+							}`}
+						>
+							<span className="mb-1">
+								<MoodIcon size={20} strokeWidth={2.2} />
+							</span>
+							<span>{t(`session.moods.${mood}`)}</span>
+						</motion.button>
+					);
+				})}
 			</div>
 		</div>
 	);
@@ -285,6 +301,7 @@ export function EmptyState({
 	title,
 	description,
 	illustration = null,
+	icon = null,
 	action,
 }) {
 	return (
@@ -293,7 +310,11 @@ export function EmptyState({
 			animate={{ opacity: 1, y: 0 }}
 			className="flex flex-col items-center justify-center text-center py-16 px-6"
 		>
-			{illustration ? (
+			{icon ? (
+				<motion.div className="mb-4 float" animate={{}} style={{}}>
+					{icon}
+				</motion.div>
+			) : illustration ? (
 				<motion.div className="text-6xl mb-4 float" animate={{}} style={{}}>
 					{illustration}
 				</motion.div>

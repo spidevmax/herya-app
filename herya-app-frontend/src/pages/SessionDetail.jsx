@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, Trash2 } from "lucide-react";
+import {
+	ChevronLeft,
+	Frown,
+	Leaf,
+	PersonStanding,
+	Star,
+	Trash2,
+	Wind,
+} from "lucide-react";
 import { getSessionById, deleteSession } from "@/api/sessions.api";
 import { ConfirmModal, SkeletonCard, Badge } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -20,25 +28,25 @@ const toUniqueMoodTokens = (moods, prefix) => {
 
 const TYPE_CONFIG = {
 	vk_sequence: {
-		emoji: "🧘",
+		icon: PersonStanding,
 		color: "var(--color-primary)",
 		labelKey: "fab.vk_sequence",
 		fallback: "VK Sequence",
 	},
 	pranayama: {
-		emoji: "💨",
+		icon: Wind,
 		color: "var(--color-primary)",
 		labelKey: "fab.pranayama",
 		fallback: "Pranayama",
 	},
 	meditation: {
-		emoji: "🌿",
+		icon: Leaf,
 		color: "var(--color-info)",
 		labelKey: "fab.meditation",
 		fallback: "Meditation",
 	},
 	complete_practice: {
-		emoji: "⭐",
+		icon: Star,
 		color: "var(--color-warning)",
 		labelKey: "fab.complete_practice",
 		fallback: "Complete Practice",
@@ -84,7 +92,11 @@ export default function SessionDetail() {
 	if (!session) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-				<span className="text-5xl mb-3">😕</span>
+				<Frown
+					size={52}
+					className="mb-3"
+					style={{ color: "var(--color-text-muted)" }}
+				/>
 				<p className="font-display text-lg font-bold text-[var(--color-text-primary)]">
 					{t("session_detail.not_found")}
 				</p>
@@ -106,10 +118,11 @@ export default function SessionDetail() {
 	const moodAfterTokens = toUniqueMoodTokens(session.moodAfter ?? [], "after");
 
 	const cfg = TYPE_CONFIG[session.sessionType] ?? {
-		emoji: "🧘",
+		icon: PersonStanding,
 		color: "var(--color-primary)",
 		label: session.sessionType,
 	};
+	const TypeIcon = cfg.icon || PersonStanding;
 	const sessionTypeLabel =
 		cfg.label ||
 		(cfg.labelKey ? t(cfg.labelKey) : "") ||
@@ -160,7 +173,11 @@ export default function SessionDetail() {
 						background: `linear-gradient(135deg, ${cfg.color}, ${cfg.color}CC)`,
 					}}
 				>
-					<span className="text-4xl">{family?.emoji ?? cfg.emoji}</span>
+					{family?.emoji ? (
+						<span className="text-4xl">{family.emoji}</span>
+					) : (
+						<TypeIcon size={34} strokeWidth={2.2} />
+					)}
 					<div>
 						<p
 							className="font-display text-xl font-bold"

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, PersonStanding } from "lucide-react";
 import { getPoses, searchPoses } from "@/api/poses.api";
 import {
 	SearchBar,
@@ -90,7 +90,7 @@ function PoseCard({ pose, index, onClick, t }) {
 						className="w-full h-full object-cover rounded-xl"
 					/>
 				) : (
-					<span className="text-2xl">🧘</span>
+					<PersonStanding size={26} style={{ color: "var(--color-primary)" }} />
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
@@ -202,10 +202,26 @@ export default function Poses() {
 	const debounceRef = useRef(null);
 
 	const DIFFICULTY_OPTIONS = [
-		{ key: "", label: t("library.poses_all_difficulties"), color: "var(--color-info)" },
-		{ key: "beginner", label: t("library.beginner"), color: "var(--color-success)" },
-		{ key: "intermediate", label: t("library.intermediate"), color: "var(--color-warning)" },
-		{ key: "advanced", label: t("library.advanced"), color: "var(--color-danger)" },
+		{
+			key: "",
+			label: t("library.poses_all_difficulties"),
+			color: "var(--color-info)",
+		},
+		{
+			key: "beginner",
+			label: t("library.beginner"),
+			color: "var(--color-success)",
+		},
+		{
+			key: "intermediate",
+			label: t("library.intermediate"),
+			color: "var(--color-warning)",
+		},
+		{
+			key: "advanced",
+			label: t("library.advanced"),
+			color: "var(--color-danger)",
+		},
 	];
 
 	const fetchPoses = useCallback(() => {
@@ -283,7 +299,12 @@ export default function Poses() {
 					["p1", "p2", "p3", "p4", "p5"].map((k) => <SkeletonCard key={k} />)
 				) : poses.length === 0 ? (
 					<EmptyState
-						illustration="🧘"
+						icon={
+							<PersonStanding
+								size={56}
+								style={{ color: "var(--color-primary)" }}
+							/>
+						}
 						title={t("library.empty_poses")}
 						description={t("library.empty_poses_hint")}
 					/>

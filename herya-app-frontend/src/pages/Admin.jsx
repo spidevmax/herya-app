@@ -7,6 +7,7 @@ import {
 	BookOpen,
 	List,
 	Shield,
+	UserRound,
 } from "lucide-react";
 import {
 	getAnalyticsDashboard,
@@ -129,7 +130,7 @@ function UserRow({ user, onChangeRole, onDelete }) {
 							className="w-full h-full object-cover"
 						/>
 					) : (
-						<span className="text-lg">🧘</span>
+						<UserRound size={18} style={{ color: "var(--color-primary)" }} />
 					)}
 				</div>
 				<div className="flex-1 min-w-0">

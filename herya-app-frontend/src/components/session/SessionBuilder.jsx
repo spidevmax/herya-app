@@ -7,6 +7,7 @@ import {
 	GripVertical,
 	ChevronDown,
 	ChevronUp,
+	PersonStanding,
 } from "lucide-react";
 import { getSequences } from "@/api/sequences.api";
 import { getBreathingPatterns } from "@/api/breathing.api";
@@ -57,24 +58,22 @@ export default function SessionBuilder({
 	useEffect(() => {
 		setLoading(true);
 		const promises = [];
-		if (
-			allowedBlockTypes.includes("vk_sequence")
-		) {
+		if (allowedBlockTypes.includes("vk_sequence")) {
 			promises.push(
 				getSequences({ limit: 100 }).then((r) => {
 					const payload = r.data?.data || r.data || {};
-					const list = payload.sequences ?? (Array.isArray(payload) ? payload : []);
+					const list =
+						payload.sequences ?? (Array.isArray(payload) ? payload : []);
 					setSequences(Array.isArray(list) ? list : []);
 				}),
 			);
 		}
-		if (
-			allowedBlockTypes.includes("pranayama")
-		) {
+		if (allowedBlockTypes.includes("pranayama")) {
 			promises.push(
 				getBreathingPatterns({ limit: 100 }).then((r) => {
 					const payload = r.data?.data || r.data || {};
-					const list = payload.patterns ?? (Array.isArray(payload) ? payload : []);
+					const list =
+						payload.patterns ?? (Array.isArray(payload) ? payload : []);
 					setBreathingPatterns(Array.isArray(list) ? list : []);
 				}),
 			);
@@ -118,9 +117,7 @@ export default function SessionBuilder({
 		if (blocks.length === 0) return;
 		const ordered = blocks.map((b, i) => ({
 			blockType: b.blockType,
-			label:
-				b.label ||
-				getBlockDefaultLabel(b),
+			label: b.label || getBlockDefaultLabel(b),
 			durationMinutes: b.durationMinutes,
 			order: i,
 			vkSequence: b.vkSequence || undefined,
@@ -143,8 +140,10 @@ export default function SessionBuilder({
 			return bp?.romanizationName || t("practice.pranayama_block");
 		}
 		if (block.blockType === "meditation") {
-			return t(`session.meditation_types.${block.meditationType}`) ||
-				t("practice.meditation_block");
+			return (
+				t(`session.meditation_types.${block.meditationType}`) ||
+				t("practice.meditation_block")
+			);
 		}
 		return t(`practice.type_${block.blockType}`);
 	};
@@ -153,10 +152,14 @@ export default function SessionBuilder({
 
 	const blockTypeColor = (bt) => {
 		switch (bt) {
-			case "vk_sequence": return "var(--color-primary)";
-			case "pranayama": return "var(--color-secondary)";
-			case "meditation": return "var(--color-accent)";
-			default: return "var(--color-primary)";
+			case "vk_sequence":
+				return "var(--color-primary)";
+			case "pranayama":
+				return "var(--color-secondary)";
+			case "meditation":
+				return "var(--color-accent)";
+			default:
+				return "var(--color-primary)";
 		}
 	};
 
@@ -164,8 +167,16 @@ export default function SessionBuilder({
 		return (
 			<div className="flex items-center justify-center py-16">
 				<div className="text-center">
-					<div className="text-4xl mb-3">🧘</div>
-					<p style={{ color: "var(--color-text-secondary)" }} className="text-sm">
+					<div className="mb-3 flex justify-center">
+						<PersonStanding
+							size={38}
+							style={{ color: "var(--color-primary)" }}
+						/>
+					</div>
+					<p
+						style={{ color: "var(--color-text-secondary)" }}
+						className="text-sm"
+					>
 						{t("practice.loading_catalog")}
 					</p>
 				</div>
@@ -216,11 +227,7 @@ export default function SessionBuilder({
 					className="flex flex-col gap-2"
 				>
 					{blocks.map((block, idx) => (
-						<Reorder.Item
-							key={block.id}
-							value={block}
-							className="touch-none"
-						>
+						<Reorder.Item key={block.id} value={block} className="touch-none">
 							<BlockCard
 								block={block}
 								index={idx}
@@ -230,7 +237,6 @@ export default function SessionBuilder({
 								onRemove={() => removeBlock(block.id)}
 								blockTypeColor={blockTypeColor}
 								blockTypeLabel={blockTypeLabel}
-								getBlockDefaultLabel={getBlockDefaultLabel}
 								t={t}
 							/>
 						</Reorder.Item>
@@ -249,10 +255,7 @@ export default function SessionBuilder({
 					>
 						{t("practice.empty_blocks")}
 					</p>
-					<p
-						className="text-xs"
-						style={{ color: "var(--color-text-muted)" }}
-					>
+					<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
 						{t("practice.empty_blocks_hint")}
 					</p>
 				</motion.div>
@@ -325,7 +328,6 @@ function BlockCard({
 	onRemove,
 	blockTypeColor,
 	blockTypeLabel,
-	getBlockDefaultLabel,
 	t,
 }) {
 	const [expanded, setExpanded] = useState(true);
@@ -396,9 +398,7 @@ function BlockCard({
 								<select
 									value={block.vkSequence || ""}
 									onChange={(e) => {
-										const seq = sequences.find(
-											(s) => s._id === e.target.value,
-										);
+										const seq = sequences.find((s) => s._id === e.target.value);
 										onUpdate({
 											vkSequence: e.target.value || null,
 											label: seq?.englishName || "",
@@ -411,9 +411,7 @@ function BlockCard({
 										color: "var(--color-text-primary)",
 									}}
 								>
-									<option value="">
-										{t("practice.select_sequence")}
-									</option>
+									<option value="">{t("practice.select_sequence")}</option>
 									{sequences.map((s) => (
 										<option key={s._id} value={s._id}>
 											{s.englishName} · {s.family}
@@ -441,9 +439,7 @@ function BlockCard({
 										color: "var(--color-text-primary)",
 									}}
 								>
-									<option value="">
-										{t("practice.select_breathing")}
-									</option>
+									<option value="">{t("practice.select_breathing")}</option>
 									{breathingPatterns.map((p) => (
 										<option key={p._id} value={p._id}>
 											{p.romanizationName} · {p.energyEffect}
@@ -459,9 +455,8 @@ function BlockCard({
 										onUpdate({
 											meditationType: e.target.value,
 											label:
-												t(
-													`session.meditation_types.${e.target.value}`,
-												) || e.target.value,
+												t(`session.meditation_types.${e.target.value}`) ||
+												e.target.value,
 										})
 									}
 									className="w-full rounded-xl border px-3 py-2 text-sm"
@@ -492,9 +487,7 @@ function BlockCard({
 										<button
 											type="button"
 											key={d}
-											onClick={() =>
-												onUpdate({ durationMinutes: d })
-											}
+											onClick={() => onUpdate({ durationMinutes: d })}
 											className="px-3 py-1.5 rounded-lg text-xs font-semibold transition"
 											style={{
 												backgroundColor:

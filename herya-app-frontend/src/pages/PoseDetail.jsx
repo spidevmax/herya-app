@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Frown, PersonStanding } from "lucide-react";
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
 import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -50,7 +50,7 @@ function RelatedPoseChip({ pose, onClick }) {
 						className="w-full h-full object-cover"
 					/>
 				) : (
-					<span className="text-2xl">🧘</span>
+					<PersonStanding size={24} style={{ color: "var(--color-primary)" }} />
 				)}
 			</div>
 			<p className="text-[10px] text-center text-[var(--color-text-secondary)] font-medium leading-tight line-clamp-2">
@@ -95,7 +95,11 @@ export default function PoseDetail() {
 	if (!pose) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-				<span className="text-5xl mb-3">😕</span>
+				<Frown
+					size={52}
+					className="mb-3"
+					style={{ color: "var(--color-text-muted)" }}
+				/>
 				<p className="font-display text-lg font-bold text-[var(--color-text-primary)]">
 					{t("pose_detail.not_found")}
 				</p>
@@ -146,7 +150,10 @@ export default function PoseDetail() {
 					/>
 				) : (
 					<div className="w-full h-full flex items-center justify-center text-8xl">
-						🧘
+						<PersonStanding
+							size={84}
+							style={{ color: "var(--color-primary)" }}
+						/>
 					</div>
 				)}
 				<button

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Settings2 } from "lucide-react";
+import { ArrowLeft, Leaf, RotateCcw, Settings2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import {
@@ -38,7 +38,7 @@ const MOOD_OPTIONS = [
  */
 export default function StartPractice() {
 	const navigate = useNavigate();
-	const { user, refreshUser } = useAuth();
+	const { refreshUser } = useAuth();
 	const { t } = useLanguage();
 	const persistence = useSessionPersistence();
 
@@ -87,11 +87,7 @@ export default function StartPractice() {
 		await createAndStartSession(blocks, totalMinutes, checkIn);
 	};
 
-	const createAndStartSession = async (
-		orderedBlocks,
-		minutes,
-		checkIn,
-	) => {
+	const createAndStartSession = async (orderedBlocks, minutes, checkIn) => {
 		setError(null);
 		try {
 			const payload = {
@@ -216,9 +212,13 @@ export default function StartPractice() {
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}
 					transition={{ type: "spring", stiffness: 260, damping: 20 }}
-					className="text-6xl"
+					className="flex justify-center"
 				>
-					🌿
+					<Leaf
+						size={64}
+						strokeWidth={2.2}
+						style={{ color: "var(--color-primary)" }}
+					/>
 				</motion.div>
 				<h2
 					className="text-2xl font-semibold"
@@ -298,9 +298,7 @@ export default function StartPractice() {
 							backgroundColor: checkInEnabled
 								? "var(--color-primary)"
 								: "var(--color-surface-card)",
-							color: checkInEnabled
-								? "white"
-								: "var(--color-text-secondary)",
+							color: checkInEnabled ? "white" : "var(--color-text-secondary)",
 							border: `1px solid ${checkInEnabled ? "var(--color-primary)" : "var(--color-border-soft)"}`,
 						}}
 					>
@@ -321,7 +319,9 @@ export default function StartPractice() {
 						border: "1px solid #F59E0B30",
 					}}
 				>
-					<div className="text-2xl">🔄</div>
+					<div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+						<RotateCcw size={16} className="text-amber-700" />
+					</div>
 					<div className="flex-1">
 						<p className="text-sm font-semibold text-amber-900">
 							{t("practice.recovery_title")}

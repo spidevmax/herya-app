@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import {
+	ChevronLeft,
+	Flame,
+	Frown,
+	Scale,
+	Snowflake,
+	Waves,
+	Wind,
+	Zap,
+} from "lucide-react";
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -11,12 +20,12 @@ const DIFF_COLORS = {
 	advanced: "var(--color-danger)",
 };
 
-const ENERGY_EMOJI = {
-	calming: "🌊",
-	energizing: "⚡",
-	balancing: "☯️",
-	cooling: "❄️",
-	heating: "🔥",
+const ENERGY_ICONS = {
+	calming: Waves,
+	energizing: Zap,
+	balancing: Scale,
+	cooling: Snowflake,
+	heating: Flame,
 };
 
 function RatioBox({ label, value, color }) {
@@ -73,7 +82,11 @@ export default function BreathingDetail() {
 	if (!pattern) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-				<span className="text-5xl mb-3">😕</span>
+				<Frown
+					size={52}
+					className="mb-3"
+					style={{ color: "var(--color-text-muted)" }}
+				/>
 				<p
 					className="text-lg font-bold"
 					style={{
@@ -97,7 +110,7 @@ export default function BreathingDetail() {
 
 	const ratio = pattern.patternRatio ?? {};
 	const diffColor = DIFF_COLORS[pattern.difficulty] ?? "var(--color-primary)";
-	const energyEmoji = ENERGY_EMOJI[pattern.energyEffect] ?? "💨";
+	const EnergyIcon = ENERGY_ICONS[pattern.energyEffect] ?? Wind;
 	const benefits = pattern.benefits ?? [];
 	const instructions = pattern.instructions ?? [];
 	const ratioStr = pattern.patternRatio
@@ -132,7 +145,11 @@ export default function BreathingDetail() {
 						borderColor: diffColor,
 					}}
 				>
-					{energyEmoji}
+					<EnergyIcon
+						size={48}
+						strokeWidth={2.2}
+						style={{ color: diffColor }}
+					/>
 				</div>
 
 				<div className="text-center">
@@ -175,7 +192,10 @@ export default function BreathingDetail() {
 								color: "var(--color-text-secondary)",
 							}}
 						>
-							{energyEmoji} {pattern.energyEffect}
+							<span className="inline-flex items-center gap-1">
+								<EnergyIcon size={13} />
+								{pattern.energyEffect}
+							</span>
 						</span>
 					)}
 				</div>

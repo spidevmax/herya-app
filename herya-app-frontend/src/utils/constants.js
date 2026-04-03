@@ -2,50 +2,50 @@ export const API_BASE =
 	import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
 export const VK_FAMILIES = [
-	{ key: "tadasana", label: "Tadasana", emoji: "🏔️", color: "#4A72FF" },
+	{ key: "tadasana", label: "Tadasana", emoji: null, color: "#4A72FF" },
 	{
 		key: "standing_asymmetric",
 		label: "Standing Asymmetric",
-		emoji: "🌊",
+		emoji: null,
 		color: "#FF6B6B",
 	},
 	{
 		key: "standing_symmetric",
 		label: "Standing Symmetric",
-		emoji: "⚖️",
+		emoji: null,
 		color: "#FFB347",
 	},
 	{
 		key: "one_leg_standing",
 		label: "One Leg Standing",
-		emoji: "🦩",
+		emoji: null,
 		color: "#C77DFF",
 	},
-	{ key: "seated", label: "Seated", emoji: "🪷", color: "#5DB075" },
-	{ key: "supine", label: "Supine", emoji: "🌙", color: "#48CAE4" },
-	{ key: "prone", label: "Prone", emoji: "🐍", color: "#F4845F" },
-	{ key: "inverted", label: "Inverted", emoji: "🔄", color: "#9B5DE5" },
-	{ key: "meditative", label: "Meditative", emoji: "🧘", color: "#74C69D" },
-	{ key: "bow_sequence", label: "Bow", emoji: "🏹", color: "#F77F00" },
+	{ key: "seated", label: "Seated", emoji: null, color: "#5DB075" },
+	{ key: "supine", label: "Supine", emoji: null, color: "#48CAE4" },
+	{ key: "prone", label: "Prone", emoji: null, color: "#F4845F" },
+	{ key: "inverted", label: "Inverted", emoji: null, color: "#9B5DE5" },
+	{ key: "meditative", label: "Meditative", emoji: null, color: "#74C69D" },
+	{ key: "bow_sequence", label: "Bow", emoji: null, color: "#F77F00" },
 	{
 		key: "triangle_sequence",
 		label: "Triangle",
-		emoji: "🔺",
+		emoji: null,
 		color: "#06D6A0",
 	},
 	{
 		key: "sun_salutation",
 		label: "Sun Salutation",
-		emoji: "☀️",
+		emoji: null,
 		color: "#FFD166",
 	},
 	{
 		key: "vajrasana_variations",
 		label: "Vajrasana",
-		emoji: "💎",
+		emoji: null,
 		color: "#EF476F",
 	},
-	{ key: "lotus_variations", label: "Lotus", emoji: "🌸", color: "#A8DADC" },
+	{ key: "lotus_variations", label: "Lotus", emoji: null, color: "#A8DADC" },
 ];
 
 export const VK_FAMILY_MAP = Object.fromEntries(
@@ -101,10 +101,10 @@ export const MOOD_COLORS = {
 };
 
 export const SESSION_TYPES = [
-	{ value: "vk_sequence", label: "VK Sequence", icon: "🧘" },
-	{ value: "pranayama", label: "Pranayama", icon: "💨" },
-	{ value: "meditation", label: "Meditation", icon: "🌿" },
-	{ value: "complete_practice", label: "Complete Practice", icon: "⭐" },
+	{ value: "vk_sequence", label: "VK Sequence", icon: null },
+	{ value: "pranayama", label: "Pranayama", icon: null },
+	{ value: "meditation", label: "Meditation", icon: null },
+	{ value: "complete_practice", label: "Complete Practice", icon: null },
 ];
 
 export const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
