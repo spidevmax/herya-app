@@ -1,6 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, Frown, PersonStanding } from "lucide-react";
+import {
+	motion,
+	useReducedMotion,
+	useScroll,
+	useTransform,
+} from "framer-motion";
+import {
+	ChevronLeft,
+	Frown,
+	PersonStanding,
+	Sparkles,
+	Target,
+	Wind,
+} from "lucide-react";
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
 import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -23,8 +36,21 @@ const formatValue = (value) => {
 	return String(value);
 };
 
-const DetailBlock = ({ title, children }) => (
-	<div
+const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
+	<motion.div
+		initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+		whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+		viewport={{ once: true, amount: 0.18 }}
+		transition={
+			reduceMotion
+				? undefined
+				: {
+						type: "spring",
+						stiffness: 190,
+						damping: 24,
+						delay: Math.min(order * 0.06, 0.32),
+					}
+		}
 		className="rounded-2xl p-4 shadow-[var(--shadow-card)]"
 		style={{ backgroundColor: "var(--color-surface-card)" }}
 	>
@@ -32,7 +58,7 @@ const DetailBlock = ({ title, children }) => (
 			{title}
 		</h3>
 		{children}
-	</div>
+	</motion.div>
 );
 
 function RelatedPoseChip({ pose, onClick }) {
@@ -64,9 +90,17 @@ export default function PoseDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t } = useLanguage();
+	const heroRef = useRef(null);
+	const prefersReducedMotion = useReducedMotion();
 	const [pose, setPose] = useState(null);
 	const [related, setRelated] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const { scrollYProgress } = useScroll({
+		target: heroRef,
+		offset: ["start start", "end start"],
+	});
+	const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
+	const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
 
 	useEffect(() => {
 		Promise.allSettled([getPoseById(id), getRelatedPoses(id)])
@@ -133,6 +167,19 @@ export default function PoseDetail() {
 	const exitSteps = normalizeList(pose.instructions?.exit);
 	const keyPoints = normalizeList(pose.alignmentDetails?.keyPoints);
 	const recommendedBreaths = pose.recommendedBreaths?.[pose.difficulty];
+	const poseDisplayName = pose.englishName || pose.name;
+	const poseDisplayRomanized = pose.romanizedName || pose.romanizationName;
+	const poseDisplaySanskrit = pose.sanskritName;
+	const poseDisplayCategory =
+		typeof pose.category === "string"
+			? pose.category.replace(/_/g, " ")
+			: Array.isArray(pose.category)
+				? pose.category.join(", ")
+				: pose.category
+					? String(pose.category)
+					: null;
+	const poseDisplayFamily =
+		typeof pose.family === "string" ? pose.family.replace(/_/g, " ") : null;
 	// Backend keys: preparatoryPoses, followUpPoses, counterposes
 	const preparatory = related?.preparatoryPoses ?? [];
 	const followUp = related?.followUpPoses ?? [];
@@ -141,21 +188,29 @@ export default function PoseDetail() {
 	return (
 		<div className="flex flex-col pb-10">
 			{/* Hero image */}
-			<div className="relative h-64 bg-[var(--color-tone-info-bg)]">
+			<div
+				ref={heroRef}
+				className="relative h-64 bg-[var(--color-tone-info-bg)] overflow-hidden"
+			>
 				{pose.image ? (
-					<img
+					<motion.img
 						src={pose.image}
 						alt={pose.englishName}
 						className="w-full h-full object-cover"
+						style={{ y: heroY, scale: heroScale }}
 					/>
 				) : (
-					<div className="w-full h-full flex items-center justify-center text-8xl">
+					<motion.div
+						className="w-full h-full flex items-center justify-center text-8xl"
+						style={{ y: heroY, scale: heroScale }}
+					>
 						<PersonStanding
 							size={84}
 							style={{ color: "var(--color-primary)" }}
 						/>
-					</div>
+					</motion.div>
 				)}
+				<div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/18 via-transparent to-transparent" />
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
@@ -167,71 +222,173 @@ export default function PoseDetail() {
 
 			<div className="px-4 pt-5 flex flex-col gap-5">
 				{/* Name & badges */}
-				<div>
-					<h1
-						className="font-display text-2xl font-bold"
-						style={{
-							fontFamily: '"Fredoka", sans-serif',
-							color: "var(--color-text-primary)",
-						}}
+				<motion.div
+					initial={{ opacity: 0, y: 16, scale: 0.985 }}
+					animate={{ opacity: 1, y: 0, scale: 1 }}
+					transition={{ type: "spring", stiffness: 230, damping: 22 }}
+					className="relative overflow-hidden rounded-[28px] p-[1px]"
+					style={{
+						background:
+							"linear-gradient(130deg, color-mix(in srgb, var(--color-primary) 36%, transparent), color-mix(in srgb, var(--color-info) 34%, transparent), color-mix(in srgb, var(--color-secondary) 30%, transparent))",
+					}}
+				>
+					<div
+						className="relative rounded-[27px] px-5 py-5 overflow-hidden"
+						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
-						{pose.englishName}
-					</h1>
-					{pose.romanizedName && (
-						<p className="text-[var(--color-text-secondary)] text-sm mt-0.5">
-							{pose.romanizedName}
-						</p>
-					)}
-					{pose.sanskritName && (
-						<p className="text-[var(--color-text-muted)] text-xs italic">
-							{pose.sanskritName}
-						</p>
-					)}
-					<div className="flex flex-wrap gap-1.5 mt-3">
-						{pose.difficulty && (
-							<Badge
-								color={
-									DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"
-								}
+						<div
+							className="absolute -right-8 -top-8 w-28 h-28 rounded-full blur-2xl opacity-35"
+							style={{ backgroundColor: "var(--color-primary-light)" }}
+						/>
+						<div
+							className="absolute -left-10 -bottom-10 w-28 h-28 rounded-full blur-2xl opacity-25"
+							style={{ backgroundColor: "var(--color-info)" }}
+						/>
+
+						<div className="relative flex items-start justify-between gap-3">
+							<div className="min-w-0">
+								<h1
+									className="font-display text-2xl font-bold leading-tight"
+									style={{
+										fontFamily: '"Fredoka", sans-serif',
+										color: "var(--color-text-primary)",
+									}}
+								>
+									{poseDisplayName}
+								</h1>
+								{poseDisplayRomanized && (
+									<p className="text-[var(--color-text-secondary)] text-sm mt-0.5 truncate">
+										{poseDisplayRomanized}
+									</p>
+								)}
+								{poseDisplaySanskrit && (
+									<p className="text-[var(--color-text-muted)] text-xs italic truncate">
+										{poseDisplaySanskrit}
+									</p>
+								)}
+							</div>
+							<div
+								className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0"
+								style={{
+									backgroundColor:
+										"color-mix(in srgb, var(--color-primary) 12%, transparent)",
+									color: "var(--color-primary)",
+								}}
 							>
-								{diffLabels[pose.difficulty] ?? pose.difficulty}
-							</Badge>
+								<Sparkles size={12} />
+								Pose Profile
+							</div>
+						</div>
+
+						<div className="flex flex-wrap gap-1.5 mt-3">
+							{pose.difficulty && (
+								<Badge
+									color={
+										DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"
+									}
+								>
+									{diffLabels[pose.difficulty] ?? pose.difficulty}
+								</Badge>
+							)}
+							{poseDisplayCategory && (
+								<Badge color="var(--color-info)">{poseDisplayCategory}</Badge>
+							)}
+							{poseDisplayFamily && (
+								<Badge color="var(--color-lavender)">{poseDisplayFamily}</Badge>
+							)}
+							{pose.drishti && (
+								<Badge color="var(--color-warning)">
+									{t("pose_detail.drishti")}: {formatValue(pose.drishti)}
+								</Badge>
+							)}
+							{pose.energyEffect && (
+								<Badge color="var(--color-success)">
+									{formatValue(pose.energyEffect)}
+								</Badge>
+							)}
+						</div>
+
+						{(recommendedBreaths ||
+							pose.sidedness?.type ||
+							pose.breathingCue) && (
+							<div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-4">
+								{recommendedBreaths && (
+									<div
+										className="rounded-xl px-3 py-2.5 border"
+										style={{
+											backgroundColor: "var(--color-tone-info-bg)",
+											borderColor:
+												"color-mix(in srgb, var(--color-info) 24%, transparent)",
+										}}
+									>
+										<p className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] inline-flex items-center gap-1">
+											<Wind size={11} />
+											{t("pose_detail.breathing")}
+										</p>
+										<p className="text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
+											{recommendedBreaths.min}-{recommendedBreaths.max}{" "}
+											{t("pose_detail.breaths")}
+										</p>
+									</div>
+								)}
+								{pose.sidedness?.type && (
+									<div
+										className="rounded-xl px-3 py-2.5 border"
+										style={{
+											backgroundColor: "var(--color-tone-warning-bg)",
+											borderColor:
+												"color-mix(in srgb, var(--color-warning) 24%, transparent)",
+										}}
+									>
+										<p className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] inline-flex items-center gap-1">
+											<Target size={11} />
+											{t("pose_detail.sidedness")}
+										</p>
+										<p className="text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
+											{formatValue(pose.sidedness.type)}
+										</p>
+									</div>
+								)}
+								{pose.breathingCue && (
+									<div
+										className="rounded-xl px-3 py-2.5 border"
+										style={{
+											backgroundColor: "var(--color-tone-success-bg)",
+											borderColor:
+												"color-mix(in srgb, var(--color-success) 24%, transparent)",
+										}}
+									>
+										<p className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] inline-flex items-center gap-1">
+											<Wind size={11} />
+											{t("pose_detail.breathe")}
+										</p>
+										<p className="text-sm font-semibold text-[var(--color-text-primary)] line-clamp-1 mt-0.5">
+											{formatValue(pose.breathingCue)}
+										</p>
+									</div>
+								)}
+							</div>
 						)}
-						{pose.category && (
-							<Badge color="var(--color-info)">
-								{typeof pose.category === "string"
-									? pose.category.replace(/_/g, " ")
-									: Array.isArray(pose.category)
-										? pose.category.join(", ")
-										: String(pose.category)}
-							</Badge>
-						)}
-						{pose.family && (
-							<Badge color="var(--color-lavender)">
-								{typeof pose.family === "string"
-									? pose.family.replace(/_/g, " ")
-									: String(pose.family)}
-							</Badge>
-						)}
-						{pose.drishti && (
-							<Badge color="var(--color-warning)">
-								{t("pose_detail.drishti")}: {pose.drishti}
-							</Badge>
-						)}
-						{pose.energyEffect && (
-							<Badge color="var(--color-success)">{pose.energyEffect}</Badge>
+
+						{pose.description && (
+							<p
+								className="mt-4 text-[var(--color-text-secondary)] text-sm leading-relaxed border-l-2 pl-3"
+								style={{
+									borderColor:
+										"color-mix(in srgb, var(--color-primary) 28%, transparent)",
+								}}
+							>
+								{pose.description}
+							</p>
 						)}
 					</div>
-				</div>
+				</motion.div>
 
-				{/* Description */}
-				{pose.description && (
-					<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
-						{pose.description}
-					</p>
-				)}
-
-				<DetailBlock title={t("pose_detail.details")}>
+				<DetailBlock
+					title={t("pose_detail.details")}
+					order={0}
+					reduceMotion={prefersReducedMotion}
+				>
 					{(pose.chakraRelated || pose.transitionType) && (
 						<div className="flex flex-wrap gap-2 mb-4">
 							{pose.chakraRelated && (
@@ -277,7 +434,11 @@ export default function PoseDetail() {
 				</DetailBlock>
 
 				{aliases.length > 0 && (
-					<DetailBlock title={t("pose_detail.aliases")}>
+					<DetailBlock
+						title={t("pose_detail.aliases")}
+						order={1}
+						reduceMotion={prefersReducedMotion}
+					>
 						<p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
 							{aliases.join(", ")}
 						</p>
@@ -285,7 +446,11 @@ export default function PoseDetail() {
 				)}
 
 				{targetMuscles.length > 0 && (
-					<DetailBlock title={t("pose_detail.target_muscles")}>
+					<DetailBlock
+						title={t("pose_detail.target_muscles")}
+						order={2}
+						reduceMotion={prefersReducedMotion}
+					>
 						<div className="flex flex-wrap gap-2">
 							{targetMuscles.map((muscle) => (
 								<Badge key={`muscle-${muscle}`} color="var(--color-success)">
@@ -297,7 +462,11 @@ export default function PoseDetail() {
 				)}
 
 				{jointFocus.length > 0 && (
-					<DetailBlock title={t("pose_detail.joints")}>
+					<DetailBlock
+						title={t("pose_detail.joints")}
+						order={3}
+						reduceMotion={prefersReducedMotion}
+					>
 						<div className="flex flex-wrap gap-2">
 							{jointFocus.map((joint) => (
 								<Badge key={`joint-${joint}`} color="var(--color-warning)">
@@ -309,7 +478,11 @@ export default function PoseDetail() {
 				)}
 
 				{benefits.length > 0 && (
-					<DetailBlock title={t("pose_detail.benefits")}>
+					<DetailBlock
+						title={t("pose_detail.benefits")}
+						order={4}
+						reduceMotion={prefersReducedMotion}
+					>
 						<ul className="flex flex-col gap-2">
 							{benefits.map((b) => (
 								<li
@@ -331,7 +504,11 @@ export default function PoseDetail() {
 					modificationSteps.length > 0 ||
 					exitSteps.length > 0 ||
 					keyPoints.length > 0) && (
-					<DetailBlock title={t("pose_detail.instructions")}>
+					<DetailBlock
+						title={t("pose_detail.instructions")}
+						order={5}
+						reduceMotion={prefersReducedMotion}
+					>
 						<div className="flex flex-col gap-4">
 							{setupSteps.length > 0 && (
 								<div>
@@ -438,7 +615,11 @@ export default function PoseDetail() {
 				)}
 
 				{contraindications.length > 0 && (
-					<DetailBlock title={t("pose_detail.contraindications")}>
+					<DetailBlock
+						title={t("pose_detail.contraindications")}
+						order={6}
+						reduceMotion={prefersReducedMotion}
+					>
 						<ul className="flex flex-col gap-2">
 							{contraindications.map((item) => (
 								<li
@@ -456,7 +637,11 @@ export default function PoseDetail() {
 				)}
 
 				{commonMistakes.length > 0 && (
-					<DetailBlock title={t("pose_detail.common_mistakes")}>
+					<DetailBlock
+						title={t("pose_detail.common_mistakes")}
+						order={7}
+						reduceMotion={prefersReducedMotion}
+					>
 						<ul className="flex flex-col gap-2">
 							{commonMistakes.map((item) => (
 								<li
@@ -474,7 +659,11 @@ export default function PoseDetail() {
 				)}
 
 				{props.length > 0 && (
-					<DetailBlock title={t("pose_detail.props")}>
+					<DetailBlock
+						title={t("pose_detail.props")}
+						order={8}
+						reduceMotion={prefersReducedMotion}
+					>
 						<div className="flex flex-wrap gap-2">
 							{props.map((item) => (
 								<Badge key={`prop-${item}`} color="var(--color-primary)">
@@ -489,7 +678,23 @@ export default function PoseDetail() {
 				{(preparatory.length > 0 ||
 					followUp.length > 0 ||
 					counterposes.length > 0) && (
-					<div>
+					<motion.div
+						initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
+						whileInView={
+							prefersReducedMotion ? undefined : { opacity: 1, y: 0 }
+						}
+						viewport={{ once: true, amount: 0.15 }}
+						transition={
+							prefersReducedMotion
+								? undefined
+								: {
+										type: "spring",
+										stiffness: 180,
+										damping: 24,
+										delay: 0.28,
+									}
+						}
+					>
 						<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
 							{t("pose_detail.related_poses")}
 						</h3>
@@ -543,7 +748,7 @@ export default function PoseDetail() {
 								</div>
 							)}
 						</div>
-					</div>
+					</motion.div>
 				)}
 			</div>
 		</div>

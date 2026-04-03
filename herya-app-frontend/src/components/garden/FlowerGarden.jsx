@@ -1,13 +1,20 @@
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
 import { MOOD_COLORS, VK_FAMILY_MAP } from "@/utils/constants";
 
 const FLOWER_SHAPES = ["🌸", "🌺", "🌼", "🌻", "🌹", "💐", "🌷", "🪷"];
 
-function clamp(v, min, max) {
+const clamp = (v, min, max) => {
 	return Math.min(Math.max(v, min), max);
-}
+};
 
-function getFlowerProps(entry, index) {
+const translateMoodLabel = (mood, t) => {
+	const key = `session.moods.${mood}`;
+	const translated = t(key);
+	return translated === key ? mood : translated;
+};
+
+const getFlowerProps = (entry, index) => {
 	const moods = entry.moodAfter || entry.moodBefore || [];
 	const primaryMood = moods[0] || "calm";
 	const color = MOOD_COLORS[primaryMood] || "#5DB075";
@@ -17,9 +24,11 @@ function getFlowerProps(entry, index) {
 	const family = entry.vkReflection?.sequenceFamily;
 	const familyColor = family ? VK_FAMILY_MAP[family]?.color : color;
 	return { color: familyColor || color, size, emoji, primaryMood };
-}
+};
 
 export default function FlowerGarden({ entries = [], onFlowerClick }) {
+	const { t } = useLanguage();
+
 	if (!entries.length) return null;
 
 	const placed = entries.map((entry, i) => {
@@ -39,34 +48,37 @@ export default function FlowerGarden({ entries = [], onFlowerClick }) {
 	return (
 		<div className="relative w-full h-72 bg-gradient-to-b from-[#E8F5ED] to-[#F8F7F4] rounded-3xl overflow-hidden">
 			<div className="absolute bottom-0 left-0 right-0 h-8 bg-[#5DB075]/20 rounded-b-3xl" />
-			{placed.map(({ entry, cx, cy, size, emoji, primaryMood }, idx) => (
-				<motion.button
-					type="button"
-					key={
-						entry._id ??
-						entry.id ??
-						entry.session ??
-						`${entry.createdAt ?? entry.date ?? primaryMood}`
-					}
-					className="absolute transform -translate-x-1/2 -translate-y-1/2"
-					style={{ left: cx + "%", top: cy + "%", fontSize: size - 8 }}
-					initial={{ scale: 0, rotate: -20 }}
-					animate={{ scale: 1, rotate: 0 }}
-					transition={{
-						delay: idx * 0.04,
-						type: "spring",
-						stiffness: 260,
-						damping: 20,
-					}}
-					whileHover={{ scale: 1.3 }}
-					whileTap={{ scale: 0.9 }}
-					onClick={() => onFlowerClick?.(entry)}
-					title={primaryMood}
-					aria-label={"Journal entry: " + primaryMood}
-				>
-					{emoji}
-				</motion.button>
-			))}
+			{placed.map(({ entry, cx, cy, size, emoji, primaryMood }, idx) => {
+				const moodLabel = translateMoodLabel(primaryMood, t);
+				return (
+					<motion.button
+						type="button"
+						key={
+							entry._id ??
+							entry.id ??
+							entry.session ??
+							`${entry.createdAt ?? entry.date ?? primaryMood}`
+						}
+						className="absolute transform -translate-x-1/2 -translate-y-1/2"
+						style={{ left: cx + "%", top: cy + "%", fontSize: size - 8 }}
+						initial={{ scale: 0, rotate: -20 }}
+						animate={{ scale: 1, rotate: 0 }}
+						transition={{
+							delay: idx * 0.04,
+							type: "spring",
+							stiffness: 260,
+							damping: 20,
+						}}
+						whileHover={{ scale: 1.3 }}
+						whileTap={{ scale: 0.9 }}
+						onClick={() => onFlowerClick?.(entry)}
+						title={moodLabel}
+						aria-label={moodLabel}
+					>
+						{emoji}
+					</motion.button>
+				);
+			})}
 		</div>
 	);
 }

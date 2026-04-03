@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
 	BookOpen,
 	ChevronLeft,
+	ChevronRight,
 	Clock,
 	Dumbbell,
 	PersonStanding,
@@ -60,6 +61,7 @@ export default function SequenceDetail() {
 			id:
 				(typeof pose === "object" && pose?._id) ||
 				`pose-${fallbackOrder}-${resolvedName}`,
+			poseId: typeof pose === "object" ? pose?._id || null : null,
 			order: fallbackOrder,
 			name: resolvedName,
 			subtitle: typeof pose === "object" ? getPoseSubtitle(pose) : null,
@@ -151,6 +153,7 @@ export default function SequenceDetail() {
 		},
 	].filter((section) => section.items.length > 0);
 	const hasAssignedPoses = sequenceSections.length > 0;
+	const viewPoseLabel = tr("sequence_detail.view_pose", "View pose");
 
 	return (
 		<div className="pb-6">
@@ -589,49 +592,119 @@ export default function SequenceDetail() {
 											{section.items.map((pose) => (
 												<li
 													key={pose.id}
-													className="rounded-xl px-3 py-2 border flex items-center justify-between gap-3"
-													style={{
-														borderColor: `${family.color}33`,
-														backgroundColor: `${family.color}0F`,
-													}}
+													className="rounded-xl border"
+													style={{ borderColor: `${family.color}33` }}
 												>
-													<div className="min-w-0">
-														<p
-															className="text-sm font-semibold truncate"
-															style={{ color: "var(--color-text-primary)" }}
+													{pose.poseId ? (
+														<button
+															type="button"
+															onClick={() =>
+																navigate(`/library/pose/${pose.poseId}`)
+															}
+															aria-label={`${viewPoseLabel}: ${pose.name}`}
+															className="group w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left transition hover:brightness-95 hover:-translate-y-[1px] cursor-pointer"
+															style={{ backgroundColor: `${family.color}0F` }}
 														>
-															{pose.order}. {pose.name}
-														</p>
-														{pose.subtitle && pose.subtitle !== pose.name ? (
-															<p
-																className="text-xs truncate"
-																style={{ color: "var(--color-text-secondary)" }}
-															>
-																{pose.subtitle}
-															</p>
-														) : null}
-														{pose.instruction ? (
-															<p
-																className="text-xs mt-1"
-																style={{ color: "var(--color-text-muted)" }}
-															>
-																{pose.instruction}
-															</p>
-														) : null}
-													</div>
-													{typeof pose.breaths === "number" ? (
-														<span
-															className="text-xs font-semibold px-2 py-1 rounded-lg"
-															style={{
-																backgroundColor: `${family.color}22`,
-																color: family.color,
-															}}
+															<div className="min-w-0">
+																<p
+																	className="text-sm font-semibold truncate"
+																	style={{ color: "var(--color-text-primary)" }}
+																>
+																	{pose.order}. {pose.name}
+																</p>
+																{pose.subtitle &&
+																pose.subtitle !== pose.name ? (
+																	<p
+																		className="text-xs truncate"
+																		style={{
+																			color: "var(--color-text-secondary)",
+																		}}
+																	>
+																		{pose.subtitle}
+																	</p>
+																) : null}
+																{pose.instruction ? (
+																	<p
+																		className="text-xs mt-1"
+																		style={{ color: "var(--color-text-muted)" }}
+																	>
+																		{pose.instruction}
+																	</p>
+																) : null}
+															</div>
+															<div className="flex items-center gap-2 shrink-0">
+																{typeof pose.breaths === "number" ? (
+																	<span
+																		className="text-xs font-semibold px-2 py-1 rounded-lg"
+																		style={{
+																			backgroundColor: `${family.color}22`,
+																			color: family.color,
+																		}}
+																	>
+																		{t("sequence_detail.breaths", {
+																			n: pose.breaths,
+																		})}
+																	</span>
+																) : null}
+																<span
+																	className="text-[11px] font-semibold inline-flex items-center gap-1"
+																	style={{ color: family.color }}
+																>
+																	{viewPoseLabel}
+																	<ChevronRight
+																		size={12}
+																		className="transition-transform group-hover:translate-x-0.5"
+																	/>
+																</span>
+															</div>
+														</button>
+													) : (
+														<div
+															className="w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3"
+															style={{ backgroundColor: `${family.color}0F` }}
 														>
-															{t("sequence_detail.breaths", {
-																n: pose.breaths,
-															})}
-														</span>
-													) : null}
+															<div className="min-w-0">
+																<p
+																	className="text-sm font-semibold truncate"
+																	style={{ color: "var(--color-text-primary)" }}
+																>
+																	{pose.order}. {pose.name}
+																</p>
+																{pose.subtitle &&
+																pose.subtitle !== pose.name ? (
+																	<p
+																		className="text-xs truncate"
+																		style={{
+																			color: "var(--color-text-secondary)",
+																		}}
+																	>
+																		{pose.subtitle}
+																	</p>
+																) : null}
+																{pose.instruction ? (
+																	<p
+																		className="text-xs mt-1"
+																		style={{ color: "var(--color-text-muted)" }}
+																	>
+																		{pose.instruction}
+																	</p>
+																) : null}
+															</div>
+															{typeof pose.breaths === "number" ? (
+																<span
+																	className="text-xs font-semibold px-2 py-1 rounded-lg"
+																	style={{
+																		backgroundColor: `${family.color}22`,
+																		color: family.color,
+																	}}
+																>
+																	{t("sequence_detail.breaths", {
+																		n: pose.breaths,
+																	})}
+																</span>
+															) : null}
+														</div>
+													)}
 												</li>
 											))}
 										</ol>

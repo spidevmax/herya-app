@@ -207,7 +207,7 @@ describe("HeroCard", () => {
 
 		await waitFor(() => {
 			expect(mockNavigate).toHaveBeenCalledWith(
-				`/session/vk_sequence?seq=${mockSequence._id}`,
+				`/start-practice?type=vk_sequence&seq=${mockSequence._id}&minutes=30`,
 			);
 		});
 	});

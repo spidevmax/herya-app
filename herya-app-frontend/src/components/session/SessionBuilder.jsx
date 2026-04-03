@@ -33,6 +33,7 @@ let blockIdCounter = 0;
 const nextBlockId = () => `block_${++blockIdCounter}_${Date.now()}`;
 export default function SessionBuilder({
 	practiceType,
+	initialBlocks = [],
 	onStartSession,
 	onBack,
 }) {
@@ -42,6 +43,8 @@ export default function SessionBuilder({
 	const [breathingPatterns, setBreathingPatterns] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [addMenuOpen, setAddMenuOpen] = useState(false);
+	const [hasHydratedInitialBlocks, setHasHydratedInitialBlocks] =
+		useState(false);
 
 	// Which block types can this practice type include
 	const allowedBlockTypes = useMemo(() => {
@@ -61,6 +64,7 @@ export default function SessionBuilder({
 
 	useEffect(() => {
 		setLoading(true);
+		setHasHydratedInitialBlocks(false);
 		const promises = [];
 		if (allowedBlockTypes.includes("vk_sequence")) {
 			promises.push(
@@ -86,6 +90,56 @@ export default function SessionBuilder({
 			.catch(() => {})
 			.finally(() => setLoading(false));
 	}, [allowedBlockTypes]);
+
+	useEffect(() => {
+		if (
+			hasHydratedInitialBlocks ||
+			blocks.length > 0 ||
+			!initialBlocks.length
+		) {
+			return;
+		}
+
+		const hydrated = initialBlocks
+			.filter((block) => allowedBlockTypes.includes(block.blockType))
+			.map((block) => {
+				const defaultConfig = {
+					cycles: null,
+					soundCue: "bell",
+					hapticFeedback: true,
+					autoAdvancePoses: true,
+					bellInterval: 0,
+					bellAtStart: true,
+					bellAtEnd: true,
+				};
+
+				return {
+					id: nextBlockId(),
+					label: "",
+					durationMinutes: block.blockType === "meditation" ? 10 : 15,
+					vkSequence: null,
+					breathingPattern: null,
+					meditationType: "silent",
+					guided: true,
+					level: "beginner",
+					...block,
+					config: {
+						...defaultConfig,
+						...(block.config || {}),
+					},
+				};
+			});
+
+		if (hydrated.length > 0) {
+			setBlocks(hydrated);
+		}
+		setHasHydratedInitialBlocks(true);
+	}, [
+		allowedBlockTypes,
+		blocks.length,
+		hasHydratedInitialBlocks,
+		initialBlocks,
+	]);
 
 	const totalMinutes = blocks.reduce(
 		(sum, b) => sum + (b.durationMinutes || 0),
@@ -353,14 +407,22 @@ function BlockCard({
 
 	// Calculate estimated duration from cycles for pranayama
 	const estimatedFromCycles = (() => {
-		if (block.blockType !== "pranayama" || !selectedPattern || !block.config?.cycles)
+		if (
+			block.blockType !== "pranayama" ||
+			!selectedPattern ||
+			!block.config?.cycles
+		)
 			return null;
-		const cp = selectedPattern.calculatedPattern || selectedPattern.patternRatio;
+		const cp =
+			selectedPattern.calculatedPattern || selectedPattern.patternRatio;
 		if (!cp) return null;
 		const base = selectedPattern.baseBreathDuration || 4;
 		const ratio = selectedPattern.patternRatio || {};
 		const cycleSec =
-			(ratio.inhale + ratio.hold + ratio.exhale + (ratio.holdAfterExhale || 0)) *
+			(ratio.inhale +
+				ratio.hold +
+				ratio.exhale +
+				(ratio.holdAfterExhale || 0)) *
 			base;
 		const pause = block.config.pauseBetweenCycles || 0;
 		const totalSec =
@@ -401,7 +463,9 @@ function BlockCard({
 					onClick={() => onUpdate({ guided: !block.guided })}
 					className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition"
 					style={{
-						backgroundColor: block.guided ? `${color}15` : "var(--color-surface)",
+						backgroundColor: block.guided
+							? `${color}15`
+							: "var(--color-surface)",
 						color: block.guided ? color : "var(--color-text-muted)",
 						border: `1px solid ${block.guided ? color : "var(--color-border-soft)"}`,
 					}}
@@ -542,8 +606,7 @@ function BlockCard({
 															onUpdate({
 																config: {
 																	...block.config,
-																	cycles:
-																		(block.config?.cycles || 10) + 1,
+																	cycles: (block.config?.cycles || 10) + 1,
 																},
 															})
 														}
@@ -564,7 +627,8 @@ function BlockCard({
 													className="text-[10px]"
 													style={{ color: "var(--color-text-muted)" }}
 												>
-													{t("guided.estimated_duration")}: ~{estimatedFromCycles} min
+													{t("guided.estimated_duration")}: ~
+													{estimatedFromCycles} min
 												</p>
 											)}
 
@@ -663,7 +727,7 @@ function BlockCard({
 
 							{/* Duration selector (always shown for meditation, shown for VK/pranayama if no cycle config) */}
 							{(block.blockType === "meditation" ||
-								(block.blockType === "vk_sequence") ||
+								block.blockType === "vk_sequence" ||
 								(block.blockType === "pranayama" && !block.config?.cycles)) && (
 								<div>
 									<p

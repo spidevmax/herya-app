@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { BookOpen, Leaf, Play, Wind } from "lucide-react";
+import { BookOpen, Leaf, Wind } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -28,14 +28,6 @@ const ACTIONS = [
 		bg: "#9B5DE515",
 		to: "/session/pranayama",
 	},
-	{
-		key: "practice",
-		labelKey: "dashboard.quick_start",
-		icon: Play,
-		color: "#FFB347",
-		bg: "#FFB34715",
-		to: "/start-practice",
-	},
 ];
 
 /** Reorder quick actions based on user preferences — no new data required. */
@@ -48,15 +40,7 @@ function getOrderedActions(user) {
 	if (timeOfDay === "morning" || wantsMeditation) {
 		return [
 			...ACTIONS.filter((a) => a.key === "pranayama"),
-			...ACTIONS.filter((a) => a.key === "practice"),
-			...ACTIONS.filter((a) => a.key !== "pranayama" && a.key !== "practice"),
-		];
-	}
-	if (timeOfDay === "evening") {
-		return [
-			...ACTIONS.filter((a) => a.key === "practice"),
-			...ACTIONS.filter((a) => a.key === "pranayama"),
-			...ACTIONS.filter((a) => a.key !== "practice" && a.key !== "pranayama"),
+			...ACTIONS.filter((a) => a.key !== "pranayama"),
 		];
 	}
 	return ACTIONS;
@@ -69,7 +53,7 @@ export default function QuickActions({ user }) {
 
 	return (
 		<div className="px-4 sm:px-6">
-			<div className="grid grid-cols-4 gap-2">
+			<div className="grid grid-cols-3 gap-2">
 				{actions.map((a, i) => {
 					const Icon = a.icon;
 					return (

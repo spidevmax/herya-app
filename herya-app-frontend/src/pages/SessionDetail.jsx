@@ -30,25 +30,25 @@ const TYPE_CONFIG = {
 	vk_sequence: {
 		icon: PersonStanding,
 		color: "var(--color-primary)",
-		labelKey: "fab.vk_sequence",
+		labelKey: "dashboard.vk_sequence",
 		fallback: "VK Sequence",
 	},
 	pranayama: {
 		icon: Wind,
 		color: "var(--color-primary)",
-		labelKey: "fab.pranayama",
+		labelKey: "dashboard.pranayama",
 		fallback: "Pranayama",
 	},
 	meditation: {
 		icon: Leaf,
 		color: "var(--color-info)",
-		labelKey: "fab.meditation",
+		labelKey: "dashboard.meditation",
 		fallback: "Meditation",
 	},
 	complete_practice: {
 		icon: Star,
 		color: "var(--color-warning)",
-		labelKey: "fab.complete_practice",
+		labelKey: "dashboard.complete_practice",
 		fallback: "Complete Practice",
 	},
 };
@@ -128,6 +128,10 @@ export default function SessionDetail() {
 		(cfg.labelKey ? t(cfg.labelKey) : "") ||
 		cfg.fallback ||
 		session.sessionType;
+	const sessionTitle =
+		session.sessionType === "vk_sequence" && session.vkSequence?.englishName
+			? session.vkSequence.englishName
+			: sessionTypeLabel;
 	const family = session.vkFamily
 		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
 		: null;
@@ -168,25 +172,37 @@ export default function SessionDetail() {
 			<div className="px-4 flex flex-col gap-4">
 				{/* Type card */}
 				<div
-					className="rounded-3xl p-5 text-white flex items-center gap-4"
+					className="rounded-3xl p-5 flex items-center gap-4"
 					style={{
-						background: `linear-gradient(135deg, ${cfg.color}, ${cfg.color}CC)`,
+						backgroundColor: `color-mix(in srgb, ${cfg.color} 16%, var(--color-surface-card))`,
+						border: `1px solid color-mix(in srgb, ${cfg.color} 32%, transparent)`,
 					}}
 				>
 					{family?.emoji ? (
 						<span className="text-4xl">{family.emoji}</span>
 					) : (
-						<TypeIcon size={34} strokeWidth={2.2} />
+						<TypeIcon
+							size={34}
+							strokeWidth={2.2}
+							style={{ color: cfg.color }}
+						/>
 					)}
 					<div>
 						<p
 							className="font-display text-xl font-bold"
-							style={{ fontFamily: '"Fredoka", sans-serif' }}
+							style={{
+								fontFamily: '"Fredoka", sans-serif',
+								color: "var(--color-text-primary)",
+							}}
 						>
-							{sessionTypeLabel}
+							{sessionTitle}
 						</p>
-						{family && <p className="text-white/80 text-sm">{family.label}</p>}
-						<p className="text-white/70 text-xs mt-1">
+						{family && (
+							<p className="text-sm text-[var(--color-text-secondary)]">
+								{family.label}
+							</p>
+						)}
+						<p className="text-xs mt-1 text-[var(--color-text-muted)]">
 							{format.date(session.date || session.createdAt)}
 						</p>
 					</div>

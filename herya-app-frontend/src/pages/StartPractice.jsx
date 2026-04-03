@@ -1,5 +1,5 @@
-import { useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useCallback, useMemo, useEffect } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, Leaf, RotateCcw, Settings2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
@@ -40,16 +40,64 @@ const MOOD_OPTIONS = [
  */
 export default function StartPractice() {
 	const navigate = useNavigate();
+	const location = useLocation();
+	const [searchParams] = useSearchParams();
 	const { refreshUser } = useAuth();
 	const { t } = useLanguage();
 	const persistence = useSessionPersistence();
 
+	const navigationResumeSession = useMemo(() => {
+		const candidate = location.state?.resumeSession;
+		if (!candidate?._id || !Array.isArray(candidate?.plannedBlocks)) {
+			return null;
+		}
+
+		if (candidate.plannedBlocks.length === 0) {
+			return null;
+		}
+
+		const totalMinutes =
+			Number(candidate.duration) ||
+			candidate.plannedBlocks.reduce(
+				(sum, block) => sum + (Number(block.durationMinutes) || 0),
+				0,
+			);
+
+		return {
+			sessionId: candidate._id,
+			practiceType: candidate.sessionType || "vk_sequence",
+			blocks: candidate.plannedBlocks,
+			totalMinutes,
+		};
+	}, [location.state]);
+	const hasNavigationResume = Boolean(navigationResumeSession);
+
+	const prefilledType = searchParams.get("type");
+	const prefilledSequenceId = searchParams.get("seq");
+	const hasPrefilledSequence =
+		prefilledType === "vk_sequence" && Boolean(prefilledSequenceId);
+	const prefilledMinutes = Number(searchParams.get("minutes")) || 15;
+
 	// Flow phase: "type" | "build" | "checkin" | "practice" | "journal" | "done"
-	const [phase, setPhase] = useState("type");
-	const [practiceType, setPracticeType] = useState(null);
-	const [blocks, setBlocks] = useState([]);
-	const [totalMinutes, setTotalMinutes] = useState(0);
-	const [sessionId, setSessionId] = useState(null);
+	const [phase, setPhase] = useState(() =>
+		hasNavigationResume ? "practice" : hasPrefilledSequence ? "build" : "type",
+	);
+	const [practiceType, setPracticeType] = useState(() =>
+		hasNavigationResume
+			? navigationResumeSession.practiceType
+			: hasPrefilledSequence
+				? "vk_sequence"
+				: null,
+	);
+	const [blocks, setBlocks] = useState(() =>
+		hasNavigationResume ? navigationResumeSession.blocks : [],
+	);
+	const [totalMinutes, setTotalMinutes] = useState(() =>
+		hasNavigationResume ? navigationResumeSession.totalMinutes : 0,
+	);
+	const [sessionId, setSessionId] = useState(() =>
+		hasNavigationResume ? navigationResumeSession.sessionId : null,
+	);
 	const [sessionSummary, setSessionSummary] = useState(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState(null);
@@ -65,14 +113,33 @@ export default function StartPractice() {
 	const [checkInIntention, setCheckInIntention] = useState("");
 
 	// Recovery banner
-	const [showRecovery, setShowRecovery] = useState(!!persistence.recovered);
+	const [showRecovery, setShowRecovery] = useState(
+		!hasNavigationResume && !!persistence.recovered,
+	);
+	const [hasHydratedNavigationResume, setHasHydratedNavigationResume] =
+		useState(false);
+	const [initialBuilderBlocks] = useState(() =>
+		hasPrefilledSequence
+			? [
+					{
+						blockType: "vk_sequence",
+						durationMinutes: prefilledMinutes,
+						vkSequence: prefilledSequenceId,
+						guided: true,
+						level: "beginner",
+					},
+				]
+			: [],
+	);
 
 	// Fetch full sequence/pattern data for guided blocks before starting practice
 	const fetchGuidedData = useCallback(async (orderedBlocks) => {
 		const seqIds = [
 			...new Set(
 				orderedBlocks
-					.filter((b) => b.blockType === "vk_sequence" && b.guided && b.vkSequence)
+					.filter(
+						(b) => b.blockType === "vk_sequence" && b.guided && b.vkSequence,
+					)
 					.map((b) => b.vkSequence),
 			),
 		];
@@ -80,7 +147,8 @@ export default function StartPractice() {
 			...new Set(
 				orderedBlocks
 					.filter(
-						(b) => b.blockType === "pranayama" && b.guided && b.breathingPattern,
+						(b) =>
+							b.blockType === "pranayama" && b.guided && b.breathingPattern,
 					)
 					.map((b) => b.breathingPattern),
 			),
@@ -259,6 +327,26 @@ export default function StartPractice() {
 		setPhase("practice");
 		setShowRecovery(false);
 	}, [persistence.recovered, fetchGuidedData]);
+
+	useEffect(() => {
+		if (!hasNavigationResume || hasHydratedNavigationResume) return;
+
+		fetchGuidedData(navigationResumeSession.blocks);
+		persistence.saveSession({
+			sessionId: navigationResumeSession.sessionId,
+			practiceType: navigationResumeSession.practiceType,
+			blocks: navigationResumeSession.blocks,
+			totalMinutes: navigationResumeSession.totalMinutes,
+			phase: "practice",
+		});
+		setHasHydratedNavigationResume(true);
+	}, [
+		fetchGuidedData,
+		hasHydratedNavigationResume,
+		hasNavigationResume,
+		navigationResumeSession,
+		persistence,
+	]);
 
 	const toggleCheckInMood = (mood) => {
 		setCheckInMood((prev) =>
@@ -461,6 +549,9 @@ export default function StartPractice() {
 						>
 							<SessionBuilder
 								practiceType={practiceType}
+								initialBlocks={
+									practiceType === "vk_sequence" ? initialBuilderBlocks : []
+								}
 								onStartSession={handleStartSession}
 								onBack={() => setPhase("type")}
 							/>

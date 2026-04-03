@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { PRANAYAMA_PATTERNS } from "@/utils/constants";
@@ -17,56 +17,79 @@ const PHASE_COLORS = {
 	hold2: "#9B5DE5",
 };
 
+const getActivePhases = (pattern) =>
+	PHASES.filter((phase) => (pattern?.[phase] || 0) > 0);
+
 export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 	const [selectedKey, setSelectedKey] = useState(patternKey);
 	const [isRunning, setIsRunning] = useState(false);
 	const [phaseIdx, setPhaseIdx] = useState(0);
-	const [tick, setTick] = useState(0);
+	const [phaseRemaining, setPhaseRemaining] = useState(1);
 	const [totalCycles, setTotalCycles] = useState(0);
 	const intervalRef = useRef(null);
 
 	const currentPattern =
 		PRANAYAMA_PATTERNS[selectedKey] || PRANAYAMA_PATTERNS["4-4-4-4"];
-	const phase = PHASES[phaseIdx];
-	const phaseDuration = currentPattern[phase];
+	const activePhases = useMemo(
+		() => getActivePhases(currentPattern),
+		[currentPattern],
+	);
+	const phase = activePhases[phaseIdx] || activePhases[0] || "inhale";
+	const phaseDuration = currentPattern[phase] || 1;
 	const color = PHASE_COLORS[phase];
 
-	const nextPhase = useCallback(() => {
+	useEffect(() => {
+		const nextPattern =
+			PRANAYAMA_PATTERNS[patternKey] || PRANAYAMA_PATTERNS["4-4-4-4"];
+		const nextActivePhases = getActivePhases(nextPattern);
+		setSelectedKey(patternKey);
+		setPhaseIdx(0);
+		setPhaseRemaining(nextPattern[nextActivePhases[0]] || 1);
+		setTotalCycles(0);
+		setIsRunning(false);
+	}, [patternKey]);
+
+	const initializePattern = useCallback((key) => {
+		const nextPattern =
+			PRANAYAMA_PATTERNS[key] || PRANAYAMA_PATTERNS["4-4-4-4"];
+		const nextActivePhases = getActivePhases(nextPattern);
+		setSelectedKey(key);
+		setPhaseIdx(0);
+		setPhaseRemaining(nextPattern[nextActivePhases[0]] || 1);
+		setTotalCycles(0);
+		setIsRunning(false);
+	}, []);
+
+	const advancePhase = useCallback(() => {
 		setPhaseIdx((prev) => {
-			let next = prev;
-			let attempts = 0;
-			do {
-				next = (next + 1) % PHASES.length;
-				attempts++;
-			} while (currentPattern[PHASES[next]] === 0 && attempts < 4);
-			if (next < prev) setTotalCycles((c) => c + 1);
+			if (activePhases.length === 0) return 0;
+			const next = (prev + 1) % activePhases.length;
+			if (next === 0) setTotalCycles((c) => c + 1);
+			const nextPhaseKey = activePhases[next] || activePhases[0] || "inhale";
+			setPhaseRemaining(currentPattern[nextPhaseKey] || 1);
 			return next;
 		});
-		setTick(0);
-	}, [currentPattern]);
+	}, [activePhases, currentPattern]);
 
 	useEffect(() => {
 		if (!isRunning) {
-			clearInterval(intervalRef.current);
+			clearTimeout(intervalRef.current);
 			return;
 		}
-		intervalRef.current = setInterval(() => {
-			setTick((t) => {
-				if (t >= phaseDuration - 1) {
-					nextPhase();
-					return 0;
-				}
-				return t + 1;
-			});
+
+		intervalRef.current = setTimeout(() => {
+			if (phaseRemaining <= 1) {
+				advancePhase();
+			} else {
+				setPhaseRemaining((remaining) => remaining - 1);
+			}
 		}, 1000);
-		return () => clearInterval(intervalRef.current);
-	}, [isRunning, phaseDuration, nextPhase]);
+
+		return () => clearTimeout(intervalRef.current);
+	}, [isRunning, phaseRemaining, advancePhase]);
 
 	const reset = () => {
-		setIsRunning(false);
-		setPhaseIdx(0);
-		setTick(0);
-		setTotalCycles(0);
+		initializePattern(selectedKey);
 	};
 
 	const scale = phase === "inhale" ? 1.35 : phase === "exhale" ? 0.85 : 1;
@@ -79,8 +102,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 						type="button"
 						key={key}
 						onClick={() => {
-							reset();
-							setSelectedKey(key);
+							initializePattern(key);
 						}}
 						className={
 							"px-3 py-1.5 rounded-xl text-xs font-semibold transition-all " +
@@ -135,18 +157,16 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 								{PHASE_LABELS[phase]}
 							</p>
 							<p className="text-3xl font-bold" style={{ color }}>
-								{isRunning ? phaseDuration - tick : phaseDuration}
+								{phaseRemaining}
 							</p>
 						</motion.div>
 					</AnimatePresence>
 				</motion.div>
 			</div>
 
-			{totalCycles > 0 && (
-				<p className="text-[#6B7280] text-sm font-medium">
-					{totalCycles} cycle{totalCycles !== 1 ? "s" : ""} completed
-				</p>
-			)}
+			<p className="text-[#6B7280] text-sm font-medium">
+				{totalCycles} cycle{totalCycles !== 1 ? "s" : ""} completed
+			</p>
 
 			<div className="flex items-center gap-4">
 				<button
@@ -170,8 +190,8 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 				</motion.button>
 			</div>
 
-			<div className="flex gap-4">
-				{PHASES.filter((p) => currentPattern[p] > 0).map((p) => (
+			<div className="flex gap-4 flex-wrap justify-center">
+				{activePhases.map((p) => (
 					<div
 						key={p}
 						className="flex flex-col items-center gap-1 px-3 py-2 rounded-xl"

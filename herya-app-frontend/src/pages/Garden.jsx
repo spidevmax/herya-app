@@ -61,6 +61,35 @@ const toUniqueMoodTokens = (moods, prefix) => {
 	});
 };
 
+const translateMoodLabel = (mood, t) => {
+	const key = `session.moods.${mood}`;
+	const translated = t(key);
+	return translated === key ? mood : translated;
+};
+
+const buildGraphViewport = (nodes) => {
+	if (!nodes.length) {
+		return { minX: 0, minY: 0, width: 1000, height: 520 };
+	}
+
+	const xs = nodes.map((node) => node.x);
+	const ys = nodes.map((node) => node.y);
+	const paddingX = 72;
+	const paddingY = 64;
+
+	const minX = Math.min(...xs) - paddingX;
+	const maxX = Math.max(...xs) + paddingX;
+	const minY = Math.min(...ys) - paddingY;
+	const maxY = Math.max(...ys) + paddingY;
+
+	return {
+		minX,
+		minY,
+		width: Math.max(maxX - minX, 1),
+		height: Math.max(maxY - minY, 1),
+	};
+};
+
 const buildGraphData = (entries) => {
 	const chronological = [...entries].sort(
 		(a, b) =>
@@ -198,6 +227,10 @@ export default function Garden() {
 	);
 	const nodeMap = useMemo(
 		() => Object.fromEntries(graph.nodes.map((node) => [node.id, node])),
+		[graph.nodes],
+	);
+	const graphViewport = useMemo(
+		() => buildGraphViewport(graph.nodes),
 		[graph.nodes],
 	);
 	const selectedMoodTokens = useMemo(
@@ -564,8 +597,12 @@ export default function Garden() {
 								border: "1px solid var(--color-border-soft)",
 							}}
 						>
-							<div className="relative h-[460px] w-full overflow-hidden rounded-2xl bg-white/60">
-								<svg viewBox="0 0 1000 520" className="h-full w-full">
+							<div className="relative h-[420px] sm:h-[460px] w-full overflow-hidden rounded-2xl bg-white/60">
+								<svg
+									viewBox={`${graphViewport.minX} ${graphViewport.minY} ${graphViewport.width} ${graphViewport.height}`}
+									preserveAspectRatio="none"
+									className="h-full w-full"
+								>
 									<title>{t("garden.graph_title")}</title>
 									{graph.edges.map((edge) => {
 										const source = nodeMap[edge.source];
@@ -616,8 +653,8 @@ export default function Garden() {
 											})}
 											className="absolute w-9 h-9 -translate-x-1/2 -translate-y-1/2 rounded-full"
 											style={{
-												left: `${(node.x / 1000) * 100}%`,
-												top: `${(node.y / 520) * 100}%`,
+												left: `${((node.x - graphViewport.minX) / graphViewport.width) * 100}%`,
+												top: `${((node.y - graphViewport.minY) / graphViewport.height) * 100}%`,
 												boxShadow: `0 0 0 1px ${node.color}40 inset`,
 											}}
 										/>
@@ -662,7 +699,7 @@ export default function Garden() {
 													color: MOOD_COLORS[mood] || "#5DB075",
 												}}
 											>
-												{mood}
+												{translateMoodLabel(mood, t)}
 											</span>
 										))}
 									</div>

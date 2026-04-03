@@ -46,6 +46,7 @@ export default function HeroCard({ sequence, reason, loading }) {
 		emoji: null,
 		label: sequence.family,
 	};
+	const recommendedMinutes = Number(sequence.estimatedDuration?.recommended);
 	const handleCardClick = () => navigate(`/library/sequence/${sequence._id}`);
 	const handleCardKeyDown = (event) => {
 		if (event.key === "Enter" || event.key === " ") {
@@ -121,7 +122,14 @@ export default function HeroCard({ sequence, reason, loading }) {
 					style={{ color: family.color }}
 					onClick={(e) => {
 						e.stopPropagation();
-						navigate(`/session/vk_sequence?seq=${sequence._id}`);
+						const params = new URLSearchParams({
+							type: "vk_sequence",
+							seq: sequence._id,
+						});
+						if (Number.isFinite(recommendedMinutes) && recommendedMinutes > 0) {
+							params.set("minutes", String(Math.round(recommendedMinutes)));
+						}
+						navigate(`/start-practice?${params.toString()}`);
 					}}
 				>
 					{t("hero.start")} <ArrowRight size={16} />

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, PersonStanding } from "lucide-react";
+import { ChevronLeft, ChevronRight, PersonStanding } from "lucide-react";
 import { getPoses, searchPoses } from "@/api/poses.api";
 import {
 	SearchBar,
@@ -37,6 +37,10 @@ function PoseCard({ pose, index, onClick, t }) {
 		intermediate: t("library.intermediate"),
 		advanced: t("library.advanced"),
 	};
+	const tr = (key, fallback) => {
+		const value = t(key);
+		return value === key ? fallback : value;
+	};
 	const category = Array.isArray(pose.vkCategory?.primary)
 		? pose.vkCategory.primary.join(", ")
 		: typeof pose.vkCategory?.primary === "string"
@@ -66,6 +70,33 @@ function PoseCard({ pose, index, onClick, t }) {
 		: null;
 	const contraindications = normalizeList(pose.contraindications).slice(0, 2);
 	const description = pose.description || "";
+	const poseName =
+		pose.englishName || pose.name || t("library.card_default_item");
+	const poseSubtitle = pose.romanizationName || pose.sanskritName || null;
+	const summaryDetails = [
+		breathingCue
+			? { label: t("library.poses_breathe"), value: breathingCue }
+			: null,
+		targetMuscles.length > 0
+			? {
+					label: t("library.poses_muscles"),
+					value: targetMuscles.join(", "),
+				}
+			: null,
+		jointFocus.length > 0
+			? {
+					label: t("library.poses_joints"),
+					value: jointFocus.join(", "),
+				}
+			: null,
+		drishti ? { label: t("library.poses_drishti"), value: drishti } : null,
+		energyEffect
+			? { label: t("library.poses_energy"), value: energyEffect }
+			: null,
+		sidedness ? { label: t("library.poses_side"), value: sidedness } : null,
+	]
+		.filter(Boolean)
+		.slice(0, 3);
 
 	return (
 		<motion.button
@@ -74,33 +105,50 @@ function PoseCard({ pose, index, onClick, t }) {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: Math.min(index * 0.03, 0.3) }}
 			onClick={onClick}
-			className="bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] rounded-2xl p-4 flex items-start gap-4 shadow-[var(--shadow-card)] w-full text-left"
+			className="group bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] rounded-2xl p-4 flex items-start gap-4 shadow-[var(--shadow-card)] w-full text-left transition-all duration-200 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-[1px] active:scale-[0.995] cursor-pointer"
 		>
 			<div
-				className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5"
+				className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5 border"
 				style={{
 					background:
 						"linear-gradient(135deg, color-mix(in srgb, var(--color-info) 14%, transparent), color-mix(in srgb, var(--color-success) 14%, transparent))",
+					borderColor: "var(--color-border-soft)",
 				}}
 			>
 				{pose.image ? (
 					<img
 						src={pose.image}
-						alt={pose.englishName}
+						alt={poseName}
 						className="w-full h-full object-cover rounded-xl"
 					/>
 				) : (
-					<PersonStanding size={26} style={{ color: "var(--color-primary)" }} />
+					<PersonStanding size={30} style={{ color: "var(--color-primary)" }} />
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
-				<p className="font-semibold text-[var(--color-text-primary)] text-sm leading-snug">
-					{pose.name}
-				</p>
-				<p className="text-[var(--color-text-muted)] text-xs italic mt-0.5">
-					{pose.romanizationName}
-				</p>
-				<div className="flex gap-1.5 mt-2 flex-wrap">
+				<div className="flex items-start justify-between gap-3">
+					<div className="min-w-0">
+						<p className="font-semibold text-[var(--color-text-primary)] text-base leading-snug truncate">
+							{poseName}
+						</p>
+						{poseSubtitle ? (
+							<p className="text-[var(--color-text-muted)] text-xs italic mt-0.5 truncate">
+								{poseSubtitle}
+							</p>
+						) : null}
+					</div>
+					<div
+						className="inline-flex items-center gap-1 text-[11px] font-semibold shrink-0"
+						style={{ color: "var(--color-primary)" }}
+					>
+						{tr("library.view_details", "View details")}
+						<ChevronRight
+							size={13}
+							className="transition-transform group-hover:translate-x-0.5"
+						/>
+					</div>
+				</div>
+				<div className="flex gap-1.5 mt-2.5 flex-wrap">
 					{pose.difficulty && (
 						<Badge
 							color={DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"}
@@ -111,55 +159,15 @@ function PoseCard({ pose, index, onClick, t }) {
 					{category && <Badge color="var(--color-info)">{category}</Badge>}
 					{family && <Badge color="var(--color-lavender)">{family}</Badge>}
 				</div>
-				<div className="mt-3 flex flex-col gap-2 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">
-					{breathingCue && (
-						<p>
+				<div className="mt-3 flex flex-col gap-1.5 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">
+					{summaryDetails.map((detail) => (
+						<p key={`${pose._id}-${detail.label}`} className="line-clamp-1">
 							<span className="font-semibold text-[var(--color-text-primary)]">
-								{t("library.poses_breathe")}
+								{detail.label}
 							</span>{" "}
-							{breathingCue}
+							{detail.value}
 						</p>
-					)}
-					{targetMuscles.length > 0 && (
-						<p>
-							<span className="font-semibold text-[var(--color-text-primary)]">
-								{t("library.poses_muscles")}
-							</span>{" "}
-							{targetMuscles.join(", ")}
-						</p>
-					)}
-					{jointFocus.length > 0 && (
-						<p>
-							<span className="font-semibold text-[var(--color-text-primary)]">
-								{t("library.poses_joints")}
-							</span>{" "}
-							{jointFocus.join(", ")}
-						</p>
-					)}
-					{drishti && (
-						<p>
-							<span className="font-semibold text-[var(--color-text-primary)]">
-								{t("library.poses_drishti")}
-							</span>{" "}
-							{drishti}
-						</p>
-					)}
-					{energyEffect && (
-						<p>
-							<span className="font-semibold text-[var(--color-text-primary)]">
-								{t("library.poses_energy")}
-							</span>{" "}
-							{energyEffect}
-						</p>
-					)}
-					{sidedness && (
-						<p>
-							<span className="font-semibold text-[var(--color-text-primary)]">
-								{t("library.poses_side")}
-							</span>{" "}
-							{sidedness}
-						</p>
-					)}
+					))}
 					{secondary.length > 0 && (
 						<p>
 							<span className="font-semibold text-[var(--color-text-primary)]">
@@ -169,7 +177,7 @@ function PoseCard({ pose, index, onClick, t }) {
 						</p>
 					)}
 					{contraindications.length > 0 && (
-						<p>
+						<p className="line-clamp-1">
 							<span className="font-semibold text-[var(--color-text-primary)]">
 								{t("library.poses_cautions")}
 							</span>{" "}
@@ -183,9 +191,21 @@ function PoseCard({ pose, index, onClick, t }) {
 					</p>
 				)}
 				{benefits.length > 0 && (
-					<p className="mt-2 text-[11px] leading-relaxed text-[var(--color-text-muted)]">
-						{benefits.join(" · ")}
-					</p>
+					<div className="mt-2 flex flex-wrap gap-1.5">
+						{benefits.map((benefit) => (
+							<span
+								key={`${pose._id}-benefit-${benefit}`}
+								className="text-[10px] px-2 py-1 rounded-full"
+								style={{
+									backgroundColor:
+										"color-mix(in srgb, var(--color-primary) 12%, transparent)",
+									color: "var(--color-text-secondary)",
+								}}
+							>
+								{benefit}
+							</span>
+						))}
+					</div>
 				)}
 			</div>
 		</motion.button>

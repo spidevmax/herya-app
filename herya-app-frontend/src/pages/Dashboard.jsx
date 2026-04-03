@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { RotateCcw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { getRecommendedSequence } from "@/api/sequences.api";
 import { getSessions, getSessionStats } from "@/api/sessions.api";
 import CalendarStrip from "@/components/dashboard/CalendarStrip";
 import HeroCard from "@/components/dashboard/HeroCard";
-import QuickActions from "@/components/dashboard/QuickActions";
+import SoftReminderCard from "@/components/dashboard/SoftReminderCard";
 import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
 import { SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -11,6 +13,7 @@ import { useLanguage } from "@/context/LanguageContext";
 
 export default function Dashboard() {
 	const { user } = useAuth();
+	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const [recommended, setRecommended] = useState(null);
 	const [recommendReason, setRecommendReason] = useState(null);
@@ -42,7 +45,10 @@ export default function Dashboard() {
 			.finally(() => setLoading(false));
 	}, []);
 
-	const sessionDates = sessions.map((s) =>
+	const completedSessions = sessions.filter((session) => session.completed);
+	const pendingSession = sessions.find((session) => !session.completed) || null;
+
+	const sessionDates = completedSessions.map((s) =>
 		(s.date || s.createdAt || "").slice(0, 10),
 	);
 	// sessionsPerWeek[3] is the current week (index 0 = oldest of last 4 weeks)
@@ -79,6 +85,12 @@ export default function Dashboard() {
 				</div>
 			</div>
 
+			<SoftReminderCard
+				user={user}
+				sessions={sessions}
+				streak={stats?.currentStreak ?? 0}
+			/>
+
 			{/* ── Responsive grid ───────────────────────────────────────────
 			    Mobile (1 col):  Calendar → Hero → QuickActions → Recent
 			    Desktop (2 col): left = Hero / Recent · right = Calendar / QuickActions
@@ -103,11 +115,6 @@ export default function Dashboard() {
 					/>
 				</div>
 
-				{/* QuickActions — DOM 3 → mobile 3rd · desktop right-bottom */}
-				<div className="lg:col-start-2 lg:row-start-2">
-					<QuickActions user={user} />
-				</div>
-
 				{/* Recent Sessions — DOM 4 → mobile 4th · desktop left-bottom */}
 				<div className="lg:col-start-1 lg:row-start-2 px-4 sm:px-6 flex flex-col gap-3">
 					{loading ? (
@@ -117,36 +124,102 @@ export default function Dashboard() {
 								<SkeletonCard key={k} />
 							))}
 						</>
-					) : sessions.length > 0 ? (
-						<>
-							<h2
-								className="text-[11px] font-bold uppercase tracking-[0.1em]"
-								style={{ color: "var(--color-text-muted)" }}
-							>
-								{t("dashboard.recent_practice")}
-							</h2>
-							{sessions.map((s, i) => (
-								<RecentSessionCard key={s._id} session={s} index={i} />
-							))}
-						</>
 					) : (
-						<div
-							className="rounded-3xl p-6 text-center shadow-[var(--shadow-card)]"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
-						>
-							<p
-								className="text-sm font-semibold mb-1"
-								style={{ color: "var(--color-text-primary)" }}
-							>
-								{t("dashboard.no_sessions_title")}
-							</p>
-							<p
-								className="text-xs"
-								style={{ color: "var(--color-text-muted)" }}
-							>
-								{t("dashboard.no_sessions_hint")}
-							</p>
-						</div>
+						<>
+							{pendingSession && (
+								<div
+									className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3"
+									style={{
+										backgroundColor: "var(--color-surface-card)",
+										border: "1px solid var(--color-border-soft)",
+									}}
+								>
+									<div className="min-w-0">
+										<p
+											className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1"
+											style={{ color: "var(--color-text-muted)" }}
+										>
+											{t("dashboard.resume_practice")}
+										</p>
+										<p
+											className="text-sm font-semibold truncate"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{t(`dashboard.${pendingSession.sessionType}`)}
+										</p>
+										<p
+											className="text-xs"
+											style={{ color: "var(--color-text-secondary)" }}
+										>
+											{t("session_detail.in_progress")} ·{" "}
+											{pendingSession.duration} min
+										</p>
+									</div>
+									<button
+										type="button"
+										onClick={() => {
+											if (
+												Array.isArray(pendingSession.plannedBlocks) &&
+												pendingSession.plannedBlocks.length > 0
+											) {
+												navigate("/start-practice", {
+													state: {
+														resumeSession: {
+															_id: pendingSession._id,
+															sessionType: pendingSession.sessionType,
+															duration: pendingSession.duration,
+															plannedBlocks: pendingSession.plannedBlocks,
+														},
+													},
+												});
+												return;
+											}
+
+											navigate("/start-practice");
+										}}
+										className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white shrink-0"
+										style={{ backgroundColor: "var(--color-primary)" }}
+									>
+										<RotateCcw size={12} />
+										{t("practice.resume")}
+									</button>
+								</div>
+							)}
+
+							{completedSessions.length > 0 ? (
+								<>
+									<h2
+										className="text-[11px] font-bold uppercase tracking-[0.1em]"
+										style={{ color: "var(--color-text-muted)" }}
+									>
+										{t("dashboard.recent_practice")}
+									</h2>
+									{completedSessions.map((s, i) => (
+										<RecentSessionCard key={s._id} session={s} index={i} />
+									))}
+								</>
+							) : (
+								!pendingSession && (
+									<div
+										className="rounded-3xl p-6 text-center shadow-[var(--shadow-card)]"
+										style={{ backgroundColor: "var(--color-surface-card)" }}
+									>
+										<p
+											className="text-sm font-semibold mb-1"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{t("dashboard.no_sessions_title")}
+										</p>
+										<p
+											className="text-xs"
+											style={{ color: "var(--color-text-muted)" }}
+										>
+											{t("dashboard.no_sessions_hint")}
+										</p>
+									</div>
+								)
+							)}
+						</>
 					)}
 				</div>
 			</div>

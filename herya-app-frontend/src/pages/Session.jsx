@@ -21,7 +21,8 @@ import { getSequenceById } from "@/api/sequences.api";
 import { getPosesByFamily, getPoses } from "@/api/poses.api";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
-import PranayamaMetronome from "@/components/session/PranayamaMetronome";
+import CycleBreathingPlayer from "@/components/session/CycleBreathingPlayer";
+import PostPracticeNudge from "@/components/session/PostPracticeNudge";
 import { Button } from "@/components/ui";
 import { SESSION_TYPES } from "@/utils/constants";
 
@@ -237,7 +238,7 @@ export default function Session() {
 
 	useEffect(() => {
 		if (
-			!isCompletePractice ||
+			(!isCompletePractice && !isPranayama) ||
 			completeCatalogLoading ||
 			completeSequences.length > 0
 		) {
@@ -266,10 +267,16 @@ export default function Session() {
 					const preferredEffect = getPreferredBreathingEffect(
 						user?.preferences?.timeOfDay,
 					);
+					const withRetentions = safeBreathList.find((item) => {
+						const ratio = item?.patternRatio || {};
+						return (ratio.hold || 0) > 0 || (ratio.holdAfterExhale || 0) > 0;
+					});
 					const recommended =
+						(isPranayama && withRetentions) ||
 						safeBreathList.find(
 							(item) => item?.energyEffect === preferredEffect,
-						) || safeBreathList[0];
+						) ||
+						safeBreathList[0];
 					if (recommended?._id) setCompletePranayamaId(recommended._id);
 				}
 			})
@@ -280,6 +287,7 @@ export default function Session() {
 			.finally(() => setCompleteCatalogLoading(false));
 	}, [
 		isCompletePractice,
+		isPranayama,
 		completeCatalogLoading,
 		completeSequences.length,
 		completePranayamaId,
@@ -530,7 +538,30 @@ export default function Session() {
 							className="flex flex-col gap-6 pt-4 items-center"
 						>
 							{isPranayama ? (
-								<PranayamaMetronome />
+								completeSelectedPranayama ? (
+									<div className="w-full">
+										<CycleBreathingPlayer
+											pattern={completeSelectedPranayama}
+											config={{
+												cycles:
+													completeSelectedPranayama.recommendedPractice?.cycles
+														?.default,
+												pauseBetweenCycles: 0,
+												hapticFeedback: true,
+											}}
+											onComplete={() => setStep("post")}
+										/>
+									</div>
+								) : (
+									<div className="w-full text-center py-16">
+										<p className="text-[#6B7280] text-sm font-medium">
+											{tr(
+												"session.complete_loading_catalog",
+												"Loading sequences and pranayama...",
+											)}
+										</p>
+									</div>
+								)
 							) : isCompletePractice ? (
 								<div className="w-full flex flex-col gap-4">
 									<div className="rounded-2xl bg-white p-5 text-center">
@@ -1000,6 +1031,7 @@ export default function Session() {
 							>
 								{t("session.post_title")}
 							</h2>
+							<PostPracticeNudge durationMinutes={duration} />
 							<div className="bg-white rounded-2xl p-5">
 								<p
 									className="text-sm font-medium text-[#1A1A2E] mb-3"

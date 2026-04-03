@@ -99,6 +99,7 @@ export const translations = {
 			see_all: "See all",
 			quick_practice: "Quick practice",
 			recent_practice: "Recent practice",
+			resume_practice: "Resume practice",
 			vk_sequence: "VK Sequence",
 			pranayama: "Pranayama",
 			meditation: "Meditation",
@@ -107,6 +108,12 @@ export const translations = {
 			day_streak: "{n}-day streak",
 			sessions_this_week: "{n} this week",
 			welcome_title: "Welcome!",
+			reminder_label: "Gentle reminder",
+			reminder_water: "Remember to drink some water before you start.",
+			reminder_short_practice: "Today, a short practice is enough.",
+			reminder_keep_going: "Your consistency matters more than the length.",
+			reminder_breathe: "Take one calm breath before you continue.",
+			dismiss_reminder: "Not now",
 			quick_garden: "Garden",
 			quick_start: "Practice",
 			no_sessions_title: "No practice yet",
@@ -600,6 +607,11 @@ export const translations = {
 			journal_gratitude_placeholder: "What are you grateful for?",
 			journal_learnings: "Insights & Learnings",
 			journal_learnings_placeholder: "Any insights from this practice?",
+			post_nudge_label: "After practice",
+			post_nudge_hydrate: "Hydrate now. A small sip helps your recovery.",
+			post_nudge_return: "Come back whenever you want. Even 5 minutes count.",
+			post_nudge_breathe: "Take one slow breath before moving on.",
+			dismiss_nudge: "Dismiss message",
 			save_journal: "Save Journal",
 			done_title: "Well done!",
 			done_subtitle: "Your practice has been recorded. Keep it up!",
@@ -680,20 +692,34 @@ export const translations = {
 			meditation_main: "Practice",
 			meditation_close: "Closing",
 			meditation_silence: "Sit in stillness. Follow your breath.",
-			meditation_guided_intro: "Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
-			meditation_guided_main: "Let your attention rest on the natural rhythm of your breath. When your mind wanders, gently bring it back without judgment.",
-			meditation_guided_close: "Begin to deepen your breath. Gently bring awareness back to your body. When you're ready, open your eyes.",
-			meditation_breath_intro: "Settle into your posture. Let your spine be tall and your shoulders relaxed. Begin to notice the natural flow of your breath.",
-			meditation_breath_main: "Observe each inhale and exhale. Notice where you feel the breath most — nostrils, chest, or belly. Simply observe without changing.",
-			meditation_breath_close: "Slowly widen your awareness from the breath to your whole body. Take a deep breath in and gently open your eyes.",
-			meditation_mantra_intro: "Find your center. Choose a mantra or intention that resonates with you today. It can be a single word or short phrase.",
-			meditation_mantra_main: "Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
-			meditation_mantra_close: "Let the mantra fade naturally. Sit in the silence it leaves. When ready, return to the room.",
-			meditation_viz_intro: "Close your eyes and take several cleansing breaths. Allow your mind to become a calm, clear space for visualization.",
-			meditation_viz_main: "Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
-			meditation_viz_close: "Let the image gently fade. Carry the feeling of peace with you as you return to the present moment.",
-			meditation_silent_intro: "Settle into stillness. There are no instructions to follow. Simply be present with whatever arises.",
-			meditation_silent_close: "Gently bring your awareness back. Notice sounds around you, the feeling of your body. Open your eyes when ready.",
+			meditation_guided_intro:
+				"Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
+			meditation_guided_main:
+				"Let your attention rest on the natural rhythm of your breath. When your mind wanders, gently bring it back without judgment.",
+			meditation_guided_close:
+				"Begin to deepen your breath. Gently bring awareness back to your body. When you're ready, open your eyes.",
+			meditation_breath_intro:
+				"Settle into your posture. Let your spine be tall and your shoulders relaxed. Begin to notice the natural flow of your breath.",
+			meditation_breath_main:
+				"Observe each inhale and exhale. Notice where you feel the breath most — nostrils, chest, or belly. Simply observe without changing.",
+			meditation_breath_close:
+				"Slowly widen your awareness from the breath to your whole body. Take a deep breath in and gently open your eyes.",
+			meditation_mantra_intro:
+				"Find your center. Choose a mantra or intention that resonates with you today. It can be a single word or short phrase.",
+			meditation_mantra_main:
+				"Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
+			meditation_mantra_close:
+				"Let the mantra fade naturally. Sit in the silence it leaves. When ready, return to the room.",
+			meditation_viz_intro:
+				"Close your eyes and take several cleansing breaths. Allow your mind to become a calm, clear space for visualization.",
+			meditation_viz_main:
+				"Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
+			meditation_viz_close:
+				"Let the image gently fade. Carry the feeling of peace with you as you return to the present moment.",
+			meditation_silent_intro:
+				"Settle into stillness. There are no instructions to follow. Simply be present with whatever arises.",
+			meditation_silent_close:
+				"Gently bring your awareness back. Notice sounds around you, the feeling of your body. Open your eyes when ready.",
 		},
 	},
 
@@ -798,6 +824,7 @@ export const translations = {
 			see_all: "Ver todo",
 			quick_practice: "Práctica rápida",
 			recent_practice: "Práctica reciente",
+			resume_practice: "Reanudar práctica",
 			vk_sequence: "Secuencia VK",
 			pranayama: "Pranayama",
 			meditation: "Meditación",
@@ -806,6 +833,12 @@ export const translations = {
 			day_streak: "Racha: {n} días",
 			sessions_this_week: "{n} esta semana",
 			welcome_title: "¡Bienvenida!",
+			reminder_label: "Recordatorio suave",
+			reminder_water: "Recuerda beber agua antes de empezar.",
+			reminder_short_practice: "Hoy, una práctica corta ya cuenta.",
+			reminder_keep_going: "Tu constancia importa más que la duración.",
+			reminder_breathe: "Haz una respiración tranquila antes de seguir.",
+			dismiss_reminder: "Ahora no",
 			quick_garden: "Jardín",
 			quick_start: "Práctica",
 			no_sessions_title: "Todavía sin práctica",
@@ -1299,6 +1332,11 @@ export const translations = {
 			journal_gratitude_placeholder: "¿Por qué estás agradecido/a?",
 			journal_learnings: "Insights y Aprendizajes",
 			journal_learnings_placeholder: "¿Algún insight de esta práctica?",
+			post_nudge_label: "Después de practicar",
+			post_nudge_hydrate: "Hidrátate ahora. Un sorbo ayuda a recuperarte.",
+			post_nudge_return: "Vuelve cuando quieras. Incluso 5 minutos cuentan.",
+			post_nudge_breathe: "Haz una respiración lenta antes de seguir.",
+			dismiss_nudge: "Cerrar mensaje",
 			save_journal: "Guardar Diario",
 			done_title: "¡Bien hecho!",
 			done_subtitle: "Tu práctica ha sido registrada. ¡Sigue así!",
@@ -1379,20 +1417,34 @@ export const translations = {
 			meditation_main: "Práctica",
 			meditation_close: "Cierre",
 			meditation_silence: "Siéntate en quietud. Sigue tu respiración.",
-			meditation_guided_intro: "Encuentra una posición sentada cómoda. Cierra suavemente los ojos. Toma tres respiraciones profundas para llegar a este momento.",
-			meditation_guided_main: "Deja que tu atención descanse en el ritmo natural de tu respiración. Cuando tu mente divague, tráela de vuelta suavemente sin juicio.",
-			meditation_guided_close: "Comienza a profundizar tu respiración. Trae suavemente la conciencia de vuelta a tu cuerpo. Cuando estés listo, abre los ojos.",
-			meditation_breath_intro: "Acomódate en tu postura. Deja que tu columna esté erguida y tus hombros relajados. Comienza a notar el flujo natural de tu respiración.",
-			meditation_breath_main: "Observa cada inhalación y exhalación. Nota dónde sientes más la respiración — fosas nasales, pecho o abdomen. Simplemente observa sin cambiar.",
-			meditation_breath_close: "Lentamente amplía tu conciencia de la respiración a todo tu cuerpo. Toma una respiración profunda y abre suavemente los ojos.",
-			meditation_mantra_intro: "Encuentra tu centro. Elige un mantra o intención que resuene contigo hoy. Puede ser una sola palabra o una frase corta.",
-			meditation_mantra_main: "Repite silenciosamente tu mantra con cada exhalación. Deja que la vibración de las palabras se asiente en tu conciencia.",
-			meditation_mantra_close: "Deja que el mantra se desvanezca naturalmente. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
-			meditation_viz_intro: "Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
-			meditation_viz_main: "Imagina una luz cálida y sanadora rodeándote. Con cada respiración, deja que disuelva la tensión y te llene de paz.",
-			meditation_viz_close: "Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
-			meditation_silent_intro: "Acomódate en la quietud. No hay instrucciones que seguir. Simplemente estate presente con lo que surja.",
-			meditation_silent_close: "Trae suavemente tu conciencia de vuelta. Nota los sonidos a tu alrededor, la sensación de tu cuerpo. Abre los ojos cuando estés listo.",
+			meditation_guided_intro:
+				"Encuentra una posición sentada cómoda. Cierra suavemente los ojos. Toma tres respiraciones profundas para llegar a este momento.",
+			meditation_guided_main:
+				"Deja que tu atención descanse en el ritmo natural de tu respiración. Cuando tu mente divague, tráela de vuelta suavemente sin juicio.",
+			meditation_guided_close:
+				"Comienza a profundizar tu respiración. Trae suavemente la conciencia de vuelta a tu cuerpo. Cuando estés listo, abre los ojos.",
+			meditation_breath_intro:
+				"Acomódate en tu postura. Deja que tu columna esté erguida y tus hombros relajados. Comienza a notar el flujo natural de tu respiración.",
+			meditation_breath_main:
+				"Observa cada inhalación y exhalación. Nota dónde sientes más la respiración — fosas nasales, pecho o abdomen. Simplemente observa sin cambiar.",
+			meditation_breath_close:
+				"Lentamente amplía tu conciencia de la respiración a todo tu cuerpo. Toma una respiración profunda y abre suavemente los ojos.",
+			meditation_mantra_intro:
+				"Encuentra tu centro. Elige un mantra o intención que resuene contigo hoy. Puede ser una sola palabra o una frase corta.",
+			meditation_mantra_main:
+				"Repite silenciosamente tu mantra con cada exhalación. Deja que la vibración de las palabras se asiente en tu conciencia.",
+			meditation_mantra_close:
+				"Deja que el mantra se desvanezca naturalmente. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
+			meditation_viz_intro:
+				"Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
+			meditation_viz_main:
+				"Imagina una luz cálida y sanadora rodeándote. Con cada respiración, deja que disuelva la tensión y te llene de paz.",
+			meditation_viz_close:
+				"Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
+			meditation_silent_intro:
+				"Acomódate en la quietud. No hay instrucciones que seguir. Simplemente estate presente con lo que surja.",
+			meditation_silent_close:
+				"Trae suavemente tu conciencia de vuelta. Nota los sonidos a tu alrededor, la sensación de tu cuerpo. Abre los ojos cuando estés listo.",
 		},
 	},
 };

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
+import PostPracticeNudge from "./PostPracticeNudge";
 import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
 
 const SENSATION_OPTIONS = [
@@ -82,6 +83,13 @@ export default function PostPracticeJournal({
 			animate={{ opacity: 1, y: 0 }}
 			className="flex flex-col gap-5 pt-2"
 		>
+			<PostPracticeNudge
+				durationMinutes={Math.round(
+					(sessionSummary?.globalElapsedSec || 0) / 60,
+				)}
+				stressAfter={stressAfter}
+			/>
+
 			{/* Session summary */}
 			<div
 				className="rounded-2xl p-5 text-center"
