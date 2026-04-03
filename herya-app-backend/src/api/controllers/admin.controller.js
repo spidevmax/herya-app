@@ -955,6 +955,7 @@ const getUserAnalytics = async (req, res, next) => {
 			practiceHistory: {
 				completedSequencesCount: completedSequences,
 			},
+			vkProgression: user.vkProgression,
 			recentSessions,
 		});
 	} catch (error) {

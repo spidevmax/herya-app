@@ -1,41 +1,49 @@
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, X } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
 import { getJournalEntries } from "@/api/journalEntries.api";
 import FlowerGarden from "@/components/garden/FlowerGarden";
 import { EmptyState } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { MOOD_COLORS } from "@/utils/constants";
+import {
+	ALL_MOODS,
+	ALL_TYPES,
+	filterGardenEntries,
+	getDatePresetRange,
+} from "@/utils/gardenFilters";
 
 const VIEW_MODE = {
 	GRAPH: "graph",
 	FLOWERS: "flowers",
 };
 
-const ALL_MOODS = "all";
-const ALL_TYPES = "all";
 const DATE_PRESETS = [7, 30, 90];
-
-const PRACTICE_TYPE_LABELS = {
-	vk_sequence: "Vinyasa Krama",
-	pranayama: "Pranayama",
-	meditation: "Meditacion",
-	complete_practice: "Practica completa",
-};
 
 const resolveEntryId = (entry) =>
 	entry?._id || entry?.id || entry?.session || null;
 
-const getEntryTimestamp = (entry) => {
-	const raw = entry?.date || entry?.createdAt;
-	if (!raw) return null;
-	const ts = new Date(raw).getTime();
-	return Number.isNaN(ts) ? null : ts;
-};
-
 const getPracticeType = (entry) =>
 	entry?.session?.sessionType || entry?.sessionType || null;
+
+const parseViewMode = (value) =>
+	value === VIEW_MODE.FLOWERS ? VIEW_MODE.FLOWERS : VIEW_MODE.GRAPH;
+
+const parseDateInput = (value) =>
+	typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "";
+
+const parseDatePreset = (value) => {
+	const parsed = Number(value);
+	return DATE_PRESETS.includes(parsed) ? parsed : null;
+};
+
+const getPracticeTypeLabel = (type, t) => {
+	const key = `garden.practice_types.${type}`;
+	const translated = t(key);
+	return translated === key ? type : translated;
+};
 
 const getPrimaryMood = (entry) => {
 	const moods = entry.moodAfter || entry.moodBefore || [];
@@ -103,17 +111,36 @@ const buildGraphData = (entries) => {
 
 export default function Garden() {
 	const { t } = useLanguage();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [entries, setEntries] = useState([]);
 	const [loading, setLoading] = useState(true);
-	const [selected, setSelected] = useState(null);
-	const [viewMode, setViewMode] = useState(VIEW_MODE.GRAPH);
-	const [selectedMood, setSelectedMood] = useState(ALL_MOODS);
-	const [selectedType, setSelectedType] = useState(ALL_TYPES);
-	const [dateFrom, setDateFrom] = useState("");
-	const [dateTo, setDateTo] = useState("");
-	const [activeDatePreset, setActiveDatePreset] = useState(null);
-	const [searchText, setSearchText] = useState("");
-	const [debouncedSearchText, setDebouncedSearchText] = useState("");
+	const [selectedEntryId, setSelectedEntryId] = useState(
+		() => searchParams.get("entry") || null,
+	);
+	const [viewMode, setViewMode] = useState(() =>
+		parseViewMode(searchParams.get("view")),
+	);
+	const [selectedMood, setSelectedMood] = useState(
+		() => searchParams.get("mood") || ALL_MOODS,
+	);
+	const [selectedType, setSelectedType] = useState(
+		() => searchParams.get("type") || ALL_TYPES,
+	);
+	const [dateFrom, setDateFrom] = useState(() =>
+		parseDateInput(searchParams.get("from")),
+	);
+	const [dateTo, setDateTo] = useState(() =>
+		parseDateInput(searchParams.get("to")),
+	);
+	const [activeDatePreset, setActiveDatePreset] = useState(() =>
+		parseDatePreset(searchParams.get("preset")),
+	);
+	const [searchText, setSearchText] = useState(
+		() => searchParams.get("q") || "",
+	);
+	const [debouncedSearchText, setDebouncedSearchText] = useState(
+		() => searchParams.get("q") || "",
+	);
 
 	const entriesWithId = useMemo(
 		() => entries.filter((entry) => resolveEntryId(entry)),
@@ -140,27 +167,14 @@ export default function Garden() {
 	}, [entriesWithId]);
 
 	const filteredEntries = useMemo(() => {
-		const query = debouncedSearchText.trim().toLowerCase();
-		const fromTs = dateFrom ? new Date(`${dateFrom}T00:00:00`).getTime() : null;
-		const toTs = dateTo ? new Date(`${dateTo}T23:59:59.999`).getTime() : null;
-
-		return entriesWithId.filter((entry) => {
-			const moods = entry.moodAfter || entry.moodBefore || [];
-			const moodOk = selectedMood === ALL_MOODS || moods.includes(selectedMood);
-
-			const type = getPracticeType(entry);
-			const typeOk = selectedType === ALL_TYPES || type === selectedType;
-
-			const ts = getEntryTimestamp(entry);
-			const fromOk = fromTs === null || (ts !== null && ts >= fromTs);
-			const toOk = toTs === null || (ts !== null && ts <= toTs);
-
-			const searchableText = `${entry.reflection || ""} ${entry.insights || ""}`
-				.toLowerCase()
-				.trim();
-			const textOk = query.length === 0 || searchableText.includes(query);
-
-			return moodOk && typeOk && fromOk && toOk && textOk;
+		return filterGardenEntries({
+			entries: entriesWithId,
+			selectedMood,
+			selectedType,
+			dateFrom,
+			dateTo,
+			searchText: debouncedSearchText,
+			getPracticeType,
 		});
 	}, [
 		dateFrom,
@@ -174,6 +188,13 @@ export default function Garden() {
 	const graph = useMemo(
 		() => buildGraphData(filteredEntries),
 		[filteredEntries],
+	);
+	const selected = useMemo(
+		() =>
+			entriesWithId.find(
+				(entry) => String(resolveEntryId(entry)) === String(selectedEntryId),
+			) || null,
+		[entriesWithId, selectedEntryId],
 	);
 	const nodeMap = useMemo(
 		() => Object.fromEntries(graph.nodes.map((node) => [node.id, node])),
@@ -211,6 +232,81 @@ export default function Garden() {
 		return () => clearTimeout(timer);
 	}, [searchText]);
 
+	useEffect(() => {
+		const nextViewMode = parseViewMode(searchParams.get("view"));
+		const nextMood = searchParams.get("mood") || ALL_MOODS;
+		const nextType = searchParams.get("type") || ALL_TYPES;
+		const nextFrom = parseDateInput(searchParams.get("from"));
+		const nextTo = parseDateInput(searchParams.get("to"));
+		const nextPreset = parseDatePreset(searchParams.get("preset"));
+		const nextQuery = searchParams.get("q") || "";
+		const nextEntryId = searchParams.get("entry") || null;
+
+		setViewMode((current) =>
+			current === nextViewMode ? current : nextViewMode,
+		);
+		setSelectedMood((current) => (current === nextMood ? current : nextMood));
+		setSelectedType((current) => (current === nextType ? current : nextType));
+		setDateFrom((current) => (current === nextFrom ? current : nextFrom));
+		setDateTo((current) => (current === nextTo ? current : nextTo));
+		setActiveDatePreset((current) =>
+			current === nextPreset ? current : nextPreset,
+		);
+		setSelectedEntryId((current) =>
+			current === nextEntryId ? current : nextEntryId,
+		);
+		setSearchText((current) => (current === nextQuery ? current : nextQuery));
+		setDebouncedSearchText((current) =>
+			current === nextQuery ? current : nextQuery,
+		);
+	}, [searchParams]);
+
+	useEffect(() => {
+		if (!loading && selectedEntryId && !selected) {
+			setSelectedEntryId(null);
+		}
+	}, [loading, selected, selectedEntryId]);
+
+	useEffect(() => {
+		const nextParams = new URLSearchParams();
+
+		if (viewMode !== VIEW_MODE.GRAPH) nextParams.set("view", viewMode);
+		if (selectedMood !== ALL_MOODS) nextParams.set("mood", selectedMood);
+		if (selectedType !== ALL_TYPES) nextParams.set("type", selectedType);
+		if (dateFrom) nextParams.set("from", dateFrom);
+		if (dateTo) nextParams.set("to", dateTo);
+		if (activeDatePreset) nextParams.set("preset", String(activeDatePreset));
+		if (selectedEntryId) nextParams.set("entry", String(selectedEntryId));
+
+		const query = debouncedSearchText.trim();
+		if (query) nextParams.set("q", query);
+
+		const next = nextParams.toString();
+		setSearchParams(
+			(previousParams) => {
+				if (previousParams.toString() === next) return previousParams;
+				return nextParams;
+			},
+			{ replace: true },
+		);
+	}, [
+		activeDatePreset,
+		debouncedSearchText,
+		dateFrom,
+		dateTo,
+		selectedEntryId,
+		selectedMood,
+		selectedType,
+		setSearchParams,
+		viewMode,
+	]);
+
+	const handleSelectEntry = (entry) => {
+		const id = resolveEntryId(entry);
+		if (!id) return;
+		setSelectedEntryId(String(id));
+	};
+
 	const clearFilters = () => {
 		setSelectedMood(ALL_MOODS);
 		setSelectedType(ALL_TYPES);
@@ -222,12 +318,9 @@ export default function Garden() {
 	};
 
 	const applyDatePreset = (days) => {
-		const today = new Date();
-		const from = new Date(today);
-		from.setDate(today.getDate() - (days - 1));
-
-		setDateFrom(from.toISOString().slice(0, 10));
-		setDateTo(today.toISOString().slice(0, 10));
+		const { from, to } = getDatePresetRange(days);
+		setDateFrom(from);
+		setDateTo(to);
 		setActiveDatePreset(days);
 	};
 
@@ -276,7 +369,7 @@ export default function Garden() {
 									: "var(--color-text-secondary)",
 						}}
 					>
-						Graph
+						{t("garden.view_graph")}
 					</button>
 					<button
 						type="button"
@@ -293,7 +386,7 @@ export default function Garden() {
 									: "var(--color-text-secondary)",
 						}}
 					>
-						Flowers
+						{t("garden.view_flowers")}
 					</button>
 				</div>
 			</div>
@@ -318,7 +411,7 @@ export default function Garden() {
 					>
 						<div className="flex items-center justify-between gap-2">
 							<p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
-								Filters
+								{t("garden.filters_label")}
 							</p>
 							<button
 								type="button"
@@ -326,7 +419,7 @@ export default function Garden() {
 								className="text-[11px] font-semibold"
 								style={{ color: "var(--color-primary)" }}
 							>
-								Clear
+								{t("garden.clear_filters")}
 							</button>
 						</div>
 
@@ -335,7 +428,7 @@ export default function Garden() {
 								type="text"
 								value={searchText}
 								onChange={(event) => setSearchText(event.target.value)}
-								placeholder="Search insights/reflection"
+								placeholder={t("garden.search_placeholder")}
 								className="h-10 rounded-xl px-3 text-sm outline-none sm:col-span-2 lg:col-span-4"
 								style={{
 									backgroundColor: "var(--color-surface)",
@@ -354,7 +447,7 @@ export default function Garden() {
 									border: "1px solid var(--color-border-soft)",
 								}}
 							>
-								<option value={ALL_MOODS}>All moods</option>
+								<option value={ALL_MOODS}>{t("garden.all_moods")}</option>
 								{moodOptions.map((mood) => (
 									<option key={`mood-filter-${mood}`} value={mood}>
 										{mood}
@@ -372,10 +465,10 @@ export default function Garden() {
 									border: "1px solid var(--color-border-soft)",
 								}}
 							>
-								<option value={ALL_TYPES}>All types</option>
+								<option value={ALL_TYPES}>{t("garden.all_types")}</option>
 								{practiceTypeOptions.map((type) => (
 									<option key={`type-filter-${type}`} value={type}>
-										{PRACTICE_TYPE_LABELS[type] || type}
+										{getPracticeTypeLabel(type, t)}
 									</option>
 								))}
 							</select>
@@ -432,27 +525,31 @@ export default function Garden() {
 										border: "1px solid var(--color-border-soft)",
 									}}
 								>
-									{days}d
+									{days}
+									{t("profile.days")}
 								</button>
 							))}
 						</div>
 
 						<p className="text-xs text-[var(--color-text-secondary)]">
-							Showing {filteredEntries.length} of {entriesWithId.length} entries
+							{t("garden.showing_summary", {
+								shown: filteredEntries.length,
+								total: entriesWithId.length,
+							})}
 						</p>
 					</div>
 
 					{filteredEntries.length === 0 ? (
 						<EmptyState
 							icon={<BookOpen size={28} />}
-							title="No matches for these filters"
-							description="Try removing mood/type filters or expanding dates."
+							title={t("garden.no_matches_title")}
+							description={t("garden.no_matches_hint")}
 						/>
 					) : viewMode === VIEW_MODE.FLOWERS ? (
 						<>
 							<FlowerGarden
 								entries={filteredEntries}
-								onFlowerClick={setSelected}
+								onFlowerClick={handleSelectEntry}
 							/>
 							<p className="text-center text-[#9CA3AF] text-xs mt-3">
 								{t("garden.tap_hint")}
@@ -469,7 +566,7 @@ export default function Garden() {
 						>
 							<div className="relative h-[460px] w-full overflow-hidden rounded-2xl bg-white/60">
 								<svg viewBox="0 0 1000 520" className="h-full w-full">
-									<title>Garden Graph</title>
+									<title>{t("garden.graph_title")}</title>
 									{graph.edges.map((edge) => {
 										const source = nodeMap[edge.source];
 										const target = nodeMap[edge.target];
@@ -512,9 +609,11 @@ export default function Garden() {
 										<button
 											type="button"
 											key={`graph-btn-${node.id}`}
-											onClick={() => setSelected(node.entry)}
+											onClick={() => handleSelectEntry(node.entry)}
 											title={`${created} • ${node.mood}`}
-											aria-label={`Open journal entry from ${created}`}
+											aria-label={t("garden.open_entry_aria", {
+												date: created,
+											})}
 											className="absolute w-9 h-9 -translate-x-1/2 -translate-y-1/2 rounded-full"
 											style={{
 												left: `${(node.x / 1000) * 100}%`,
@@ -538,7 +637,7 @@ export default function Garden() {
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							className="fixed inset-0 bg-black/30 z-40"
-							onClick={() => setSelected(null)}
+							onClick={() => setSelectedEntryId(null)}
 						/>
 						<motion.div
 							initial={{ y: "100%", opacity: 0 }}
@@ -570,7 +669,8 @@ export default function Garden() {
 								</div>
 								<button
 									type="button"
-									onClick={() => setSelected(null)}
+									onClick={() => setSelectedEntryId(null)}
+									aria-label={t("ui.close_modal")}
 									className="w-9 h-9 rounded-full bg-[#F8F7F4] flex items-center justify-center"
 								>
 									<X size={18} className="text-[#6B7280]" />
