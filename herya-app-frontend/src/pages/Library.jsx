@@ -585,13 +585,13 @@ export default function Library() {
 						style={{
 							backgroundColor:
 								tab === tabItem.key
-									? "var(--color-secondary)"
+									? "var(--color-info)"
 									: "var(--color-surface-card)",
 							color:
 								tab === tabItem.key ? "white" : "var(--color-text-secondary)",
 							borderColor:
 								tab === tabItem.key
-									? "var(--color-secondary)"
+									? "var(--color-info)"
 									: "var(--color-border)",
 							fontFamily: '"DM Sans", sans-serif',
 						}}
@@ -635,13 +635,16 @@ export default function Library() {
 									style={{
 										backgroundColor:
 											difficultyFilter === option
-												? "var(--color-primary)"
+												? "var(--color-warning)"
 												: "var(--color-surface-card)",
 										color:
 											difficultyFilter === option
 												? "white"
 												: "var(--color-text-secondary)",
-										borderColor: "var(--color-border)",
+										borderColor:
+											difficultyFilter === option
+												? "var(--color-warning)"
+												: "var(--color-border)",
 									}}
 								>
 									{option === "all"
@@ -664,13 +667,16 @@ export default function Library() {
 									style={{
 										backgroundColor:
 											effectFilter === option
-												? "var(--color-secondary)"
+												? "var(--color-success)"
 												: "var(--color-surface-card)",
 										color:
 											effectFilter === option
 												? "white"
 												: "var(--color-text-secondary)",
-										borderColor: "var(--color-border)",
+										borderColor:
+											effectFilter === option
+												? "var(--color-success)"
+												: "var(--color-border)",
 									}}
 								>
 									{option === "all"
@@ -738,7 +744,7 @@ export default function Library() {
 											setHasFetched(false);
 										}}
 										className="mt-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
-										style={{ backgroundColor: "var(--color-primary)" }}
+										style={{ backgroundColor: "var(--color-info)" }}
 									>
 										{retryLabel}
 									</button>

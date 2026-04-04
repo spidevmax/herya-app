@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import {
 	Plus,
@@ -28,6 +28,29 @@ const MEDITATION_STYLES = [
 ];
 
 const DURATION_PRESETS = [5, 10, 15, 20, 30, 45, 60];
+
+const getPranayamaEstimatedMinutes = (block, pattern) => {
+	if (block?.blockType !== "pranayama" || !pattern) return null;
+
+	const cycles = Number(block.config?.cycles);
+	if (!Number.isFinite(cycles) || cycles <= 0) return null;
+
+	const ratio = block.config?.customRatio || pattern.patternRatio || {};
+	const base = Number(pattern.baseBreathDuration) || 4;
+	const cycleSec =
+		((Number(ratio.inhale) || 0) +
+			(Number(ratio.hold) || 0) +
+			(Number(ratio.exhale) || 0) +
+			(Number(ratio.holdAfterExhale) || 0)) *
+		base;
+
+	if (cycleSec <= 0) return null;
+
+	const pause = Math.max(0, Number(block.config?.pauseBetweenCycles) || 0);
+	const totalSec = cycleSec * cycles + pause * Math.max(0, cycles - 1);
+
+	return Math.max(1, Math.ceil(totalSec / 60));
+};
 
 let blockIdCounter = 0;
 const nextBlockId = () => `block_${++blockIdCounter}_${Date.now()}`;
@@ -116,7 +139,12 @@ export default function SessionBuilder({
 				return {
 					id: nextBlockId(),
 					label: "",
-					durationMinutes: block.blockType === "meditation" ? 10 : 15,
+					durationMinutes:
+						block.blockType === "meditation"
+							? 10
+							: block.blockType === "pranayama"
+								? 0
+								: 15,
 					vkSequence: null,
 					breathingPattern: null,
 					meditationType: "silent",
@@ -141,9 +169,28 @@ export default function SessionBuilder({
 		initialBlocks,
 	]);
 
-	const totalMinutes = blocks.reduce(
-		(sum, b) => sum + (b.durationMinutes || 0),
-		0,
+	const getEffectiveBlockDurationMinutes = useCallback(
+		(block) => {
+			if (block.blockType !== "pranayama")
+				return Number(block.durationMinutes) || 0;
+
+			const selectedPattern = breathingPatterns.find(
+				(pattern) => pattern._id === block.breathingPattern,
+			);
+			const estimated = getPranayamaEstimatedMinutes(block, selectedPattern);
+
+			return estimated ?? (Number(block.durationMinutes) || 0);
+		},
+		[breathingPatterns],
+	);
+
+	const totalMinutes = useMemo(
+		() =>
+			blocks.reduce(
+				(sum, block) => sum + getEffectiveBlockDurationMinutes(block),
+				0,
+			),
+		[blocks, getEffectiveBlockDurationMinutes],
 	);
 
 	const addBlock = (blockType) => {
@@ -151,7 +198,8 @@ export default function SessionBuilder({
 			id: nextBlockId(),
 			blockType,
 			label: "",
-			durationMinutes: blockType === "meditation" ? 10 : 15,
+			durationMinutes:
+				blockType === "meditation" ? 10 : blockType === "pranayama" ? 0 : 15,
 			vkSequence: null,
 			breathingPattern: null,
 			meditationType: "silent",
@@ -181,12 +229,27 @@ export default function SessionBuilder({
 		);
 	};
 
+	const isBlockConfigured = (block) => {
+		switch (block.blockType) {
+			case "vk_sequence":
+				return Boolean(block.vkSequence);
+			case "pranayama":
+				return Boolean(block.breathingPattern);
+			case "meditation":
+				return Boolean(block.meditationType);
+			default:
+				return true;
+		}
+	};
+
+	const canStart = blocks.length > 0 && blocks.every(isBlockConfigured);
+
 	const handleStart = () => {
-		if (blocks.length === 0) return;
+		if (!canStart) return;
 		const ordered = blocks.map((b, i) => ({
 			blockType: b.blockType,
 			label: b.label || getBlockDefaultLabel(b),
-			durationMinutes: b.durationMinutes,
+			durationMinutes: getEffectiveBlockDurationMinutes(b),
 			order: i,
 			vkSequence: b.vkSequence || undefined,
 			breathingPattern: b.breathingPattern || undefined,
@@ -377,7 +440,7 @@ export default function SessionBuilder({
 			{/* Start button */}
 			<Button
 				onClick={handleStart}
-				disabled={blocks.length === 0}
+				disabled={!canStart}
 				size="lg"
 				className="w-full mt-2"
 			>
@@ -406,29 +469,10 @@ function BlockCard({
 	);
 
 	// Calculate estimated duration from cycles for pranayama
-	const estimatedFromCycles = (() => {
-		if (
-			block.blockType !== "pranayama" ||
-			!selectedPattern ||
-			!block.config?.cycles
-		)
-			return null;
-		const cp =
-			selectedPattern.calculatedPattern || selectedPattern.patternRatio;
-		if (!cp) return null;
-		const base = selectedPattern.baseBreathDuration || 4;
-		const ratio = selectedPattern.patternRatio || {};
-		const cycleSec =
-			(ratio.inhale +
-				ratio.hold +
-				ratio.exhale +
-				(ratio.holdAfterExhale || 0)) *
-			base;
-		const pause = block.config.pauseBetweenCycles || 0;
-		const totalSec =
-			cycleSec * block.config.cycles + pause * (block.config.cycles - 1);
-		return Math.ceil(totalSec / 60);
-	})();
+	const estimatedFromCycles = getPranayamaEstimatedMinutes(
+		block,
+		selectedPattern,
+	);
 
 	return (
 		<motion.div
@@ -481,8 +525,10 @@ function BlockCard({
 					style={{ color: "var(--color-text-secondary)" }}
 				>
 					{estimatedFromCycles
-						? `~${estimatedFromCycles}m`
-						: `${block.durationMinutes}m`}
+						? `${estimatedFromCycles}m`
+						: block.blockType === "pranayama"
+							? "--"
+							: `${block.durationMinutes}m`}
 				</span>
 				<button
 					type="button"
@@ -627,8 +673,8 @@ function BlockCard({
 													className="text-[10px]"
 													style={{ color: "var(--color-text-muted)" }}
 												>
-													{t("guided.estimated_duration")}: ~
-													{estimatedFromCycles} min
+													{t("guided.estimated_duration")}:{estimatedFromCycles}{" "}
+													min
 												</p>
 											)}
 
@@ -725,10 +771,9 @@ function BlockCard({
 								</>
 							)}
 
-							{/* Duration selector (always shown for meditation, shown for VK/pranayama if no cycle config) */}
+							{/* Duration selector (manual for meditation and VK sequence only) */}
 							{(block.blockType === "meditation" ||
-								block.blockType === "vk_sequence" ||
-								(block.blockType === "pranayama" && !block.config?.cycles)) && (
+								block.blockType === "vk_sequence") && (
 								<div>
 									<p
 										className="text-xs font-medium mb-2"

@@ -8,30 +8,33 @@ const ACTIONS = [
 		key: "library",
 		labelKey: "nav.library",
 		icon: BookOpen,
-		color: "#4A72FF",
-		bg: "#4A72FF15",
+		color: "var(--color-info)",
+		bg: "color-mix(in srgb, var(--color-info) 14%, var(--color-surface-card))",
+		border: "color-mix(in srgb, var(--color-info) 28%, transparent)",
 		to: "/library",
 	},
 	{
 		key: "garden",
 		labelKey: "dashboard.quick_garden",
 		icon: Leaf,
-		color: "#5DB075",
-		bg: "#5DB07515",
+		color: "var(--color-success)",
+		bg: "color-mix(in srgb, var(--color-success) 14%, var(--color-surface-card))",
+		border: "color-mix(in srgb, var(--color-success) 28%, transparent)",
 		to: "/garden",
 	},
 	{
 		key: "pranayama",
 		labelKey: "fab.pranayama",
 		icon: Wind,
-		color: "#9B5DE5",
-		bg: "#9B5DE515",
+		color: "var(--color-warning)",
+		bg: "color-mix(in srgb, var(--color-warning) 16%, var(--color-surface-card))",
+		border: "color-mix(in srgb, var(--color-warning) 30%, transparent)",
 		to: "/session/pranayama",
 	},
 ];
 
 /** Reorder quick actions based on user preferences — no new data required. */
-function getOrderedActions(user) {
+const getOrderedActions = (user) => {
 	const timeOfDay = user?.preferences?.timeOfDay;
 	const goals = Array.isArray(user?.goals) ? user.goals : [];
 	const wantsMeditation =
@@ -44,7 +47,7 @@ function getOrderedActions(user) {
 		];
 	}
 	return ACTIONS;
-}
+};
 
 export default function QuickActions({ user }) {
 	const navigate = useNavigate();
@@ -64,12 +67,12 @@ export default function QuickActions({ user }) {
 							transition={{ delay: i * 0.07 }}
 							whileTap={{ scale: 0.93 }}
 							onClick={() => navigate(a.to)}
-							className="flex flex-col items-center gap-2 py-3 rounded-2xl"
-							style={{ backgroundColor: a.bg }}
+							className="flex flex-col items-center gap-2 py-3 rounded-2xl border"
+							style={{ background: a.bg, borderColor: a.border }}
 						>
 							<Icon size={22} style={{ color: a.color }} strokeWidth={1.8} />
 							<span
-								className="text-[11px] font-semibold"
+								className="text-[12px] font-semibold"
 								style={{ color: a.color }}
 							>
 								{t(a.labelKey)}

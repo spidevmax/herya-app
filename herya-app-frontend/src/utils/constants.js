@@ -2,50 +2,50 @@ export const API_BASE =
 	import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
 export const VK_FAMILIES = [
-	{ key: "tadasana", label: "Tadasana", emoji: null, color: "#4A72FF" },
+	{ key: "tadasana", label: "Tadasana", emoji: null, color: "#2458B8" },
 	{
 		key: "standing_asymmetric",
 		label: "Standing Asymmetric",
 		emoji: null,
-		color: "#FF6B6B",
+		color: "#D84A3A",
 	},
 	{
 		key: "standing_symmetric",
 		label: "Standing Symmetric",
 		emoji: null,
-		color: "#FFB347",
+		color: "#E6A328",
 	},
 	{
 		key: "one_leg_standing",
 		label: "One Leg Standing",
 		emoji: null,
-		color: "#C77DFF",
+		color: "#3C73CE",
 	},
-	{ key: "seated", label: "Seated", emoji: null, color: "#5DB075" },
-	{ key: "supine", label: "Supine", emoji: null, color: "#48CAE4" },
-	{ key: "prone", label: "Prone", emoji: null, color: "#F4845F" },
-	{ key: "inverted", label: "Inverted", emoji: null, color: "#9B5DE5" },
-	{ key: "meditative", label: "Meditative", emoji: null, color: "#74C69D" },
-	{ key: "bow_sequence", label: "Bow", emoji: null, color: "#F77F00" },
+	{ key: "seated", label: "Seated", emoji: null, color: "#1F8A5B" },
+	{ key: "supine", label: "Supine", emoji: null, color: "#2F7EA8" },
+	{ key: "prone", label: "Prone", emoji: null, color: "#C96B2C" },
+	{ key: "inverted", label: "Inverted", emoji: null, color: "#1C4E9F" },
+	{ key: "meditative", label: "Meditative", emoji: null, color: "#3E9A6D" },
+	{ key: "bow_sequence", label: "Bow", emoji: null, color: "#CB7A1B" },
 	{
 		key: "triangle_sequence",
 		label: "Triangle",
 		emoji: null,
-		color: "#06D6A0",
+		color: "#2A9D6F",
 	},
 	{
 		key: "sun_salutation",
 		label: "Sun Salutation",
 		emoji: null,
-		color: "#FFD166",
+		color: "#E5AE38",
 	},
 	{
 		key: "vajrasana_variations",
 		label: "Vajrasana",
 		emoji: null,
-		color: "#EF476F",
+		color: "#C84B3A",
 	},
-	{ key: "lotus_variations", label: "Lotus", emoji: null, color: "#A8DADC" },
+	{ key: "lotus_variations", label: "Lotus", emoji: null, color: "#4F96B8" },
 ];
 
 export const VK_FAMILY_MAP = Object.fromEntries(

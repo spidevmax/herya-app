@@ -5,39 +5,39 @@
   --font-display: "Fredoka", "Georgia", sans-serif;
   --font-body: "DM Sans", system-ui, sans-serif;
 
-  /* Calm Earth mode (default) */
-  --color-primary: #4e8b6a;
-  --color-primary-light: #74a88b;
-  --color-primary-dark: #3b7054;
-  --color-secondary: #c79a63;
-  --color-secondary-light: #d7b184;
-  --color-secondary-dark: #a87c48;
-  --color-accent: #b76a64;
-  --color-accent-light: #c98a85;
-  --color-accent-dark: #96524d;
+  /* Retro Play mode (default) */
+  --color-primary: #2458b8;
+  --color-primary-light: #4a78cd;
+  --color-primary-dark: #1b428c;
+  --color-secondary: #1f8a5b;
+  --color-secondary-light: #44a579;
+  --color-secondary-dark: #166344;
+  --color-accent: #d84a3a;
+  --color-accent-light: #e86c60;
+  --color-accent-dark: #ab3227;
 
-  --color-surface: #f7f3ed;
-  --color-surface-card: #fcfaf7;
-  --color-text-primary: #2f3833;
-  --color-text-secondary: #5f6a63;
-  --color-text-muted: #98a29d;
-  --color-border: #ddd5c9;
+  --color-surface: #f6f0e4;
+  --color-surface-card: #fffcf6;
+  --color-text-primary: #1c2d4a;
+  --color-text-secondary: #3f4f6a;
+  --color-text-muted: #6f7d92;
+  --color-border: #d8d0c2;
 
-  --color-info: #5b8e9b;
-  --color-success: #6c9c80;
-  --color-warning: #b08a5e;
-  --color-danger: #b76a64;
-  --color-error-bg: #f9e8e6;
-  --color-error-text: #9b4f49;
+  --color-info: #2458b8;
+  --color-success: #1f8a5b;
+  --color-warning: #e6a328;
+  --color-danger: #d84a3a;
+  --color-error-bg: #fceae8;
+  --color-error-text: #952e23;
 
-  --shadow-card: 0 3px 14px rgba(47, 56, 51, 0.08), 0 1px 4px rgba(47, 56, 51, 0.06);
-  --shadow-card-hover: 0 8px 24px rgba(47, 56, 51, 0.12), 0 2px 8px rgba(47, 56, 51, 0.08);
-  --shadow-fab: 0 8px 24px rgba(78, 139, 106, 0.26);
-  --shadow-button: 0 4px 12px rgba(78, 139, 106, 0.28);
-  --shadow-secondary: 0 4px 12px rgba(167, 124, 72, 0.26);
-  --shadow-accent: 0 4px 12px rgba(150, 82, 77, 0.24);
-  --gradient-primary: linear-gradient(135deg, #f2ece2 0%, #edf1eb 52%, #f1e8e3 100%);
-  --gradient-secondary: linear-gradient(135deg, #b58a59, #c8a57d);
+  --shadow-card: 0 3px 14px rgba(28, 45, 74, 0.08), 0 1px 4px rgba(28, 45, 74, 0.06);
+  --shadow-card-hover: 0 8px 24px rgba(28, 45, 74, 0.14), 0 2px 8px rgba(28, 45, 74, 0.08);
+  --shadow-fab: 0 8px 24px rgba(36, 88, 184, 0.28);
+  --shadow-button: 0 4px 12px rgba(36, 88, 184, 0.3);
+  --shadow-secondary: 0 4px 12px rgba(31, 138, 91, 0.26);
+  --shadow-accent: 0 4px 12px rgba(216, 74, 58, 0.24);
+  --gradient-primary: linear-gradient(135deg, #f7f1e6 0%, #f4f8ff 52%, #fff1ea 100%);
+  --gradient-secondary: linear-gradient(135deg, #2458b8, #4a78cd);
 
   --radius-card: 18px;
   --radius-card-lg: 24px;

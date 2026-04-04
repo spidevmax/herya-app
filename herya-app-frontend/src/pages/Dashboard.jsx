@@ -178,7 +178,7 @@ export default function Dashboard() {
 											navigate("/start-practice");
 										}}
 										className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white shrink-0"
-										style={{ backgroundColor: "var(--color-primary)" }}
+										style={{ backgroundColor: "var(--color-info)" }}
 									>
 										<RotateCcw size={12} />
 										{t("practice.resume")}

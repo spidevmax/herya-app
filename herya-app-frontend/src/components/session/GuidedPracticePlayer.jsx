@@ -48,6 +48,17 @@ export default function GuidedPracticePlayer({
 	const timer = useSessionTimer(blocks);
 	const prevBlockRef = useRef(timer.currentBlockIndex);
 	const blockChangeAudioRef = useRef(null);
+	const plannedTotalSec = useRef(
+		blocks.reduce(
+			(sum, block) => sum + (Number(block.durationMinutes) || 0) * 60,
+			0,
+		),
+	);
+
+	const resolveElapsedSec = useCallback(() => {
+		if (timer.globalElapsedSec > 0) return timer.globalElapsedSec;
+		return plannedTotalSec.current;
+	}, [timer.globalElapsedSec]);
 
 	// Persist progress periodically
 	useEffect(() => {
@@ -95,17 +106,19 @@ export default function GuidedPracticePlayer({
 
 	const handleFinish = useCallback(() => {
 		timer.pause();
+		const elapsedSec = resolveElapsedSec();
 		onComplete({
 			blocksCompleted: timer.currentBlockIndex + 1,
-			globalElapsedSec: timer.globalElapsedSec,
+			globalElapsedSec: elapsedSec,
 		});
-	}, [timer, onComplete]);
+	}, [timer, onComplete, resolveElapsedSec]);
 
 	const handleAbandon = () => {
 		timer.pause();
+		const elapsedSec = resolveElapsedSec();
 		onAbandon({
 			blocksCompleted: timer.currentBlockIndex,
-			globalElapsedSec: timer.globalElapsedSec,
+			globalElapsedSec: elapsedSec,
 		});
 	};
 

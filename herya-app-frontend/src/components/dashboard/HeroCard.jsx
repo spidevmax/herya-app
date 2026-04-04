@@ -46,6 +46,8 @@ export default function HeroCard({ sequence, reason, loading }) {
 		emoji: null,
 		label: sequence.family,
 	};
+	const heroColorStart = `color-mix(in srgb, ${family.color} 58%, var(--color-primary-dark))`;
+	const heroColorEnd = `color-mix(in srgb, ${family.color} 42%, var(--color-primary))`;
 	const recommendedMinutes = Number(sequence.estimatedDuration?.recommended);
 	const handleCardClick = () => navigate(`/library/sequence/${sequence._id}`);
 	const handleCardKeyDown = (event) => {
@@ -69,9 +71,10 @@ export default function HeroCard({ sequence, reason, loading }) {
 			<div
 				className="p-6 relative overflow-hidden"
 				style={{
-					background: `linear-gradient(135deg, ${family.color}, ${family.color}CC)`,
+					background: `linear-gradient(135deg, ${heroColorStart}, ${heroColorEnd})`,
 				}}
 			>
+				<div className="absolute inset-0 pointer-events-none bg-black/10" />
 				<div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 float select-none pointer-events-none">
 					{family.emoji ? (
 						<span className="text-8xl">{family.emoji}</span>
@@ -83,24 +86,26 @@ export default function HeroCard({ sequence, reason, loading }) {
 						/>
 					)}
 				</div>
-				<span className="inline-flex items-center gap-1 text-xs font-medium text-white/80 uppercase tracking-widest mb-1">
+				<span className="relative inline-flex items-center gap-1 text-xs font-medium text-white/85 uppercase tracking-widest mb-1">
 					{t("dashboard.recommended")}
 				</span>
 				{reason ? (
-					<p className="text-white/60 text-[11px] mb-2 italic">{reason}</p>
+					<p className="relative text-white/70 text-[11px] mb-2 italic">
+						{reason}
+					</p>
 				) : (
 					<div className="mb-2" />
 				)}
 				<h2
-					className="text-2xl font-semibold text-white leading-tight mb-1"
+					className="relative text-2xl font-semibold text-white leading-tight mb-1"
 					style={{ fontFamily: '"Fredoka", sans-serif' }}
 				>
 					{sequence.englishName}
 				</h2>
-				<p className="text-white/80 text-xs font-medium italic mb-4">
+				<p className="relative text-white/80 text-xs font-medium italic mb-4">
 					{sequence.sanskritName}
 				</p>
-				<div className="flex items-center gap-3 mb-5">
+				<div className="relative flex items-center gap-3 mb-5">
 					{sequence.estimatedDuration?.recommended && (
 						<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
 							<Clock size={13} className="text-white/80" />
@@ -118,8 +123,8 @@ export default function HeroCard({ sequence, reason, loading }) {
 				</div>
 				<button
 					type="button"
-					className="flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg"
-					style={{ color: family.color }}
+					className="relative flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg"
+					style={{ color: "var(--color-text-primary)" }}
 					onClick={(e) => {
 						e.stopPropagation();
 						const params = new URLSearchParams({
