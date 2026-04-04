@@ -71,7 +71,7 @@ const userSchema = new mongoose.Schema(
 			type: Date,
 			select: false,
 		},
-		role: { type: String, enum: ["user", "admin"], default: "user" },
+		role: { type: String, enum: ["user", "tutor", "admin"], default: "user" },
 		profileImageUrl: { type: String, trim: true },
 		profileImageId: { type: String, trim: true },
 		pronouns: { type: String, trim: true, maxlength: 40 },
@@ -175,6 +175,14 @@ const userSchema = new mongoose.Schema(
 				type: String,
 				enum: ["light", "dark"],
 				default: "light",
+			},
+			lowStimMode: {
+				type: Boolean,
+				default: false,
+			},
+			safetyAnchors: {
+				phrase: { type: String, trim: true, maxlength: 120, default: "" },
+				bodyCue: { type: String, trim: true, maxlength: 120, default: "" },
 			},
 		},
 	},

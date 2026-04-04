@@ -54,10 +54,7 @@ function SuccessOverlay({ onDone, t }) {
 					<Check size={48} className="text-white" />
 				</div>
 			</motion.div>
-			<h2
-				className="font-display text-2xl font-bold mb-2"
-				style={{ fontFamily: '"Fredoka", sans-serif' }}
-			>
+			<h2 className="font-display text-2xl font-bold mb-2">
 				{t("journal_form.success_title")}
 			</h2>
 			<p className="text-white/80 text-sm mb-8">
@@ -93,6 +90,8 @@ export default function JournalForm() {
 	});
 	const [loading, setLoading] = useState(false);
 	const [fetching, setFetching] = useState(isEdit);
+	const [fetchError, setFetchError] = useState(false);
+	const [saveError, setSaveError] = useState(null);
 	const [success, setSuccess] = useState(false);
 
 	useEffect(() => {
@@ -102,11 +101,13 @@ export default function JournalForm() {
 				const e = r.data?.data || r.data;
 				if (e) setForm((f) => ({ ...f, ...e }));
 			})
+			.catch(() => setFetchError(true))
 			.finally(() => setFetching(false));
 	}, [id, isEdit]);
 
 	const handleSave = async () => {
 		setLoading(true);
+		setSaveError(null);
 		try {
 			const payload = new FormData();
 			payload.append("moodBefore", form.moodBefore);
@@ -130,7 +131,7 @@ export default function JournalForm() {
 			}
 			setSuccess(true);
 		} catch {
-			// let user retry
+			setSaveError(true);
 		} finally {
 			setLoading(false);
 		}
@@ -153,10 +154,30 @@ export default function JournalForm() {
 		);
 	}
 
+	if (fetchError) {
+		return (
+			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+				<p className="text-lg font-bold font-display text-[var(--color-text-primary)]">
+					{t("journal_form.fetch_error")}
+				</p>
+				<button
+					type="button"
+					onClick={() => navigate(-1)}
+					className="mt-4 text-sm font-semibold"
+					style={{ color: "var(--color-primary)" }}
+				>
+					{"\u2190"} {t("ui.cancel")}
+				</button>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<AnimatePresence>
-				{success && <SuccessOverlay onDone={() => navigate("/garden")} t={t} />}
+				{success && (
+					<SuccessOverlay onDone={() => navigate("/journal")} t={t} />
+				)}
 			</AnimatePresence>
 
 			<div className="flex flex-col pt-4 pb-28">
@@ -171,13 +192,7 @@ export default function JournalForm() {
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
-					<h1
-						className="font-display text-xl font-bold"
-						style={{
-							fontFamily: '"Fredoka", sans-serif',
-							color: "var(--color-text-primary)",
-						}}
-					>
+					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
 						{isEdit
 							? t("journal_form.edit_title")
 							: t("journal_form.new_title")}
@@ -289,13 +304,7 @@ export default function JournalForm() {
 					</div>
 
 					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3
-							className="mb-4 font-display font-bold"
-							style={{
-								fontFamily: '"Fredoka", sans-serif',
-								color: "var(--color-text-primary)",
-							}}
-						>
+						<h3 className="mb-4 font-display font-bold text-[var(--color-text-primary)]">
 							{t("journal_form.after")}
 						</h3>
 						<MoodSelector
@@ -368,6 +377,25 @@ export default function JournalForm() {
 					</div>
 				</div>
 			</div>
+
+			{saveError && (
+				<motion.div
+					initial={{ opacity: 0, y: 8 }}
+					animate={{ opacity: 1, y: 0 }}
+					className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4"
+				>
+					<div
+						className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+						style={{
+							backgroundColor: "var(--color-warning-bg)",
+							border: "1px solid var(--color-warning-border)",
+							color: "var(--color-text-primary)",
+						}}
+					>
+						{t("journal_form.save_error")}
+					</div>
+				</motion.div>
+			)}
 
 			<motion.div
 				initial={{ y: 80 }}

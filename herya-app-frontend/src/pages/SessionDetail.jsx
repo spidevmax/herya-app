@@ -150,13 +150,7 @@ export default function SessionDetail() {
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
-					<h1
-						className="font-display text-xl font-bold"
-						style={{
-							fontFamily: '"Fredoka", sans-serif',
-							color: "var(--color-text-primary)",
-						}}
-					>
+					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
 						{t("session_detail.title")}
 					</h1>
 				</div>
@@ -188,13 +182,7 @@ export default function SessionDetail() {
 						/>
 					)}
 					<div>
-						<p
-							className="font-display text-xl font-bold"
-							style={{
-								fontFamily: '"Fredoka", sans-serif',
-								color: "var(--color-text-primary)",
-							}}
-						>
+						<p className="font-display text-xl font-bold text-[var(--color-text-primary)]">
 							{sessionTitle}
 						</p>
 						{family && (

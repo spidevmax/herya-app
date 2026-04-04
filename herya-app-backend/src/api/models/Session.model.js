@@ -155,6 +155,10 @@ const sessionSchema = new mongoose.Schema(
 			enabled: { type: Boolean, default: false },
 			mood: [{ type: String }],
 			energyLevel: { type: Number, min: 1, max: 10 },
+			signal: {
+				type: String,
+				enum: ["green", "yellow", "red"],
+			},
 			intention: { type: String, maxlength: 200 },
 		},
 
@@ -241,6 +245,23 @@ const sessionSchema = new mongoose.Schema(
 		},
 
 		notes: { type: String, trim: true, maxlength: 1000 },
+		recommendationContext: {
+			applied: { type: Boolean, default: false },
+			source: {
+				type: String,
+				enum: ["dashboard_tutor_insights", "manual", "other"],
+				default: "other",
+			},
+			key: { type: String, trim: true, maxlength: 80 },
+			preset: { type: String, enum: ["adult", "tutor"] },
+			confidence: { type: String, enum: ["low", "medium", "high"] },
+			appliedAt: { type: Date },
+		},
+		tutorSupport: {
+			safePauseCount: { type: Number, default: 0, min: 0 },
+			anchorAvailable: { type: Boolean, default: false },
+			anchorUsed: { type: Boolean, default: false },
+		},
 	},
 	{
 		timestamps: true,
@@ -275,7 +296,9 @@ sessionSchema.pre("save", async function () {
 
 	// complete_practice requires completePractice with at least one sequence
 	if (sessionType === "complete_practice" && !hasCompletePractice) {
-		throw new Error("complete_practice requires at least one sequence in mainSequences");
+		throw new Error(
+			"complete_practice requires at least one sequence in mainSequences",
+		);
 	}
 
 	// vk_sequence must NOT include completePractice data
@@ -285,7 +308,9 @@ sessionSchema.pre("save", async function () {
 
 	// complete_practice must NOT include a direct vkSequence reference
 	if (sessionType === "complete_practice" && vkSequence) {
-		throw new Error("complete_practice uses completePractice.mainSequences, not vkSequence");
+		throw new Error(
+			"complete_practice uses completePractice.mainSequences, not vkSequence",
+		);
 	}
 });
 

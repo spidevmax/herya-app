@@ -1,16 +1,22 @@
 import { motion } from "framer-motion";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { DAY_LABELS } from "@/utils/constants";
 
+const toLocalIsoDate = (date) => {
+	const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+	return localDate.toISOString().slice(0, 10);
+};
+
 function getCalendarDays(sessionDates = []) {
 	const today = new Date();
+	const todayIso = toLocalIsoDate(today);
 	const practiced = new Set(sessionDates.map((d) => d.slice(0, 10)));
 	return Array.from({ length: 14 }, (_, i) => {
 		const d = new Date(today);
 		d.setDate(today.getDate() - (13 - i));
-		const iso = d.toISOString().slice(0, 10);
-		const isToday = i === 13;
+		const iso = toLocalIsoDate(d);
+		const isToday = iso === todayIso;
 		return {
 			date: d,
 			iso,
@@ -28,11 +34,18 @@ export default function CalendarStrip({
 	weekSessions = null,
 }) {
 	const { t } = useLanguage();
+	const stripRef = useRef(null);
 	const days = useMemo(() => getCalendarDays(sessionDates), [sessionDates]);
+
+	useEffect(() => {
+		const strip = stripRef.current;
+		if (!strip) return;
+		strip.scrollLeft = strip.scrollWidth;
+	}, []);
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-3 px-4 sm:px-6">
+			<div className="flex items-center justify-between mb-3 px-4 lg:px-0">
 				<span
 					className="text-[11px] font-bold uppercase tracking-[0.1em]"
 					style={{ color: "var(--color-text-muted)" }}
@@ -59,7 +72,10 @@ export default function CalendarStrip({
 					</span>
 				</div>
 			</div>
-			<div className="flex gap-2 overflow-x-auto px-4 sm:px-6 pb-1">
+			<div
+				ref={stripRef}
+				className="flex gap-2 overflow-x-auto px-4 lg:px-0 pb-1"
+			>
 				{days.map((d, i) => (
 					<motion.div
 						key={d.iso}
@@ -67,6 +83,7 @@ export default function CalendarStrip({
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: i * 0.03 }}
 						className="flex-shrink-0 flex flex-col items-center gap-1 w-10"
+						aria-label={`${d.label} ${d.day}${d.practiced ? ` — ${t("dashboard.practiced")}` : ""}${d.isToday ? ` — ${t("dashboard.today")}` : ""}`}
 					>
 						<span
 							className="text-[10px] font-semibold"
@@ -91,7 +108,7 @@ export default function CalendarStrip({
 										? "white"
 										: "var(--color-text-secondary)",
 								boxShadow: d.isToday
-									? "0 4px 12px rgba(78,139,106,0.35)"
+									? "0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 4px 12px rgba(78,139,106,0.35)"
 									: "none",
 							}}
 						>

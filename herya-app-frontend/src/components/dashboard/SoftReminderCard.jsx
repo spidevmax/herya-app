@@ -96,10 +96,10 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				initial={{ opacity: 0, y: -8 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -8 }}
-				className="px-4 sm:px-6"
+				className="px-4 lg:px-0"
 			>
 				<div
-					className="rounded-3xl p-4 sm:p-5 shadow-[var(--shadow-card)] border"
+					className="rounded-3xl p-4 shadow-[var(--shadow-card)] border"
 					style={{
 						background: reminder.bg,
 						borderColor: "var(--color-border-soft)",

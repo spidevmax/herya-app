@@ -25,11 +25,14 @@ export const colors = {
 		muted: "var(--color-text-muted)",
 	},
 	border: {
+		base: "var(--color-border)",
 		light: "var(--color-border-soft)",
 	},
 	surface: {
+		base: "var(--color-surface)",
 		white: "var(--color-surface-card)",
 		light: "var(--color-surface-secondary)",
+		elevated: "var(--color-surface-elevated)",
 	},
 	states: {
 		disabled_opacity: 0.5,

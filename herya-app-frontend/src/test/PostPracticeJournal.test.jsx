@@ -7,7 +7,7 @@ import {
 	within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import PostPracticeJournal from "./PostPracticeJournal";
+import PostPracticeJournal from "../components/session/PostPracticeJournal";
 
 vi.mock("@/context/LanguageContext", () => ({
 	useLanguage: () => ({
@@ -56,6 +56,7 @@ const sanitizeMotionProps = (props) => {
 };
 
 vi.mock("framer-motion", () => ({
+	AnimatePresence: ({ children }) => <>{children}</>,
 	motion: {
 		div: ({ children, ...props }) => (
 			<div {...sanitizeMotionProps(props)}>{children}</div>
@@ -64,7 +65,7 @@ vi.mock("framer-motion", () => ({
 }));
 
 vi.mock("@/components/ui", () => ({
-	Button: ({ children, onClick, disabled, ...props }) => (
+	Button: ({ children, onClick, disabled, loading, ...props }) => (
 		<button
 			onClick={onClick}
 			disabled={disabled}
@@ -132,7 +133,7 @@ describe("PostPracticeJournal", () => {
 		expect(container.textContent).toContain("3");
 	});
 
-	it("allows toggling mood selection (max 3)", () => {
+	it("allows toggling mood selection (max 3)", async () => {
 		const handleSave = vi.fn();
 		const { container } = render(
 			<PostPracticeJournal
@@ -142,18 +143,20 @@ describe("PostPracticeJournal", () => {
 				saving={false}
 			/>,
 		);
+		const ui = within(container);
+		const calmButton = ui.getByText("Calm");
+		fireEvent.click(calmButton);
 
-		// Get mood section by looking for "How do you feel?" and selecting first button after
-		const allButtons = container.querySelectorAll("button");
+		const saveButton = ui.getByTestId("save-button");
+		fireEvent.click(saveButton);
 
-		// Click first mood button (Calm)
-		const firstMoodButton = allButtons[0];
-		fireEvent.click(firstMoodButton);
-
-		// Verify button changed color by checking if it was toggled
-		expect(firstMoodButton.style.backgroundColor).toBe(
-			"var(--color-secondary)",
-		);
+		await waitFor(() => {
+			expect(handleSave).toHaveBeenCalledWith(
+				expect.objectContaining({
+					moodAfter: expect.arrayContaining(["calm"]),
+				}),
+			);
+		});
 	});
 
 	it("allows adjusting energy level slider", () => {

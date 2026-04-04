@@ -11,8 +11,13 @@ describe("Users — GET /me", () => {
 	});
 
 	it("returns the authenticated user's profile", async () => {
-		const { token } = await createUser({ name: "Profile User", email: "profile@test.com" });
-		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
+		const { token } = await createUser({
+			name: "Profile User",
+			email: "profile@test.com",
+		});
+		const res = await request(app)
+			.get(`${BASE}/me`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 		expect(res.body.data).toHaveProperty("email", "profile@test.com");
@@ -21,7 +26,10 @@ describe("Users — GET /me", () => {
 
 describe("Users — PUT /me", () => {
 	it("updates the user's name", async () => {
-		const { token } = await createUser({ name: "Old Name", email: "update@test.com" });
+		const { token } = await createUser({
+			name: "Old Name",
+			email: "update@test.com",
+		});
 		const res = await request(app)
 			.put(`${BASE}/me`)
 			.set("Authorization", `Bearer ${token}`)
@@ -29,12 +37,51 @@ describe("Users — PUT /me", () => {
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("name", "New Name");
 	});
+
+	it("updates low stimulation preference", async () => {
+		const { token } = await createUser({ email: "prefs@test.com" });
+		const res = await request(app)
+			.put(`${BASE}/me`)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				preferences: {
+					lowStimMode: true,
+				},
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.body.data.preferences).toHaveProperty("lowStimMode", true);
+	});
+
+	it("updates safety anchors preference", async () => {
+		const { token } = await createUser({ email: "anchors@test.com" });
+		const res = await request(app)
+			.put(`${BASE}/me`)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				preferences: {
+					safetyAnchors: {
+						phrase: "We breathe together",
+						bodyCue: "Feet on floor",
+					},
+				},
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.body.data.preferences).toHaveProperty("safetyAnchors");
+		expect(res.body.data.preferences.safetyAnchors).toEqual({
+			phrase: "We breathe together",
+			bodyCue: "Feet on floor",
+		});
+	});
 });
 
 describe("Users — GET /me/stats", () => {
 	it("returns stats for the authenticated user", async () => {
 		const { token } = await createUser({ email: "stats@test.com" });
-		const res = await request(app).get(`${BASE}/me/stats`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(`${BASE}/me/stats`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("totalSessions");
 		expect(res.body.data).toHaveProperty("totalMinutes");

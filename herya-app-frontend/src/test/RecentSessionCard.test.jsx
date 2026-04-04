@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
-import RecentSessionCard from "./RecentSessionCard";
+import RecentSessionCard from "../components/dashboard/RecentSessionCard";
 
 const mockNavigate = vi.fn();
 

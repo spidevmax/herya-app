@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	Play,
@@ -40,12 +40,22 @@ export default function GuidedPracticePlayer({
 	blocks,
 	sequencesData = {},
 	patternsData = {},
+	lowStimMode = false,
+	isTutorMode = false,
+	safetyAnchors,
 	onComplete,
 	onAbandon,
 	onSaveProgress,
 }) {
 	const { t } = useLanguage();
 	const timer = useSessionTimer(blocks);
+	const [safePauseOpen, setSafePauseOpen] = useState(false);
+	const [safePauseRemaining, setSafePauseRemaining] = useState(90);
+	const [safePauseCount, setSafePauseCount] = useState(0);
+	const [anchorUsed, setAnchorUsed] = useState(false);
+	const anchorPhrase = (safetyAnchors?.phrase || "").trim();
+	const anchorBodyCue = (safetyAnchors?.bodyCue || "").trim();
+	const hasAnchors = Boolean(anchorPhrase || anchorBodyCue);
 	const prevBlockRef = useRef(timer.currentBlockIndex);
 	const blockChangeAudioRef = useRef(null);
 	const plannedTotalSec = useRef(
@@ -80,6 +90,7 @@ export default function GuidedPracticePlayer({
 
 	// Play sound on block change
 	useEffect(() => {
+		if (lowStimMode) return;
 		if (timer.currentBlockIndex !== prevBlockRef.current && timer.isRunning) {
 			prevBlockRef.current = timer.currentBlockIndex;
 			try {
@@ -102,7 +113,7 @@ export default function GuidedPracticePlayer({
 				// Audio not available
 			}
 		}
-	}, [timer.currentBlockIndex, timer.isRunning]);
+	}, [timer.currentBlockIndex, timer.isRunning, lowStimMode]);
 
 	const handleFinish = useCallback(() => {
 		timer.pause();
@@ -110,8 +121,20 @@ export default function GuidedPracticePlayer({
 		onComplete({
 			blocksCompleted: timer.currentBlockIndex + 1,
 			globalElapsedSec: elapsedSec,
+			tutorSupport: {
+				safePauseCount,
+				anchorAvailable: hasAnchors,
+				anchorUsed,
+			},
 		});
-	}, [timer, onComplete, resolveElapsedSec]);
+	}, [
+		anchorUsed,
+		hasAnchors,
+		onComplete,
+		resolveElapsedSec,
+		safePauseCount,
+		timer,
+	]);
 
 	const handleAbandon = () => {
 		timer.pause();
@@ -119,7 +142,39 @@ export default function GuidedPracticePlayer({
 		onAbandon({
 			blocksCompleted: timer.currentBlockIndex,
 			globalElapsedSec: elapsedSec,
+			tutorSupport: {
+				safePauseCount,
+				anchorAvailable: hasAnchors,
+				anchorUsed,
+			},
 		});
+	};
+
+	useEffect(() => {
+		if (!safePauseOpen) return;
+		if (safePauseRemaining <= 0) return;
+
+		const id = setInterval(() => {
+			setSafePauseRemaining((prev) => Math.max(0, prev - 1));
+		}, 1000);
+
+		return () => clearInterval(id);
+	}, [safePauseOpen, safePauseRemaining]);
+
+	const openSafePause = () => {
+		timer.pause();
+		setSafePauseRemaining(90);
+		setSafePauseCount((prev) => prev + 1);
+		setSafePauseOpen(true);
+	};
+
+	const closeSafePauseAndResume = () => {
+		setSafePauseOpen(false);
+		if (timer.globalElapsedSec > 0) {
+			timer.resume();
+		} else {
+			timer.start();
+		}
 	};
 
 	// When a guided sub-player completes its block, advance
@@ -237,8 +292,12 @@ export default function GuidedPracticePlayer({
 							<PoseByPosePlayer
 								sequence={sequencesData[currentBlock.vkSequence]}
 								level={currentBlock.level || "beginner"}
-								guided={currentBlock.guided}
+								guided={currentBlock.guided && !lowStimMode}
+								lowStimMode={lowStimMode}
 								autoAdvance={currentBlock.config?.autoAdvancePoses !== false}
+								blockDurationSec={(currentBlock.durationMinutes || 0) * 60}
+								distributionMode={currentBlock.config?.distributionMode || "auto"}
+								manualOverrides={currentBlock.config?.manualOverrides || {}}
 								onComplete={handleBlockPlayerComplete}
 							/>
 						)}
@@ -257,8 +316,21 @@ export default function GuidedPracticePlayer({
 							<PhasedMeditationPlayer
 								meditationType={currentBlock.meditationType || "guided"}
 								durationMinutes={currentBlock.durationMinutes || 10}
-								config={currentBlock.config || {}}
-								guided={currentBlock.guided}
+								config={{
+									...(currentBlock.config || {}),
+									bellAtStart: lowStimMode
+										? false
+										: currentBlock.config?.bellAtStart,
+									bellAtEnd: lowStimMode
+										? false
+										: currentBlock.config?.bellAtEnd,
+									bellInterval: lowStimMode
+										? 0
+										: currentBlock.config?.bellInterval,
+									lowStim: lowStimMode,
+								}}
+								guided={currentBlock.guided && !lowStimMode}
+								lowStimMode={lowStimMode}
 								onComplete={handleBlockPlayerComplete}
 							/>
 						)}
@@ -290,13 +362,7 @@ export default function GuidedPracticePlayer({
 									/>
 								</div>
 
-								<h3
-									className="text-xl font-semibold mb-1"
-									style={{
-										fontFamily: '"DM Sans", sans-serif',
-										color: "var(--color-text-primary)",
-									}}
-								>
+								<h3 className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
 									{currentBlock.label}
 								</h3>
 
@@ -423,6 +489,115 @@ export default function GuidedPracticePlayer({
 			)}
 
 			{/* Finish / Abandon */}
+			{isTutorMode && (
+				<>
+					<Button variant="outline" className="w-full" onClick={openSafePause}>
+						{t("practice.safe_pause")}
+					</Button>
+					{safePauseOpen && (
+						<div
+							className="rounded-2xl p-4 border flex flex-col gap-3"
+							style={{
+								backgroundColor: "var(--color-surface-card)",
+								borderColor: "var(--color-border-soft)",
+							}}
+						>
+							<p
+								className="text-sm font-semibold"
+								style={{ color: "var(--color-text-primary)" }}
+							>
+								{t("practice.safe_pause_title")}
+							</p>
+							<p
+								className="text-xs"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								{t("practice.safe_pause_subtitle")}
+							</p>
+							<div
+								className="text-xs"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								1. {t("practice.safe_pause_step_1")}
+							</div>
+							<div
+								className="text-xs"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								2. {t("practice.safe_pause_step_2")}
+							</div>
+							<div
+								className="text-xs"
+								style={{ color: "var(--color-text-secondary)" }}
+							>
+								3. {t("practice.safe_pause_step_3")}
+							</div>
+							{(anchorPhrase || anchorBodyCue) && (
+								<div
+									className="rounded-xl p-3 border"
+									style={{
+										backgroundColor: "var(--color-surface)",
+										borderColor: "var(--color-border-soft)",
+									}}
+								>
+									<p
+										className="text-[11px] font-semibold mb-1"
+										style={{ color: "var(--color-text-primary)" }}
+									>
+										{t("practice.safe_pause_anchor_title")}
+									</p>
+									{anchorPhrase && (
+										<p
+											className="text-xs"
+											style={{ color: "var(--color-text-secondary)" }}
+										>
+											{t("practice.safe_pause_anchor_phrase_label")}:{" "}
+											{anchorPhrase}
+										</p>
+									)}
+									{anchorBodyCue && (
+										<p
+											className="text-xs"
+											style={{ color: "var(--color-text-secondary)" }}
+										>
+											{t("practice.safe_pause_anchor_cue_label")}:{" "}
+											{anchorBodyCue}
+										</p>
+									)}
+									<Button
+										variant={anchorUsed ? "primary" : "outline"}
+										size="sm"
+										onClick={() => setAnchorUsed(true)}
+										className="mt-2"
+									>
+										{anchorUsed
+											? t("practice.safe_pause_anchor_used")
+											: t("practice.safe_pause_anchor_mark_used")}
+									</Button>
+								</div>
+							)}
+							<p
+								className="text-sm font-bold"
+								style={{ color: "var(--color-primary)" }}
+							>
+								{t("practice.safe_pause_timer", { n: safePauseRemaining })}
+							</p>
+							<div className="flex gap-2">
+								<Button
+									variant="outline"
+									className="flex-1"
+									onClick={closeSafePauseAndResume}
+								>
+									{t("practice.safe_pause_resume")}
+								</Button>
+								<Button className="flex-1" onClick={handleAbandon}>
+									{t("practice.safe_pause_end")}
+								</Button>
+							</div>
+						</div>
+					)}
+				</>
+			)}
 			<div className="flex gap-2 pt-2">
 				<Button variant="ghost" className="flex-1" onClick={handleAbandon}>
 					<Square size={14} />

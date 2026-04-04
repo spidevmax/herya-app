@@ -152,7 +152,7 @@ const register = async (req, res, next) => {
 	let imageUploaded = false;
 
 	try {
-		const { email } = req.body;
+		const { email, role } = req.body;
 
 		// Check if the email already exists BEFORE processing
 		const userExist = await User.findOne({ email });
@@ -165,7 +165,8 @@ const register = async (req, res, next) => {
 			throw createError(400, "This user already exists");
 		}
 
-		const user = new User(req.body);
+		const registrationRole = role === "tutor" ? "tutor" : "user";
+		const user = new User({ ...req.body, role: registrationRole });
 
 		// Upload image to Cloudinary if provided
 		if (req.file) {

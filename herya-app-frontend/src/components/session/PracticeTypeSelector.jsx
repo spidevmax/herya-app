@@ -24,8 +24,8 @@ const PRACTICE_TYPES = [
 	{
 		value: "complete_practice",
 		icon: Star,
-		color: "#F59E0B",
-		bgColor: "#F59E0B",
+		color: "var(--color-warning)",
+		bgColor: "var(--color-warning)",
 	},
 ];
 
@@ -35,13 +35,7 @@ export default function PracticeTypeSelector({ onSelect }) {
 	return (
 		<div className="flex flex-col gap-6 pt-4">
 			<div className="text-center">
-				<h2
-					className="text-2xl font-semibold mb-2"
-					style={{
-						fontFamily: '"DM Sans", sans-serif',
-						color: "var(--color-text-primary)",
-					}}
-				>
+				<h2 className="text-2xl font-semibold mb-2 text-[var(--color-text-primary)]">
 					{t("practice.select_type_title")}
 				</h2>
 				<p

@@ -175,13 +175,7 @@ export default function SequenceDetail() {
 						style={{ color: "var(--color-text-primary)" }}
 					/>
 				</button>
-				<h1
-					className="font-display text-lg font-semibold truncate"
-					style={{
-						fontFamily: '"Fredoka", sans-serif',
-						color: "var(--color-text-primary)",
-					}}
-				>
+				<h1 className="font-display text-lg font-semibold truncate text-[var(--color-text-primary)]">
 					{loading ? t("sequence_detail.loading") : seq?.englishName}
 				</h1>
 			</div>
@@ -225,10 +219,7 @@ export default function SequenceDetail() {
 						<span className="text-white/80 text-xs font-bold uppercase tracking-widest">
 							{family.label}
 						</span>
-						<h2
-							className="font-display text-2xl font-bold text-white mt-1 mb-1"
-							style={{ fontFamily: '"Fredoka", sans-serif' }}
-						>
+						<h2 className="font-display text-2xl font-bold text-white mt-1 mb-1">
 							{seq.englishName}
 						</h2>
 						<p className="text-white/70 text-sm italic mb-4">

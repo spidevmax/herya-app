@@ -34,6 +34,28 @@ describe("Sessions — POST /", () => {
 		expect(res.body.data).toHaveProperty("duration", 30);
 	});
 
+	it("persists tutor check-in signal when provided", async () => {
+		const { token } = await createUser({
+			email: "sessioncheckinsignal@test.com",
+		});
+		const res = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				...SESSION_PAYLOAD,
+				checkIn: {
+					enabled: true,
+					mood: ["focused"],
+					energyLevel: 5,
+					signal: "yellow",
+					intention: "tutor-guided",
+				},
+			});
+
+		expect(res.status).toBe(201);
+		expect(res.body.data).toHaveProperty("checkIn.signal", "yellow");
+	});
+
 	it("updates user counters when creating an already completed session", async () => {
 		const { token } = await createUser({
 			email: "sessioncreatecompleted@test.com",
@@ -214,5 +236,33 @@ describe("Sessions — GET /stats", () => {
 			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("totalSessions");
+		expect(res.body.data).toHaveProperty("tutorInsights");
+		expect(res.body.data.tutorInsights).toHaveProperty("sessionCount");
+		expect(res.body.data.tutorInsights).toHaveProperty("totalSafePauses");
+		expect(res.body.data.tutorInsights).toHaveProperty("anchorUseRate");
+		expect(res.body.data.tutorInsights).toHaveProperty("weeklyTrend");
+		expect(res.body.data.tutorInsights.weeklyTrend).toHaveProperty(
+			"currentWeek",
+		);
+		expect(res.body.data.tutorInsights.weeklyTrend).toHaveProperty(
+			"previousWeek",
+		);
+		expect(res.body.data.tutorInsights.weeklyTrend).toHaveProperty("delta");
+		expect(res.body.data.tutorInsights).toHaveProperty("recommendation");
+		expect(res.body.data.tutorInsights.recommendation).toHaveProperty("key");
+		expect(res.body.data.tutorInsights.recommendation).toHaveProperty(
+			"severity",
+		);
+		expect(res.body.data.tutorInsights.recommendation).toHaveProperty("preset");
+		expect(res.body.data.tutorInsights.recommendation).toHaveProperty(
+			"confidence",
+		);
+		expect(res.body.data.tutorInsights).toHaveProperty("recommendationOutcome");
+		expect(res.body.data.tutorInsights.recommendationOutcome).toHaveProperty(
+			"appliedCount",
+		);
+		expect(res.body.data.tutorInsights.recommendationOutcome).toHaveProperty(
+			"improvedRate",
+		);
 	});
 });

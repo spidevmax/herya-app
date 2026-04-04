@@ -14,15 +14,15 @@ const formatHuman = (v) =>
 const effectColor = (e) => {
 	switch (e) {
 		case "calming":
-			return "#5DB075";
+			return "var(--color-prana-balanced)";
 		case "energizing":
-			return "#FFB347";
+			return "var(--color-prana-warm-accent)";
 		case "balancing":
-			return "#4A72FF";
+			return "var(--color-primary)";
 		case "cooling":
-			return "#48CAE4";
+			return "var(--color-prana-cooling)";
 		case "heating":
-			return "#EF476F";
+			return "var(--color-prana-energizing)";
 		default:
 			return "var(--color-text-muted)";
 	}

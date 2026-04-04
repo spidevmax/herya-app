@@ -10,6 +10,7 @@ const { check } = require("express-validator");
  * - name: Required, non-empty string, 2-50 characters
  * - email: Required, valid email format
  * - password: Required, minimum 8 characters
+ * - role: Required, must be "user" or "tutor"
  *
  * @example
  * router.post("/register", uploadUserImage.single("profileImage"), registerValidations, handleValidationErrors, registerUser);
@@ -35,6 +36,12 @@ const registerValidations = [
 		.withMessage("Password is required")
 		.isLength({ min: 8 })
 		.withMessage("Password must be at least 8 characters long"),
+
+	check("role")
+		.notEmpty()
+		.withMessage("Role is required")
+		.isIn(["user", "tutor"])
+		.withMessage("Role must be either 'user' or 'tutor'"),
 ];
 
 /**

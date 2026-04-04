@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
-import HeroCard from "./HeroCard";
+import HeroCard from "../components/dashboard/HeroCard";
 
 const mockNavigate = vi.fn();
 
@@ -50,14 +50,18 @@ const sanitizeMotionProps = (props) => {
 vi.mock("framer-motion", () => ({
 	motion: {
 		div: ({ children, onClick, ...props }) => (
-			<button
-				type="button"
+			<mock-motion-div
 				{...sanitizeMotionProps(props)}
+				role="button"
+				tabIndex={0}
 				data-testid="motion-div"
 				onClick={onClick}
+				onKeyDown={(event) => {
+					if (event.key === "Enter" || event.key === " ") onClick?.(event);
+				}}
 			>
 				{children}
-			</button>
+			</mock-motion-div>
 		),
 	},
 }));

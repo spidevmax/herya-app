@@ -36,13 +36,7 @@ export default function NotFound() {
 					</span>
 				</div>
 
-				<h1
-					className="text-3xl sm:text-4xl font-bold leading-tight mb-3"
-					style={{
-						fontFamily: '"Fredoka", sans-serif',
-						color: "var(--color-text-primary)",
-					}}
-				>
+				<h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-3 text-[var(--color-text-primary)]">
 					{t("not_found.title")}
 				</h1>
 

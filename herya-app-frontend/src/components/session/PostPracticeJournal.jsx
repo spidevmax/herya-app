@@ -7,6 +7,16 @@ import PostPracticeNudge from "./PostPracticeNudge";
 import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-secondary)";
+const TUTOR_SIGNAL_AFTER_MAP = {
+	green: { mood: ["calm"], energy: 4, stress: 3 },
+	yellow: { mood: ["focused"], energy: 5, stress: 5 },
+	red: { mood: ["anxious"], energy: 6, stress: 8 },
+};
+const SIGNAL_SCORES = {
+	green: 2,
+	yellow: 1,
+	red: 0,
+};
 
 const SENSATION_OPTIONS = [
 	"relaxed",
@@ -22,6 +32,7 @@ const SENSATION_OPTIONS = [
 export default function PostPracticeJournal({
 	sessionSummary,
 	checkInData,
+	isTutorMode = false,
 	onSave,
 	saving,
 }) {
@@ -33,6 +44,7 @@ export default function PostPracticeJournal({
 	const [emotionalNotes, setEmotionalNotes] = useState("");
 	const [gratitude, setGratitude] = useState("");
 	const [learnings, setLearnings] = useState("");
+	const [signalAfter, setSignalAfter] = useState("yellow");
 
 	const toggleMood = (mood) => {
 		setMoodAfter((prev) =>
@@ -51,19 +63,32 @@ export default function PostPracticeJournal({
 	};
 
 	const handleSave = () => {
+		const tutorSignalPreset =
+			TUTOR_SIGNAL_AFTER_MAP[signalAfter] || TUTOR_SIGNAL_AFTER_MAP.yellow;
 		const normalizedMoodBefore =
 			checkInData?.mood?.length > 0 ? checkInData.mood : ["focused"];
-		const normalizedMoodAfter = moodAfter.length > 0 ? moodAfter : ["calm"];
+		const normalizedMoodAfter = isTutorMode
+			? tutorSignalPreset.mood
+			: moodAfter.length > 0
+				? moodAfter
+				: ["calm"];
+		const normalizedEnergyAfter = isTutorMode
+			? tutorSignalPreset.energy
+			: energyAfter;
+		const normalizedStressAfter = isTutorMode
+			? tutorSignalPreset.stress
+			: stressAfter;
 
 		onSave({
 			moodAfter: normalizedMoodAfter,
+			signalAfter: isTutorMode ? signalAfter : null,
 			energyLevel: {
 				before: checkInData?.energyLevel || 5,
-				after: energyAfter,
+				after: normalizedEnergyAfter,
 			},
 			stressLevel: {
 				before: checkInData?.stressLevel || 5,
-				after: stressAfter,
+				after: normalizedStressAfter,
 			},
 			physicalSensations: physicalSensations.join(", "),
 			emotionalNotes,
@@ -78,6 +103,49 @@ export default function PostPracticeJournal({
 		const s = sec % 60;
 		return `${m}:${String(s).padStart(2, "0")}`;
 	};
+
+	const tutorSummaryKey = (() => {
+		if (!isTutorMode) return null;
+		if (signalAfter === "green") return "practice.tutor_summary_green";
+		if (signalAfter === "yellow") return "practice.tutor_summary_yellow";
+		return "practice.tutor_summary_red";
+	})();
+
+	const tutorMicroAchievements = (() => {
+		if (!isTutorMode) return [];
+
+		const durationMinutes = Math.max(
+			1,
+			Math.round((sessionSummary?.globalElapsedSec || 0) / 60),
+		);
+		const blocksCompleted = Math.max(
+			0,
+			Number(sessionSummary?.blocksCompleted || 0),
+		);
+		const entries = [];
+
+		if (blocksCompleted > 0) {
+			entries.push(t("practice.micro_blocks", { n: blocksCompleted }));
+		}
+
+		entries.push(t("practice.micro_minutes", { n: durationMinutes }));
+
+		const beforeSignal = checkInData?.signal;
+		const beforeScore = SIGNAL_SCORES[beforeSignal];
+		const afterScore = SIGNAL_SCORES[signalAfter];
+
+		if (beforeScore !== undefined && afterScore !== undefined) {
+			if (afterScore > beforeScore) {
+				entries.push(t("practice.micro_regulation_up"));
+			} else if (afterScore === beforeScore) {
+				entries.push(t("practice.micro_regulation_steady"));
+			} else {
+				entries.push(t("practice.micro_regulation_awareness"));
+			}
+		}
+
+		return entries.slice(0, 3);
+	})();
 
 	return (
 		<motion.div
@@ -108,13 +176,7 @@ export default function PostPracticeJournal({
 						className="mx-auto mb-3"
 					/>
 				</motion.div>
-				<h2
-					className="text-xl font-semibold mb-1"
-					style={{
-						fontFamily: '"DM Sans", sans-serif',
-						color: "var(--color-text-primary)",
-					}}
-				>
+				<h2 className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
 					{t("practice.journal_title")}
 				</h2>
 				{sessionSummary && (
@@ -149,6 +211,38 @@ export default function PostPracticeJournal({
 						</div>
 					</div>
 				)}
+				{isTutorMode && tutorSummaryKey && (
+					<p
+						className="text-xs mt-3"
+						style={{ color: "var(--color-text-secondary)" }}
+					>
+						{t(tutorSummaryKey)}
+					</p>
+				)}
+				{isTutorMode && tutorMicroAchievements.length > 0 && (
+					<div
+						className="mt-4 rounded-xl px-3 py-2 text-left"
+						style={{ backgroundColor: "var(--color-surface)" }}
+					>
+						<p
+							className="text-[11px] font-semibold mb-1"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{t("practice.micro_title")}
+						</p>
+						<div className="flex flex-col gap-1">
+							{tutorMicroAchievements.map((item) => (
+								<p
+									key={item}
+									className="text-[11px]"
+									style={{ color: "var(--color-text-secondary)" }}
+								>
+									• {item}
+								</p>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 
 			{/* Mood after */}
@@ -160,103 +254,140 @@ export default function PostPracticeJournal({
 					className="text-sm font-medium mb-3"
 					style={{ color: "var(--color-text-primary)" }}
 				>
-					{t("practice.journal_mood_after")}
+					{isTutorMode
+						? t("practice.checkout_signal")
+						: t("practice.journal_mood_after")}
 				</p>
-				<div className="flex flex-wrap gap-2">
-					{GARDEN_MOOD_ORDER.map((m) => {
-						const selected = moodAfter.includes(m);
-						const color = getMoodColor(m);
-						return (
-							<button
-								type="button"
-								key={m}
-								onClick={() => toggleMood(m)}
-								className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
-								style={{
-									backgroundColor: selected ? color : "var(--color-surface)",
-									color: selected ? "white" : "var(--color-text-secondary)",
-								}}
-							>
-								{t(`session.moods.${m}`)}
-							</button>
-						);
-					})}
-				</div>
+				{isTutorMode ? (
+					<div className="grid grid-cols-3 gap-2">
+						{["green", "yellow", "red"].map((signal) => {
+							const selected = signalAfter === signal;
+							const signalColor =
+								signal === "green"
+									? "var(--color-signal-green)"
+									: signal === "yellow"
+										? "var(--color-signal-yellow)"
+										: "var(--color-signal-red)";
+							return (
+								<button
+									type="button"
+									key={signal}
+									onClick={() => setSignalAfter(signal)}
+									className="rounded-xl px-3 py-2 text-xs font-semibold transition"
+									style={{
+										backgroundColor: selected
+											? signalColor
+											: "var(--color-surface)",
+										color: selected ? "white" : "var(--color-text-secondary)",
+										border: `1px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
+									}}
+								>
+									{t(`practice.signal_${signal}`)}
+								</button>
+							);
+						})}
+					</div>
+				) : (
+					<div className="flex flex-wrap gap-2">
+						{GARDEN_MOOD_ORDER.map((m) => {
+							const selected = moodAfter.includes(m);
+							const color = getMoodColor(m);
+							return (
+								<button
+									type="button"
+									key={m}
+									onClick={() => toggleMood(m)}
+									className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
+									style={{
+										backgroundColor: selected ? color : "var(--color-surface)",
+										color: selected ? "white" : "var(--color-text-secondary)",
+									}}
+								>
+									{t(`session.moods.${m}`)}
+								</button>
+							);
+						})}
+					</div>
+				)}
 			</div>
 
 			{/* Energy & Stress */}
-			<div
-				className="rounded-2xl p-5 flex flex-col gap-4"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
-			>
-				<div>
-					<p
-						className="text-sm font-medium mb-2"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{t("practice.journal_energy_after", { n: energyAfter })}
-					</p>
-					<input
-						type="range"
-						min={1}
-						max={10}
-						value={energyAfter}
-						onChange={(e) => setEnergyAfter(+e.target.value)}
-						className="w-full"
-						style={{ accentColor: "var(--color-secondary)" }}
-					/>
+			{!isTutorMode && (
+				<div
+					className="rounded-2xl p-5 flex flex-col gap-4"
+					style={{ backgroundColor: "var(--color-surface-card)" }}
+				>
+					<div>
+						<p
+							className="text-sm font-medium mb-2"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{t("practice.journal_energy_after", { n: energyAfter })}
+						</p>
+						<input
+							type="range"
+							min={1}
+							max={10}
+							value={energyAfter}
+							onChange={(e) => setEnergyAfter(+e.target.value)}
+							className="w-full"
+							style={{ accentColor: "var(--color-secondary)" }}
+						/>
+					</div>
+					<div>
+						<p
+							className="text-sm font-medium mb-2"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{t("practice.journal_stress_after", { n: stressAfter })}
+						</p>
+						<input
+							type="range"
+							min={1}
+							max={10}
+							value={stressAfter}
+							onChange={(e) => setStressAfter(+e.target.value)}
+							className="w-full"
+							style={{ accentColor: "var(--color-accent)" }}
+						/>
+					</div>
 				</div>
-				<div>
-					<p
-						className="text-sm font-medium mb-2"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{t("practice.journal_stress_after", { n: stressAfter })}
-					</p>
-					<input
-						type="range"
-						min={1}
-						max={10}
-						value={stressAfter}
-						onChange={(e) => setStressAfter(+e.target.value)}
-						className="w-full"
-						style={{ accentColor: "var(--color-accent)" }}
-					/>
-				</div>
-			</div>
+			)}
 
 			{/* Physical sensations */}
-			<div
-				className="rounded-2xl p-5"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
-			>
-				<p
-					className="text-sm font-medium mb-3"
-					style={{ color: "var(--color-text-primary)" }}
+			{!isTutorMode && (
+				<div
+					className="rounded-2xl p-5"
+					style={{ backgroundColor: "var(--color-surface-card)" }}
 				>
-					{t("practice.journal_sensations")}
-				</p>
-				<div className="flex flex-wrap gap-2">
-					{SENSATION_OPTIONS.map((s) => (
-						<button
-							type="button"
-							key={s}
-							onClick={() => toggleSensation(s)}
-							className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
-							style={{
-								backgroundColor: physicalSensations.includes(s)
-									? "var(--color-accent)"
-									: "var(--color-surface)",
-								color: physicalSensations.includes(s)
-									? "white"
-									: "var(--color-text-secondary)",
-							}}
-						>
-							{t(`practice.sensation_${s}`)}
-						</button>
-					))}
+					<p
+						className="text-sm font-medium mb-3"
+						style={{ color: "var(--color-text-primary)" }}
+					>
+						{t("practice.journal_sensations")}
+					</p>
+					<div className="flex flex-wrap gap-2">
+						{SENSATION_OPTIONS.map((s) => (
+							<button
+								type="button"
+								key={s}
+								onClick={() => toggleSensation(s)}
+								className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
+								style={{
+									backgroundColor: physicalSensations.includes(s)
+										? "var(--color-accent)"
+										: "var(--color-surface)",
+									color: physicalSensations.includes(s)
+										? "white"
+										: "var(--color-text-secondary)",
+								}}
+							>
+								{t(`practice.sensation_${s}`)}
+							</button>
+						))}
+					</div>
 				</div>
-			</div>
+			)}
 
 			{/* Free-form notes */}
 			<div
@@ -268,7 +399,9 @@ export default function PostPracticeJournal({
 						className="text-sm font-medium mb-2"
 						style={{ color: "var(--color-text-primary)" }}
 					>
-						{t("practice.journal_emotional_notes")}
+						{isTutorMode
+							? t("practice.tutor_notes")
+							: t("practice.journal_emotional_notes")}
 					</p>
 					<textarea
 						value={emotionalNotes}

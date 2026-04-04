@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { motion } from "framer-motion";
+import { AlertTriangle, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { getRecommendedSequence } from "@/api/sequences.api";
 import { getSessions, getSessionStats } from "@/api/sessions.api";
 import CalendarStrip from "@/components/dashboard/CalendarStrip";
 import HeroCard from "@/components/dashboard/HeroCard";
+import PracticeSnapshotCard from "@/components/dashboard/PracticeSnapshotCard";
 import SoftReminderCard from "@/components/dashboard/SoftReminderCard";
 import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
+import TutorInsightsCard from "@/components/dashboard/TutorInsightsCard";
 import { SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -20,14 +23,26 @@ export default function Dashboard() {
 	const [sessions, setSessions] = useState([]);
 	const [stats, setStats] = useState(null);
 	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
+	const isTutorUser = user?.role === "tutor";
 
-	useEffect(() => {
+	const loadDashboard = () => {
+		setLoading(true);
+		setError(false);
 		Promise.allSettled([
 			getRecommendedSequence(),
 			getSessions({ limit: 5 }),
 			getSessionStats(),
 		])
 			.then(([rec, sess, st]) => {
+				const allRejected =
+					rec.status === "rejected" &&
+					sess.status === "rejected" &&
+					st.status === "rejected";
+				if (allRejected) {
+					setError(true);
+					return;
+				}
 				if (rec.status === "fulfilled") {
 					const payload = rec.value.data?.data || rec.value.data;
 					setRecommended(payload?.sequence ?? payload);
@@ -43,10 +58,19 @@ export default function Dashboard() {
 					setStats(st.value.data?.data || st.value.data);
 			})
 			.finally(() => setLoading(false));
+	};
+
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	useEffect(() => {
+		loadDashboard();
 	}, []);
 
 	const completedSessions = sessions.filter((session) => session.completed);
 	const pendingSession = sessions.find((session) => !session.completed) || null;
+	const totalPracticeMinutes = completedSessions.reduce(
+		(sum, session) => sum + (Number(session.duration) || 0),
+		0,
+	);
 
 	const sessionDates = completedSessions.map((s) =>
 		(s.date || s.createdAt || "").slice(0, 10),
@@ -63,9 +87,14 @@ export default function Dashboard() {
 				: "dashboard.greeting_evening";
 
 	return (
-		<div className="flex flex-col gap-5 pt-4 pb-6 max-w-7xl mx-auto">
+		<div className="flex flex-col gap-6 pt-4 pb-6 max-w-7xl mx-auto px-4 lg:px-6">
 			{/* ── Header ────────────────────────────────────────────────────── */}
-			<div className="flex items-center justify-between px-4 sm:px-6">
+			<motion.div
+				initial={{ opacity: 0, y: -8 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3 }}
+				className="flex items-center justify-between"
+			>
 				<div>
 					<p
 						className="text-sm font-medium"
@@ -73,50 +102,116 @@ export default function Dashboard() {
 					>
 						{t(greetingKey)},
 					</p>
-					<h1
-						className="text-2xl font-semibold"
-						style={{
-							fontFamily: '"Fredoka", sans-serif',
-							color: "var(--color-primary)",
-						}}
-					>
+					<h1 className="text-2xl font-semibold text-[var(--color-primary)]">
 						{user?.name?.split(" ")[0] ?? "Yogi"}
 					</h1>
 				</div>
-			</div>
+			</motion.div>
 
-			<SoftReminderCard
-				user={user}
-				sessions={sessions}
-				streak={stats?.currentStreak ?? 0}
-			/>
+			{error && (
+				<motion.button
+					type="button"
+					initial={{ opacity: 0, y: 8 }}
+					animate={{ opacity: 1, y: 0 }}
+					onClick={loadDashboard}
+					className="w-full rounded-2xl p-4 flex items-center gap-3 text-left"
+					style={{
+						backgroundColor: "var(--color-warning-bg)",
+						border: "1px solid var(--color-warning-border)",
+					}}
+				>
+					<AlertTriangle size={20} style={{ color: "var(--color-warning)" }} />
+					<div>
+						<p className="text-sm font-semibold text-[var(--color-text-primary)]">
+							{t("dashboard.error_title")}
+						</p>
+						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+							{t("dashboard.error_hint")}
+						</p>
+					</div>
+				</motion.button>
+			)}
+
+			<motion.div
+				initial={{ opacity: 0, y: 8 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3, delay: 0.05 }}
+			>
+				<SoftReminderCard
+					user={user}
+					sessions={sessions}
+					streak={stats?.currentStreak ?? 0}
+				/>
+			</motion.div>
 
 			{/* ── Responsive grid ───────────────────────────────────────────
-			    Mobile (1 col):  Calendar → Hero → QuickActions → Recent
-			    Desktop (2 col): left = Hero / Recent · right = Calendar / QuickActions
+			    Mobile (1 col):  Calendar → Hero → Recent
+			    Desktop (2 col): left (55%) = Hero / Recent · right (45%) = Calendar / Snapshot / Tutor
 			    DOM order must match mobile order; lg: explicit placement for desktop.
 			────────────────────────────────────────────────────────────────── */}
-			<div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] lg:gap-x-4 gap-y-5 items-start">
+			<div className="grid grid-cols-1 lg:grid-cols-[55%_45%] lg:gap-x-5 gap-y-5 items-start">
 				{/* Calendar — DOM 1 → mobile top · desktop right-top */}
-				<div className="lg:col-start-2 lg:row-start-1">
+				<motion.div
+					initial={{ opacity: 0, y: 12 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.35, delay: 0.1 }}
+					className="lg:col-start-2 lg:row-start-1"
+				>
 					<CalendarStrip
 						sessionDates={sessionDates}
 						streak={stats?.currentStreak ?? 0}
 						weekSessions={weekSessions}
 					/>
-				</div>
+				</motion.div>
 
 				{/* Hero — DOM 2 → mobile 2nd · desktop left-top */}
-				<div className="lg:col-start-1 lg:row-start-1">
+				<motion.div
+					initial={{ opacity: 0, y: 12 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.35, delay: 0.15 }}
+					className="lg:col-start-1 lg:row-start-1"
+				>
 					<HeroCard
 						sequence={recommended}
 						reason={recommendReason}
 						loading={loading}
 					/>
-				</div>
+				</motion.div>
+
+				{/* Snapshot — mobile flow after hero · desktop right middle */}
+				<motion.div
+					initial={{ opacity: 0, y: 12 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.35, delay: 0.2 }}
+					className="lg:col-start-2 lg:row-start-2"
+				>
+					<PracticeSnapshotCard
+						streak={stats?.currentStreak ?? 0}
+						weekSessions={weekSessions ?? 0}
+						totalPracticeMinutes={totalPracticeMinutes}
+						pendingSession={pendingSession}
+					/>
+				</motion.div>
+
+				{/* Tutor insights — visible only for tutor users */}
+				{isTutorUser && (
+					<motion.div
+						initial={{ opacity: 0, y: 12 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.35, delay: 0.25 }}
+						className="lg:col-start-2 lg:row-start-3"
+					>
+						<TutorInsightsCard tutorInsights={stats?.tutorInsights} />
+					</motion.div>
+				)}
 
 				{/* Recent Sessions — DOM 4 → mobile 4th · desktop left-bottom */}
-				<div className="lg:col-start-1 lg:row-start-2 px-4 sm:px-6 flex flex-col gap-3">
+				<motion.div
+					initial={{ opacity: 0, y: 12 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.35, delay: 0.25 }}
+					className="lg:col-start-1 lg:row-start-2 flex flex-col gap-3"
+				>
 					{loading ? (
 						<>
 							<div className="h-4 w-36 rounded-lg skeleton" />
@@ -221,7 +316,7 @@ export default function Dashboard() {
 							)}
 						</>
 					)}
-				</div>
+				</motion.div>
 			</div>
 		</div>
 	);

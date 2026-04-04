@@ -48,6 +48,7 @@ export default function PhasedMeditationPlayer({
 	durationMinutes = 10,
 	config = {},
 	guided = true,
+	lowStimMode = false,
 	onComplete,
 }) {
 	const { t } = useLanguage();
@@ -63,7 +64,7 @@ export default function PhasedMeditationPlayer({
 
 	const [isRunning, setIsRunning] = useState(false);
 	const [elapsedSec, setElapsedSec] = useState(0);
-	const [showGuide, setShowGuide] = useState(guided);
+	const [showGuide, setShowGuide] = useState(guided && !lowStimMode);
 	const intervalRef = useRef(null);
 	const bellAudioRef = useRef(null);
 	const lastBellRef = useRef(0);
@@ -86,10 +87,7 @@ export default function PhasedMeditationPlayer({
 			osc.frequency.value = freq;
 			osc.type = "sine";
 			gain.gain.setValueAtTime(0.12, ctx.currentTime);
-			gain.gain.exponentialRampToValueAtTime(
-				0.001,
-				ctx.currentTime + duration,
-			);
+			gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
 			osc.start(ctx.currentTime);
 			osc.stop(ctx.currentTime + duration);
 		} catch {
@@ -169,15 +167,16 @@ export default function PhasedMeditationPlayer({
 	}, [elapsedSec, phases]);
 
 	const remaining = totalSec - elapsedSec;
-	const progress = totalSec > 0 ? elapsedSec / totalSec : 0;
-	const instructions = MEDITATION_INSTRUCTIONS[meditationType] || MEDITATION_INSTRUCTIONS.guided;
+	const instructions =
+		MEDITATION_INSTRUCTIONS[meditationType] || MEDITATION_INSTRUCTIONS.guided;
 
 	const phaseColors = {
 		intro: "var(--color-accent)",
 		main: "var(--color-primary)",
 		close: "var(--color-secondary)",
 	};
-	const currentColor = phaseColors[currentPhase.phase.type] || "var(--color-accent)";
+	const currentColor =
+		phaseColors[currentPhase.phase.type] || "var(--color-accent)";
 
 	return (
 		<div className="flex flex-col items-center gap-5 py-2">
@@ -250,12 +249,12 @@ export default function PhasedMeditationPlayer({
 						border: `3px solid ${currentColor}30`,
 					}}
 					animate={
-						isRunning
+						isRunning && !lowStimMode
 							? { scale: [1, 1.05, 1], opacity: [1, 0.8, 1] }
 							: { scale: 1, opacity: 1 }
 					}
 					transition={
-						isRunning
+						isRunning && !lowStimMode
 							? { duration: 6, repeat: Infinity, ease: "easeInOut" }
 							: {}
 					}

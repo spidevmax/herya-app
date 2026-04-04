@@ -14,7 +14,7 @@ const { createError } = require("../../utils/createError");
  * Retrieves all users with pagination and filtering.
  *
  * Query Parameters:
- * - role: Filter by role (user/admin)
+ * - role: Filter by role (user/tutor/admin)
  * - page: Page number
  * - limit: Results per page
  * - search: Search by name or email
@@ -64,13 +64,13 @@ const getAllUsers = async (req, res, next) => {
 /**
  * Controller: updateUserRole (Admin)
  * -----------------------------------
- * Changes a user's role between 'user' and 'admin'.
+ * Changes a user's role between 'user', 'tutor', and 'admin'.
  *
  * URL Parameters:
  * - id: MongoDB ObjectId of the target user
  *
  * Request Body:
- * - role: "user" | "admin"
+ * - role: "user" | "tutor" | "admin"
  *
  * Workflow:
  * 1. Validates role value against allowed list.
@@ -92,8 +92,11 @@ const updateUserRole = async (req, res, next) => {
 		const { id } = req.params;
 		const { role } = req.body;
 
-		if (!["user", "admin"].includes(role)) {
-			throw createError(400, "Invalid role. Must be 'user' or 'admin'");
+		if (!["user", "tutor", "admin"].includes(role)) {
+			throw createError(
+				400,
+				"Invalid role. Must be 'user', 'tutor', or 'admin'",
+			);
 		}
 
 		const user = await User.findByIdAndUpdate(

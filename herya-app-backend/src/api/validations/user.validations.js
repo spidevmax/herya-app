@@ -97,6 +97,27 @@ const updateProfileValidations = [
 		.optional()
 		.isIn(["light", "dark"])
 		.withMessage('preferences.theme must be one of: "light", "dark"'),
+
+	check("preferences.lowStimMode")
+		.optional()
+		.isBoolean()
+		.withMessage("preferences.lowStimMode must be boolean"),
+
+	check("preferences.safetyAnchors.phrase")
+		.optional()
+		.trim()
+		.isLength({ max: 120 })
+		.withMessage(
+			"preferences.safetyAnchors.phrase must be 120 characters or less",
+		),
+
+	check("preferences.safetyAnchors.bodyCue")
+		.optional()
+		.trim()
+		.isLength({ max: 120 })
+		.withMessage(
+			"preferences.safetyAnchors.bodyCue must be 120 characters or less",
+		),
 ];
 
 /**

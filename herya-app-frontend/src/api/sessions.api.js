@@ -15,6 +15,7 @@ export const advanceSessionBlock = (id, direction) =>
 	api.post(`/sessions/${id}/advance-block`, { direction });
 export const completeGuidedSession = (id, data) =>
 	api.post(`/sessions/${id}/complete`, data);
-export const abandonSession = (id) => api.post(`/sessions/${id}/abandon`);
+export const abandonSession = (id, data = {}) =>
+	api.post(`/sessions/${id}/abandon`, data);
 export const getPracticeAnalytics = () =>
 	api.get("/sessions/analytics/practice");

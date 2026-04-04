@@ -23,13 +23,8 @@ const GOAL_OPTIONS = [
 
 const PRACTICE_INTENSITIES = ["gentle", "moderate", "vigorous"];
 const TIME_OF_DAY_OPTIONS = ["morning", "afternoon", "evening", "anytime"];
-const NOTIFICATION_FREQUENCIES = ["daily", "weekly", "never"];
 
 const toArray = (value) => (Array.isArray(value) ? value : []);
-const normalizeTime = (value) => {
-	if (typeof value !== "string" || !value) return "09:00";
-	return value.slice(0, 5);
-};
 
 const createInitialDraft = (user) => ({
 	name: user?.name ?? "",
@@ -40,15 +35,13 @@ const createInitialDraft = (user) => ({
 		practiceIntensity: user?.preferences?.practiceIntensity ?? "moderate",
 		sessionDuration: user?.preferences?.sessionDuration ?? 30,
 		timeOfDay: user?.preferences?.timeOfDay ?? "anytime",
-		notifications: {
-			enabled: user?.preferences?.notifications?.enabled ?? true,
-			frequency: user?.preferences?.notifications?.frequency ?? "weekly",
-			reminderTime: normalizeTime(
-				user?.preferences?.notifications?.reminderTime,
-			),
-		},
 		language: user?.preferences?.language ?? "en",
 		theme: user?.preferences?.theme ?? "light",
+		lowStimMode: user?.preferences?.lowStimMode ?? false,
+		safetyAnchors: {
+			phrase: user?.preferences?.safetyAnchors?.phrase ?? "",
+			bodyCue: user?.preferences?.safetyAnchors?.bodyCue ?? "",
+		},
 	},
 });
 
@@ -116,9 +109,11 @@ function Toggle({ id, checked, onChange }) {
 export default function Profile() {
 	const { user, logout, updateUser } = useAuth();
 	const { t } = useLanguage();
+	const isTutor = user?.role === "tutor";
 	const [savingProfile, setSavingProfile] = useState(false);
 	const [saveSuccess, setSaveSuccess] = useState(false);
 	const [uploadingPhoto, setUploadingPhoto] = useState(false);
+	const [saveError, setSaveError] = useState(false);
 	const [deletingAccount, setDeletingAccount] = useState(false);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 	const [draft, setDraft] = useState(() => createInitialDraft(user));
@@ -169,6 +164,7 @@ export default function Profile() {
 
 	const handleSaveProfile = async () => {
 		setSavingProfile(true);
+		setSaveError(false);
 		try {
 			const payload = {
 				name: draft.name,
@@ -182,6 +178,15 @@ export default function Profile() {
 					notifications: draft.preferences.notifications,
 					language: draft.preferences.language,
 					theme: draft.preferences.theme,
+					...(isTutor
+						? {
+								lowStimMode: draft.preferences.lowStimMode,
+								safetyAnchors: {
+									phrase: draft.preferences.safetyAnchors.phrase,
+									bodyCue: draft.preferences.safetyAnchors.bodyCue,
+								},
+							}
+						: {}),
 				},
 			};
 			const response = await updateProfile(payload);
@@ -192,6 +197,9 @@ export default function Profile() {
 				setSaveSuccess(true);
 				setTimeout(() => setSaveSuccess(false), 1800);
 			}
+		} catch {
+			setSaveError(true);
+			setTimeout(() => setSaveError(false), 3000);
 		} finally {
 			setSavingProfile(false);
 		}
@@ -271,10 +279,7 @@ export default function Profile() {
 										className={`w-full h-full object-cover transition-opacity duration-200 ${uploadingPhoto ? "opacity-40" : ""}`}
 									/>
 								) : (
-									<span
-										className="text-3xl sm:text-4xl font-bold text-white select-none"
-										style={{ fontFamily: '"Fredoka", sans-serif' }}
-									>
+									<span className="text-3xl sm:text-4xl font-bold text-white select-none font-display">
 										{initials}
 									</span>
 								)}
@@ -299,7 +304,6 @@ export default function Profile() {
 							<div className="flex flex-wrap items-center gap-2 mb-1.5">
 								<h1
 									className="text-3xl sm:text-4xl font-semibold leading-tight"
-									style={{ fontFamily: '"Fredoka", sans-serif' }}
 								>
 									{user?.name || t("profile.title")}
 								</h1>
@@ -370,7 +374,7 @@ export default function Profile() {
 						style={cardStyle}
 					>
 						<SectionTitle>{t("profile.account_details")}</SectionTitle>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 							<label className="space-y-1.5 text-sm">
 								<span
 									className="font-semibold"
@@ -460,9 +464,7 @@ export default function Profile() {
 												backgroundColor: active
 													? "var(--color-primary)"
 													: "var(--color-surface)",
-												color: active
-													? "white"
-													: "var(--color-text-secondary)",
+												color: active ? "white" : "var(--color-text-secondary)",
 												border: "1px solid var(--color-border)",
 											}}
 										>
@@ -480,7 +482,7 @@ export default function Profile() {
 						style={cardStyle}
 					>
 						<SectionTitle>{t("profile.practice_preferences")}</SectionTitle>
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 							<label className="space-y-1.5 text-sm">
 								<span
 									className="font-semibold"
@@ -551,13 +553,95 @@ export default function Profile() {
 							</label>
 						</div>
 
+						{isTutor && (
+							<div
+								className="pt-4 border-t"
+								style={{ borderColor: "var(--color-border-soft)" }}
+							>
+								<div className="flex items-center justify-between gap-4">
+									<div>
+										<p
+											className="text-sm font-semibold"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{t("profile.low_stim_mode")}
+										</p>
+										<p
+											className="text-xs mt-1"
+											style={{ color: "var(--color-text-muted)" }}
+										>
+											{t("profile.low_stim_mode_hint")}
+										</p>
+									</div>
+									<Toggle
+										id="low-stim-mode"
+										checked={draft.preferences.lowStimMode}
+										onChange={(event) =>
+											setPreference(
+												"preferences.lowStimMode",
+												event.target.checked,
+											)
+										}
+									/>
+								</div>
+								<div className="grid grid-cols-1 2xl:grid-cols-2 gap-3 mt-4">
+									<label className="space-y-1.5 text-sm">
+										<span
+											className="font-semibold"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{t("profile.safety_anchor_phrase")}
+										</span>
+										<input
+											value={draft.preferences.safetyAnchors.phrase}
+											onChange={(event) =>
+												setPreference(
+													"preferences.safetyAnchors.phrase",
+													event.target.value,
+												)
+											}
+											placeholder={t(
+												"profile.safety_anchor_phrase_placeholder",
+											)}
+											maxLength={120}
+											className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
+											style={inputStyle}
+										/>
+									</label>
+									<label className="space-y-1.5 text-sm">
+										<span
+											className="font-semibold"
+											style={{ color: "var(--color-text-primary)" }}
+										>
+											{t("profile.safety_anchor_body_cue")}
+										</span>
+										<input
+											value={draft.preferences.safetyAnchors.bodyCue}
+											onChange={(event) =>
+												setPreference(
+													"preferences.safetyAnchors.bodyCue",
+													event.target.value,
+												)
+											}
+											placeholder={t(
+												"profile.safety_anchor_body_cue_placeholder",
+											)}
+											maxLength={120}
+											className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
+											style={inputStyle}
+										/>
+									</label>
+								</div>
+							</div>
+						)}
+
 						{/* Interface subsection */}
 						<div
 							className="pt-4 border-t space-y-3"
 							style={{ borderColor: "var(--color-border)" }}
 						>
 							<SectionTitle>{t("profile.interface_title")}</SectionTitle>
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+							<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 								<label className="space-y-1.5 text-sm">
 									<span
 										className="font-semibold"
@@ -603,82 +687,6 @@ export default function Profile() {
 							</div>
 						</div>
 					</div>
-
-					{/* Notifications card */}
-					<div
-						className="rounded-3xl p-5 sm:p-6 shadow-[var(--shadow-card)]"
-						style={cardStyle}
-					>
-						<div className="flex items-center justify-between mb-4">
-							<SectionTitle>{t("profile.notifications_title")}</SectionTitle>
-							<Toggle
-								id="notifications-enabled"
-								checked={draft.preferences.notifications.enabled}
-								onChange={(event) =>
-									setPreference(
-										"preferences.notifications.enabled",
-										event.target.checked,
-									)
-								}
-							/>
-						</div>
-						{draft.preferences.notifications.enabled ? (
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-								<label className="space-y-1.5 text-sm">
-									<span
-										className="font-semibold"
-										style={{ color: "var(--color-text-primary)" }}
-									>
-										{t("profile.frequency")}
-									</span>
-									<select
-										value={draft.preferences.notifications.frequency}
-										onChange={(event) =>
-											setPreference(
-												"preferences.notifications.frequency",
-												event.target.value,
-											)
-										}
-										className="w-full rounded-xl px-4 py-3 border outline-none"
-										style={inputStyle}
-									>
-										{NOTIFICATION_FREQUENCIES.map((item) => (
-											<option key={item} value={item}>
-												{getOptionLabel("notifications_frequency", item)}
-											</option>
-										))}
-									</select>
-								</label>
-								<label className="space-y-1.5 text-sm">
-									<span
-										className="font-semibold"
-										style={{ color: "var(--color-text-primary)" }}
-									>
-										{t("profile.reminder_time")}
-									</span>
-									<input
-										type="time"
-										value={draft.preferences.notifications.reminderTime}
-										onChange={(event) =>
-											setPreference(
-												"preferences.notifications.reminderTime",
-												event.target.value,
-											)
-										}
-										className="w-full rounded-xl px-4 py-3 border outline-none"
-										style={inputStyle}
-									/>
-								</label>
-							</div>
-						) : (
-							<p
-								className="text-sm"
-								style={{ color: "var(--color-text-muted)" }}
-							>
-								{t("profile.notifications_disabled_hint")}
-							</p>
-						)}
-					</div>
 				</div>
 
 				{/* RIGHT COLUMN — sticky */}
@@ -688,6 +696,19 @@ export default function Profile() {
 						style={cardStyle}
 					>
 						<SectionTitle>{t("profile.actions_title")}</SectionTitle>
+
+						{saveError && (
+							<div
+								className="rounded-xl px-4 py-2.5 text-center text-sm font-semibold"
+								style={{
+									backgroundColor: "var(--color-warning-bg)",
+									border: "1px solid var(--color-warning-border)",
+									color: "var(--color-text-primary)",
+								}}
+							>
+								{t("profile.save_error")}
+							</div>
+						)}
 
 						{/* Save — primary CTA */}
 						<Button

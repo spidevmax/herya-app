@@ -14,7 +14,7 @@ import {
 	useNavigate,
 } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import Garden from "./Garden";
+import Journal from "./Journal";
 
 vi.mock("@/api/journalEntries.api", () => ({
 	getJournalEntries: vi.fn(),
@@ -30,39 +30,42 @@ vi.mock("@/context/LanguageContext", () => ({
 	useLanguage: () => ({
 		t: (key, vars) => {
 			const dict = {
-				"garden.title": "Your Garden",
-				"garden.entries_plural": "journal entries",
-				"garden.entries_singular": "journal entry",
-				"garden.view_graph": "Graph",
-				"garden.view_flowers": "Flowers",
-				"garden.filters_label": "Filters",
-				"garden.clear_filters": "Clear",
-				"garden.search_placeholder": "Search insights/reflection",
-				"garden.all_moods": "All moods",
-				"garden.all_types": "All types",
-				"garden.no_matches_title": "No matches for these filters",
-				"garden.no_matches_hint":
+				"journal.title": "Your Journal",
+				"journal.entries_plural": "journal entries",
+				"journal.entries_singular": "journal entry",
+				"journal.filters_label": "Filters",
+				"journal.clear_filters": "Clear",
+				"journal.search_placeholder": "Search insights/reflection",
+				"journal.all_moods": "All moods",
+				"journal.all_types": "All types",
+				"journal.no_matches_title": "No matches for these filters",
+				"journal.no_matches_hint":
 					"Try removing mood/type filters or expanding dates.",
-				"garden.graph_title": "Garden Graph",
-				"garden.tap_hint": "Tap a flower to see the entry",
+				"journal.tap_hint": "Tap a flower to see the entry",
 				"profile.days": "d",
 				"ui.close_modal": "Close modal",
+				"journal.reflection_label": "Reflection",
+				"journal.practice_type_label": "Practice Type",
+				"session.duration_label": "Duration",
+				"profile.minutes": "min",
 			};
 
-			if (key === "garden.showing_summary") {
-				return `Showing ${vars?.shown} of ${vars?.total} entries`;
-			}
-
-			if (key === "garden.open_entry_aria") {
+			if (key === "journal.open_entry_aria") {
 				return `Open entry ${vars?.date}`;
 			}
 
-			if (key.startsWith("garden.practice_types.")) {
+			if (key.startsWith("journal.practice_types.")) {
 				return key;
 			}
 
 			return dict[key] || key;
 		},
+	}),
+}));
+
+vi.mock("@/context/AuthContext", () => ({
+	useAuth: () => ({
+		user: { role: "user" },
 	}),
 }));
 
@@ -130,15 +133,15 @@ const NavigatorLink = ({ to, label, testId }) => {
 	);
 };
 
-const renderGardenWithNavigation = (initialEntry = "/garden") =>
+const renderJournalWithNavigation = (initialEntry = "/journal") =>
 	render(
 		<MemoryRouter initialEntries={[initialEntry]}>
 			<Routes>
 				<Route
-					path="/garden"
+					path="/journal"
 					element={
 						<>
-							<Garden />
+							<Journal />
 							<LocationProbe />
 							<NavigatorLink
 								to="/dummy"
@@ -153,7 +156,7 @@ const renderGardenWithNavigation = (initialEntry = "/garden") =>
 		</MemoryRouter>,
 	);
 
-describe("Garden browser history navigation", () => {
+describe("Journal browser history navigation", () => {
 	beforeEach(() => {
 		vi.mocked(getJournalEntries).mockResolvedValue({
 			data: { data: { journals: JOURNALS } },
@@ -166,8 +169,8 @@ describe("Garden browser history navigation", () => {
 	});
 
 	it("hydrates from URL on initial load and restores after transitioning away and back", async () => {
-		const view = renderGardenWithNavigation(
-			"/garden?view=flowers&mood=calm&type=meditation",
+		const view = renderJournalWithNavigation(
+			"/journal?mood=calm&type=meditation",
 		);
 		const ui = within(view.container);
 
@@ -175,25 +178,23 @@ describe("Garden browser history navigation", () => {
 			expect(vi.mocked(getJournalEntries)).toHaveBeenCalled();
 		});
 
-		const flowersBtn = ui.getByRole("button", { name: "Flowers" });
-		expect(flowersBtn).toBeTruthy();
-
 		const [moodSelect, typeSelect] = ui.getAllByRole("combobox");
 		expect(moodSelect.value).toBe("calm");
 		expect(typeSelect.value).toBe("meditation");
 
 		const search = ui.getByTestId("location-search").textContent;
-		expect(search).toContain("view=flowers");
 		expect(search).toContain("mood=calm");
 		expect(search).toContain("type=meditation");
 	});
 
 	it("preserves URL state after changing filters locally", async () => {
-		const view = renderGardenWithNavigation("/garden?view=flowers&mood=calm");
+		const view = renderJournalWithNavigation("/journal?mood=calm");
 		const ui = within(view.container);
 
 		await waitFor(() => {
-			expect(ui.getByRole("button", { name: "Flowers" })).toBeTruthy();
+			expect(
+				ui.getByPlaceholderText("Search insights/reflection"),
+			).toBeTruthy();
 		});
 
 		const [, typeSelect] = ui.getAllByRole("combobox");
@@ -208,15 +209,12 @@ describe("Garden browser history navigation", () => {
 		expect(ui.getByTestId("location-search").textContent).toContain(
 			"mood=calm",
 		);
-		expect(ui.getByTestId("location-search").textContent).toContain(
-			"view=flowers",
-		);
 	});
 
 	it("restores complete state when navigating to a URL with encoded filters", async () => {
 		const complexUrl =
-			"/garden?view=flowers&mood=calm&from=2026-03-01&to=2026-03-31&preset=30&q=clear&type=meditation&entry=j1";
-		const view = renderGardenWithNavigation(complexUrl);
+			"/journal?mood=calm&from=2026-03-01&to=2026-03-31&preset=30&q=clear&type=meditation&entry=j1";
+		const view = renderJournalWithNavigation(complexUrl);
 		const ui = within(view.container);
 
 		await waitFor(() => {
@@ -239,11 +237,13 @@ describe("Garden browser history navigation", () => {
 	});
 
 	it("handles URL without query params as clean state", async () => {
-		const view = renderGardenWithNavigation("/garden");
+		const view = renderJournalWithNavigation("/journal");
 		const ui = within(view.container);
 
 		await waitFor(() => {
-			expect(ui.getByRole("button", { name: "Graph" })).toBeTruthy();
+			expect(
+				ui.getByPlaceholderText("Search insights/reflection"),
+			).toBeTruthy();
 		});
 
 		const searchInput = ui.getByPlaceholderText("Search insights/reflection");

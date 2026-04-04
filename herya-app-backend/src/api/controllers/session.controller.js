@@ -40,8 +40,15 @@ const { deleteImgCloudinary } = require("../../utils/deleteImage");
  */
 const createSession = async (req, res, next) => {
 	try {
-		const { sessionType, vkSequence, completePractice, duration, plannedBlocks } = req.body;
-		const isBlockBased = Array.isArray(plannedBlocks) && plannedBlocks.length > 0;
+		const {
+			sessionType,
+			vkSequence,
+			completePractice,
+			duration,
+			plannedBlocks,
+		} = req.body;
+		const isBlockBased =
+			Array.isArray(plannedBlocks) && plannedBlocks.length > 0;
 
 		// Validate required fields based on sessionType (skip for block-based sessions)
 		if (!isBlockBased && sessionType === "vk_sequence" && !vkSequence) {
@@ -51,7 +58,11 @@ const createSession = async (req, res, next) => {
 			);
 		}
 
-		if (!isBlockBased && sessionType === "complete_practice" && !completePractice) {
+		if (
+			!isBlockBased &&
+			sessionType === "complete_practice" &&
+			!completePractice
+		) {
 			throw createError(
 				400,
 				"completePractice is required for complete_practice session type",
@@ -474,6 +485,268 @@ const getSessionStats = async (req, res, next) => {
 				? Math.round(totalMinutes / recentSessions.length)
 				: 0;
 
+		// Tutor support insights from the last 4 weeks.
+		const tutorSessions = await Session.find({
+			user: req.user._id,
+			date: { $gte: fourWeeksAgo },
+			$or: [
+				{ "checkIn.signal": { $in: ["green", "yellow", "red"] } },
+				{ "tutorSupport.safePauseCount": { $gt: 0 } },
+				{ "tutorSupport.anchorAvailable": true },
+				{ "tutorSupport.anchorUsed": true },
+			],
+		})
+			.select("_id date checkIn tutorSupport")
+			.lean();
+
+		const tutorSessionIds = tutorSessions.map((session) => session._id);
+		const tutorJournals =
+			tutorSessionIds.length > 0
+				? await JournalEntry.find({
+						user: req.user._id,
+						session: { $in: tutorSessionIds },
+					})
+						.select("session signalAfter")
+						.lean()
+				: [];
+
+		const journalSignalBySession = new Map(
+			tutorJournals.map((journal) => [
+				String(journal.session),
+				journal.signalAfter,
+			]),
+		);
+
+		const signalRank = {
+			green: 1,
+			yellow: 2,
+			red: 3,
+		};
+
+		const buildTutorInsights = (sessionsSlice) => {
+			const insights = {
+				sessionCount: sessionsSlice.length,
+				totalSafePauses: 0,
+				sessionsWithSafePause: 0,
+				anchorAvailableSessions: 0,
+				anchorUsedSessions: 0,
+				anchorUseRate: 0,
+				signalTransitionsCount: 0,
+				signalImprovedCount: 0,
+				signalSteadyCount: 0,
+				signalWorsenedCount: 0,
+				signalImprovementRate: 0,
+			};
+
+			sessionsSlice.forEach((session) => {
+				const safePauseCount =
+					Math.max(0, Number(session?.tutorSupport?.safePauseCount) || 0) || 0;
+				const anchorAvailable = Boolean(session?.tutorSupport?.anchorAvailable);
+				const anchorUsed = Boolean(session?.tutorSupport?.anchorUsed);
+
+				insights.totalSafePauses += safePauseCount;
+				if (safePauseCount > 0) insights.sessionsWithSafePause += 1;
+				if (anchorAvailable) insights.anchorAvailableSessions += 1;
+				if (anchorUsed) insights.anchorUsedSessions += 1;
+
+				const beforeSignal = session?.checkIn?.signal;
+				const afterSignal = journalSignalBySession.get(String(session._id));
+				if (!beforeSignal || !afterSignal) return;
+				if (!signalRank[beforeSignal] || !signalRank[afterSignal]) return;
+
+				insights.signalTransitionsCount += 1;
+				if (signalRank[afterSignal] < signalRank[beforeSignal]) {
+					insights.signalImprovedCount += 1;
+				} else if (signalRank[afterSignal] === signalRank[beforeSignal]) {
+					insights.signalSteadyCount += 1;
+				} else {
+					insights.signalWorsenedCount += 1;
+				}
+			});
+
+			insights.anchorUseRate =
+				insights.anchorAvailableSessions > 0
+					? Math.round(
+							(insights.anchorUsedSessions / insights.anchorAvailableSessions) *
+								100,
+						)
+					: 0;
+
+			insights.signalImprovementRate =
+				insights.signalTransitionsCount > 0
+					? Math.round(
+							(insights.signalImprovedCount / insights.signalTransitionsCount) *
+								100,
+						)
+					: 0;
+
+			return insights;
+		};
+
+		const tutorInsights = buildTutorInsights(tutorSessions);
+
+		const currentWeekStart = new Date();
+		currentWeekStart.setHours(0, 0, 0, 0);
+		currentWeekStart.setDate(currentWeekStart.getDate() - 6);
+
+		const previousWeekStart = new Date(currentWeekStart);
+		previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+
+		const currentWeekTutorSessions = tutorSessions.filter(
+			(session) => new Date(session.date) >= currentWeekStart,
+		);
+		const previousWeekTutorSessions = tutorSessions.filter((session) => {
+			const sessionDate = new Date(session.date);
+			return sessionDate >= previousWeekStart && sessionDate < currentWeekStart;
+		});
+
+		const currentWeekInsights = buildTutorInsights(currentWeekTutorSessions);
+		const previousWeekInsights = buildTutorInsights(previousWeekTutorSessions);
+
+		tutorInsights.weeklyTrend = {
+			currentWeek: currentWeekInsights,
+			previousWeek: previousWeekInsights,
+			delta: {
+				sessionCount:
+					currentWeekInsights.sessionCount - previousWeekInsights.sessionCount,
+				totalSafePauses:
+					currentWeekInsights.totalSafePauses -
+					previousWeekInsights.totalSafePauses,
+				anchorUseRate:
+					currentWeekInsights.anchorUseRate -
+					previousWeekInsights.anchorUseRate,
+				signalImprovementRate:
+					currentWeekInsights.signalImprovementRate -
+					previousWeekInsights.signalImprovementRate,
+			},
+		};
+
+		const getTutorRecommendation = (insights) => {
+			const sessions = insights.sessionCount || 0;
+			const transitions = insights.signalTransitionsCount || 0;
+
+			if ((insights.sessionCount || 0) < 2) {
+				return {
+					key: "collect_more_data",
+					severity: "info",
+					preset: "tutor",
+					confidence: "low",
+				};
+			}
+
+			if (
+				(insights.anchorAvailableSessions || 0) > 0 &&
+				(insights.anchorUseRate || 0) < 50
+			) {
+				return {
+					key: "increase_anchor_prompts",
+					severity: "warning",
+					preset: "tutor",
+					confidence: transitions >= 3 ? "high" : "medium",
+				};
+			}
+
+			if (
+				(insights.signalImprovementRate || 0) < 40 &&
+				(insights.weeklyTrend?.delta?.signalImprovementRate || 0) < 0
+			) {
+				return {
+					key: "prioritize_short_coregulation",
+					severity: "warning",
+					preset: "tutor",
+					confidence: transitions >= 3 ? "high" : "medium",
+				};
+			}
+
+			if (
+				(insights.signalImprovementRate || 0) >= 70 &&
+				(insights.weeklyTrend?.delta?.signalImprovementRate || 0) >= 0
+			) {
+				return {
+					key: "maintain_current_plan",
+					severity: "success",
+					preset: "adult",
+					confidence: sessions >= 4 && transitions >= 3 ? "high" : "medium",
+				};
+			}
+
+			return {
+				key: "keep_consistent_routine",
+				severity: "info",
+				preset: "adult",
+				confidence: sessions >= 3 ? "medium" : "low",
+			};
+		};
+
+		tutorInsights.recommendation = getTutorRecommendation(tutorInsights);
+
+		const recommendationAppliedSessions = await Session.find({
+			user: req.user._id,
+			date: { $gte: fourWeeksAgo },
+			"recommendationContext.applied": true,
+			"recommendationContext.source": "dashboard_tutor_insights",
+		})
+			.select("_id checkIn recommendationContext")
+			.lean();
+
+		const appliedSessionIds = recommendationAppliedSessions.map(
+			(session) => session._id,
+		);
+		const appliedSessionJournals =
+			appliedSessionIds.length > 0
+				? await JournalEntry.find({
+						user: req.user._id,
+						session: { $in: appliedSessionIds },
+					})
+						.select("session signalAfter")
+						.lean()
+				: [];
+
+		const appliedSignalBySession = new Map(
+			appliedSessionJournals.map((journal) => [
+				String(journal.session),
+				journal.signalAfter,
+			]),
+		);
+
+		const recommendationOutcome = {
+			appliedCount: recommendationAppliedSessions.length,
+			withSignalOutcome: 0,
+			improvedCount: 0,
+			improvedRate: 0,
+			byPreset: {
+				adult: 0,
+				tutor: 0,
+			},
+		};
+
+		recommendationAppliedSessions.forEach((session) => {
+			const preset = session?.recommendationContext?.preset;
+			if (preset === "adult") recommendationOutcome.byPreset.adult += 1;
+			if (preset === "tutor") recommendationOutcome.byPreset.tutor += 1;
+
+			const beforeSignal = session?.checkIn?.signal;
+			const afterSignal = appliedSignalBySession.get(String(session._id));
+			if (!beforeSignal || !afterSignal) return;
+			if (!signalRank[beforeSignal] || !signalRank[afterSignal]) return;
+
+			recommendationOutcome.withSignalOutcome += 1;
+			if (signalRank[afterSignal] < signalRank[beforeSignal]) {
+				recommendationOutcome.improvedCount += 1;
+			}
+		});
+
+		recommendationOutcome.improvedRate =
+			recommendationOutcome.withSignalOutcome > 0
+				? Math.round(
+						(recommendationOutcome.improvedCount /
+							recommendationOutcome.withSignalOutcome) *
+							100,
+					)
+				: 0;
+
+		tutorInsights.recommendationOutcome = recommendationOutcome;
+
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,
 			totalMinutes: user.totalMinutes,
@@ -485,6 +758,7 @@ const getSessionStats = async (req, res, next) => {
 			sessionsPerWeek,
 			mostPracticedFamilies,
 			avgDuration,
+			tutorInsights,
 			lastPracticeDate: user.lastPracticeDate,
 		});
 	} catch (error) {
@@ -664,7 +938,8 @@ const completeGuidedSession = async (req, res, next) => {
 		const elapsedMs = now - startedAt - totalPausedMs;
 		const actualMinutes = Math.max(1, Math.round(elapsedMs / 60000));
 
-		const blocksCompleted = req.body.blocksCompleted ?? session.plannedBlocks.length;
+		const blocksCompleted =
+			req.body?.blocksCompleted ?? session.plannedBlocks.length;
 		const completionRate =
 			session.plannedBlocks.length > 0
 				? Math.round((blocksCompleted / session.plannedBlocks.length) * 100)
@@ -674,7 +949,17 @@ const completeGuidedSession = async (req, res, next) => {
 		session.completed = true;
 		session.actualDuration = actualMinutes;
 		session.completionRate = completionRate;
-		if (req.body.notes) session.notes = req.body.notes;
+		if (req.body?.tutorSupport) {
+			session.tutorSupport = {
+				safePauseCount: Math.max(
+					0,
+					Number(req.body?.tutorSupport?.safePauseCount) || 0,
+				),
+				anchorAvailable: Boolean(req.body?.tutorSupport?.anchorAvailable),
+				anchorUsed: Boolean(req.body?.tutorSupport?.anchorUsed),
+			};
+		}
+		if (req.body?.notes) session.notes = req.body.notes;
 
 		const saved = await session.save();
 		await updateUserStats(req.user._id, saved);
@@ -715,6 +1000,17 @@ const abandonSession = async (req, res, next) => {
 			session.plannedBlocks.length > 0
 				? Math.round((blocksCompleted / session.plannedBlocks.length) * 100)
 				: 0;
+
+		if (req.body?.tutorSupport) {
+			session.tutorSupport = {
+				safePauseCount: Math.max(
+					0,
+					Number(req.body?.tutorSupport?.safePauseCount) || 0,
+				),
+				anchorAvailable: Boolean(req.body?.tutorSupport?.anchorAvailable),
+				anchorUsed: Boolean(req.body?.tutorSupport?.anchorUsed),
+			};
+		}
 
 		const saved = await session.save();
 		return sendResponse(res, 200, true, "Session abandoned", saved);
@@ -811,13 +1107,9 @@ const getPracticeAnalytics = async (req, res, next) => {
 
 		return sendResponse(res, 200, true, "Analytics retrieved", {
 			completionRate:
-				stats.total > 0
-					? Math.round((stats.completed / stats.total) * 100)
-					: 0,
+				stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
 			abandonmentRate:
-				stats.total > 0
-					? Math.round((stats.abandoned / stats.total) * 100)
-					: 0,
+				stats.total > 0 ? Math.round((stats.abandoned / stats.total) * 100) : 0,
 			avgDuration: Math.round(stats.avgDuration || 0),
 			totalSessions: stats.total,
 			byType: byType.map((t) => ({

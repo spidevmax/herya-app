@@ -1,34 +1,48 @@
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
+import { LoadingSpinner } from "@/components/ui";
 import AppLayout from "@/components/layout/AppLayout";
 import {
 	AdminRoute,
 	ProtectedRoute,
 	PublicRoute,
 } from "@/components/routing/RouteGuards";
-import Admin from "@/pages/Admin";
-import AuthCallback from "@/pages/AuthCallback";
-import Dashboard from "@/pages/Dashboard";
-import ForgotPassword from "@/pages/ForgotPassword";
-import Garden from "@/pages/Garden";
-import JournalForm from "@/pages/JournalForm";
-import BreathingDetail from "@/pages/BreathingDetail";
-import Library from "@/pages/Library";
-import Login from "@/pages/Login";
-import NotFound from "@/pages/NotFound";
-import PoseDetail from "@/pages/PoseDetail";
-import Poses from "@/pages/Poses";
-import Profile from "@/pages/Profile";
-import Register from "@/pages/Register";
-import ResetPassword from "@/pages/ResetPassword";
-import SequenceDetail from "@/pages/SequenceDetail";
-import Session from "@/pages/Session";
-import StartPractice from "@/pages/StartPractice";
-import SessionDetail from "@/pages/SessionDetail";
-import SessionHistory from "@/pages/SessionHistory";
+
+const Admin = lazy(() => import("@/pages/Admin"));
+const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
+const Journal = lazy(() => import("@/pages/Journal"));
+const JournalForm = lazy(() => import("@/pages/JournalForm"));
+const BreathingDetail = lazy(() => import("@/pages/BreathingDetail"));
+const Library = lazy(() => import("@/pages/Library"));
+const Login = lazy(() => import("@/pages/Login"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const PoseDetail = lazy(() => import("@/pages/PoseDetail"));
+const Poses = lazy(() => import("@/pages/Poses"));
+const Profile = lazy(() => import("@/pages/Profile"));
+const Register = lazy(() => import("@/pages/Register"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const SequenceDetail = lazy(() => import("@/pages/SequenceDetail"));
+const Session = lazy(() => import("@/pages/Session"));
+const StartPractice = lazy(() => import("@/pages/StartPractice"));
+const SessionDetail = lazy(() => import("@/pages/SessionDetail"));
+const SessionHistory = lazy(() => import("@/pages/SessionHistory"));
+
+const prefetchDashboardRoutes = (role) => {
+	void import("@/pages/Dashboard");
+	void import("@/pages/Journal");
+
+	if (role === "tutor") {
+		void import("@/pages/StartPractice");
+		return;
+	}
+
+	void import("@/pages/Library");
+};
 
 /** Syncs language and theme from user.preferences after login */
 function SyncUserPreferences() {
@@ -47,6 +61,31 @@ function SyncUserPreferences() {
 	return null;
 }
 
+function PrefetchLikelyRoutes() {
+	const { user, loading } = useAuth();
+
+	useEffect(() => {
+		if (loading || !user) return undefined;
+
+		const schedulePrefetch = () => prefetchDashboardRoutes(user.role);
+		const idleCallbackId =
+			typeof window !== "undefined" && "requestIdleCallback" in window
+				? window.requestIdleCallback(schedulePrefetch)
+				: window.setTimeout(schedulePrefetch, 0);
+
+		return () => {
+			if (typeof window !== "undefined" && "cancelIdleCallback" in window) {
+				window.cancelIdleCallback(idleCallbackId);
+				return;
+			}
+
+			window.clearTimeout(idleCallbackId);
+		};
+	}, [loading, user]);
+
+	return null;
+}
+
 function LegacyPoseDetailRedirect() {
 	const { id } = useParams();
 	return <Navigate replace to={`/library/pose/${id}`} />;
@@ -61,73 +100,88 @@ const AppRoutes = () => {
 	return (
 		<>
 			<SyncUserPreferences />
-			<Routes>
-				<Route path="/auth/callback" element={<AuthCallback />} />
-				<Route
-					path="/login"
-					element={
-						<PublicRoute>
-							<Login />
-						</PublicRoute>
-					}
-				/>
-				<Route path="/forgot-password" element={<ForgotPassword />} />
-				<Route
-					path="/register"
-					element={
-						<PublicRoute>
-							<Register />
-						</PublicRoute>
-					}
-				/>
-				<Route path="/reset-password" element={<ResetPassword />} />
-
-				<Route
-					element={
-						<ProtectedRoute>
-							<AppLayout />
-						</ProtectedRoute>
-					}
-				>
-					<Route path="/" element={<Dashboard />} />
-
-					<Route path="/library" element={<Library />} />
-					<Route path="/library/sequence/:id" element={<SequenceDetail />} />
-					<Route path="/library/pose/:id" element={<PoseDetail />} />
-					<Route path="/library/breathing/:id" element={<BreathingDetail />} />
-					<Route path="/poses" element={<Poses />} />
-					<Route path="/poses/:id" element={<LegacyPoseDetailRedirect />} />
+			<PrefetchLikelyRoutes />
+			<Suspense
+				fallback={
+					<div className="min-h-dvh flex items-center justify-center">
+						<LoadingSpinner size={40} color="var(--color-primary)" />
+					</div>
+				}
+			>
+				<Routes>
+					<Route path="/auth/callback" element={<AuthCallback />} />
 					<Route
-						path="/breathing/:id"
-						element={<LegacyBreathingDetailRedirect />}
+						path="/login"
+						element={
+							<PublicRoute>
+								<Login />
+							</PublicRoute>
+						}
 					/>
+					<Route path="/forgot-password" element={<ForgotPassword />} />
+					<Route
+						path="/register"
+						element={
+							<PublicRoute>
+								<Register />
+							</PublicRoute>
+						}
+					/>
+					<Route path="/reset-password" element={<ResetPassword />} />
 
-					<Route path="/start-practice" element={<StartPractice />} />
-					<Route path="/session/:type" element={<Session />} />
-					<Route path="/sessions" element={<SessionHistory />} />
-					<Route path="/sessions/:id" element={<SessionDetail />} />
+					<Route
+						element={
+							<ProtectedRoute>
+								<AppLayout />
+							</ProtectedRoute>
+						}
+					>
+						<Route path="/" element={<Dashboard />} />
 
-					<Route path="/garden" element={<Garden />} />
-					<Route path="/journal" element={<Navigate replace to="/garden" />} />
-					<Route path="/journal/new" element={<JournalForm />} />
-					<Route path="/journal/:id/edit" element={<JournalForm />} />
+						<Route path="/library" element={<Library />} />
+						<Route path="/library/sequence/:id" element={<SequenceDetail />} />
+						<Route path="/library/pose/:id" element={<PoseDetail />} />
+						<Route
+							path="/library/breathing/:id"
+							element={<BreathingDetail />}
+						/>
+						<Route path="/poses" element={<Poses />} />
+						<Route path="/poses/:id" element={<LegacyPoseDetailRedirect />} />
+						<Route
+							path="/breathing/:id"
+							element={<LegacyBreathingDetailRedirect />}
+						/>
 
-					<Route path="/profile" element={<Profile />} />
-				</Route>
+						<Route path="/start-practice" element={<StartPractice />} />
+						<Route path="/session/:type" element={<Session />} />
+						<Route path="/sessions" element={<SessionHistory />} />
+						<Route path="/sessions/:id" element={<SessionDetail />} />
 
-				<Route
-					path="/admin"
-					element={
-						<AdminRoute>
-							<AppLayout />
-						</AdminRoute>
-					}
-				>
-					<Route index element={<Admin />} />
-				</Route>
+						<Route path="/journal" element={<Journal />} />
+						<Route
+							path="/garden"
+							element={<Navigate replace to="/journal" />}
+						/>
+						<Route path="/journal/new" element={<JournalForm />} />
+						<Route path="/journal/:id/edit" element={<JournalForm />} />
 
-				<Route path="*" element={<NotFound />} />
-			</Routes>
+						<Route path="/profile" element={<Profile />} />
+					</Route>
+
+					<Route
+						path="/admin"
+						element={
+							<AdminRoute>
+								<AppLayout />
+							</AdminRoute>
+						}
+					>
+						<Route index element={<Admin />} />
+					</Route>
+
+					<Route path="*" element={<NotFound />} />
+				</Routes>
+			</Suspense>
 		</>
 	);
 };

@@ -11,7 +11,7 @@ export default function BottomNav() {
 		{ to: "/", icon: Home, label: t("nav.home") },
 		{ to: "/library", icon: BookOpen, label: t("nav.library") },
 		null,
-		{ to: "/garden", icon: Leaf, label: t("nav.garden") },
+		{ to: "/journal", icon: Leaf, label: t("nav.journal") },
 		{ to: "/profile", icon: User, label: t("nav.profile") },
 	];
 
@@ -32,10 +32,11 @@ export default function BottomNav() {
 								key="fab"
 								onClick={() => navigate("/start-practice")}
 								whileTap={{ scale: 0.9 }}
+								aria-label={t("fab.vk_sequence")}
 								className="relative flex items-center justify-center w-14 h-14 rounded-full text-white -mt-5"
 								style={{
 									backgroundColor: "var(--color-primary)",
-									boxShadow: "0 6px 24px rgba(107, 142, 95, 0.3)",
+									boxShadow: "var(--shadow-fab)",
 								}}
 							>
 								<Plus size={26} strokeWidth={2.5} />
@@ -69,8 +70,7 @@ export default function BottomNav() {
 											color: isActive
 												? "var(--color-primary)"
 												: "var(--color-text-muted)",
-											fontFamily: '"DM Sans", sans-serif',
-										}}
+													}}
 									>
 										{item.label}
 									</span>

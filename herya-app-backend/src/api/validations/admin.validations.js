@@ -9,7 +9,7 @@ const { query, param, body } = require("express-validator");
 /**
  * getAllUsersValidation
  * Validates query parameters for retrieving all users with filtering
- * - role: optional filter by user role (user/admin)
+ * - role: optional filter by user role (user/tutor/admin)
  * - search: optional search by name or email
  * - page: pagination page number (default: 1, min: 1)
  * - limit: results per page (default: 20, max: 100)
@@ -17,8 +17,8 @@ const { query, param, body } = require("express-validator");
 const getAllUsersValidation = [
 	query("role")
 		.optional()
-		.isIn(["user", "admin"])
-		.withMessage("Invalid role. Must be 'user' or 'admin'"),
+		.isIn(["user", "tutor", "admin"])
+		.withMessage("Invalid role. Must be 'user', 'tutor', or 'admin'"),
 
 	query("search")
 		.optional()
@@ -27,7 +27,10 @@ const getAllUsersValidation = [
 		.isLength({ min: 1 })
 		.withMessage("Search query must not be empty"),
 
-	query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+	query("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
 
 	query("limit")
 		.optional()
@@ -39,7 +42,7 @@ const getAllUsersValidation = [
  * updateUserRoleValidation
  * Validates user ID parameter and role update body
  * - id: MongoDB ObjectId format
- * - role: must be 'user' or 'admin'
+ * - role: must be 'user', 'tutor', or 'admin'
  */
 const updateUserRoleValidation = [
 	param("id").isMongoId().withMessage("Invalid user ID format"),
@@ -47,15 +50,17 @@ const updateUserRoleValidation = [
 	body("role")
 		.notEmpty()
 		.withMessage("Role is required")
-		.isIn(["user", "admin"])
-		.withMessage("Invalid role. Must be 'user' or 'admin'"),
+		.isIn(["user", "tutor", "admin"])
+		.withMessage("Invalid role. Must be 'user', 'tutor', or 'admin'"),
 ];
 
 /**
  * userIdParamValidation
  * Validates MongoDB ObjectId for user parameter
  */
-const userIdParamValidation = [param("id").isMongoId().withMessage("Invalid user ID format")];
+const userIdParamValidation = [
+	param("id").isMongoId().withMessage("Invalid user ID format"),
+];
 
 /**
  * createVKSequenceValidation
@@ -110,7 +115,10 @@ const updateVKSequenceValidation = [
 		.isLength({ min: 2, max: 255 })
 		.withMessage("English name must be between 2 and 255 characters"),
 
-	body("level").optional().isInt({ min: 1, max: 3 }).withMessage("Level must be 1, 2, or 3"),
+	body("level")
+		.optional()
+		.isInt({ min: 1, max: 3 })
+		.withMessage("Level must be 1, 2, or 3"),
 ];
 
 /**

@@ -34,11 +34,51 @@ const createSessionValidations = [
 		.isInt({ min: 1 })
 		.withMessage("Duration must be a positive integer (minutes)"),
 
-	check("vkSequence").optional().isMongoId().withMessage("vkSequence must be a valid MongoDB ID"),
+	check("vkSequence")
+		.optional()
+		.isMongoId()
+		.withMessage("vkSequence must be a valid MongoDB ID"),
 
-	check("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+	check("completed")
+		.optional()
+		.isBoolean()
+		.withMessage("Completed must be a boolean value"),
 
-	check("date").optional().isISO8601().withMessage("Date must be a valid ISO 8601 date"),
+	check("checkIn.signal")
+		.optional()
+		.isIn(["green", "yellow", "red"])
+		.withMessage('checkIn.signal must be one of: "green", "yellow", "red"'),
+
+	check("recommendationContext.applied")
+		.optional()
+		.isBoolean()
+		.withMessage("recommendationContext.applied must be boolean"),
+
+	check("recommendationContext.source")
+		.optional()
+		.isIn(["dashboard_tutor_insights", "manual", "other"])
+		.withMessage(
+			'recommendationContext.source must be one of: "dashboard_tutor_insights", "manual", "other"',
+		),
+
+	check("recommendationContext.preset")
+		.optional()
+		.isIn(["adult", "tutor"])
+		.withMessage(
+			'recommendationContext.preset must be one of: "adult", "tutor"',
+		),
+
+	check("recommendationContext.confidence")
+		.optional()
+		.isIn(["low", "medium", "high"])
+		.withMessage(
+			'recommendationContext.confidence must be one of: "low", "medium", "high"',
+		),
+
+	check("date")
+		.optional()
+		.isISO8601()
+		.withMessage("Date must be a valid ISO 8601 date"),
 
 	check("vkFeedback.sequenceChallenge")
 		.optional()
@@ -50,7 +90,9 @@ const createSessionValidations = [
 	check("vkFeedback.vinyasaPace")
 		.optional()
 		.isIn(["too_slow", "perfect", "too_fast"])
-		.withMessage('vkFeedback.vinyasaPace must be one of: "too_slow", "perfect", "too_fast"'),
+		.withMessage(
+			'vkFeedback.vinyasaPace must be one of: "too_slow", "perfect", "too_fast"',
+		),
 
 	check("vkFeedback.breathComfort")
 		.optional()
@@ -76,7 +118,10 @@ const createSessionValidations = [
  * router.put("/:id", updateSessionValidations, handleValidationErrors, updateSession);
  */
 const updateSessionValidations = [
-	check("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+	check("completed")
+		.optional()
+		.isBoolean()
+		.withMessage("Completed must be a boolean value"),
 
 	check("duration")
 		.optional()
@@ -99,7 +144,9 @@ const updateSessionValidations = [
 	check("vkFeedback.vinyasaPace")
 		.optional()
 		.isIn(["too_slow", "perfect", "too_fast"])
-		.withMessage('vkFeedback.vinyasaPace must be one of: "too_slow", "perfect", "too_fast"'),
+		.withMessage(
+			'vkFeedback.vinyasaPace must be one of: "too_slow", "perfect", "too_fast"',
+		),
 
 	check("vkFeedback.breathComfort")
 		.optional()
@@ -134,7 +181,10 @@ const sessionIdValidation = [
  * router.get("/", sessionPaginationValidation, handleValidationErrors, getUserSessions);
  */
 const sessionPaginationValidation = [
-	check("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+	check("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
 
 	check("limit")
 		.optional()
@@ -148,11 +198,20 @@ const sessionPaginationValidation = [
 			'Session type must be one of: "vk_sequence", "pranayama", "meditation", "complete_practice"',
 		),
 
-	check("completed").optional().isBoolean().withMessage("Completed must be a boolean value"),
+	check("completed")
+		.optional()
+		.isBoolean()
+		.withMessage("Completed must be a boolean value"),
 
-	check("startDate").optional().isISO8601().withMessage("Start date must be a valid ISO 8601 date"),
+	check("startDate")
+		.optional()
+		.isISO8601()
+		.withMessage("Start date must be a valid ISO 8601 date"),
 
-	check("endDate").optional().isISO8601().withMessage("End date must be a valid ISO 8601 date"),
+	check("endDate")
+		.optional()
+		.isISO8601()
+		.withMessage("End date must be a valid ISO 8601 date"),
 ];
 
 module.exports = {

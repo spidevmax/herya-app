@@ -7,7 +7,7 @@ import {
 	within,
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import PracticeTypeSelector from "./PracticeTypeSelector";
+import PracticeTypeSelector from "../components/session/PracticeTypeSelector";
 
 vi.mock("@/context/LanguageContext", () => ({
 	useLanguage: () => ({

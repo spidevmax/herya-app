@@ -41,7 +41,10 @@ describe("Admin — Authorization", () => {
 	it("returns 401 on all routes without a token", async () => {
 		const routes = [
 			() => request(app).get(`${BASE}/users`),
-			() => request(app).put(`${BASE}/users/000000000000000000000000/role`).send({ role: "user" }),
+			() =>
+				request(app)
+					.put(`${BASE}/users/000000000000000000000000/role`)
+					.send({ role: "user" }),
 			() => request(app).delete(`${BASE}/users/000000000000000000000000`),
 			() => request(app).post(`${BASE}/poses`),
 			() => request(app).post(`${BASE}/breathing-patterns`),
@@ -56,7 +59,9 @@ describe("Admin — Authorization", () => {
 
 	it("returns 403 when a regular user tries to access admin routes", async () => {
 		const { token } = await createUser({ email: "regular@test.com" });
-		const res = await request(app).get(`${BASE}/users`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(`${BASE}/users`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(403);
 	});
 });
@@ -69,7 +74,9 @@ describe("Admin — GET /users", () => {
 		await createUser({ email: "user1@test.com" });
 		await createUser({ email: "user2@test.com" });
 
-		const res = await request(app).get(`${BASE}/users`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(`${BASE}/users`)
+			.set("Authorization", `Bearer ${token}`);
 
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
@@ -142,8 +149,23 @@ describe("Admin — PUT /users/:id/role", () => {
 		expect(res.body.data).toHaveProperty("role", "user");
 	});
 
+	it("updates a user role to tutor", async () => {
+		const { token } = await createAdmin({ email: "admin-tutor@test.com" });
+		const { user } = await createUser({ email: "to-tutor@test.com" });
+
+		const res = await request(app)
+			.put(`${BASE}/users/${user._id}/role`)
+			.set("Authorization", `Bearer ${token}`)
+			.send({ role: "tutor" });
+
+		expect(res.status).toBe(200);
+		expect(res.body.data).toHaveProperty("role", "tutor");
+	});
+
 	it("returns 400 for an invalid role value", async () => {
-		const { token } = await createAdmin({ email: "admin-invalidrole@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-invalidrole@test.com",
+		});
 		const { user } = await createUser({ email: "target-invalid@test.com" });
 
 		const res = await request(app)
@@ -180,7 +202,9 @@ describe("Admin — DELETE /users/:id", () => {
 	});
 
 	it("returns 404 for a non-existent user", async () => {
-		const { token } = await createAdmin({ email: "admin-deletenotfound@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-deletenotfound@test.com",
+		});
 
 		const res = await request(app)
 			.delete(`${BASE}/users/000000000000000000000000`)
@@ -234,7 +258,9 @@ describe("Admin — PUT /poses/:id", () => {
 	});
 
 	it("returns 404 for a non-existent pose", async () => {
-		const { token } = await createAdmin({ email: "admin-updatepose404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-updatepose404@test.com",
+		});
 
 		const res = await request(app)
 			.put(`${BASE}/poses/000000000000000000000000`)
@@ -280,7 +306,9 @@ describe("Admin — DELETE /poses/:id", () => {
 	});
 
 	it("returns 404 for a non-existent pose", async () => {
-		const { token } = await createAdmin({ email: "admin-deletepose404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-deletepose404@test.com",
+		});
 
 		const res = await request(app)
 			.delete(`${BASE}/poses/000000000000000000000000`)
@@ -294,7 +322,9 @@ describe("Admin — DELETE /poses/:id", () => {
 
 describe("Admin — POST /breathing-patterns", () => {
 	it("creates a breathing pattern and returns 201", async () => {
-		const { token } = await createAdmin({ email: "admin-createbreathing@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-createbreathing@test.com",
+		});
 
 		const res = await request(app)
 			.post(`${BASE}/breathing-patterns`)
@@ -307,7 +337,9 @@ describe("Admin — POST /breathing-patterns", () => {
 	});
 
 	it("returns 400 when required fields are missing", async () => {
-		const { token } = await createAdmin({ email: "admin-badbreathing@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-badbreathing@test.com",
+		});
 
 		const res = await request(app)
 			.post(`${BASE}/breathing-patterns`)
@@ -320,7 +352,9 @@ describe("Admin — POST /breathing-patterns", () => {
 
 describe("Admin — PUT /breathing-patterns/:id", () => {
 	it("updates a breathing pattern's difficulty", async () => {
-		const { token } = await createAdmin({ email: "admin-updatebreathing@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-updatebreathing@test.com",
+		});
 		const pattern = await BreathingPattern.create({
 			...BREATHING_PAYLOAD,
 			romanizationName: "UpdateBreathing",
@@ -336,7 +370,9 @@ describe("Admin — PUT /breathing-patterns/:id", () => {
 	});
 
 	it("returns 404 for a non-existent pattern", async () => {
-		const { token } = await createAdmin({ email: "admin-updatebreathing404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-updatebreathing404@test.com",
+		});
 
 		const res = await request(app)
 			.put(`${BASE}/breathing-patterns/000000000000000000000000`)
@@ -349,7 +385,9 @@ describe("Admin — PUT /breathing-patterns/:id", () => {
 
 describe("Admin — DELETE /breathing-patterns/:id", () => {
 	it("deletes a breathing pattern and returns 200", async () => {
-		const { token } = await createAdmin({ email: "admin-deletebreathing@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-deletebreathing@test.com",
+		});
 		const pattern = await BreathingPattern.create({
 			...BREATHING_PAYLOAD,
 			romanizationName: "DeleteBreathing",
@@ -364,7 +402,9 @@ describe("Admin — DELETE /breathing-patterns/:id", () => {
 	});
 
 	it("returns 404 for a non-existent pattern", async () => {
-		const { token } = await createAdmin({ email: "admin-deletebreathing404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-deletebreathing404@test.com",
+		});
 
 		const res = await request(app)
 			.delete(`${BASE}/breathing-patterns/000000000000000000000000`)
@@ -406,7 +446,10 @@ describe("Admin — POST /sequences", () => {
 describe("Admin — PUT /sequences/:id", () => {
 	it("updates a VK sequence's english name", async () => {
 		const { token } = await createAdmin({ email: "admin-updateseq@test.com" });
-		const seq = await VKSequence.create({ ...VK_SEQUENCE_PAYLOAD, isSystemSequence: true });
+		const seq = await VKSequence.create({
+			...VK_SEQUENCE_PAYLOAD,
+			isSystemSequence: true,
+		});
 
 		const res = await request(app)
 			.put(`${BASE}/sequences/${seq._id}`)
@@ -418,7 +461,9 @@ describe("Admin — PUT /sequences/:id", () => {
 	});
 
 	it("returns 404 for a non-existent sequence", async () => {
-		const { token } = await createAdmin({ email: "admin-updateseq404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-updateseq404@test.com",
+		});
 
 		const res = await request(app)
 			.put(`${BASE}/sequences/000000000000000000000000`)
@@ -432,7 +477,10 @@ describe("Admin — PUT /sequences/:id", () => {
 describe("Admin — DELETE /sequences/:id", () => {
 	it("deletes a VK sequence and returns 200", async () => {
 		const { token } = await createAdmin({ email: "admin-deleteseq@test.com" });
-		const seq = await VKSequence.create({ ...VK_SEQUENCE_PAYLOAD, isSystemSequence: true });
+		const seq = await VKSequence.create({
+			...VK_SEQUENCE_PAYLOAD,
+			isSystemSequence: true,
+		});
 
 		const res = await request(app)
 			.delete(`${BASE}/sequences/${seq._id}`)
@@ -443,7 +491,9 @@ describe("Admin — DELETE /sequences/:id", () => {
 	});
 
 	it("returns 404 for a non-existent sequence", async () => {
-		const { token } = await createAdmin({ email: "admin-deleteseq404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-deleteseq404@test.com",
+		});
 
 		const res = await request(app)
 			.delete(`${BASE}/sequences/000000000000000000000000`)
@@ -473,7 +523,9 @@ describe("Admin — GET /analytics/dashboard", () => {
 
 describe("Admin — GET /analytics/users/:userId", () => {
 	it("returns analytics for a specific user", async () => {
-		const { token } = await createAdmin({ email: "admin-useranalytics@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-useranalytics@test.com",
+		});
 		const { user } = await createUser({ email: "analytics-target@test.com" });
 
 		const res = await request(app)
@@ -488,7 +540,9 @@ describe("Admin — GET /analytics/users/:userId", () => {
 	});
 
 	it("returns 404 for a non-existent user", async () => {
-		const { token } = await createAdmin({ email: "admin-analytics404@test.com" });
+		const { token } = await createAdmin({
+			email: "admin-analytics404@test.com",
+		});
 
 		const res = await request(app)
 			.get(`${BASE}/analytics/users/000000000000000000000000`)

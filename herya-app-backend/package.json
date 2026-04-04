@@ -8,6 +8,7 @@
 		"dev": "nodemon index.js",
 		"seed": "node ./src/seeds/index.js",
 		"seed:recalc-stats": "node ./src/seeds/recalculateUserStats.seed.js",
+		"seed:migrate-tutor-roles": "node ./src/seeds/migrateTutorRoles.seed.js",
 		"lint": "biome lint .",
 		"format": "biome format --write .",
 		"check": "biome check .",

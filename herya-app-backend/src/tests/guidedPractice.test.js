@@ -42,10 +42,7 @@ describe("Guided Practice — full lifecycle", () => {
 	const auth = () => ({ Authorization: `Bearer ${token}` });
 
 	it("creates a planned session with blocks", async () => {
-		const res = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const res = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 
 		expect(res.status).toBe(201);
 		expect(res.body.data.status).toBe("planned");
@@ -60,9 +57,7 @@ describe("Guided Practice — full lifecycle", () => {
 			.send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
-		const res = await request(app)
-			.post(`${BASE}/${id}/start`)
-			.set(auth());
+		const res = await request(app).post(`${BASE}/${id}/start`).set(auth());
 
 		expect(res.status).toBe(200);
 		expect(res.body.data.status).toBe("active");
@@ -78,9 +73,7 @@ describe("Guided Practice — full lifecycle", () => {
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
 
-		const res = await request(app)
-			.post(`${BASE}/${id}/pause`)
-			.set(auth());
+		const res = await request(app).post(`${BASE}/${id}/pause`).set(auth());
 
 		expect(res.status).toBe(200);
 		expect(res.body.data.status).toBe("paused");
@@ -97,9 +90,7 @@ describe("Guided Practice — full lifecycle", () => {
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
 		await request(app).post(`${BASE}/${id}/pause`).set(auth());
 
-		const res = await request(app)
-			.post(`${BASE}/${id}/start`)
-			.set(auth());
+		const res = await request(app).post(`${BASE}/${id}/start`).set(auth());
 
 		expect(res.status).toBe(200);
 		expect(res.body.data.status).toBe("active");
@@ -166,10 +157,38 @@ describe("Guided Practice — full lifecycle", () => {
 		expect(res.body.data.actualDuration).toBeGreaterThanOrEqual(1);
 
 		// Verify user stats updated
-		const stats = await request(app)
-			.get(`${BASE}/stats`)
-			.set(auth());
+		const stats = await request(app).get(`${BASE}/stats`).set(auth());
 		expect(stats.body.data.totalSessions).toBe(1);
+	});
+
+	it("stores tutor support telemetry when completing a session", async () => {
+		const create = await request(app)
+			.post(BASE)
+			.set(auth())
+			.send(PLANNED_SESSION);
+		const id = create.body.data._id;
+
+		await request(app).post(`${BASE}/${id}/start`).set(auth());
+
+		const res = await request(app)
+			.post(`${BASE}/${id}/complete`)
+			.set(auth())
+			.send({
+				blocksCompleted: 3,
+				tutorSupport: {
+					safePauseCount: 2,
+					anchorAvailable: true,
+					anchorUsed: true,
+				},
+			});
+
+		expect(res.status).toBe(200);
+		expect(res.body.data).toHaveProperty("tutorSupport");
+		expect(res.body.data.tutorSupport).toEqual({
+			safePauseCount: 2,
+			anchorAvailable: true,
+			anchorUsed: true,
+		});
 	});
 
 	it("abandons a session with partial completion rate", async () => {
@@ -185,9 +204,7 @@ describe("Guided Practice — full lifecycle", () => {
 			.set(auth())
 			.send({ direction: "next" });
 
-		const res = await request(app)
-			.post(`${BASE}/${id}/abandon`)
-			.set(auth());
+		const res = await request(app).post(`${BASE}/${id}/abandon`).set(auth());
 
 		expect(res.status).toBe(200);
 		expect(res.body.data.status).toBe("abandoned");
@@ -204,9 +221,7 @@ describe("Guided Practice — full lifecycle", () => {
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
 
-		const res = await request(app)
-			.get(`${BASE}/active/current`)
-			.set(auth());
+		const res = await request(app).get(`${BASE}/active/current`).set(auth());
 
 		expect(res.status).toBe(200);
 		expect(res.body.data._id).toBe(id);
@@ -214,9 +229,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("returns null when no active session", async () => {
-		const res = await request(app)
-			.get(`${BASE}/active/current`)
-			.set(auth());
+		const res = await request(app).get(`${BASE}/active/current`).set(auth());
 
 		expect(res.status).toBe(200);
 		expect(res.body.data).toBeFalsy();
@@ -225,7 +238,9 @@ describe("Guided Practice — full lifecycle", () => {
 
 describe("Guided Practice — check-in", () => {
 	it("stores check-in data when provided", async () => {
-		const { token } = await createUser({ email: `checkin-${Date.now()}@test.com` });
+		const { token } = await createUser({
+			email: `checkin-${Date.now()}@test.com`,
+		});
 
 		const res = await request(app)
 			.post(BASE)
@@ -249,7 +264,9 @@ describe("Guided Practice — check-in", () => {
 
 describe("Guided Practice — analytics", () => {
 	it("returns analytics for user with sessions", async () => {
-		const { token } = await createUser({ email: `analytics-${Date.now()}@test.com` });
+		const { token } = await createUser({
+			email: `analytics-${Date.now()}@test.com`,
+		});
 		const auth = { Authorization: `Bearer ${token}` };
 
 		// Create and complete a session
@@ -264,9 +281,7 @@ describe("Guided Practice — analytics", () => {
 			.set(auth)
 			.send({ blocksCompleted: 3 });
 
-		const res = await request(app)
-			.get(`${BASE}/analytics/practice`)
-			.set(auth);
+		const res = await request(app).get(`${BASE}/analytics/practice`).set(auth);
 
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("completionRate");

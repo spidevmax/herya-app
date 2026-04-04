@@ -3,8 +3,9 @@ import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { requestPasswordReset } from '@/api/auth.api';
-import { useLanguage } from '@/context/LanguageContext';
+import { requestPasswordReset } from "@/api/auth.api";
+import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
+import { useLanguage } from "@/context/LanguageContext";
 
 const ForgotPassword = () => {
 	const { t, lang } = useLanguage();
@@ -37,6 +38,8 @@ const ForgotPassword = () => {
 				transition={{ duration: 0.35 }}
 				className="mx-auto w-full max-w-md rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] sm:p-8"
 			>
+				<AuthBrandHeader compact showSubtitle={false} />
+
 				<h1 className="font-display text-3xl font-bold text-[var(--color-text-primary)]">
 					{t("forgot_password.title")}
 				</h1>

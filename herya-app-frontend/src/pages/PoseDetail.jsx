@@ -247,13 +247,7 @@ export default function PoseDetail() {
 
 						<div className="relative flex items-start justify-between gap-3">
 							<div className="min-w-0">
-								<h1
-									className="font-display text-2xl font-bold leading-tight"
-									style={{
-										fontFamily: '"Fredoka", sans-serif',
-										color: "var(--color-text-primary)",
-									}}
-								>
+								<h1 className="font-display text-2xl font-bold leading-tight text-[var(--color-text-primary)]">
 									{poseDisplayName}
 								</h1>
 								{poseDisplayRomanized && (

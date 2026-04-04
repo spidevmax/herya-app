@@ -8,7 +8,7 @@ import PageTransition from "./PageTransition";
 const NAV_ITEMS = [
 	{ to: "/", icon: Home, labelKey: "nav.home" },
 	{ to: "/library", icon: BookOpen, labelKey: "nav.library" },
-	{ to: "/garden", icon: Leaf, labelKey: "nav.garden" },
+	{ to: "/journal", icon: Leaf, labelKey: "nav.journal" },
 	{ to: "/profile", icon: User, labelKey: "nav.profile" },
 ];
 
@@ -26,13 +26,7 @@ function DesktopSidebar() {
 		>
 			{/* Logo */}
 			<div className="px-3 mb-6">
-				<h1
-					className="text-2xl font-bold"
-					style={{
-						color: "var(--color-primary)",
-						fontFamily: '"Fredoka", sans-serif',
-					}}
-				>
+				<h1 className="text-2xl font-bold text-[var(--color-primary)]">
 					Herya
 				</h1>
 			</div>
@@ -59,7 +53,7 @@ function DesktopSidebar() {
 							{({ isActive }) => (
 								<>
 									<Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
-									<span style={{ fontFamily: '"DM Sans", sans-serif' }}>
+									<span>
 										{t(item.labelKey)}
 									</span>
 								</>

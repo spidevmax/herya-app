@@ -390,19 +390,10 @@ export default function Session() {
 				>
 					<CheckCircle size={72} style={{ color: "var(--color-primary)" }} />
 				</motion.div>
-				<h2
-					className="text-2xl font-semibold"
-					style={{
-						fontFamily: '"DM Sans", sans-serif',
-						color: "var(--color-text-primary)",
-					}}
-				>
+				<h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">
 					{t("session.done_title")}
 				</h2>
-				<p
-					className="text-[#6B7280] text-center text-sm font-medium"
-					style={{ fontFamily: '"DM Sans", sans-serif' }}
-				>
+				<p className="text-[var(--color-text-muted)] text-center text-sm font-medium">
 					{t("session.done_subtitle")}
 				</p>
 				<Button onClick={() => navigate("/")}>{t("session.back_home")}</Button>
@@ -412,21 +403,16 @@ export default function Session() {
 
 	return (
 		<div className="flex flex-col min-h-dvh">
-			<div className="sticky top-0 z-10 bg-[#F8F7F4]/90 backdrop-blur-xl px-4 pt-4 pb-3 flex items-center gap-3">
+			<div className="sticky-header">
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
-					className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm"
+					aria-label={tr("ui.back", "Back")}
+					className="w-10 h-10 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-sm"
 				>
 					<ArrowLeft size={20} />
 				</button>
-				<h1
-					className="text-lg font-semibold"
-					style={{
-						fontFamily: '"DM Sans", sans-serif',
-						color: "var(--color-text-primary)",
-					}}
-				>
+				<h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
 					{sessionTypeLabel}
 				</h1>
 			</div>
@@ -441,19 +427,13 @@ export default function Session() {
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-6 pt-4"
 						>
-							<h2
-								className="text-xl font-semibold"
-								style={{
-									fontFamily: '"DM Sans", sans-serif',
-									color: "var(--color-text-primary)",
-								}}
-							>
+							<h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
 								{t("session.pre_title")}
 							</h2>
-							<div className="bg-white rounded-2xl p-5">
+							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
+			
 								>
 									{t("session.pre_mood")}
 								</p>
@@ -466,8 +446,8 @@ export default function Session() {
 											className={
 												"px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition " +
 												(moodBefore.includes(m)
-													? "bg-[#4A72FF] text-white"
-													: "bg-[#F8F7F4] text-[#6B7280]")
+													? "bg-[var(--color-primary)] text-white"
+													: "bg-[var(--color-surface)] text-[var(--color-text-muted)]")
 											}
 										>
 											{t(`session.moods.${m}`)}
@@ -475,10 +455,10 @@ export default function Session() {
 									))}
 								</div>
 							</div>
-							<div className="bg-white rounded-2xl p-5">
+							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
+			
 								>
 									{t("session.pre_energy", { n: energyBefore })}
 								</p>
@@ -488,13 +468,13 @@ export default function Session() {
 									max={10}
 									value={energyBefore}
 									onChange={(e) => setEnergyBefore(+e.target.value)}
-									className="w-full accent-[#4A72FF]"
+									className="w-full accent-[var(--color-primary)]"
 								/>
 							</div>
-							<div className="bg-white rounded-2xl p-5">
+							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3 flex items-center gap-2"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3 flex items-center gap-2"
+			
 								>
 									<Clock size={16} />{" "}
 									{t("session.pre_duration", { n: duration })}
@@ -511,8 +491,8 @@ export default function Session() {
 											className={
 												"px-4 py-2 rounded-xl text-sm font-semibold transition " +
 												(duration === d
-													? "bg-[#4A72FF] text-white"
-													: "bg-[#F8F7F4] text-[#6B7280]")
+													? "bg-[var(--color-primary)] text-white"
+													: "bg-[var(--color-surface)] text-[var(--color-text-muted)]")
 											}
 										>
 											{d}m
@@ -554,7 +534,7 @@ export default function Session() {
 									</div>
 								) : (
 									<div className="w-full text-center py-16">
-										<p className="text-[#6B7280] text-sm font-medium">
+										<p className="text-[var(--color-text-muted)] text-sm font-medium">
 											{tr(
 												"session.complete_loading_catalog",
 												"Loading sequences and pranayama...",
@@ -564,13 +544,13 @@ export default function Session() {
 								)
 							) : isCompletePractice ? (
 								<div className="w-full flex flex-col gap-4">
-									<div className="rounded-2xl bg-white p-5 text-center">
-										<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-2">
+									<div className="rounded-2xl bg-[var(--color-surface-card)] p-5 text-center">
+										<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">
 											{t("fab.complete_practice")}
 										</p>
 										<h3
-											className="text-xl font-semibold text-[#1A1A2E] mb-2"
-											style={{ fontFamily: '"DM Sans", sans-serif' }}
+											className="text-xl font-semibold text-[var(--color-text-primary)] mb-2"
+					
 										>
 											{completeSelectedMain.length > 0
 												? tr(
@@ -582,7 +562,7 @@ export default function Session() {
 														"Choose at least one main sequence",
 													)}
 										</h3>
-										<p className="text-sm text-[#6B7280]">
+										<p className="text-sm text-[var(--color-text-muted)]">
 											{completeSelectedMain.length > 0
 												? tr(
 														"session.complete_ready_hint",
@@ -596,19 +576,19 @@ export default function Session() {
 									</div>
 
 									{completeSelectedWarmup && (
-										<div className="rounded-2xl bg-white p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
 												{tr("session.complete_warmup", "Warmup")}
 											</p>
-											<p className="text-sm font-medium text-[#1A1A2E]">
+											<p className="text-sm font-medium text-[var(--color-text-primary)]">
 												{completeSelectedWarmup.englishName}
 											</p>
 										</div>
 									)}
 
 									{completeSelectedMain.length > 0 && (
-										<div className="rounded-2xl bg-white p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-2">
+										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">
 												{tr(
 													"session.complete_main_sequences",
 													"Main sequences",
@@ -618,7 +598,7 @@ export default function Session() {
 												{completeSelectedMain.map((item) => (
 													<span
 														key={item._id}
-														className="px-3 py-1.5 rounded-xl bg-[#F8F7F4] text-sm font-medium text-[#1A1A2E] border border-[#E5E7EB]"
+														className="px-3 py-1.5 rounded-xl bg-[var(--color-surface)] text-sm font-medium text-[var(--color-text-primary)] border border-[var(--color-border)]"
 													>
 														{item.englishName}
 													</span>
@@ -628,32 +608,32 @@ export default function Session() {
 									)}
 
 									{completeSelectedCooldown && (
-										<div className="rounded-2xl bg-white p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
 												{tr("session.complete_cooldown", "Cooldown")}
 											</p>
-											<p className="text-sm font-medium text-[#1A1A2E]">
+											<p className="text-sm font-medium text-[var(--color-text-primary)]">
 												{completeSelectedCooldown.englishName}
 											</p>
 										</div>
 									)}
 
 									{completeSelectedPranayama && (
-										<div className="rounded-2xl bg-white p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
 												{t("fab.pranayama")}
 											</p>
-											<p className="text-sm font-medium text-[#1A1A2E]">
+											<p className="text-sm font-medium text-[var(--color-text-primary)]">
 												{completeSelectedPranayama.romanizationName}
 											</p>
 										</div>
 									)}
 
-									<div className="rounded-2xl bg-white p-4">
-										<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280] mb-1">
+									<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
+										<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
 											{t("fab.meditation")}
 										</p>
-										<p className="text-sm font-medium text-[#1A1A2E]">
+										<p className="text-sm font-medium text-[var(--color-text-primary)]">
 											{getMeditationLabel(completeSelectedMeditation)} ·{" "}
 											{completeMeditationDuration} min
 										</p>
@@ -668,8 +648,8 @@ export default function Session() {
 										/>
 									</div>
 									<p
-										className="text-xl font-semibold text-[#1A1A2E]"
-										style={{ fontFamily: '"DM Sans", sans-serif' }}
+										className="text-xl font-semibold text-[var(--color-text-primary)]"
+				
 									>
 										{tr("session.loading_sequence", "Loading sequence...")}
 									</p>
@@ -678,8 +658,8 @@ export default function Session() {
 								<>
 									<div className="w-full">
 										<p
-											className="text-xs font-medium text-[#6B7280] uppercase tracking-widest text-center mb-3"
-											style={{ fontFamily: '"DM Sans", sans-serif' }}
+											className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-widest text-center mb-3"
+					
 										>
 											{tr(
 												"session.pose_progress",
@@ -695,7 +675,7 @@ export default function Session() {
 											initial={{ opacity: 0, y: 10 }}
 											animate={{ opacity: 1, y: 0 }}
 											transition={{ duration: 0.3 }}
-											className="bg-white rounded-2xl p-6 text-center"
+											className="bg-[var(--color-surface-card)] rounded-2xl p-6 text-center"
 										>
 											<div className="text-6xl mb-4">
 												<PersonStanding
@@ -704,23 +684,23 @@ export default function Session() {
 												/>
 											</div>
 											<h3
-												className="text-xl font-semibold text-[#1A1A2E] mb-2"
-												style={{ fontFamily: '"DM Sans", sans-serif' }}
+												className="text-xl font-semibold text-[var(--color-text-primary)] mb-2"
+						
 											>
 												{currentPoseName}
 											</h3>
 											{currentPoseSanskrit && (
 												<p
-													className="text-sm italic text-[#9CA3AF] mb-4"
-													style={{ fontFamily: '"DM Sans", sans-serif' }}
+													className="text-sm italic text-[var(--color-text-muted)] mb-4"
+							
 												>
 													{currentPoseSanskrit}
 												</p>
 											)}
 											{currentPoseDescription && (
 												<p
-													className="text-sm text-[#6B7280] mt-4"
-													style={{ fontFamily: '"DM Sans", sans-serif' }}
+													className="text-sm text-[var(--color-text-muted)] mt-4"
+							
 												>
 													{currentPoseDescription}
 												</p>
@@ -734,7 +714,7 @@ export default function Session() {
 													setCurrentPoseIndex(Math.max(0, currentPoseIndex - 1))
 												}
 												disabled={currentPoseIndex === 0}
-												className="w-10 h-10 rounded-full bg-[#F8F7F4] flex items-center justify-center disabled:opacity-30"
+												className="w-10 h-10 rounded-full bg-[var(--color-surface)] flex items-center justify-center disabled:opacity-30"
 											>
 												<ChevronLeft size={20} />
 											</button>
@@ -747,8 +727,8 @@ export default function Session() {
 														className={
 															"w-2 h-2 rounded-full transition " +
 															(idx === currentPoseIndex
-																? "bg-[#4A72FF] w-6"
-																: "bg-[#D1D5DB]")
+																? "bg-[var(--color-primary)] w-6"
+																: "bg-[var(--color-border)]")
 														}
 													/>
 												))}
@@ -764,7 +744,7 @@ export default function Session() {
 													)
 												}
 												disabled={currentPoseIndex === practicePoses.length - 1}
-												className="w-10 h-10 rounded-full bg-[#F8F7F4] flex items-center justify-center disabled:opacity-30"
+												className="w-10 h-10 rounded-full bg-[var(--color-surface)] flex items-center justify-center disabled:opacity-30"
 											>
 												<ChevronRight size={20} />
 											</button>
@@ -780,8 +760,8 @@ export default function Session() {
 										/>
 									</div>
 									<p
-										className="text-xl font-semibold text-[#1A1A2E]"
-										style={{ fontFamily: '"DM Sans", sans-serif' }}
+										className="text-xl font-semibold text-[var(--color-text-primary)]"
+				
 									>
 										{tr(
 											"session.no_poses_in_sequence",
@@ -798,14 +778,14 @@ export default function Session() {
 										/>
 									</div>
 									<p
-										className="text-xl font-semibold text-[#1A1A2E]"
-										style={{ fontFamily: '"DM Sans", sans-serif' }}
+										className="text-xl font-semibold text-[var(--color-text-primary)]"
+				
 									>
 										{t("session.active_title")}
 									</p>
 									<p
-										className="text-[#9CA3AF] text-sm font-medium mt-2"
-										style={{ fontFamily: '"DM Sans", sans-serif' }}
+										className="text-[var(--color-text-muted)] text-sm font-medium mt-2"
+				
 									>
 										{tr("session.active_minutes", "{n} minutes", {
 											n: duration,
@@ -820,11 +800,11 @@ export default function Session() {
 					)}
 
 					{isCompletePractice && (
-						<div className="bg-white rounded-2xl p-5 flex flex-col gap-4">
+						<div className="bg-[var(--color-surface-card)] rounded-2xl p-5 flex flex-col gap-4">
 							<div>
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
+			
 								>
 									{tr(
 										"session.complete_builder_title",
@@ -832,7 +812,7 @@ export default function Session() {
 									)}
 								</p>
 								{completeCatalogLoading ? (
-									<p className="text-sm text-[#6B7280]">
+									<p className="text-sm text-[var(--color-text-muted)]">
 										{tr(
 											"session.complete_loading_catalog",
 											"Loading sequences and pranayama...",
@@ -841,7 +821,7 @@ export default function Session() {
 								) : (
 									<div className="flex flex-col gap-4">
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
 												{tr(
 													"session.complete_warmup_sequence",
 													"Warmup sequence",
@@ -850,7 +830,7 @@ export default function Session() {
 											<select
 												value={completeWarmupId}
 												onChange={(e) => setCompleteWarmupId(e.target.value)}
-												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
 											>
 												<option value="">
 													{tr(
@@ -868,13 +848,13 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
 												{tr(
 													"session.complete_main_sequences",
 													"Main sequences",
 												)}
 											</p>
-											<div className="max-h-44 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-[#F8F7F4] p-3 flex flex-col gap-2">
+											<div className="max-h-44 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 flex flex-col gap-2">
 												{completeSequences.map((item) => (
 													<button
 														type="button"
@@ -883,8 +863,8 @@ export default function Session() {
 														className={
 															"w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition " +
 															(completeMainIds.includes(item._id)
-																? "bg-[#4A72FF] text-white"
-																: "bg-white text-[#1A1A2E]")
+																? "bg-[var(--color-primary)] text-white"
+																: "bg-[var(--color-surface-card)] text-[var(--color-text-primary)]")
 														}
 													>
 														{item.englishName} · {item.family}
@@ -894,7 +874,7 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
 												{tr(
 													"session.complete_cooldown_sequence",
 													"Cooldown sequence",
@@ -903,7 +883,7 @@ export default function Session() {
 											<select
 												value={completeCooldownId}
 												onChange={(e) => setCompleteCooldownId(e.target.value)}
-												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
 											>
 												<option value="">
 													{tr(
@@ -921,13 +901,13 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
 												{t("fab.pranayama")}
 											</p>
 											<select
 												value={completePranayamaId}
 												onChange={(e) => setCompletePranayamaId(e.target.value)}
-												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
 											>
 												<option value="">
 													{tr("session.complete_no_pranayama", "No pranayama")}
@@ -941,7 +921,7 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[#6B7280]">
+											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
 												{t("fab.meditation")}
 											</p>
 											<select
@@ -949,7 +929,7 @@ export default function Session() {
 												onChange={(e) =>
 													setCompleteMeditationType(e.target.value)
 												}
-												className="w-full rounded-xl border border-[#E5E7EB] bg-[#F8F7F4] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
 											>
 												{MEDITATION_OPTIONS.map((option) => (
 													<option key={option.value} value={option.value}>
@@ -958,7 +938,7 @@ export default function Session() {
 												))}
 											</select>
 											<div>
-												<p className="text-sm font-medium text-[#1A1A2E] mb-2">
+												<p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
 													{tr(
 														"session.complete_meditation_duration",
 														"Meditation duration",
@@ -974,7 +954,7 @@ export default function Session() {
 													onChange={(e) =>
 														setCompleteMeditationDuration(+e.target.value)
 													}
-													className="w-full accent-[#5DB075]"
+													className="w-full accent-[var(--color-secondary)]"
 												/>
 											</div>
 										</div>
@@ -983,7 +963,7 @@ export default function Session() {
 							</div>
 
 							{completeMainIds.length > 0 && (
-								<div className="rounded-2xl bg-[#F8F7F4] p-4 text-sm text-[#1A1A2E]">
+								<div className="rounded-2xl bg-[var(--color-surface)] p-4 text-sm text-[var(--color-text-primary)]">
 									<p className="font-semibold mb-2">
 										{tr("session.complete_plan_title", "Your plan")}
 									</p>
@@ -1026,16 +1006,16 @@ export default function Session() {
 							className="flex flex-col gap-6 pt-4"
 						>
 							<h2
-								className="text-xl font-semibold text-[#1A1A2E]"
-								style={{ fontFamily: '"DM Sans", sans-serif' }}
+								className="text-xl font-semibold text-[var(--color-text-primary)]"
+		
 							>
 								{t("session.post_title")}
 							</h2>
 							<PostPracticeNudge durationMinutes={duration} />
-							<div className="bg-white rounded-2xl p-5">
+							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
+			
 								>
 									{t("session.post_mood")}
 								</p>
@@ -1048,8 +1028,8 @@ export default function Session() {
 											className={
 												"px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition " +
 												(moodAfter.includes(m)
-													? "bg-[#5DB075] text-white"
-													: "bg-[#F8F7F4] text-[#6B7280]")
+													? "bg-[var(--color-secondary)] text-white"
+													: "bg-[var(--color-surface)] text-[var(--color-text-muted)]")
 											}
 										>
 											{t(`session.moods.${m}`)}
@@ -1057,10 +1037,10 @@ export default function Session() {
 									))}
 								</div>
 							</div>
-							<div className="bg-white rounded-2xl p-5">
+							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
+			
 								>
 									{t("session.post_energy", { n: energyAfter })}
 								</p>
@@ -1070,13 +1050,13 @@ export default function Session() {
 									max={10}
 									value={energyAfter}
 									onChange={(e) => setEnergyAfter(+e.target.value)}
-									className="w-full accent-[#5DB075]"
+									className="w-full accent-[var(--color-secondary)]"
 								/>
 							</div>
-							<div className="bg-white rounded-2xl p-5">
+							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
 								<p
-									className="text-sm font-medium text-[#1A1A2E] mb-3"
-									style={{ fontFamily: '"DM Sans", sans-serif' }}
+									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
+			
 								>
 									{t("session.post_notes")}
 								</p>
@@ -1085,7 +1065,7 @@ export default function Session() {
 									onChange={(e) => setNotes(e.target.value)}
 									rows={3}
 									placeholder={t("session.post_notes_placeholder")}
-									className="w-full text-sm text-[#1A1A2E] placeholder-[#9CA3AF] bg-[#F8F7F4] rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[#5DB075] resize-none"
+									className="w-full text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] bg-[var(--color-surface)] rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[var(--color-secondary)] resize-none"
 								/>
 							</div>
 							<Button onClick={handleComplete} disabled={saving}>

@@ -138,13 +138,7 @@ export default function SessionHistory() {
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
-					<h1
-						className="font-display text-2xl font-bold"
-						style={{
-							fontFamily: '"Fredoka", sans-serif',
-							color: "var(--color-text-primary)",
-						}}
-					>
+					<h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
 						{t("session_history.title")}
 					</h1>
 				</div>

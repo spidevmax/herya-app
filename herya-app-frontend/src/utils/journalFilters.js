@@ -19,7 +19,7 @@ export const getDatePresetRange = (days, now = new Date()) => {
 	};
 };
 
-export const filterGardenEntries = ({
+export const filterJournalEntries = ({
 	entries,
 	selectedMood,
 	selectedType,

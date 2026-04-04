@@ -10,12 +10,12 @@ export default function HeroCard({ sequence, reason, loading }) {
 	const { t } = useLanguage();
 
 	if (loading)
-		return <div className="mx-4 sm:mx-6 rounded-3xl h-52 skeleton" />;
+		return <div className="mx-4 lg:mx-0 rounded-3xl h-52 skeleton" />;
 
 	if (!sequence) {
 		return (
 			<div
-				className="mx-4 sm:mx-6 rounded-3xl p-6 text-white"
+				className="mx-4 lg:mx-0 rounded-3xl p-6 text-white"
 				style={{
 					background:
 						"linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
@@ -23,7 +23,7 @@ export default function HeroCard({ sequence, reason, loading }) {
 			>
 				<h2
 					className="text-2xl font-semibold mb-2"
-					style={{ fontFamily: '"Fredoka", sans-serif' }}
+
 				>
 					{t("dashboard.welcome_title")}
 				</h2>
@@ -59,14 +59,14 @@ export default function HeroCard({ sequence, reason, loading }) {
 
 	return (
 		<motion.div
-			initial={{ opacity: 0, scale: 0.96 }}
-			animate={{ opacity: 1, scale: 1 }}
-			className="mx-4 sm:mx-6 rounded-3xl overflow-hidden cursor-pointer"
+			className="mx-4 lg:mx-0 rounded-3xl overflow-hidden cursor-pointer"
 			onClick={handleCardClick}
 			onKeyDown={handleCardKeyDown}
 			role="button"
 			tabIndex={0}
+			whileHover={{ scale: 1.02 }}
 			whileTap={{ scale: 0.98 }}
+			transition={{ duration: 0.25 }}
 		>
 			<div
 				className="p-6 relative overflow-hidden"
@@ -98,7 +98,7 @@ export default function HeroCard({ sequence, reason, loading }) {
 				)}
 				<h2
 					className="relative text-2xl font-semibold text-white leading-tight mb-1"
-					style={{ fontFamily: '"Fredoka", sans-serif' }}
+
 				>
 					{sequence.englishName}
 				</h2>

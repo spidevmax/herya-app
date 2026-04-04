@@ -11,6 +11,8 @@ import {
 	BookOpen,
 	Timer,
 	Minus,
+	ArrowLeftRight,
+	AlertTriangle,
 } from "lucide-react";
 import { getSequences } from "@/api/sequences.api";
 import { getBreathingPatterns } from "@/api/breathing.api";
@@ -18,6 +20,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 import SequencePicker from "./SequencePicker";
 import BreathingPatternPicker from "./BreathingPatternPicker";
+import { distributePoseTime, formatPoseDuration } from "@/utils/distributePoseTime";
 
 const MEDITATION_STYLES = [
 	"guided",
@@ -242,7 +245,14 @@ export default function SessionBuilder({
 		}
 	};
 
-	const canStart = blocks.length > 0 && blocks.every(isBlockConfigured);
+	const canStart = blocks.length > 0 && blocks.every((block) => {
+		if (!isBlockConfigured(block)) return false;
+		// VK blocks must have a valid duration
+		if (block.blockType === "vk_sequence" && (!block.durationMinutes || block.durationMinutes <= 0)) {
+			return false;
+		}
+		return true;
+	});
 
 	const handleStart = () => {
 		if (!canStart) return;
@@ -341,13 +351,7 @@ export default function SessionBuilder({
 				</div>
 			</div>
 
-			<h2
-				className="text-xl font-semibold"
-				style={{
-					fontFamily: '"DM Sans", sans-serif',
-					color: "var(--color-text-primary)",
-				}}
-			>
+			<h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
 				{t("practice.build_session_title")}
 			</h2>
 
@@ -474,6 +478,28 @@ function BlockCard({
 		selectedPattern,
 	);
 
+	// VK time distribution
+	const selectedSequence = sequences.find((s) => s._id === block.vkSequence);
+	const vkDistribution = useMemo(() => {
+		if (block.blockType !== "vk_sequence" || !selectedSequence) return null;
+		const corePoses = selectedSequence.structure?.corePoses || [];
+		if (!corePoses.length) return null;
+		return distributePoseTime({
+			corePoses,
+			blockTotalSec: (block.durationMinutes || 0) * 60,
+			level: block.level || "beginner",
+			mode: block.config?.distributionMode || "auto",
+			manualOverrides: block.config?.manualOverrides || {},
+		});
+	}, [
+		block.blockType,
+		block.durationMinutes,
+		block.level,
+		block.config?.distributionMode,
+		block.config?.manualOverrides,
+		selectedSequence,
+	]);
+
 	return (
 		<motion.div
 			layout
@@ -560,19 +586,51 @@ function BlockCard({
 						<div className="px-3 pb-3 flex flex-col gap-2.5">
 							{/* VK Sequence picker */}
 							{block.blockType === "vk_sequence" && (
-								<SequencePicker
-									sequences={sequences}
-									selectedId={block.vkSequence}
-									onSelect={(seq) => {
-										onUpdate({
-											vkSequence: seq._id,
-											label: seq.englishName || "",
-											durationMinutes:
-												seq.estimatedDuration?.recommended ||
-												block.durationMinutes,
-										});
-									}}
-								/>
+								<>
+									<SequencePicker
+										sequences={sequences}
+										selectedId={block.vkSequence}
+										onSelect={(seq) => {
+											onUpdate({
+												vkSequence: seq._id,
+												label: seq.englishName || "",
+												durationMinutes:
+													seq.estimatedDuration?.recommended ||
+													block.durationMinutes,
+											});
+										}}
+									/>
+
+									{/* Per-pose time breakdown */}
+									{vkDistribution && vkDistribution.poses.length > 0 && (
+										<VKPoseBreakdown
+											distribution={vkDistribution}
+											distributionMode={block.config?.distributionMode || "auto"}
+											onChangeMode={(mode) =>
+												onUpdate({
+													config: {
+														...block.config,
+														distributionMode: mode,
+														manualOverrides: mode === "manual" ? (block.config?.manualOverrides || {}) : {},
+													},
+												})
+											}
+											onManualOverride={(idx, sec) =>
+												onUpdate({
+													config: {
+														...block.config,
+														manualOverrides: {
+															...(block.config?.manualOverrides || {}),
+															[idx]: sec,
+														},
+													},
+												})
+											}
+											color={color}
+											t={t}
+										/>
+									)}
+								</>
 							)}
 
 							{/* Pranayama pattern picker + cycle config */}
@@ -810,5 +868,179 @@ function BlockCard({
 				)}
 			</AnimatePresence>
 		</motion.div>
+	);
+}
+
+const DISTRIBUTION_MODES = ["auto", "equal", "manual"];
+
+function VKPoseBreakdown({
+	distribution,
+	distributionMode,
+	onChangeMode,
+	onManualOverride,
+	color,
+	t,
+}) {
+	const { poses, warning, naturalSec, totalSec } = distribution;
+
+	return (
+		<div
+			className="rounded-xl p-2.5 flex flex-col gap-2"
+			style={{
+				backgroundColor: "var(--color-surface)",
+				border: "1px solid var(--color-border-soft)",
+			}}
+		>
+			{/* Header with mode selector */}
+			<div className="flex items-center justify-between">
+				<p
+					className="text-xs font-semibold"
+					style={{ color: "var(--color-text-secondary)" }}
+				>
+					{t("practice.time_distribution")}
+				</p>
+				<div className="flex gap-1">
+					{DISTRIBUTION_MODES.map((mode) => (
+						<button
+							key={mode}
+							type="button"
+							onClick={() => onChangeMode(mode)}
+							className="px-2 py-0.5 rounded-md text-[10px] font-semibold transition"
+							style={{
+								backgroundColor: distributionMode === mode ? color : "transparent",
+								color: distributionMode === mode ? "white" : "var(--color-text-muted)",
+							}}
+						>
+							{t(`practice.dist_${mode}`)}
+						</button>
+					))}
+				</div>
+			</div>
+
+			{/* Warning */}
+			{warning && (
+				<div
+					className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium"
+					style={{
+						backgroundColor: "var(--color-warning-bg, #FEF3C7)",
+						color: "var(--color-warning-text, #92400E)",
+					}}
+				>
+					<AlertTriangle size={12} />
+					{warning === "insufficient_time"
+						? t("practice.warn_insufficient_time")
+						: warning === "manual_overflow"
+							? t("practice.warn_manual_overflow")
+							: t("practice.warn_invalid_duration")}
+				</div>
+			)}
+
+			{/* Pose list */}
+			<div className="flex flex-col gap-1">
+				{poses.map((p) => (
+					<div
+						key={p.index}
+						className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
+						style={{
+							backgroundColor: p.manual
+								? `${color}08`
+								: "transparent",
+						}}
+					>
+						{/* Pose name */}
+						<span
+							className="text-xs flex-1 truncate"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{p.poseName}
+						</span>
+
+						{/* Bilateral indicator */}
+						{p.bilateral && (
+							<span
+								className="flex items-center gap-0.5 text-[9px] font-medium px-1.5 py-0.5 rounded-full"
+								style={{
+									backgroundColor: `${color}15`,
+									color,
+								}}
+							>
+								<ArrowLeftRight size={9} />
+								{formatPoseDuration(p.perSideSec)}/{t("practice.side")}
+							</span>
+						)}
+
+						{/* Time display / manual input */}
+						{distributionMode === "manual" ? (
+							<div className="flex items-center gap-1">
+								<button
+									type="button"
+									onClick={() => onManualOverride(p.index, Math.max(12, p.totalSec - 5))}
+									className="w-5 h-5 rounded flex items-center justify-center"
+									style={{
+										backgroundColor: "var(--color-surface-card)",
+										color: "var(--color-text-muted)",
+										border: "1px solid var(--color-border-soft)",
+									}}
+								>
+									<Minus size={10} />
+								</button>
+								<span
+									className="text-xs font-bold w-10 text-center"
+									style={{ color }}
+								>
+									{formatPoseDuration(p.totalSec)}
+								</span>
+								<button
+									type="button"
+									onClick={() => onManualOverride(p.index, p.totalSec + 5)}
+									className="w-5 h-5 rounded flex items-center justify-center"
+									style={{
+										backgroundColor: "var(--color-surface-card)",
+										color: "var(--color-text-muted)",
+										border: "1px solid var(--color-border-soft)",
+									}}
+								>
+									<Plus size={10} />
+								</button>
+							</div>
+						) : (
+							<span
+								className="text-xs font-bold"
+								style={{ color }}
+							>
+								{formatPoseDuration(p.totalSec)}
+							</span>
+						)}
+
+						{/* Breaths */}
+						<span
+							className="text-[10px]"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{p.breaths}b
+						</span>
+					</div>
+				))}
+			</div>
+
+			{/* Footer: natural vs allocated */}
+			<div
+				className="flex items-center justify-between pt-1 border-t"
+				style={{ borderColor: "var(--color-border-soft)" }}
+			>
+				<span
+					className="text-[10px]"
+					style={{ color: "var(--color-text-muted)" }}
+				>
+					{t("practice.natural_duration")}: {formatPoseDuration(naturalSec)}
+				</span>
+				<span
+					className="text-[10px] font-semibold"
+					style={{ color: "var(--color-text-secondary)" }}
+				>
+					{t("practice.total")}: {formatPoseDuration(totalSec)}
+				</span>
+			</div>
+		</div>
 	);
 }

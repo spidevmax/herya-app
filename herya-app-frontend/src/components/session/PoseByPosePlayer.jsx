@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	ChevronLeft,
@@ -10,8 +10,10 @@ import {
 	Eye,
 	EyeOff,
 	AlertTriangle,
+	ArrowLeftRight,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { distributePoseTime, formatPoseDuration } from "@/utils/distributePoseTime";
 
 const TABS = ["alignment", "breathing", "mistakes", "benefits"];
 
@@ -19,77 +21,68 @@ export default function PoseByPosePlayer({
 	sequence,
 	level = "beginner",
 	guided = true,
+	lowStimMode = false,
 	autoAdvance = true,
+	blockDurationSec = 0,
+	distributionMode = "auto",
+	manualOverrides = {},
 	onComplete,
 	onPoseChange,
 }) {
 	const { t } = useLanguage();
 	const [poseIndex, setPoseIndex] = useState(0);
 	const [side, setSide] = useState(null); // null | "left" | "right"
-	const [breathCount, setBreathCount] = useState(0);
+	const [elapsedSec, setElapsedSec] = useState(0);
 	const [isRunning, setIsRunning] = useState(false);
-	const [showGuide, setShowGuide] = useState(guided);
+	const [showGuide, setShowGuide] = useState(guided && !lowStimMode);
 	const [activeTab, setActiveTab] = useState("alignment");
 	const intervalRef = useRef(null);
+	const lastTickRef = useRef(null);
 
 	const corePoses = sequence?.structure?.corePoses || [];
 	const currentCorePose = corePoses[poseIndex];
 	const pose = currentCorePose?.pose;
 
-	// Calculate target breaths for this pose & level
-	const getTargetBreaths = useCallback(() => {
-		if (!pose) return 5;
-		const levelBreaths = pose.recommendedBreaths?.[level];
-		if (levelBreaths) {
-			return Math.round((levelBreaths.min + levelBreaths.max) / 2);
-		}
-		return currentCorePose?.breaths || 5;
-	}, [pose, level, currentCorePose]);
+	// Compute time distribution for all poses
+	const distribution = useMemo(() => {
+		if (!corePoses.length) return null;
+		const effectiveDuration = blockDurationSec > 0
+			? blockDurationSec
+			: corePoses.length * 20 * (corePoses.some(cp => cp?.pose?.sidedness?.type === "both_sides") ? 2 : 1);
+		return distributePoseTime({
+			corePoses,
+			blockTotalSec: effectiveDuration,
+			level,
+			mode: distributionMode,
+			manualOverrides,
+		});
+	}, [corePoses, blockDurationSec, level, distributionMode, manualOverrides]);
 
-	const targetBreaths = getTargetBreaths();
-	const isAsymmetric =
-		pose?.sidedness?.type === "both_sides";
+	const currentPoseAlloc = distribution?.poses?.[poseIndex];
+	const targetSec = currentPoseAlloc
+		? (side ? currentPoseAlloc.perSideSec : currentPoseAlloc.totalSec)
+		: 20;
+	const targetBreaths = currentPoseAlloc?.breaths || 5;
+	const isAsymmetric = pose?.sidedness?.type === "both_sides";
 
 	// Determine if we need to do a second side
 	const needsSecondSide = isAsymmetric && side === "left";
-
-	// Timer: count breaths (~4s per breath)
-	useEffect(() => {
-		if (!isRunning) {
-			clearInterval(intervalRef.current);
-			return;
-		}
-		intervalRef.current = setInterval(() => {
-			setBreathCount((prev) => {
-				const next = prev + 1;
-				if (next >= targetBreaths && autoAdvance) {
-					// Auto-advance after reaching target
-					setTimeout(() => advancePose(), 300);
-					return prev;
-				}
-				return next;
-			});
-		}, 4000); // ~4 seconds per breath
-		return () => clearInterval(intervalRef.current);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isRunning, targetBreaths, autoAdvance]);
 
 	const advancePose = useCallback(() => {
 		// If asymmetric and on left side, switch to right
 		if (isAsymmetric && side === "left") {
 			setSide("right");
-			setBreathCount(0);
+			setElapsedSec(0);
 			return;
 		}
 
 		// Move to next pose
 		if (poseIndex < corePoses.length - 1) {
 			const nextPose = corePoses[poseIndex + 1]?.pose;
-			const nextIsAsymmetric =
-				nextPose?.sidedness?.type === "both_sides";
+			const nextIsAsymmetric = nextPose?.sidedness?.type === "both_sides";
 			setPoseIndex((i) => i + 1);
 			setSide(nextIsAsymmetric ? "left" : null);
-			setBreathCount(0);
+			setElapsedSec(0);
 			onPoseChange?.(poseIndex + 1);
 		} else {
 			// Sequence complete
@@ -98,24 +91,47 @@ export default function PoseByPosePlayer({
 		}
 	}, [isAsymmetric, side, poseIndex, corePoses, onPoseChange, onComplete]);
 
+	// Timer: count elapsed seconds (drift-free)
+	useEffect(() => {
+		if (!isRunning) {
+			clearInterval(intervalRef.current);
+			lastTickRef.current = null;
+			return;
+		}
+		lastTickRef.current = Date.now();
+		intervalRef.current = setInterval(() => {
+			const now = Date.now();
+			const delta = Math.min((now - (lastTickRef.current || now)) / 1000, 2);
+			lastTickRef.current = now;
+			setElapsedSec((prev) => {
+				const next = prev + delta;
+				if (next >= targetSec && autoAdvance) {
+					setTimeout(() => advancePose(), 300);
+					return prev;
+				}
+				return next;
+			});
+		}, 250);
+		return () => clearInterval(intervalRef.current);
+	}, [isRunning, targetSec, autoAdvance, advancePose]);
+
 	const goToPose = useCallback(
 		(idx) => {
 			if (idx < 0 || idx >= corePoses.length) return;
 			const nextPose = corePoses[idx]?.pose;
-			const nextIsAsymmetric =
-				nextPose?.sidedness?.type === "both_sides";
+			const nextIsAsymmetric = nextPose?.sidedness?.type === "both_sides";
 			setPoseIndex(idx);
 			setSide(nextIsAsymmetric ? "left" : null);
-			setBreathCount(0);
+			setElapsedSec(0);
 			onPoseChange?.(idx);
 		},
 		[corePoses, onPoseChange],
 	);
 
 	const handleStart = () => {
-		if (poseIndex === 0 && breathCount === 0 && isAsymmetric) {
+		if (poseIndex === 0 && elapsedSec === 0 && isAsymmetric) {
 			setSide("left");
-		} else if (poseIndex === 0 && breathCount === 0 && !isAsymmetric) {
+		} else if (poseIndex === 0 && elapsedSec === 0 && !isAsymmetric) {
 			setSide(null);
 		}
 		setIsRunning(true);
@@ -142,7 +158,8 @@ export default function PoseByPosePlayer({
 	}
 
 	const poseName = pose.romanizationName || pose.name || "—";
-	const breathProgress = Math.min(breathCount / targetBreaths, 1);
+	const timeProgress = Math.min(elapsedSec / targetSec, 1);
+	const remainingSec = Math.max(0, Math.ceil(targetSec - elapsedSec));
 
 	return (
 		<div className="flex flex-col gap-4">
@@ -176,10 +193,10 @@ export default function PoseByPosePlayer({
 			<AnimatePresence mode="wait">
 				<motion.div
 					key={`${poseIndex}-${side}`}
-					initial={{ opacity: 0, x: 40 }}
+					initial={{ opacity: 0, x: lowStimMode ? 0 : 40 }}
 					animate={{ opacity: 1, x: 0 }}
-					exit={{ opacity: 0, x: -40 }}
-					transition={{ duration: 0.25 }}
+					exit={{ opacity: 0, x: lowStimMode ? 0 : -40 }}
+					transition={{ duration: lowStimMode ? 0.15 : 0.25 }}
 					className="rounded-2xl overflow-hidden"
 					style={{
 						backgroundColor: "var(--color-surface-card)",
@@ -225,7 +242,7 @@ export default function PoseByPosePlayer({
 						<span
 							className="absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full"
 							style={{
-								backgroundColor: "rgba(0,0,0,0.5)",
+								backgroundColor: "var(--color-overlay)",
 								color: "white",
 							}}
 						>
@@ -246,13 +263,7 @@ export default function PoseByPosePlayer({
 								{pose.sanskritName}
 							</p>
 						)}
-						<h3
-							className="text-lg font-semibold"
-							style={{
-								fontFamily: '"DM Sans", sans-serif',
-								color: "var(--color-text-primary)",
-							}}
-						>
+						<h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
 							{poseName}
 						</h3>
 						{pose.name && pose.name !== poseName && (
@@ -275,7 +286,7 @@ export default function PoseByPosePlayer({
 						)}
 					</div>
 
-					{/* Breath progress */}
+					{/* Time + breath progress */}
 					<div className="px-4 pb-3">
 						<div className="flex items-center justify-between mb-1">
 							<span
@@ -284,26 +295,55 @@ export default function PoseByPosePlayer({
 							>
 								{pose.breathingCue || t("guided.breathe_steadily")}
 							</span>
-							<span
-								className="text-xs font-bold"
-								style={{ color: "var(--color-primary)" }}
-							>
-								{breathCount}/{targetBreaths}
-							</span>
+							<div className="flex items-center gap-2">
+								{currentPoseAlloc?.bilateral && side && (
+									<span
+										className="flex items-center gap-0.5 text-[9px] font-medium px-1.5 py-0.5 rounded-full"
+										style={{
+											backgroundColor: "var(--color-primary-light, #EEF2FF)",
+											color: "var(--color-primary)",
+										}}
+									>
+										<ArrowLeftRight size={9} />
+										{side === "left" ? t("guided.side_left") : t("guided.side_right")}
+									</span>
+								)}
+								<span
+									className="text-xs font-bold tabular-nums"
+									style={{ color: "var(--color-primary)" }}
+								>
+									{formatPoseDuration(remainingSec)}
+								</span>
+							</div>
 						</div>
 						<div
 							className="w-full h-2 rounded-full overflow-hidden"
 							style={{ backgroundColor: "var(--color-border-soft)" }}
 							role="progressbar"
-							aria-valuenow={breathCount}
-							aria-valuemax={targetBreaths}
+							aria-valuenow={Math.round(elapsedSec)}
+							aria-valuemax={targetSec}
+							aria-label={`${formatPoseDuration(remainingSec)} ${t("practice.remaining")}`}
 						>
 							<motion.div
 								className="h-full rounded-full"
 								style={{ backgroundColor: "var(--color-primary)" }}
-								animate={{ width: `${breathProgress * 100}%` }}
+								animate={{ width: `${timeProgress * 100}%` }}
 								transition={{ duration: 0.3 }}
 							/>
+						</div>
+						<div className="flex items-center justify-between mt-1">
+							<span
+								className="text-[10px]"
+								style={{ color: "var(--color-text-muted)" }}
+							>
+								{t("guided.breaths")}: ~{targetBreaths}
+							</span>
+							<span
+								className="text-[10px]"
+								style={{ color: "var(--color-text-muted)" }}
+							>
+								{formatPoseDuration(Math.round(elapsedSec))} / {formatPoseDuration(targetSec)}
+							</span>
 						</div>
 					</div>
 
@@ -370,7 +410,11 @@ export default function PoseByPosePlayer({
 					style={{ backgroundColor: "var(--color-primary)" }}
 					aria-label={isRunning ? t("guided.pause") : t("guided.play")}
 				>
-					{isRunning ? <Pause size={24} /> : <Play size={24} className="ml-0.5" />}
+					{isRunning ? (
+						<Pause size={24} />
+					) : (
+						<Play size={24} className="ml-0.5" />
+					)}
 				</motion.button>
 
 				<button
@@ -400,7 +444,7 @@ export default function PoseByPosePlayer({
 			<div className="flex justify-center">
 				<button
 					type="button"
-					onClick={() => setBreathCount(0)}
+					onClick={() => setElapsedSec(0)}
 					className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg"
 					style={{
 						color: "var(--color-text-secondary)",
@@ -429,10 +473,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 			style={{ borderColor: "var(--color-border-soft)" }}
 		>
 			{/* Tabs */}
-			<div
-				className="flex gap-0.5 px-3 pt-2 overflow-x-auto"
-				role="tablist"
-			>
+			<div className="flex gap-0.5 px-3 pt-2 overflow-x-auto" role="tablist">
 				{TABS.map((tab) => (
 					<button
 						key={tab}
@@ -443,13 +484,8 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 						className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap transition"
 						style={{
 							backgroundColor:
-								activeTab === tab
-									? "var(--color-primary)"
-									: "transparent",
-							color:
-								activeTab === tab
-									? "white"
-									: "var(--color-text-muted)",
+								activeTab === tab ? "var(--color-primary)" : "transparent",
+							color: activeTab === tab ? "white" : "var(--color-text-muted)",
 						}}
 					>
 						{t(`guided.tab_${tab}`)}
@@ -462,8 +498,8 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 				{activeTab === "alignment" && (
 					<div className="flex flex-col gap-2">
 						{alignmentPoints.length > 0 ? (
-							alignmentPoints.map((kp, i) => (
-								<div key={i}>
+							alignmentPoints.map((kp) => (
+								<div key={kp.area || kp.instruction}>
 									<p
 										className="text-xs font-semibold capitalize"
 										style={{ color: "var(--color-text-primary)" }}
@@ -488,9 +524,9 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 								</div>
 							))
 						) : instructions.alignment?.length > 0 ? (
-							instructions.alignment.map((inst, i) => (
+							instructions.alignment.map((inst) => (
 								<p
-									key={i}
+									key={inst}
 									className="text-xs"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
@@ -506,12 +542,22 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 							</p>
 						)}
 						{cues.length > 0 && (
-							<div className="mt-2 pt-2 border-t" style={{ borderColor: "var(--color-border-soft)" }}>
-								<p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--color-text-muted)" }}>
+							<div
+								className="mt-2 pt-2 border-t"
+								style={{ borderColor: "var(--color-border-soft)" }}
+							>
+								<p
+									className="text-[10px] font-semibold uppercase mb-1"
+									style={{ color: "var(--color-text-muted)" }}
+								>
 									{t("guided.teaching_cues")}
 								</p>
-								{cues.map((c, i) => (
-									<p key={i} className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+								{cues.map((c) => (
+									<p
+										key={c}
+										className="text-xs"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
 										• {c}
 									</p>
 								))}
@@ -538,11 +584,18 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 						</p>
 						{instructions.setup?.length > 0 && (
 							<div>
-								<p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--color-text-muted)" }}>
+								<p
+									className="text-[10px] font-semibold uppercase mb-1"
+									style={{ color: "var(--color-text-muted)" }}
+								>
 									{t("guided.setup")}
 								</p>
-								{instructions.setup.map((s, i) => (
-									<p key={i} className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+								{instructions.setup.map((s) => (
+									<p
+										key={s}
+										className="text-xs"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
 										{i + 1}. {s}
 									</p>
 								))}
@@ -550,11 +603,18 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 						)}
 						{instructions.exit?.length > 0 && (
 							<div>
-								<p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--color-text-muted)" }}>
+								<p
+									className="text-[10px] font-semibold uppercase mb-1"
+									style={{ color: "var(--color-text-muted)" }}
+								>
 									{t("guided.exit_pose")}
 								</p>
-								{instructions.exit.map((s, i) => (
-									<p key={i} className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+								{instructions.exit.map((s) => (
+									<p
+										key={s}
+										className="text-xs"
+										style={{ color: "var(--color-text-secondary)" }}
+									>
 										{i + 1}. {s}
 									</p>
 								))}
@@ -566,8 +626,8 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 				{activeTab === "mistakes" && (
 					<div className="flex flex-col gap-1.5">
 						{mistakes.length > 0 ? (
-							mistakes.map((m, i) => (
-								<div key={i} className="flex items-start gap-1.5">
+							mistakes.map((m) => (
+								<div key={m} className="flex items-start gap-1.5">
 									<AlertTriangle
 										size={12}
 										className="shrink-0 mt-0.5"
@@ -590,12 +650,22 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 							</p>
 						)}
 						{contraindications.length > 0 && (
-							<div className="mt-2 pt-2 border-t" style={{ borderColor: "var(--color-border-soft)" }}>
-								<p className="text-[10px] font-semibold uppercase mb-1" style={{ color: "var(--color-warning-text, #92400E)" }}>
+							<div
+								className="mt-2 pt-2 border-t"
+								style={{ borderColor: "var(--color-border-soft)" }}
+							>
+								<p
+									className="text-[10px] font-semibold uppercase mb-1"
+									style={{ color: "var(--color-warning-text, #92400E)" }}
+								>
 									{t("guided.contraindications")}
 								</p>
-								{contraindications.map((c, i) => (
-									<p key={i} className="text-xs" style={{ color: "var(--color-warning-text, #92400E)" }}>
+								{contraindications.map((c) => (
+									<p
+										key={c}
+										className="text-xs"
+										style={{ color: "var(--color-warning-text, #92400E)" }}
+									>
 										• {c}
 									</p>
 								))}
@@ -607,9 +677,9 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 				{activeTab === "benefits" && (
 					<div className="flex flex-col gap-1">
 						{benefits.length > 0 ? (
-							benefits.map((b, i) => (
+							benefits.map((b) => (
 								<p
-									key={i}
+									key={b}
 									className="text-xs"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
@@ -625,7 +695,10 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 							</p>
 						)}
 						{pose.targetMuscles?.length > 0 && (
-							<p className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>
+							<p
+								className="text-xs mt-1"
+								style={{ color: "var(--color-text-muted)" }}
+							>
 								{t("guided.target_muscles")}: {pose.targetMuscles.join(", ")}
 							</p>
 						)}

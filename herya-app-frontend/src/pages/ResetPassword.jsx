@@ -3,9 +3,13 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
 import { resetPassword } from "@/api/auth.api";
+import { useLanguage } from "@/context/LanguageContext";
+import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
+import { Button } from "@/components/ui";
 
 export default function ResetPassword() {
 	const navigate = useNavigate();
+	const { t } = useLanguage();
 	const [searchParams] = useSearchParams();
 	const token = searchParams.get("token") || "";
 	const [form, setForm] = useState({ newPassword: "", confirmPassword: "" });
@@ -15,15 +19,20 @@ export default function ResetPassword() {
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
 
+	const tr = (key, fallback) => {
+		const value = t(key);
+		return value === key ? fallback : value;
+	};
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!token) {
-			setError("Invalid or missing reset token");
+			setError(tr("reset_password.invalid_token", "Invalid or missing reset token"));
 			return;
 		}
 
 		if (form.newPassword !== form.confirmPassword) {
-			setError("Passwords don't match");
+			setError(tr("reset_password.mismatch", "Passwords don't match"));
 			return;
 		}
 
@@ -38,7 +47,7 @@ export default function ResetPassword() {
 			setSuccess(true);
 			setTimeout(() => navigate("/login"), 2000);
 		} catch (err) {
-			setError(err?.response?.data?.message || "Password reset failed");
+			setError(err?.response?.data?.message || tr("reset_password.error", "Password reset failed"));
 		} finally {
 			setLoading(false);
 		}
@@ -47,13 +56,9 @@ export default function ResetPassword() {
 	return (
 		<div
 			className="min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden"
-			style={{
-				background:
-					"linear-gradient(135deg, #FFD89B 0%, #E8F4D0 50%, #FFD7E8 100%)",
-				fontFamily: '"Fredoka", sans-serif',
-			}}
+			style={{ background: "var(--gradient-warm)" }}
 		>
-			<div className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-white/25 blur-xl" />
+			<div className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-[var(--color-surface-card)]/25 blur-xl" />
 			<div className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl" />
 
 			<motion.div
@@ -62,88 +67,65 @@ export default function ResetPassword() {
 				transition={{ duration: 0.5 }}
 				className="w-full max-w-sm relative z-10"
 			>
-				{/* Form View */}
+				<AuthBrandHeader compact showSubtitle={false} />
+
 				{!success && (
 					<>
 						<button
 							type="button"
 							onClick={() => navigate("/login")}
-							className="flex items-center gap-2 mb-6 hover:opacity-70 transition font-bold text-lg"
-							style={{ color: "var(--color-primary)" }}
+							aria-label={tr("reset_password.back", "Back")}
+							className="flex items-center gap-2 mb-6 font-bold text-lg text-[var(--color-primary)] hover:opacity-70 transition"
 						>
 							<ArrowLeft size={20} />
-							Back
+							{tr("reset_password.back", "Back")}
 						</button>
 
 						<div className="text-center mb-8">
 							<Lock
 								size={54}
-								className="mb-4 inline-block"
-								style={{ color: "var(--color-primary)" }}
+								className="mb-4 inline-block text-[var(--color-primary)]"
 							/>
-							<h1
-								className="text-4xl font-bold mb-2"
-								style={{
-									color: "var(--color-primary)",
-									fontFamily: '"Fredoka", sans-serif',
-								}}
-							>
-								New password
+							<h1 className="font-display text-4xl font-bold mb-2 text-[var(--color-primary)]">
+								{tr("reset_password.title", "New password")}
 							</h1>
-							<p
-								className="text-sm"
-								style={{
-									color: "var(--color-text-secondary)",
-									fontFamily: '"DM Sans", sans-serif',
-								}}
-							>
-								Enter your new secure password
+							<p className="text-sm text-[var(--color-text-secondary)]">
+								{tr("reset_password.subtitle", "Enter your new secure password")}
 							</p>
 						</div>
 
-						{/* Card */}
 						<motion.div
-							className="rounded-4xl p-8 backdrop-blur-sm border-4"
+							className="rounded-3xl p-8 backdrop-blur-sm border-[3px] border-[var(--color-secondary)] bg-[var(--color-surface-card)]"
 							style={{
-								backgroundColor: "var(--color-surface-card)",
-								borderColor: "var(--color-secondary)",
-								borderWidth: "3px",
-								boxShadow: "0 10px 40px rgba(255, 184, 77, 0.25)",
+								boxShadow: "var(--shadow-warm)",
 							}}
 							whileHover={{
 								y: -8,
 								scale: 1.02,
-								boxShadow: "0 15px 50px rgba(255, 184, 77, 0.35)",
+								boxShadow: "var(--shadow-warm-hover)",
 							}}
 						>
 							{error && (
 								<motion.div
 									initial={{ opacity: 0, y: -8, scale: 0.95 }}
 									animate={{ opacity: 1, y: 0, scale: 1 }}
-									className="mb-4 px-5 py-4 rounded-3xl text-sm font-semibold"
-									style={{
-										backgroundColor: "var(--color-error-bg)",
-										color: "var(--color-error-text)",
-										borderLeft: "5px solid var(--color-accent)",
-										fontFamily: '"DM Sans", sans-serif',
-									}}
+									className="mb-4 px-5 py-4 rounded-2xl text-sm font-semibold bg-[var(--color-error-bg)] text-[var(--color-error-text)] border-l-4 border-[var(--color-accent)]"
 								>
 									{error}
 								</motion.div>
 							)}
 
 							<form onSubmit={handleSubmit} className="flex flex-col gap-5">
-								{/* New Password */}
 								<div className="relative">
 									<Lock
 										size={20}
-										className="absolute left-4 top-1/2 -translate-y-1/2"
-										style={{ color: "var(--color-primary)" }}
+										className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]"
 									/>
 									<input
 										type={showPassword ? "text" : "password"}
 										autoComplete="new-password"
 										required
+										aria-label={tr("reset_password.new_password_label", "New password")}
 										placeholder="••••••••"
 										value={form.newPassword}
 										onChange={(e) =>
@@ -152,43 +134,28 @@ export default function ResetPassword() {
 												newPassword: e.target.value,
 											}))
 										}
-										className="w-full pl-12 pr-12 py-4 rounded-3xl text-sm font-semibold focus:outline-none transition-all duration-200"
-										style={{
-											borderColor: "var(--color-border)",
-											border: "2px solid",
-											backgroundColor: "var(--color-surface)",
-											color: "var(--color-text-primary)",
-										}}
-										onFocus={(e) => {
-											e.style.borderColor = "var(--color-primary)";
-											e.style.boxShadow = "0 0 0 4px rgba(93, 184, 127, 0.15)";
-										}}
-										onBlur={(e) => {
-											e.style.borderColor = "var(--color-border)";
-											e.style.boxShadow = "none";
-										}}
+										className="input-base input-base-lg pl-12 pr-12"
 									/>
 									<button
 										type="button"
 										onClick={() => setShowPassword((v) => !v)}
-										className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition"
-										style={{ color: "var(--color-primary)" }}
+										aria-label={showPassword ? tr("login.hide_password", "Hide password") : tr("login.show_password", "Show password")}
+										className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] hover:opacity-70 transition"
 									>
 										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
 									</button>
 								</div>
 
-								{/* Confirm Password */}
 								<div className="relative">
 									<Lock
 										size={20}
-										className="absolute left-4 top-1/2 -translate-y-1/2"
-										style={{ color: "var(--color-primary)" }}
+										className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]"
 									/>
 									<input
 										type={showConfirmPassword ? "text" : "password"}
 										autoComplete="new-password"
 										required
+										aria-label={tr("reset_password.confirm_password_label", "Confirm password")}
 										placeholder="••••••••"
 										value={form.confirmPassword}
 										onChange={(e) =>
@@ -197,27 +164,13 @@ export default function ResetPassword() {
 												confirmPassword: e.target.value,
 											}))
 										}
-										className="w-full pl-12 pr-12 py-4 rounded-3xl text-sm font-semibold focus:outline-none transition-all duration-200"
-										style={{
-											borderColor: "var(--color-border)",
-											border: "2px solid",
-											backgroundColor: "var(--color-surface)",
-											color: "var(--color-text-primary)",
-										}}
-										onFocus={(e) => {
-											e.style.borderColor = "var(--color-primary)";
-											e.style.boxShadow = "0 0 0 4px rgba(93, 184, 127, 0.15)";
-										}}
-										onBlur={(e) => {
-											e.style.borderColor = "var(--color-border)";
-											e.style.boxShadow = "none";
-										}}
+										className="input-base input-base-lg pl-12 pr-12"
 									/>
 									<button
 										type="button"
 										onClick={() => setShowConfirmPassword((v) => !v)}
-										className="absolute right-4 top-1/2 -translate-y-1/2 hover:opacity-70 transition"
-										style={{ color: "var(--color-primary)" }}
+										aria-label={showConfirmPassword ? tr("login.hide_password", "Hide password") : tr("login.show_password", "Show password")}
+										className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] hover:opacity-70 transition"
 									>
 										{showConfirmPassword ? (
 											<EyeOff size={20} />
@@ -227,87 +180,56 @@ export default function ResetPassword() {
 									</button>
 								</div>
 
-								{/* Submit Button */}
-								<motion.button
+								<Button
 									type="submit"
 									disabled={loading}
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									className="mt-4 font-bold text-lg py-4 rounded-3xl text-white transition-all disabled:opacity-50"
-									style={{
-										backgroundColor: "var(--color-primary)",
-										boxShadow: "var(--shadow-button)",
-									}}
+									size="lg"
+									className="mt-4 w-full"
 								>
-									{loading ? "Resetting..." : "Reset Password"}
-								</motion.button>
+									{loading
+										? tr("reset_password.submitting", "Resetting...")
+										: tr("reset_password.submit", "Reset Password")}
+								</Button>
 							</form>
 
-							{/* Back Link */}
-							<p
-								className="text-center text-sm mt-6 font-semibold"
-								style={{ color: "var(--color-text-secondary)" }}
-							>
+							<p className="text-center text-sm mt-6 font-semibold text-[var(--color-text-secondary)]">
 								<Link
 									to="/login"
-									className="font-bold hover:underline transition"
-									style={{ color: "var(--color-secondary)" }}
+									className="font-bold text-[var(--color-secondary)] hover:underline transition"
 								>
-									Back to login
+									{tr("reset_password.back_to_login", "Back to login")}
 								</Link>
 							</p>
 						</motion.div>
 					</>
 				)}
 
-				{/* Success State */}
 				{success && (
 					<motion.div
 						initial={{ opacity: 0, scale: 0.95 }}
 						animate={{ opacity: 1, scale: 1 }}
-						className="rounded-4xl p-8 border-4 backdrop-blur-sm"
+						className="rounded-3xl p-8 border-[3px] border-[var(--color-secondary)] backdrop-blur-sm bg-[var(--color-surface-card)]"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							borderColor: "var(--color-secondary)",
-							borderWidth: "3px",
-							boxShadow: "0 10px 40px rgba(255, 184, 77, 0.25)",
+							boxShadow: "var(--shadow-warm)",
 						}}
 					>
 						<div className="text-center">
 							<Lock
 								size={46}
-								className="mb-4 inline-block"
-								style={{ color: "var(--color-primary)" }}
+								className="mb-4 inline-block text-[var(--color-primary)]"
 							/>
-							<h2
-								className="text-3xl font-bold mb-3"
-								style={{
-									color: "var(--color-primary)",
-									fontFamily: '"Fredoka", sans-serif',
-								}}
-							>
-								All set
+							<h2 className="font-display text-3xl font-bold mb-3 text-[var(--color-primary)]">
+								{tr("reset_password.success_title", "All set")}
 							</h2>
-							<p
-								className="text-sm mb-6 font-semibold"
-								style={{
-									color: "var(--color-text-secondary)",
-									fontFamily: '"DM Sans", sans-serif',
-								}}
-							>
-								Your password has been successfully reset. Redirecting to
-								login...
+							<p className="text-sm mb-6 font-semibold text-[var(--color-text-secondary)]">
+								{tr("reset_password.success_message", "Your password has been successfully reset. Redirecting to login...")}
 							</p>
 							<Link
 								to="/login"
-								className="inline-block font-bold py-4 px-8 rounded-3xl transition hover:opacity-80"
-								style={{
-									backgroundColor: "var(--color-primary)",
-									color: "white",
-									boxShadow: "var(--shadow-button)",
-								}}
+								className="inline-block font-bold py-4 px-8 rounded-3xl bg-[var(--color-primary)] text-white transition hover:opacity-80"
+								style={{ boxShadow: "var(--shadow-button)" }}
 							>
-								Back to login
+								{tr("reset_password.back_to_login", "Back to login")}
 							</Link>
 						</div>
 					</motion.div>

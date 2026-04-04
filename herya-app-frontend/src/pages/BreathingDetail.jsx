@@ -32,12 +32,11 @@ function RatioBox({ label, value, color }) {
 	return (
 		<div className="flex flex-col items-center gap-1">
 			<div
-				className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold border-2"
+				className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold border-2 font-display"
 				style={{
 					backgroundColor: `${color}18`,
 					borderColor: color,
 					color,
-					fontFamily: '"Fredoka", sans-serif',
 				}}
 			>
 				{value}
@@ -87,13 +86,7 @@ export default function BreathingDetail() {
 					className="mb-3"
 					style={{ color: "var(--color-text-muted)" }}
 				/>
-				<p
-					className="text-lg font-bold"
-					style={{
-						color: "var(--color-text-primary)",
-						fontFamily: '"Fredoka", sans-serif',
-					}}
-				>
+				<p className="text-lg font-bold font-display text-[var(--color-text-primary)]">
 					{t("breathing_detail.not_found")}
 				</p>
 				<button
@@ -153,13 +146,7 @@ export default function BreathingDetail() {
 				</div>
 
 				<div className="text-center">
-					<h1
-						className="text-2xl font-bold"
-						style={{
-							color: "var(--color-text-primary)",
-							fontFamily: '"Fredoka", sans-serif',
-						}}
-					>
+					<h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
 						{pattern.romanizationName}
 					</h1>
 					{pattern.iastName && (
@@ -247,13 +234,7 @@ export default function BreathingDetail() {
 								color="var(--color-info)"
 							/>
 						</div>
-						<p
-							className="text-center mt-4 text-lg font-bold"
-							style={{
-								color: "var(--color-text-primary)",
-								fontFamily: '"Fredoka", sans-serif',
-							}}
-						>
+						<p className="text-center mt-4 text-lg font-bold font-display text-[var(--color-text-primary)]">
 							{ratioStr}
 						</p>
 					</div>
@@ -265,13 +246,7 @@ export default function BreathingDetail() {
 						className="rounded-2xl p-4"
 						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
-						<h3
-							className="font-bold mb-3"
-							style={{
-								color: "var(--color-text-primary)",
-								fontFamily: '"Fredoka", sans-serif',
-							}}
-						>
+						<h3 className="font-bold mb-3 text-[var(--color-text-primary)]">
 							{t("breathing_detail.benefits")}
 						</h3>
 						<ul className="flex flex-col gap-2">
@@ -292,13 +267,7 @@ export default function BreathingDetail() {
 				{/* Step-by-step instructions */}
 				{instructions.length > 0 && (
 					<div>
-						<h3
-							className="font-bold mb-3"
-							style={{
-								color: "var(--color-text-primary)",
-								fontFamily: '"Fredoka", sans-serif',
-							}}
-						>
+						<h3 className="font-bold mb-3 text-[var(--color-text-primary)]">
 							{t("breathing_detail.instructions")}
 						</h3>
 						<ol className="flex flex-col gap-3">

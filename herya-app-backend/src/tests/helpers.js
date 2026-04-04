@@ -10,6 +10,7 @@ const createUser = async (overrides = {}) => {
 		name: "Test User",
 		email: `test-${Date.now()}@example.com`,
 		password: "SecurePass123",
+		role: "user",
 	};
 	const data = { ...defaults, ...overrides };
 	const res = await request(app).post("/api/v1/auth/register").send(data);

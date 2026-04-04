@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import Garden from "./Garden";
+import Journal from "./Journal";
 
 vi.mock("@/api/journalEntries.api", () => ({
 	getJournalEntries: vi.fn(),
@@ -24,39 +24,46 @@ vi.mock("@/context/LanguageContext", () => ({
 	useLanguage: () => ({
 		t: (key, vars) => {
 			const dict = {
-				"garden.title": "Your Garden",
-				"garden.entries_plural": "journal entries",
-				"garden.entries_singular": "journal entry",
-				"garden.view_graph": "Graph",
-				"garden.view_flowers": "Flowers",
-				"garden.filters_label": "Filters",
-				"garden.clear_filters": "Clear",
-				"garden.search_placeholder": "Search insights/reflection",
-				"garden.all_moods": "All moods",
-				"garden.all_types": "All types",
-				"garden.no_matches_title": "No matches for these filters",
-				"garden.no_matches_hint":
+				"journal.title": "Your Journal",
+				"journal.entries_plural": "journal entries",
+				"journal.entries_singular": "journal entry",
+				"journal.filters_label": "Filters",
+				"journal.clear_filters": "Clear",
+				"journal.search_placeholder": "Search insights/reflection",
+				"journal.all_moods": "All moods",
+				"journal.all_types": "All types",
+				"journal.no_matches_title": "No matches for these filters",
+				"journal.no_matches_hint":
 					"Try removing mood/type filters or expanding dates.",
-				"garden.graph_title": "Garden Graph",
-				"garden.tap_hint": "Tap a flower to see the entry",
+				"journal.tap_hint": "Tap a flower to see the entry",
 				"profile.days": "d",
 				"ui.close_modal": "Close modal",
+				"journal.reflection_label": "Reflection",
+				"journal.practice_type_label": "Practice Type",
+				"session.duration_label": "Duration",
+				"profile.minutes": "min",
 			};
 
-			if (key === "garden.showing_summary") {
+			if (key === "journal.showing_summary") {
 				return `Showing ${vars?.shown} of ${vars?.total} entries`;
 			}
 
-			if (key === "garden.open_entry_aria") {
+			if (key === "journal.open_entry_aria") {
 				return `Open entry ${vars?.date}`;
 			}
 
-			if (key.startsWith("garden.practice_types.")) {
+			if (key.startsWith("journal.practice_types.")) {
 				return key;
 			}
 
 			return dict[key] || key;
 		},
+	}),
+}));
+
+vi.mock("@/context/AuthContext", () => ({
+	useAuth: () => ({
+		user: { role: "user" },
 	}),
 }));
 
@@ -109,15 +116,15 @@ const LocationProbe = () => {
 	return <div data-testid="location-search">{location.search}</div>;
 };
 
-const renderGarden = (initialEntry) =>
+const renderJournal = (initialEntry) =>
 	render(
 		<MemoryRouter initialEntries={[initialEntry]}>
 			<Routes>
 				<Route
-					path="/garden"
+					path="/journal"
 					element={
 						<>
-							<Garden />
+							<Journal />
 							<LocationProbe />
 						</>
 					}
@@ -126,7 +133,7 @@ const renderGarden = (initialEntry) =>
 		</MemoryRouter>,
 	);
 
-describe("Garden query params integration", () => {
+describe("Journal query params integration", () => {
 	beforeEach(() => {
 		vi.mocked(getJournalEntries).mockResolvedValue({
 			data: { data: { journals: JOURNALS } },
@@ -139,8 +146,8 @@ describe("Garden query params integration", () => {
 	});
 
 	it("hydrates controls from URL query params", async () => {
-		const view = renderGarden(
-			"/garden?view=flowers&mood=calm&type=meditation&from=2026-03-01&to=2026-03-31&preset=30&q=clear",
+		const view = renderJournal(
+			"/journal?mood=calm&type=meditation&from=2026-03-01&to=2026-03-31&preset=30&q=clear",
 		);
 		const ui = within(view.container);
 
@@ -157,22 +164,20 @@ describe("Garden query params integration", () => {
 
 		expect(ui.getByDisplayValue("2026-03-01")).toBeTruthy();
 		expect(ui.getByDisplayValue("2026-03-31")).toBeTruthy();
-		expect(ui.getByTestId("location-search").textContent).toContain(
-			"view=flowers",
-		);
 	});
 
 	it("syncs URL when user changes filters and search", async () => {
-		const view = renderGarden("/garden");
+		const view = renderJournal("/journal");
 		const ui = within(view.container);
 
 		await waitFor(() => {
-			expect(ui.getByRole("button", { name: "Graph" })).toBeTruthy();
+			expect(
+				ui.getByPlaceholderText("Search insights/reflection"),
+			).toBeTruthy();
 		});
 
 		const [moodSelect] = ui.getAllByRole("combobox");
 		fireEvent.change(moodSelect, { target: { value: "calm" } });
-		fireEvent.click(ui.getByRole("button", { name: "Flowers" }));
 
 		const searchInput = ui.getByPlaceholderText("Search insights/reflection");
 		fireEvent.change(searchInput, { target: { value: "breathe" } });
@@ -183,17 +188,29 @@ describe("Garden query params integration", () => {
 		});
 
 		const search = ui.getByTestId("location-search").textContent || "";
-		expect(search).toContain("view=flowers");
 		expect(search).toContain("mood=calm");
 	});
 
-	it("persists selected entry in URL and restores modal from query", async () => {
-		const view = renderGarden("/garden?entry=j2");
+	it("shows all entries by default when no filters are set", async () => {
+		const view = renderJournal("/journal");
 		const ui = within(view.container);
 
 		await waitFor(() => {
-			expect(ui.getByText("Strong energy")).toBeTruthy();
+			expect(ui.getByText("Showing 2 of 2 entries")).toBeTruthy();
 		});
+
+		expect(ui.queryByText("No matches for these filters")).toBeNull();
+	});
+
+	it("persists selected entry in URL and restores modal from query", async () => {
+		const view = renderJournal("/journal?entry=j2");
+		const ui = within(view.container);
+
+		await waitFor(() => {
+			expect(ui.getByRole("button", { name: "Close modal" })).toBeTruthy();
+		});
+
+		expect(ui.getAllByText("Strong energy").length).toBeGreaterThan(0);
 
 		expect(ui.getByTestId("location-search").textContent).toContain("entry=j2");
 		fireEvent.click(ui.getByRole("button", { name: "Close modal" }));

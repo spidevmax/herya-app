@@ -29,11 +29,11 @@ const formatTime = (sec) => {
 
 // Palette tints per profile style
 const PALETTE_TINTS = {
-	warm: { bg: "var(--color-pranayama-inhale, #4A90D9)", accent: "#E8A838" },
-	calming: { bg: "var(--color-accent, #9B7ECF)", accent: "#9B7ECF" },
-	cooling: { bg: "#48CAE4", accent: "#48CAE4" },
-	energizing: { bg: "#EF476F", accent: "#FF6B6B" },
-	balanced: { bg: "var(--color-secondary, #5DB075)", accent: "#5DB075" },
+	warm: { bg: "var(--color-prana-warm)", accent: "var(--color-prana-warm-accent)" },
+	calming: { bg: "var(--color-prana-calming)", accent: "var(--color-prana-calming)" },
+	cooling: { bg: "var(--color-prana-cooling)", accent: "var(--color-prana-cooling)" },
+	energizing: { bg: "var(--color-prana-energizing)", accent: "var(--color-prana-energizing-accent)" },
+	balanced: { bg: "var(--color-prana-balanced)", accent: "var(--color-prana-balanced)" },
 };
 
 export default function CycleBreathingPlayer({
@@ -46,7 +46,7 @@ export default function CycleBreathingPlayer({
 
 	// ── Resolve profile ──────────────────────────────────────────────────
 	const baseProfile = useMemo(() => getProfile(pattern), [pattern]);
-	const [lowStim, setLowStim] = useState(false);
+	const [lowStim, setLowStim] = useState(Boolean(config.lowStim));
 	const profile = useMemo(
 		() => (lowStim ? applyLowStim(baseProfile) : baseProfile),
 		[baseProfile, lowStim],
@@ -95,9 +95,7 @@ export default function CycleBreathingPlayer({
 	);
 
 	const targetCycles =
-		config.cycles ||
-		pattern?.recommendedPractice?.cycles?.default ||
-		10;
+		config.cycles || pattern?.recommendedPractice?.cycles?.default || 10;
 	const pauseBetween =
 		config.pauseBetweenCycles ?? profile.pauseBetweenCycles ?? 0;
 
@@ -105,13 +103,10 @@ export default function CycleBreathingPlayer({
 	const [activeNostril, setActiveNostril] = useState("left");
 
 	// ── Breathing engine ─────────────────────────────────────────────────
-	const handlePhaseChange = useCallback(
-		() => {
-			audio.playPhaseChange(profile.audio);
-			vibrate(profile.haptic?.phaseChange || 0);
-		},
-		[audio, profile, vibrate],
-	);
+	const handlePhaseChange = useCallback(() => {
+		audio.playPhaseChange(profile.audio);
+		vibrate(profile.haptic?.phaseChange || 0);
+	}, [audio, profile, vibrate]);
 
 	const handleCycleComplete = useCallback(
 		(count) => {
@@ -143,11 +138,7 @@ export default function CycleBreathingPlayer({
 		const key = engine.currentPhaseKey;
 		if (key !== prevPhaseRef.current) {
 			prevPhaseRef.current = key;
-			audio.playPhaseGuide(
-				key,
-				profile.audio,
-				engine.currentPhaseDuration,
-			);
+			audio.playPhaseGuide(key, profile.audio, engine.currentPhaseDuration);
 		}
 	}, [
 		engine.isRunning,
@@ -295,17 +286,12 @@ export default function CycleBreathingPlayer({
 					}}
 					role="img"
 					aria-label={t(
-						PHASE_LABEL_KEYS[engine.currentPhaseKey] ||
-							"pranayama.inhale",
+						PHASE_LABEL_KEYS[engine.currentPhaseKey] || "pranayama.inhale",
 					)}
 				>
 					<AnimatePresence mode="wait">
 						<motion.div
-							key={
-								engine.isPausing
-									? "pause"
-									: engine.currentPhaseKey
-							}
+							key={engine.isPausing ? "pause" : engine.currentPhaseKey}
 							initial={{ opacity: 0, y: 6 }}
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -6 }}
@@ -328,9 +314,7 @@ export default function CycleBreathingPlayer({
 											color: "var(--color-text-muted)",
 										}}
 									>
-										{Math.ceil(
-											pauseBetween - engine.pauseElapsed,
-										)}
+										{Math.ceil(pauseBetween - engine.pauseElapsed)}
 									</p>
 								</>
 							) : showCompletionState ? (
@@ -344,14 +328,10 @@ export default function CycleBreathingPlayer({
 								</p>
 							) : (
 								<>
-									<p
-										className="font-semibold text-base"
-										style={{ color }}
-									>
+									<p className="font-semibold text-base" style={{ color }}>
 										{t(
-											PHASE_LABEL_KEYS[
-												engine.currentPhaseKey
-											] || "pranayama.inhale",
+											PHASE_LABEL_KEYS[engine.currentPhaseKey] ||
+												"pranayama.inhale",
 										)}
 									</p>
 									<p
@@ -360,9 +340,7 @@ export default function CycleBreathingPlayer({
 									>
 										{engine.isRunning
 											? Math.ceil(engine.phaseRemaining)
-											: Math.ceil(
-													engine.currentPhaseDuration,
-												)}
+											: Math.ceil(engine.currentPhaseDuration)}
 									</p>
 								</>
 							)}
@@ -430,8 +408,7 @@ export default function CycleBreathingPlayer({
 						className="flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg transition-all"
 						style={{
 							backgroundColor:
-								phase === engine.currentPhaseKey &&
-								!engine.isPausing
+								phase === engine.currentPhaseKey && !engine.isPausing
 									? `${PHASE_COLORS[phase]}15`
 									: "transparent",
 						}}
@@ -474,8 +451,7 @@ export default function CycleBreathingPlayer({
 											? paletteTint.accent
 											: "var(--color-border-soft)",
 									transform:
-										idx === engine.completedCycles &&
-										engine.isRunning
+										idx === engine.completedCycles && engine.isRunning
 											? "scale(1.3)"
 											: "scale(1)",
 								}}
@@ -500,8 +476,8 @@ export default function CycleBreathingPlayer({
 				<div
 					className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
 					style={{
-						backgroundColor: "var(--color-danger, #EF476F)20",
-						color: "var(--color-danger, #EF476F)",
+						backgroundColor: "var(--color-error-bg)",
+						color: "var(--color-error-text)",
 					}}
 					role="alert"
 				>
@@ -547,9 +523,7 @@ export default function CycleBreathingPlayer({
 					disabled={showCompletionState}
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg disabled:opacity-50"
 					style={{ backgroundColor: color }}
-					aria-label={
-						engine.isRunning ? t("guided.pause") : t("guided.play")
-					}
+					aria-label={engine.isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{engine.isRunning ? (
 						<Pause size={24} />
@@ -575,17 +549,11 @@ export default function CycleBreathingPlayer({
 							: "var(--color-text-muted)",
 					}}
 					aria-label={t(
-						audioEnabled
-							? "pranayama.audio_on"
-							: "pranayama.audio_off",
+						audioEnabled ? "pranayama.audio_on" : "pranayama.audio_off",
 					)}
 					aria-pressed={audioEnabled}
 				>
-					{audioEnabled ? (
-						<Volume2 size={16} />
-					) : (
-						<VolumeX size={16} />
-					)}
+					{audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
 				</button>
 			</div>
 
@@ -636,9 +604,7 @@ export default function CycleBreathingPlayer({
 						borderColor: lowStim
 							? `${paletteTint.accent}40`
 							: "var(--color-border-soft)",
-						color: lowStim
-							? paletteTint.accent
-							: "var(--color-text-muted)",
+						color: lowStim ? paletteTint.accent : "var(--color-text-muted)",
 					}}
 					aria-label={t("pranayama.low_stimulation")}
 					aria-pressed={lowStim}

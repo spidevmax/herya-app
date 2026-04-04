@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
 	ALL_MOODS,
 	ALL_TYPES,
-	filterGardenEntries,
+	filterJournalEntries,
 	getDatePresetRange,
-} from "./gardenFilters";
+} from "./journalFilters";
 
 const getPracticeType = (entry) => entry.sessionType || null;
 
@@ -35,9 +35,9 @@ describe("getDatePresetRange", () => {
 	});
 });
 
-describe("filterGardenEntries", () => {
+describe("filterJournalEntries", () => {
 	it("filters by mood", () => {
-		const result = filterGardenEntries({
+		const result = filterJournalEntries({
 			entries: ENTRIES,
 			selectedMood: "calm",
 			selectedType: ALL_TYPES,
@@ -51,7 +51,7 @@ describe("filterGardenEntries", () => {
 	});
 
 	it("filters by type + date range + query", () => {
-		const result = filterGardenEntries({
+		const result = filterJournalEntries({
 			entries: ENTRIES,
 			selectedMood: ALL_MOODS,
 			selectedType: "pranayama",
@@ -65,7 +65,7 @@ describe("filterGardenEntries", () => {
 	});
 
 	it("returns all entries for empty filters", () => {
-		const result = filterGardenEntries({
+		const result = filterJournalEntries({
 			entries: ENTRIES,
 			selectedMood: ALL_MOODS,
 			selectedType: ALL_TYPES,
@@ -78,7 +78,7 @@ describe("filterGardenEntries", () => {
 	});
 
 	it("includes entries on exact date boundaries", () => {
-		const result = filterGardenEntries({
+		const result = filterJournalEntries({
 			entries: ENTRIES,
 			selectedMood: ALL_MOODS,
 			selectedType: ALL_TYPES,
@@ -104,7 +104,7 @@ describe("filterGardenEntries", () => {
 			},
 		];
 
-		const result = filterGardenEntries({
+		const result = filterJournalEntries({
 			entries: entriesWithInvalidDate,
 			selectedMood: ALL_MOODS,
 			selectedType: ALL_TYPES,

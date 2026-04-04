@@ -33,7 +33,7 @@ export function Card({ children, className = "", onClick, hover = true }) {
 }
 
 // ── SearchBar ────────────────────────────────────────────────────────────────
-export const SearchBar = ({ value, onChange, placeholder = "Search..." }) => {
+export const SearchBar = ({ value, onChange, placeholder = "Search...", clearLabel = "Clear search" }) => {
 	return (
 		<div className="relative">
 			<Search
@@ -51,7 +51,7 @@ export const SearchBar = ({ value, onChange, placeholder = "Search..." }) => {
 				<button
 					type="button"
 					onClick={() => onChange("")}
-					aria-label="Clear search"
+					aria-label={clearLabel}
 					className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
 				>
 					<X size={16} />
@@ -241,7 +241,7 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 };
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
-export function Badge({ children, color = "#5DB87F", className = "" }) {
+export function Badge({ children, color = "var(--color-secondary)", className = "" }) {
 	return (
 		<span
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}
@@ -333,7 +333,7 @@ export function EmptyState({
 }
 
 // ── ProgressBar ───────────────────────────────────────────────────────────────
-export function ProgressBar({ value, max, color = "#5DB87F", className = "" }) {
+export function ProgressBar({ value, max, color = "var(--color-secondary)", className = "" }) {
 	const pct = Math.min(100, Math.round((value / max) * 100));
 	return (
 		<div
@@ -357,7 +357,7 @@ export function CircleProgress({
 	max,
 	size = 64,
 	stroke = 6,
-	color = "#5DB87F",
+	color = "var(--color-secondary)",
 	children,
 }) {
 	const { t } = useLanguage();

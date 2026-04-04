@@ -168,6 +168,26 @@ const updateMyProfile = async (req, res, next) => {
 			if (preferences.theme) {
 				user.set("preferences.theme", preferences.theme);
 			}
+
+			if (preferences.lowStimMode !== undefined) {
+				user.set("preferences.lowStimMode", preferences.lowStimMode);
+			}
+
+			if (preferences.safetyAnchors) {
+				const phrase =
+					typeof preferences.safetyAnchors.phrase === "string"
+						? preferences.safetyAnchors.phrase.trim()
+						: user.preferences?.safetyAnchors?.phrase || "";
+				const bodyCue =
+					typeof preferences.safetyAnchors.bodyCue === "string"
+						? preferences.safetyAnchors.bodyCue.trim()
+						: user.preferences?.safetyAnchors?.bodyCue || "";
+
+				user.set("preferences.safetyAnchors", {
+					phrase,
+					bodyCue,
+				});
+			}
 		}
 
 		// Handle profile image update

@@ -156,8 +156,8 @@ function StatBox({ value, label, bg, color }) {
 			style={{ backgroundColor: bg }}
 		>
 			<span
-				className="text-sm font-bold leading-none"
-				style={{ color, fontFamily: '"Fredoka", sans-serif' }}
+				className="text-sm font-bold leading-none font-display"
+				style={{ color }}
 			>
 				{value}
 			</span>
@@ -238,11 +238,8 @@ function RetroCard({
 							/>
 						) : (
 							<div
-								className="w-full h-full flex items-center justify-center text-2xl font-black"
-								style={{
-									color: borderColor,
-									fontFamily: '"Fredoka", sans-serif',
-								}}
+								className="w-full h-full flex items-center justify-center text-2xl font-black font-display"
+								style={{ color: borderColor }}
 							>
 								{monogram || "?"}
 							</div>
@@ -260,10 +257,7 @@ function RetroCard({
 								</p>
 								<h3
 									className="font-black text-base leading-tight truncate"
-									style={{
-										color: borderColor,
-										fontFamily: '"Fredoka", sans-serif',
-									}}
+									style={{ color: borderColor }}
 								>
 									{title}
 								</h3>
@@ -552,13 +546,7 @@ export default function Library() {
 	return (
 		<div className="flex flex-col pt-4 pb-6 gap-4">
 			<div className="px-4">
-				<h1
-					className="text-3xl font-bold mb-1"
-					style={{
-						color: "var(--color-text-primary)",
-						fontFamily: '"Fredoka", sans-serif',
-					}}
-				>
+				<h1 className="text-3xl font-bold mb-1 text-[var(--color-text-primary)]">
 					{t("library.title", "Library")}
 				</h1>
 				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
@@ -593,7 +581,6 @@ export default function Library() {
 								tab === tabItem.key
 									? "var(--color-info)"
 									: "var(--color-border)",
-							fontFamily: '"DM Sans", sans-serif',
 						}}
 					>
 						{tabItem.label}
@@ -617,7 +604,6 @@ export default function Library() {
 							backgroundColor: "var(--color-surface-card)",
 							borderColor: "var(--color-border)",
 							color: "var(--color-text-primary)",
-							fontFamily: '"DM Sans", sans-serif',
 						}}
 					/>
 				</div>

@@ -83,6 +83,9 @@ usersRouter.use(authenticateToken());
  *                     language:
  *                       type: string
  *                       enum: [en, es]
+ *                     lowStimMode:
+ *                       type: boolean
+ *                       example: true
  *       401:
  *         description: Unauthorized - missing or invalid token
  *       404:
@@ -140,6 +143,9 @@ usersRouter.get("/me", getMyProfile);
  *                     type: string
  *                     enum: [morning, afternoon, evening, anytime]
  *                     example: morning
+ *                   lowStimMode:
+ *                     type: boolean
+ *                     example: true
  *                   notifications:
  *                     type: object
  *                     properties:

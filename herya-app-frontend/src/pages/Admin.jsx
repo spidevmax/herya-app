@@ -119,6 +119,12 @@ function AdminDashboard({ stats, loading }) {
 }
 
 function UserRow({ user, onChangeRole, onDelete }) {
+	const [nextRole, setNextRole] = useState(user.role);
+
+	useEffect(() => {
+		setNextRole(user.role);
+	}, [user.role]);
+
 	return (
 		<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
 			<div className="flex items-center gap-3 mb-3">
@@ -145,26 +151,36 @@ function UserRow({ user, onChangeRole, onDelete }) {
 					color={
 						user.role === "admin"
 							? "var(--color-info)"
-							: "var(--color-text-secondary)"
+							: user.role === "tutor"
+								? "var(--color-warning)"
+								: "var(--color-text-secondary)"
 					}
 				>
 					{user.role}
 				</Badge>
 			</div>
-			<div className="flex gap-2">
+			<div className="flex gap-2 items-center">
+				<select
+					value={nextRole}
+					onChange={(e) => setNextRole(e.target.value)}
+					className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text-primary)]"
+				>
+					<option value="user">Estandar</option>
+					<option value="tutor">Tutor</option>
+					<option value="admin">Admin</option>
+				</select>
 				<button
 					type="button"
-					onClick={() =>
-						onChangeRole(user._id, user.role === "admin" ? "user" : "admin")
-					}
-					className="flex-1 py-2 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] text-[var(--color-primary)]"
+					disabled={nextRole === user.role}
+					onClick={() => onChangeRole(user._id, nextRole)}
+					className="py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] text-[var(--color-primary)] disabled:opacity-50"
 				>
-					{user.role === "admin" ? "→ Usuario" : "→ Admin"}
+					Guardar rol
 				</button>
 				<button
 					type="button"
 					onClick={() => onDelete(user)}
-					className="flex-1 py-2 rounded-xl text-xs font-semibold bg-[var(--color-error-bg)] text-[var(--color-danger)]"
+					className="py-2 px-3 rounded-xl text-xs font-semibold bg-[var(--color-error-bg)] text-[var(--color-danger)]"
 				>
 					Eliminar
 				</button>
@@ -325,13 +341,7 @@ export default function Admin() {
 				</button>
 				<div className="flex items-center gap-2">
 					<Shield size={20} className="text-[var(--color-primary)]" />
-					<h1
-						className="font-display text-xl font-bold"
-						style={{
-							fontFamily: '"Fredoka", sans-serif',
-							color: "var(--color-text-primary)",
-						}}
-					>
+					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
 						Administración
 					</h1>
 				</div>
