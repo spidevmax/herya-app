@@ -4,7 +4,9 @@ import { CheckCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 import PostPracticeNudge from "./PostPracticeNudge";
-import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
+import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
+
+const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-secondary)";
 
 const SENSATION_OPTIONS = [
 	"relaxed",
@@ -161,24 +163,24 @@ export default function PostPracticeJournal({
 					{t("practice.journal_mood_after")}
 				</p>
 				<div className="flex flex-wrap gap-2">
-					{MOOD_AFTER_OPTIONS.slice(0, 12).map((m) => (
-						<button
-							type="button"
-							key={m}
-							onClick={() => toggleMood(m)}
-							className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
-							style={{
-								backgroundColor: moodAfter.includes(m)
-									? "var(--color-secondary)"
-									: "var(--color-surface)",
-								color: moodAfter.includes(m)
-									? "white"
-									: "var(--color-text-secondary)",
-							}}
-						>
-							{t(`session.moods.${m}`)}
-						</button>
-					))}
+					{GARDEN_MOOD_ORDER.map((m) => {
+						const selected = moodAfter.includes(m);
+						const color = getMoodColor(m);
+						return (
+							<button
+								type="button"
+								key={m}
+								onClick={() => toggleMood(m)}
+								className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
+								style={{
+									backgroundColor: selected ? color : "var(--color-surface)",
+									color: selected ? "white" : "var(--color-text-secondary)",
+								}}
+							>
+								{t(`session.moods.${m}`)}
+							</button>
+						);
+					})}
 				</div>
 			</div>
 

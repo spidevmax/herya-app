@@ -488,14 +488,14 @@ function BlockCard({
 			}}
 		>
 			{/* Header */}
-			<div className="flex items-center gap-2 px-3 py-3">
+			<div className="flex items-center gap-2 px-3 py-2">
 				<GripVertical
 					size={16}
 					className="cursor-grab"
 					style={{ color: "var(--color-text-muted)" }}
 				/>
 				<span
-					className="text-xs font-semibold uppercase tracking-wider"
+					className="text-[11px] font-semibold uppercase tracking-[0.18em]"
 					style={{ color }}
 				>
 					{index + 1}. {blockTypeLabel(block.blockType)}
@@ -557,7 +557,7 @@ function BlockCard({
 						exit={{ height: 0, opacity: 0 }}
 						className="overflow-hidden"
 					>
-						<div className="px-4 pb-4 flex flex-col gap-3">
+						<div className="px-3 pb-3 flex flex-col gap-2.5">
 							{/* VK Sequence picker */}
 							{block.blockType === "vk_sequence" && (
 								<SequencePicker
@@ -597,7 +597,7 @@ function BlockCard({
 									{/* Cycle configuration */}
 									{selectedPattern && (
 										<div
-											className="rounded-xl p-3 flex flex-col gap-2"
+											className="rounded-xl p-2.5 flex flex-col gap-1.5"
 											style={{
 												backgroundColor: "var(--color-surface)",
 												border: "1px solid var(--color-border-soft)",
@@ -632,7 +632,7 @@ function BlockCard({
 																},
 															})
 														}
-														className="w-7 h-7 rounded-lg flex items-center justify-center border"
+														className="w-6 h-6 rounded-lg flex items-center justify-center border"
 														style={{
 															borderColor: "var(--color-border-soft)",
 															color: "var(--color-text-secondary)",
@@ -641,7 +641,7 @@ function BlockCard({
 														<Minus size={12} />
 													</button>
 													<span
-														className="text-sm font-bold w-8 text-center"
+														className="text-xs font-bold w-7 text-center"
 														style={{ color: "var(--color-text-primary)" }}
 													>
 														{block.config?.cycles || 10}
@@ -656,7 +656,7 @@ function BlockCard({
 																},
 															})
 														}
-														className="w-7 h-7 rounded-lg flex items-center justify-center border"
+														className="w-6 h-6 rounded-lg flex items-center justify-center border"
 														style={{
 															borderColor: "var(--color-border-soft)",
 															color: "var(--color-text-secondary)",

@@ -7,7 +7,7 @@ import FlowerGarden from "@/components/garden/FlowerGarden";
 import { EmptyState } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
-import { MOOD_COLORS } from "@/utils/constants";
+import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
 import {
 	ALL_MOODS,
 	ALL_TYPES,
@@ -183,7 +183,14 @@ export default function Garden() {
 				if (mood) set.add(mood);
 			});
 		});
-		return Array.from(set).sort((a, b) => a.localeCompare(b));
+		return Array.from(set).sort((a, b) => {
+			const indexA = GARDEN_MOOD_ORDER.indexOf(a);
+			const indexB = GARDEN_MOOD_ORDER.indexOf(b);
+			if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+			if (indexA === -1) return 1;
+			if (indexB === -1) return -1;
+			return indexA - indexB;
+		});
 	}, [entriesWithId]);
 
 	const practiceTypeOptions = useMemo(() => {
@@ -483,7 +490,7 @@ export default function Garden() {
 								<option value={ALL_MOODS}>{t("garden.all_moods")}</option>
 								{moodOptions.map((mood) => (
 									<option key={`mood-filter-${mood}`} value={mood}>
-										{mood}
+										{translateMoodLabel(mood, t)}
 									</option>
 								))}
 							</select>

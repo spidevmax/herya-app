@@ -100,6 +100,27 @@ export const MOOD_COLORS = {
 	clear: "#48CAE4",
 };
 
+export const GARDEN_MOOD_ORDER = [
+	"calm",
+	"centered",
+	"peaceful",
+	"grounded",
+	"energized",
+	"motivated",
+	"focused",
+	"light",
+	"clear",
+	"tired",
+	"stressed",
+	"anxious",
+	"overwhelmed",
+	"restless",
+	"sad",
+	"discouraged",
+	"happy",
+	"grateful",
+];
+
 export const SESSION_TYPES = [
 	{ value: "vk_sequence", label: "VK Sequence", icon: null },
 	{ value: "pranayama", label: "Pranayama", icon: null },

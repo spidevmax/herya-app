@@ -19,17 +19,9 @@ import SessionBuilder from "@/components/session/SessionBuilder";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
 import { Button } from "@/components/ui";
+import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
 
-const MOOD_OPTIONS = [
-	"calm",
-	"anxious",
-	"energized",
-	"tired",
-	"focused",
-	"stressed",
-	"happy",
-	"restless",
-];
+const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-primary)";
 
 /**
  * StartPractice — 4-phase flow:
@@ -587,24 +579,28 @@ export default function StartPractice() {
 									{t("practice.checkin_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
-									{MOOD_OPTIONS.map((m) => (
-										<button
-											type="button"
-											key={m}
-											onClick={() => toggleCheckInMood(m)}
-											className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
-											style={{
-												backgroundColor: checkInMood.includes(m)
-													? "var(--color-primary)"
-													: "var(--color-surface)",
-												color: checkInMood.includes(m)
-													? "white"
-													: "var(--color-text-secondary)",
-											}}
-										>
-											{t(`session.moods.${m}`)}
-										</button>
-									))}
+									{GARDEN_MOOD_ORDER.map((m) => {
+										const selected = checkInMood.includes(m);
+										const color = getMoodColor(m);
+										return (
+											<button
+												type="button"
+												key={m}
+												onClick={() => toggleCheckInMood(m)}
+												className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
+												style={{
+													backgroundColor: selected
+														? color
+														: "var(--color-surface)",
+													color: selected
+														? "white"
+														: "var(--color-text-secondary)",
+												}}
+											>
+												{t(`session.moods.${m}`)}
+											</button>
+										);
+									})}
 								</div>
 							</div>
 
