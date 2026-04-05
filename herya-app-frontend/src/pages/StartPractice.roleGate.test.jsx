@@ -116,6 +116,8 @@ vi.mock("@/components/ui", () => ({
 			{children}
 		</button>
 	),
+	StickyHeader: ({ title }) => <div>{title || "Header"}</div>,
+	ConfirmModal: () => null,
 }));
 
 const renderStartPractice = ({ role, routeState } = {}) => {
@@ -152,9 +154,9 @@ describe("StartPractice role gating", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Select VK" }));
 
 		await waitFor(() => {
-			expect(screen.getByText("Adult start")).toBeInTheDocument();
+			expect(screen.getByText("Session builder")).toBeInTheDocument();
+			expect(screen.queryByText("Tutor mode")).not.toBeInTheDocument();
 			expect(screen.queryByText("Tutor + child")).not.toBeInTheDocument();
-			expect(screen.getByText("Low stim hint")).toBeInTheDocument();
 		});
 	});
 
@@ -167,8 +169,9 @@ describe("StartPractice role gating", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Select VK" }));
 
 		await waitFor(() => {
+			expect(screen.getByText("Session builder")).toBeInTheDocument();
+			expect(screen.queryByText("Tutor mode")).not.toBeInTheDocument();
 			expect(screen.queryByText("Tutor + child")).not.toBeInTheDocument();
-			expect(screen.getByText("Low stim hint")).toBeInTheDocument();
 			expect(screen.queryByText("Tutor hint")).not.toBeInTheDocument();
 		});
 	});

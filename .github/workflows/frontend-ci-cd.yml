@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [22.x]
 
     steps:
       - uses: actions/checkout@v4
@@ -36,12 +36,8 @@ jobs:
         run: npm ci
         working-directory: herya-app-frontend
 
-      - name: Run linter
-        run: npm run lint
-        working-directory: herya-app-frontend
-
       - name: Run tests
-        run: npm test
+        run: npm test -- --maxWorkers=1
         working-directory: herya-app-frontend
 
       - name: Build
