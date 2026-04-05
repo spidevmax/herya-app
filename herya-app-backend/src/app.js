@@ -109,14 +109,27 @@ app.use((_req, _res, next) => {
 });
 
 app.use((err, _req, res, _next) => {
-	const status = err.status || 500;
-	const message = err.message || "Internal Server Error";
+	// Mongoose validation errors → 400 with structured details
+	const isMongooseValidation = err.name === "ValidationError" && err.errors;
+	const status = isMongooseValidation ? 400 : err.status || 500;
+	const message = isMongooseValidation
+		? "Validation error"
+		: err.message || "Internal Server Error";
 
 	if (NODE_ENV !== "test") {
 		console.error(`[${status}] ${message}`);
 	}
 
-	res.status(status).json({ success: false, message });
+	const response = { success: false, message };
+
+	if (isMongooseValidation) {
+		response.errors = Object.entries(err.errors).map(([field, detail]) => ({
+			field,
+			message: detail.message,
+		}));
+	}
+
+	res.status(status).json(response);
 });
 
 module.exports = app;

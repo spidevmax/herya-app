@@ -8,7 +8,6 @@
 		"dev": "nodemon index.js",
 		"seed": "node ./src/seeds/index.js",
 		"seed:recalc-stats": "node ./src/seeds/recalculateUserStats.seed.js",
-		"seed:migrate-tutor-roles": "node ./src/seeds/migrateTutorRoles.seed.js",
 		"lint": "biome lint .",
 		"format": "biome format --write .",
 		"check": "biome check .",
@@ -28,7 +27,7 @@
 	"type": "commonjs",
 	"dependencies": {
 		"bcrypt": "^6.0.0",
-		"cloudinary": "^1.41.3",
+		"cloudinary": "^2.9.0",
 		"cors": "^2.8.6",
 		"dotenv": "^17.3.1",
 		"express": "^5.2.1",

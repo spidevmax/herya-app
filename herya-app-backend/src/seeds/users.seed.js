@@ -18,6 +18,33 @@ async function seedUsers() {
 			return;
 		}
 
+		// Create admin user if it doesn't exist
+		const adminExists = await User.findOne({ email: "admin@herya.local" });
+		if (!adminExists) {
+			const adminUser = new User({
+				name: "Admin",
+				email: "admin@herya.local",
+				password: "AdminPassword123", // hashed by pre-save hook
+				role: "admin",
+				goals: [],
+				totalSessions: 0,
+				totalMinutes: 0,
+				currentStreak: 0,
+				vkProgression: {
+					currentMainSequence: null,
+					completedSequences: [],
+				},
+				preferences: {
+					practiceIntensity: "moderate",
+					sessionDuration: 30,
+					timeOfDay: "anytime",
+					language: "en",
+				},
+			});
+			await adminUser.save();
+			console.log("✅ Created admin user: admin@herya.local");
+		}
+
 		// Read CSV file
 		const csvPath = path.join(__dirname, "data", "users.csv");
 		const csvContent = fs.readFileSync(csvPath, "utf-8");

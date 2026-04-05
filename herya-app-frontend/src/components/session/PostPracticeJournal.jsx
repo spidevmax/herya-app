@@ -35,6 +35,8 @@ export default function PostPracticeJournal({
 	isTutorMode = false,
 	onSave,
 	saving,
+	error = null,
+	onDismissError,
 }) {
 	const { t } = useLanguage();
 	const [moodAfter, setMoodAfter] = useState([]);
@@ -458,6 +460,36 @@ export default function PostPracticeJournal({
 				</div>
 			</div>
 
+			{/* Error banner */}
+			{error && (
+				<motion.div
+					initial={{ opacity: 0, y: 8 }}
+					animate={{ opacity: 1, y: 0 }}
+					className="rounded-xl p-3 flex items-center justify-between"
+					style={{
+						backgroundColor: "var(--color-warning-bg)",
+						border: "1px solid var(--color-warning-border)",
+					}}
+				>
+					<p
+						className="text-sm font-medium"
+						style={{ color: "var(--color-text-primary)" }}
+					>
+						{error}
+					</p>
+					{onDismissError && (
+						<button
+							type="button"
+							onClick={onDismissError}
+							className="ml-2 text-xs font-bold"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							✕
+						</button>
+					)}
+				</motion.div>
+			)}
+
 			{/* Save */}
 			<Button
 				onClick={handleSave}
@@ -466,7 +498,7 @@ export default function PostPracticeJournal({
 				size="lg"
 				className="w-full"
 			>
-				{t("practice.save_journal")}
+				{error ? t("practice.retry_save") : t("practice.save_journal")}
 			</Button>
 		</motion.div>
 	);

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
-import { Camera, LogOut } from "lucide-react";
+import { Camera, LogOut, Shield } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	deleteMyAccount,
 	updateProfile,
@@ -107,6 +108,7 @@ function Toggle({ id, checked, onChange }) {
 }
 
 export default function Profile() {
+	const navigate = useNavigate();
 	const { user, logout, updateUser } = useAuth();
 	const { t } = useLanguage();
 	const isTutor = user?.role === "tutor";
@@ -302,9 +304,7 @@ export default function Profile() {
 						{/* Name + meta */}
 						<div className="min-w-0 pt-1">
 							<div className="flex flex-wrap items-center gap-2 mb-1.5">
-								<h1
-									className="text-3xl sm:text-4xl font-semibold leading-tight"
-								>
+								<h1 className="text-3xl sm:text-4xl font-semibold leading-tight">
 									{user?.name || t("profile.title")}
 								</h1>
 								{displayPronouns ? (
@@ -732,7 +732,19 @@ export default function Profile() {
 									: t("profile.save_changes")}
 						</Button>
 
-						{/* Logout — ghost, neutral */}
+						{/* Admin Panel — if user is admin */}
+						{user?.role === "admin" && (
+							<Button
+								variant="outline"
+								onClick={() => navigate("/admin")}
+								className="flex items-center justify-center gap-2 w-full"
+								style={{ color: "var(--color-primary)" }}
+							>
+								<Shield size={16} />
+								{t("profile.admin_panel")}
+							</Button>
+						)}
+
 						<Button
 							variant="ghost"
 							onClick={logout}

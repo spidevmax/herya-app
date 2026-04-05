@@ -61,7 +61,6 @@ export default function SessionBuilder({
 	practiceType,
 	initialBlocks = [],
 	onStartSession,
-	onBack,
 }) {
 	const { t } = useLanguage();
 	const [blocks, setBlocks] = useState([]);
@@ -251,6 +250,10 @@ export default function SessionBuilder({
 		if (block.blockType === "vk_sequence" && (!block.durationMinutes || block.durationMinutes <= 0)) {
 			return false;
 		}
+		// Pranayama blocks must have a computable duration > 0
+		if (block.blockType === "pranayama" && getEffectiveBlockDurationMinutes(block) <= 0) {
+			return false;
+		}
 		return true;
 	});
 
@@ -329,16 +332,8 @@ export default function SessionBuilder({
 
 	return (
 		<div className="flex flex-col gap-4 pt-2">
-			{/* Header with back and total time */}
-			<div className="flex items-center justify-between">
-				<button
-					type="button"
-					onClick={onBack}
-					className="text-sm font-medium"
-					style={{ color: "var(--color-primary)" }}
-				>
-					{t("practice.change_type")}
-				</button>
+			{/* Header with total time */}
+			<div className="flex items-center justify-end">
 				<div
 					className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold"
 					style={{
@@ -882,6 +877,7 @@ function VKPoseBreakdown({
 	t,
 }) {
 	const { poses, warning, naturalSec, totalSec } = distribution;
+	const [showAdvanced, setShowAdvanced] = useState(false);
 
 	return (
 		<div
@@ -891,7 +887,7 @@ function VKPoseBreakdown({
 				border: "1px solid var(--color-border-soft)",
 			}}
 		>
-			{/* Header with mode selector */}
+			{/* Header with advanced toggle */}
 			<div className="flex items-center justify-between">
 				<p
 					className="text-xs font-semibold"
@@ -899,23 +895,45 @@ function VKPoseBreakdown({
 				>
 					{t("practice.time_distribution")}
 				</p>
-				<div className="flex gap-1">
-					{DISTRIBUTION_MODES.map((mode) => (
-						<button
-							key={mode}
-							type="button"
-							onClick={() => onChangeMode(mode)}
-							className="px-2 py-0.5 rounded-md text-[10px] font-semibold transition"
-							style={{
-								backgroundColor: distributionMode === mode ? color : "transparent",
-								color: distributionMode === mode ? "white" : "var(--color-text-muted)",
-							}}
-						>
-							{t(`practice.dist_${mode}`)}
-						</button>
-					))}
-				</div>
+				<button
+					type="button"
+					onClick={() => setShowAdvanced((v) => !v)}
+					className="flex items-center gap-1 text-[10px] font-medium transition"
+					style={{ color: "var(--color-text-muted)" }}
+				>
+					{t("practice.advanced_timing")}
+					{showAdvanced ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+				</button>
 			</div>
+
+			{/* Distribution mode selector (collapsed by default) */}
+			<AnimatePresence>
+				{showAdvanced && (
+					<motion.div
+						initial={{ height: 0, opacity: 0 }}
+						animate={{ height: "auto", opacity: 1 }}
+						exit={{ height: 0, opacity: 0 }}
+						className="overflow-hidden"
+					>
+						<div className="flex gap-1 pb-1">
+							{DISTRIBUTION_MODES.map((mode) => (
+								<button
+									key={mode}
+									type="button"
+									onClick={() => onChangeMode(mode)}
+									className="px-2 py-0.5 rounded-md text-[10px] font-semibold transition"
+									style={{
+										backgroundColor: distributionMode === mode ? color : "transparent",
+										color: distributionMode === mode ? "white" : "var(--color-text-muted)",
+									}}
+								>
+									{t(`practice.dist_${mode}`)}
+								</button>
+							))}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			{/* Warning */}
 			{warning && (

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ export default function Dashboard() {
 	const [error, setError] = useState(false);
 	const isTutorUser = user?.role === "tutor";
 
-	const loadDashboard = () => {
+	const loadDashboard = useCallback(() => {
 		setLoading(true);
 		setError(false);
 		Promise.allSettled([
@@ -58,11 +58,11 @@ export default function Dashboard() {
 					setStats(st.value.data?.data || st.value.data);
 			})
 			.finally(() => setLoading(false));
-	};
+	}, []);
 
 	useEffect(() => {
 		loadDashboard();
-	}, []);
+	}, [loadDashboard]);
 
 	const completedSessions = sessions.filter((session) => session.completed);
 	const pendingSession = sessions.find((session) => !session.completed) || null;

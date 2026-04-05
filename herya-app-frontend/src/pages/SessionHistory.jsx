@@ -16,40 +16,33 @@ import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
 
-const TYPE_OPTIONS = [
-	{ key: "", label: "Todas", color: "var(--color-primary)" },
-	{ key: "vk_sequence", label: "Secuencia VK", color: "var(--color-primary)" },
-	{ key: "pranayama", label: "Pranayama", color: "var(--color-primary)" },
-	{ key: "meditation", label: "Meditación", color: "var(--color-info)" },
-	{
-		key: "complete_practice",
-		label: "Práctica completa",
-		color: "var(--color-warning)",
-	},
-];
-
-const TYPE_CONFIG = {
-	vk_sequence: {
-		icon: PersonStanding,
-		color: "var(--color-primary)",
-		label: "Secuencia VK",
-	},
-	pranayama: { icon: Wind, color: "var(--color-primary)", label: "Pranayama" },
-	meditation: { icon: Leaf, color: "var(--color-info)", label: "Meditación" },
-	complete_practice: {
-		icon: Star,
-		color: "var(--color-warning)",
-		label: "Práctica completa",
-	},
+const TYPE_ICONS = {
+	vk_sequence: PersonStanding,
+	pranayama: Wind,
+	meditation: Leaf,
+	complete_practice: Star,
 };
 
-function SessionCard({ session, index, onClick }) {
-	const cfg = TYPE_CONFIG[session.sessionType] ?? {
-		icon: PersonStanding,
-		color: "var(--color-primary)",
-		label: session.sessionType,
-	};
-	const TypeIcon = cfg.icon || PersonStanding;
+const TYPE_COLORS = {
+	vk_sequence: "var(--color-primary)",
+	pranayama: "var(--color-primary)",
+	meditation: "var(--color-info)",
+	complete_practice: "var(--color-warning)",
+};
+
+const TYPE_FILTER_KEYS = ["", "vk_sequence", "pranayama", "meditation", "complete_practice"];
+const TYPE_FILTER_I18N = {
+	"": "session_history.filter_all",
+	vk_sequence: "session_history.filter_vk",
+	pranayama: "session_history.filter_pranayama",
+	meditation: "session_history.filter_meditation",
+	complete_practice: "session_history.filter_complete",
+};
+
+function SessionCard({ session, index, onClick, t }) {
+	const color = TYPE_COLORS[session.sessionType] || "var(--color-primary)";
+	const TypeIcon = TYPE_ICONS[session.sessionType] || PersonStanding;
+	const label = t(TYPE_FILTER_I18N[session.sessionType] || `practice.type_${session.sessionType}`);
 	const family = session.vkFamily
 		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
 		: null;
@@ -64,17 +57,17 @@ function SessionCard({ session, index, onClick }) {
 		>
 			<div
 				className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-				style={{ backgroundColor: `${cfg.color}15` }}
+				style={{ backgroundColor: `${color}15` }}
 			>
 				{family?.emoji ? (
 					<span className="text-2xl">{family.emoji}</span>
 				) : (
-					<TypeIcon size={24} strokeWidth={2.2} style={{ color: cfg.color }} />
+					<TypeIcon size={24} strokeWidth={2.2} style={{ color }} />
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
 				<p className="font-semibold text-[var(--color-text-primary)] text-sm truncate">
-					{cfg.label}
+					{label}
 				</p>
 				<p className="text-[var(--color-text-muted)] text-xs mt-0.5">
 					{format.date(session.date || session.createdAt)}
@@ -143,7 +136,11 @@ export default function SessionHistory() {
 					</h1>
 				</div>
 				<FilterChips
-					options={TYPE_OPTIONS}
+					options={TYPE_FILTER_KEYS.map((key) => ({
+						key,
+						label: t(TYPE_FILTER_I18N[key]),
+						color: TYPE_COLORS[key] || "var(--color-primary)",
+					}))}
 					selected={type}
 					onSelect={(nextType) => {
 						setType(nextType);
@@ -173,6 +170,7 @@ export default function SessionHistory() {
 							session={s}
 							index={i}
 							onClick={() => navigate(`/sessions/${s._id}`)}
+							t={t}
 						/>
 					))
 				)}

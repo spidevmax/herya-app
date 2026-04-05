@@ -44,8 +44,35 @@ const createSessionValidations = [
 		.isBoolean()
 		.withMessage("Completed must be a boolean value"),
 
-	check("checkIn.signal")
+	check("plannedBlocks")
 		.optional()
+		.isArray()
+		.withMessage("plannedBlocks must be an array"),
+
+	check("plannedBlocks.*.blockType")
+		.optional()
+		.isIn(["vk_sequence", "pranayama", "meditation"])
+		.withMessage(
+			'plannedBlocks blockType must be one of: "vk_sequence", "pranayama", "meditation"',
+		),
+
+	check("plannedBlocks.*.label")
+		.optional()
+		.isString()
+		.withMessage("plannedBlocks label must be a string"),
+
+	check("plannedBlocks.*.durationMinutes")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("plannedBlocks durationMinutes must be a positive integer"),
+
+	check("plannedBlocks.*.order")
+		.optional()
+		.isInt({ min: 0 })
+		.withMessage("plannedBlocks order must be a non-negative integer"),
+
+	check("checkIn.signal")
+		.optional({ values: "undefined" })
 		.isIn(["green", "yellow", "red"])
 		.withMessage('checkIn.signal must be one of: "green", "yellow", "red"'),
 

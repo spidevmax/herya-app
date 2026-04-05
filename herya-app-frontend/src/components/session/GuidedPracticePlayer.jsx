@@ -12,7 +12,7 @@ import {
 	Wind,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { Button, ProgressBar, CircleProgress } from "@/components/ui";
+import { Button, ProgressBar, CircleProgress, ConfirmModal } from "@/components/ui";
 import useSessionTimer from "@/hooks/useSessionTimer";
 import PoseByPosePlayer from "./PoseByPosePlayer";
 import CycleBreathingPlayer from "./CycleBreathingPlayer";
@@ -46,9 +46,11 @@ export default function GuidedPracticePlayer({
 	onComplete,
 	onAbandon,
 	onSaveProgress,
+	onTimerStart,
 }) {
 	const { t } = useLanguage();
 	const timer = useSessionTimer(blocks);
+	const [abandonModalOpen, setAbandonModalOpen] = useState(false);
 	const [safePauseOpen, setSafePauseOpen] = useState(false);
 	const [safePauseRemaining, setSafePauseRemaining] = useState(90);
 	const [safePauseCount, setSafePauseCount] = useState(0);
@@ -56,6 +58,7 @@ export default function GuidedPracticePlayer({
 	const anchorPhrase = (safetyAnchors?.phrase || "").trim();
 	const anchorBodyCue = (safetyAnchors?.bodyCue || "").trim();
 	const hasAnchors = Boolean(anchorPhrase || anchorBodyCue);
+	const backendTimerStartedRef = useRef(false);
 	const prevBlockRef = useRef(timer.currentBlockIndex);
 	const blockChangeAudioRef = useRef(null);
 	const plannedTotalSec = useRef(
@@ -69,6 +72,15 @@ export default function GuidedPracticePlayer({
 		if (timer.globalElapsedSec > 0) return timer.globalElapsedSec;
 		return plannedTotalSec.current;
 	}, [timer.globalElapsedSec]);
+
+	// Start the frontend timer AND notify the backend (once)
+	const startTimerWithBackend = useCallback(() => {
+		timer.start();
+		if (!backendTimerStartedRef.current) {
+			backendTimerStartedRef.current = true;
+			onTimerStart?.();
+		}
+	}, [timer.start, onTimerStart]);
 
 	// Persist progress periodically
 	useEffect(() => {
@@ -173,7 +185,7 @@ export default function GuidedPracticePlayer({
 		if (timer.globalElapsedSec > 0) {
 			timer.resume();
 		} else {
-			timer.start();
+			startTimerWithBackend();
 		}
 	};
 
@@ -210,6 +222,14 @@ export default function GuidedPracticePlayer({
 
 	const hasGuidedPlayer = isGuidedVK || isGuidedPranayama || isGuidedMeditation;
 
+	// For guided blocks the sub-player drives playback, so start the global
+	// timer automatically. Non-guided blocks wait for the user to press play.
+	useEffect(() => {
+		if (hasGuidedPlayer && !timer.isRunning && timer.globalElapsedSec === 0) {
+			startTimerWithBackend();
+		}
+	}, [hasGuidedPlayer, timer.isRunning, timer.globalElapsedSec, startTimerWithBackend]);
+
 	return (
 		<div className="flex flex-col gap-5 pt-2 pb-4">
 			{/* Global progress bar */}
@@ -239,13 +259,13 @@ export default function GuidedPracticePlayer({
 						className="text-[10px]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
-						{t("practice.elapsed")}
+						{t("practice.time_elapsed")}: {formatTime(timer.globalElapsedSec)}
 					</span>
 					<span
 						className="text-[10px]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
-						{t("practice.remaining")}: {formatTime(timer.globalRemainingSec)}
+						{t("practice.time_remaining")}: {formatTime(timer.globalRemainingSec)}
 					</span>
 				</div>
 			</div>
@@ -461,7 +481,7 @@ export default function GuidedPracticePlayer({
 								? timer.pause
 								: timer.globalElapsedSec > 0
 									? timer.resume
-									: timer.start
+									: startTimerWithBackend
 						}
 						aria-label={timer.isRunning ? t("practice.aria_pause") : t("practice.aria_play")}
 						className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
@@ -602,7 +622,10 @@ export default function GuidedPracticePlayer({
 				</>
 			)}
 			<div className="flex gap-2 pt-2">
-				<Button variant="ghost" className="flex-1" onClick={handleAbandon}>
+				<Button variant="ghost" className="flex-1" onClick={() => {
+					timer.pause();
+					setAbandonModalOpen(true);
+				}}>
 					<Square size={14} />
 					{t("practice.end_session")}
 				</Button>
@@ -610,6 +633,24 @@ export default function GuidedPracticePlayer({
 					{t("practice.complete_session")}
 				</Button>
 			</div>
+
+			<ConfirmModal
+				open={abandonModalOpen}
+				onClose={() => {
+					setAbandonModalOpen(false);
+					// Only resume if the timer was previously running
+					if (timer.globalElapsedSec > 0) timer.resume();
+				}}
+				onConfirm={() => {
+					setAbandonModalOpen(false);
+					handleAbandon();
+				}}
+				title={t("practice.abandon_title")}
+				description={t("practice.abandon_description")}
+				confirmLabel={t("practice.abandon_confirm")}
+				cancelLabel={t("practice.abandon_cancel")}
+				danger
+			/>
 		</div>
 	);
 }

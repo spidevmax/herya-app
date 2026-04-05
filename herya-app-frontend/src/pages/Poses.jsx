@@ -73,6 +73,8 @@ function PoseCard({ pose, index, onClick, t }) {
 	const poseName =
 		pose.englishName || pose.name || t("library.card_default_item");
 	const poseSubtitle = pose.romanizationName || pose.sanskritName || null;
+	const poseImage =
+		pose.image || pose.media?.thumbnail?.url || pose.media?.images?.[0]?.url;
 	const summaryDetails = [
 		breathingCue
 			? { label: t("library.poses_breathe"), value: breathingCue }
@@ -115,9 +117,9 @@ function PoseCard({ pose, index, onClick, t }) {
 					borderColor: "var(--color-border-soft)",
 				}}
 			>
-				{pose.image ? (
+				{poseImage ? (
 					<img
-						src={pose.image}
+						src={poseImage}
 						alt={poseName}
 						className="w-full h-full object-cover rounded-xl"
 					/>

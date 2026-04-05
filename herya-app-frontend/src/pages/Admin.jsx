@@ -25,16 +25,13 @@ import {
 	SkeletonCard,
 	Badge,
 } from "@/components/ui";
+import PoseManager from "@/components/admin/PoseManager";
+import SequenceManager from "@/components/admin/SequenceManager";
+import BreathingPatternManager from "@/components/admin/BreathingPatternManager";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
-const TABS = [
-	{ key: "dashboard", label: "Dashboard" },
-	{ key: "users", label: "Usuarios" },
-	{ key: "content", label: "Contenido" },
-];
-
-function AdminDashboard({ stats, loading }) {
+function AdminDashboard({ stats, loading, t }) {
 	if (loading)
 		return (
 			<div className="flex flex-col gap-3">
@@ -49,25 +46,25 @@ function AdminDashboard({ stats, loading }) {
 			<div className="grid grid-cols-2 gap-3">
 				<StatCard
 					icon={<Users size={18} />}
-					label="Usuarios totales"
+					label={t("admin.dashboard_total_users")}
 					value={stats.totalUsers ?? 0}
 					color="var(--color-primary)"
 				/>
 				<StatCard
 					icon={<List size={18} />}
-					label="Sesiones totales"
+					label={t("admin.dashboard_total_sessions")}
 					value={stats.totalSessions ?? 0}
 					color="var(--color-primary)"
 				/>
 				<StatCard
 					icon={<BookOpen size={18} />}
-					label="Entradas diario"
+					label={t("admin.dashboard_journal_entries")}
 					value={stats.totalJournalEntries ?? 0}
 					color="var(--color-info)"
 				/>
 				<StatCard
 					icon={<BarChart2 size={18} />}
-					label="Usuarios activos"
+					label={t("admin.dashboard_active_users")}
 					value={stats.activeUsers ?? 0}
 					color="var(--color-warning)"
 				/>
@@ -76,7 +73,7 @@ function AdminDashboard({ stats, loading }) {
 			{stats.popularSequences?.length > 0 && (
 				<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
 					<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
-						Secuencias populares
+						{t("admin.dashboard_popular_sequences")}
 					</p>
 					{stats.popularSequences.map((s, i) => (
 						<div
@@ -97,7 +94,7 @@ function AdminDashboard({ stats, loading }) {
 			{stats.sessionsByType && (
 				<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
 					<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
-						Sesiones por tipo
+						{t("admin.dashboard_sessions_by_type")}
 					</p>
 					{Object.entries(stats.sessionsByType).map(([type, count]) => (
 						<div
@@ -118,7 +115,7 @@ function AdminDashboard({ stats, loading }) {
 	);
 }
 
-function UserRow({ user, onChangeRole, onDelete }) {
+function UserRow({ user, onChangeRole, onDelete, t }) {
 	const [nextRole, setNextRole] = useState(user.role);
 
 	useEffect(() => {
@@ -165,9 +162,9 @@ function UserRow({ user, onChangeRole, onDelete }) {
 					onChange={(e) => setNextRole(e.target.value)}
 					className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text-primary)]"
 				>
-					<option value="user">Estandar</option>
-					<option value="tutor">Tutor</option>
-					<option value="admin">Admin</option>
+					<option value="user">{t("admin.users_role_standard")}</option>
+					<option value="tutor">{t("admin.users_role_tutor")}</option>
+					<option value="admin">{t("admin.users_role_admin")}</option>
 				</select>
 				<button
 					type="button"
@@ -175,14 +172,14 @@ function UserRow({ user, onChangeRole, onDelete }) {
 					onClick={() => onChangeRole(user._id, nextRole)}
 					className="py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] text-[var(--color-primary)] disabled:opacity-50"
 				>
-					Guardar rol
+					{t("admin.users_save_role")}
 				</button>
 				<button
 					type="button"
 					onClick={() => onDelete(user)}
 					className="py-2 px-3 rounded-xl text-xs font-semibold bg-[var(--color-error-bg)] text-[var(--color-danger)]"
 				>
-					Eliminar
+					{t("admin.users_delete")}
 				</button>
 			</div>
 		</div>
@@ -228,7 +225,7 @@ export default function Admin() {
 	const { user } = useAuth();
 	const { t } = useLanguage();
 	const navigate = useNavigate();
-	const [tab, setTab] = useState("dashboard");
+	const [tab, setTab] = useState("poses");
 
 	const [stats, setStats] = useState(null);
 	const [statsLoading, setStatsLoading] = useState(true);
@@ -342,21 +339,34 @@ export default function Admin() {
 				<div className="flex items-center gap-2">
 					<Shield size={20} className="text-[var(--color-primary)]" />
 					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
-						Administración
+						{t("admin.title")}
 					</h1>
 				</div>
 			</div>
 
 			<TabBar
-				tabs={TABS}
+				tabs={[
+					{ key: "poses", label: t("admin.tab_poses") },
+					{ key: "sequences", label: t("admin.tab_sequences") },
+					{ key: "breathing", label: t("admin.tab_breathing") },
+					{ key: "dashboard", label: t("admin.tab_dashboard") },
+					{ key: "users", label: t("admin.tab_users") },
+					{ key: "content", label: t("admin.tab_content") },
+				]}
 				active={tab}
 				onSelect={setTab}
 				className="px-4 mb-5"
 			/>
 
 			<div className="px-4">
+				{tab === "poses" && <PoseManager />}
+
+				{tab === "sequences" && <SequenceManager />}
+
+				{tab === "breathing" && <BreathingPatternManager />}
+
 				{tab === "dashboard" && (
-					<AdminDashboard stats={stats} loading={statsLoading} />
+					<AdminDashboard stats={stats} loading={statsLoading} t={t} />
 				)}
 
 				{tab === "users" && (
@@ -369,6 +379,7 @@ export default function Admin() {
 										user={u}
 										onChangeRole={handleChangeRole}
 										onDelete={setDeleteTarget}
+										t={t}
 									/>
 								))}
 					</div>
@@ -396,8 +407,7 @@ export default function Admin() {
 						/>
 						<div className="bg-[var(--color-surface-card)] rounded-2xl p-4">
 							<p className="text-xs text-[var(--color-text-muted)] text-center">
-								Para crear o editar contenido usa la API directamente o el panel
-								Swagger en /api-docs
+								{t("admin.content_help")}
 							</p>
 						</div>
 					</div>
@@ -408,9 +418,11 @@ export default function Admin() {
 				open={Boolean(deleteTarget)}
 				onClose={() => setDeleteTarget(null)}
 				onConfirm={handleDeleteUser}
-				title={`¿Eliminar a ${deleteTarget?.name}?`}
-				description="Se eliminarán todas sus sesiones, entradas de diario y datos. Esta acción es irreversible."
-				confirmLabel="Eliminar usuario"
+				title={t("admin.users_delete_confirm_title", {
+					name: deleteTarget?.name ?? "",
+				})}
+				description={t("admin.users_delete_confirm_desc")}
+				confirmLabel={t("admin.users_delete_confirm")}
 				danger
 				loading={deleteLoading}
 			/>

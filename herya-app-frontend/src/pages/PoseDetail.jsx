@@ -62,6 +62,9 @@ const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
 );
 
 function RelatedPoseChip({ pose, onClick }) {
+	const relatedImage =
+		pose.image || pose.media?.thumbnail?.url || pose.media?.images?.[0]?.url;
+
 	return (
 		<button
 			type="button"
@@ -69,9 +72,9 @@ function RelatedPoseChip({ pose, onClick }) {
 			className="flex-shrink-0 flex flex-col items-center gap-1.5 w-20"
 		>
 			<div className="w-16 h-16 rounded-2xl bg-[var(--color-tone-info-bg)] flex items-center justify-center overflow-hidden">
-				{pose.image ? (
+				{relatedImage ? (
 					<img
-						src={pose.image}
+						src={relatedImage}
 						alt={pose.englishName}
 						className="w-full h-full object-cover"
 					/>
@@ -170,6 +173,8 @@ export default function PoseDetail() {
 	const poseDisplayName = pose.englishName || pose.name;
 	const poseDisplayRomanized = pose.romanizedName || pose.romanizationName;
 	const poseDisplaySanskrit = pose.sanskritName;
+	const poseImage =
+		pose.image || pose.media?.thumbnail?.url || pose.media?.images?.[0]?.url;
 	const poseDisplayCategory =
 		typeof pose.category === "string"
 			? pose.category.replace(/_/g, " ")
@@ -192,9 +197,9 @@ export default function PoseDetail() {
 				ref={heroRef}
 				className="relative h-64 bg-[var(--color-tone-info-bg)] overflow-hidden"
 			>
-				{pose.image ? (
+				{poseImage ? (
 					<motion.img
-						src={pose.image}
+						src={poseImage}
 						alt={pose.englishName}
 						className="w-full h-full object-cover"
 						style={{ y: heroY, scale: heroScale }}

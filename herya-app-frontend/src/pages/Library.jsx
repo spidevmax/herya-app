@@ -171,20 +171,14 @@ function StatBox({ value, label, bg, color }) {
 	);
 }
 
-function RetroCard({
-	item,
-	type,
-	index,
-	onClick,
-	typeLabel,
-	fallbackItemLabel,
-}) {
+function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 	const palette = getPalette(item, type);
 	const borderColor = palette.border;
 	const title = getCardTitle(item, fallbackItemLabel);
 	const subtitle = getCardSubtitle(item);
 	const monogram = getMonogram(title) || typeLabel.slice(0, 2).toUpperCase();
-	const imageSrc = item.image;
+	const imageSrc =
+		item.image || item.media?.thumbnail?.url || item.media?.images?.[0]?.url;
 	const stats =
 		type === "sequences"
 			? [
@@ -262,15 +256,6 @@ function RetroCard({
 									{title}
 								</h3>
 							</div>
-							<span
-								className="rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.12em]"
-								style={{
-									color: borderColor,
-									backgroundColor: `${borderColor}16`,
-								}}
-							>
-								#{index + 1}
-							</span>
 						</div>
 						{subtitle && subtitle !== title && (
 							<p
@@ -776,7 +761,7 @@ export default function Library() {
 												</span>
 											</div>
 											<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-												{group.items.map((item, itemIndex) => (
+												{group.items.map((item) => (
 													<RetroCard
 														key={
 															item._id ||
@@ -788,7 +773,6 @@ export default function Library() {
 														}
 														item={item}
 														type={getCardType(item, tab)}
-														index={itemIndex}
 														typeLabel={cardTypeLabel(getCardType(item, tab))}
 														fallbackItemLabel={tr(
 															"library.card_default_item",
@@ -805,7 +789,7 @@ export default function Library() {
 								)
 							) : (
 								<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-									{prioritizedItems.map((item, itemIndex) => (
+									{prioritizedItems.map((item) => (
 										<RetroCard
 											key={
 												item._id ||
@@ -817,7 +801,6 @@ export default function Library() {
 											}
 											item={item}
 											type={getCardType(item, tab)}
-											index={itemIndex}
 											typeLabel={cardTypeLabel(getCardType(item, tab))}
 											fallbackItemLabel={tr(
 												"library.card_default_item",

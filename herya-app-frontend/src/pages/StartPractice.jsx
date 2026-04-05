@@ -19,7 +19,7 @@ import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
 import SessionBuilder from "@/components/session/SessionBuilder";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
-import { Button, StickyHeader } from "@/components/ui";
+import { Button, ConfirmModal, StickyHeader } from "@/components/ui";
 import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-primary)";
@@ -201,6 +201,7 @@ export default function StartPractice() {
 	const [sessionSummary, setSessionSummary] = useState(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState(null);
+	const [confirmBackOpen, setConfirmBackOpen] = useState(false);
 
 	// Guided data: fetched sequence/pattern objects keyed by ID
 	const [sequencesData, setSequencesData] = useState({});
@@ -638,12 +639,32 @@ export default function StartPractice() {
 								}
 							: null;
 
+					// Sanitize checkIn: strip null signal (express-validator rejects null vs undefined)
+					const sanitizedCheckIn = checkIn
+						? {
+								...checkIn,
+								...(checkIn.signal == null ? {} : { signal: checkIn.signal }),
+							}
+						: null;
+					if (sanitizedCheckIn && checkIn.signal == null) {
+						delete sanitizedCheckIn.signal;
+					}
+
+					// Ensure duration is a positive integer (backend isInt rejects floats)
+					const safeDuration = Math.max(1, Math.round(minutes));
+
+					// Ensure every block has durationMinutes >= 1
+					const safeBlocks = orderedBlocks.map((b) => ({
+						...b,
+						durationMinutes: Math.max(1, Math.round(Number(b.durationMinutes) || 1)),
+					}));
+
 					const payload = {
 						sessionType: practiceType,
-						duration: minutes,
-						plannedBlocks: orderedBlocks,
+						duration: safeDuration,
+						plannedBlocks: safeBlocks,
 						status: "planned",
-						...(checkIn ? { checkIn } : {}),
+						...(sanitizedCheckIn ? { checkIn: sanitizedCheckIn } : {}),
 						...(recommendationContext ? { recommendationContext } : {}),
 					};
 
@@ -652,7 +673,8 @@ export default function StartPractice() {
 					const id = session._id;
 					setSessionId(id);
 
-					await startSessionTimer(id);
+					// Don't start the backend timer here — it will be started
+					// when the user presses play (or when a guided block auto-starts).
 					return { id };
 				})(),
 			]);
@@ -668,7 +690,15 @@ export default function StartPractice() {
 			setPhase("practice");
 		} catch (err) {
 			console.error("Failed to create session:", err);
-			setError(t("practice.error_create_session"));
+			const data = err?.response?.data;
+			const firstValidationMsg =
+				data?.errors?.[0]?.message || data?.errors?.[0]?.msg;
+			const backendMsg = firstValidationMsg || data?.message || null;
+			setError(
+				backendMsg && backendMsg !== "Validation error"
+					? `${t("practice.error_create_session")} (${backendMsg})`
+					: t("practice.error_create_session"),
+			);
 		}
 	};
 
@@ -714,8 +744,7 @@ export default function StartPractice() {
 			console.error("Failed to abandon session:", err);
 		}
 		persistence.clearSession();
-		// Still show journal even on abandon
-		setPhase("journal");
+		setPhase("done");
 	};
 
 	const handleSaveJournal = async (journalData) => {
@@ -835,8 +864,13 @@ export default function StartPractice() {
 			{/* Header */}
 			<StickyHeader
 				onBack={() => {
-					if (phase === "build") setPhase("type");
-					else if (phase === "checkin") setPhase("build");
+					if (phase === "build") {
+						if (blocks.length > 0) {
+							setConfirmBackOpen(true);
+							return;
+						}
+						setPhase("type");
+					} else if (phase === "checkin") setPhase("build");
 					else if (phase === "type") navigate(-1);
 					else navigate("/");
 				}}
@@ -1127,7 +1161,6 @@ export default function StartPractice() {
 									practiceType === "vk_sequence" ? initialBuilderBlocks : []
 								}
 								onStartSession={handleStartSession}
-								onBack={() => setPhase("type")}
 							/>
 						</motion.div>
 					)}
@@ -1295,6 +1328,13 @@ export default function StartPractice() {
 								onComplete={handleComplete}
 								onAbandon={handleAbandon}
 								onSaveProgress={handleSaveProgress}
+								onTimerStart={() => {
+									if (sessionId) {
+										startSessionTimer(sessionId).catch((err) =>
+											console.error("Failed to start backend timer:", err),
+										);
+									}
+								}}
 							/>
 						</motion.div>
 					)}
@@ -1321,11 +1361,26 @@ export default function StartPractice() {
 								}
 								onSave={handleSaveJournal}
 								saving={saving}
+								error={error}
+								onDismissError={() => setError(null)}
 							/>
 						</motion.div>
 					)}
 				</AnimatePresence>
 			</div>
+
+			<ConfirmModal
+				open={confirmBackOpen}
+				onClose={() => setConfirmBackOpen(false)}
+				onConfirm={() => {
+					setConfirmBackOpen(false);
+					setBlocks([]);
+					setPhase("type");
+				}}
+				title={t("practice.confirm_back_title")}
+				description={t("practice.confirm_back_desc")}
+				confirmLabel={t("practice.confirm_back_yes")}
+			/>
 		</div>
 	);
 }
