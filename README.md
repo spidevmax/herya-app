@@ -1,36 +1,21 @@
 # Herya
 
-Web application for yoga practice with a Vinyasa Krama focus. The project is organized as a monorepo with:
-
-- Frontend in React + Vite
-- Backend REST API in Node.js + Express + MongoDB
-
-## Table of contents
-
-- [Overview](#overview)
-- [Repository structure](#repository-structure)
-- [Technologies](#technologies)
-- [Requirements](#requirements)
-- [Getting started](#getting-started)
-- [Environment variables](#environment-variables)
-- [Available scripts](#available-scripts)
-- [Documentation and resources](#documentation-and-resources)
-- [Architecture diagrams](#architecture-diagrams)
-- [Testing and quality](#testing-and-quality)
-- [Common issues](#common-issues)
+Herya is a full-stack web application for personalized yoga practice with a
+Vinyasa Krama focus. It combines guided session building, reflective journaling,
+role-based workflows, and an admin content system.
 
 ## Overview
 
-Herya allows:
+Herya includes:
 
-- User registration and authentication with JWT
-- Practice profile management
-- Asana and breathing pattern exploration
-- Vinyasa Krama sequence management
-- Session logging and journal entries
-- Admin panel for content and user management
+- JWT-based authentication and role-aware access
+- Practice flows for three roles: user, tutor, and admin
+- Asana, breathing pattern, and Vinyasa Krama sequence exploration
+- Guided session creation and practice tracking
+- Post-practice journaling and insights
+- Admin tools for user and content management (poses, sequences, breathing)
 
-## Repository structure
+## Repository Structure
 
 ```text
 .
@@ -38,10 +23,9 @@ Herya allows:
 │   ├── herya-app-memoria.docx
 │   ├── herya-insomnia.json
 │   ├── PLANNING.md
-│   └── ...
+│   └── start-practice-architecture.md
 ├── herya-app-backend/
 │   ├── src/
-│   ├── tests/
 │   ├── index.js
 │   └── package.json
 └── herya-app-frontend/
@@ -50,11 +34,12 @@ Herya allows:
     └── package.json
 ```
 
-## Technologies
+## Tech Stack
 
 ### Backend
 
-- Node.js + Express 5
+- Node.js
+- Express 5
 - MongoDB + Mongoose
 - JWT + bcrypt
 - Cloudinary + Multer
@@ -67,47 +52,73 @@ Herya allows:
 - React 19
 - Vite 7
 - React Router
-- Axios
 - Tailwind CSS 4
 - Framer Motion
+- Axios
+- Vitest + Testing Library
 
 ## Requirements
 
-- Node.js 18 or higher
+- Node.js 22 recommended (matches CI)
 - npm 9 or higher
-- Local MongoDB or MongoDB Atlas
-- Cloudinary account (for uploads)
+- MongoDB (local or Atlas)
+- Cloudinary account for uploads
 
-## Getting started
+## Getting Started
 
-### 1) Clone and install dependencies
+### 1) Clone the repository
 
 ```bash
 git clone https://github.com/spidevmax/herya-app.git
 cd herya-app
+```
 
-cd herya-app-backend && npm install
-cd ../herya-app-frontend && npm install
+### 2) Install dependencies
+
+```bash
+cd herya-app-backend && npm ci
+cd ../herya-app-frontend && npm ci
 cd ..
 ```
 
-### 2) Configure environment variables
+### 3) Configure environment variables
 
-Create these files manually:
+Create:
 
-- `herya-app-backend/.env`
-- `herya-app-frontend/.env`
+- herya-app-backend/.env
+- herya-app-frontend/.env
 
-Use the minimum recommended values in the [Environment variables](#environment-variables) section.
+Minimal values:
 
-### 3) (Optional) Seed the database
+Backend:
+
+```env
+NODE_ENV=development
+PORT=3000
+DB_URL=mongodb+srv://user:password@cluster.mongodb.net/herya
+FRONTEND_URL=http://localhost:5173
+
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+JWT_SECRET=replace_with_a_long_secure_secret
+```
+
+Frontend:
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+### 4) Optional: seed the database
 
 ```bash
 cd herya-app-backend
 npm run seed
 ```
 
-### 4) Start backend and frontend
+### 5) Run backend and frontend
 
 Terminal 1:
 
@@ -125,74 +136,37 @@ npm run dev
 
 Default URLs:
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:3000`
-- Swagger: `http://localhost:3000/api-docs`
+- Frontend: http://localhost:5173
+- Backend: http://localhost:3000
+- Swagger: http://localhost:3000/api-docs
 
-## Environment variables
+## Available Scripts
 
-### Backend (`herya-app-backend/.env`)
+### Backend (herya-app-backend)
 
-```env
-NODE_ENV=development
-PORT=3000
-DB_URL=mongodb+srv://user:password@cluster.mongodb.net/herya
-FRONTEND_URL=http://localhost:5173
+- npm run dev: start server with nodemon
+- npm start: start server
+- npm run seed: run full seed pipeline
+- npm run seed:recalc-stats: recalculate user stats from sessions
+- npm test: run Jest tests
+- npm run lint: run Biome lint
+- npm run format: run Biome formatter
+- npm run check: run Biome checks
+- npm run check:fix: auto-fix Biome issues
 
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+### Frontend (herya-app-frontend)
 
-JWT_SECRET=replace_with_a_long_secure_secret
-```
+- npm run dev: start Vite dev server
+- npm run build: build production bundle
+- npm run preview: preview production build
+- npm run lint: run ESLint
+- npm test: run Vitest once
+- npm run test:coverage: run tests with coverage
+- npm run test:watch: run Vitest in watch mode
 
-### Frontend (`herya-app-frontend/.env`)
+## Testing and CI
 
-```env
-VITE_API_URL=http://localhost:3000/api/v1
-```
-
-## Available scripts
-
-### Backend (`herya-app-backend`)
-
-- `npm run dev`: start server with nodemon
-- `npm start`: start server in normal mode
-- `npm run seed`: run seed scripts
-- `npm test`: run tests
-- `npm run lint`: run Biome linter
-- `npm run format`: format code with Biome
-- `npm run check`: lint + format checks
-- `npm run check:fix`: auto-fix lint and formatting issues
-
-### Frontend (`herya-app-frontend`)
-
-- `npm run dev`: start Vite in development mode
-- `npm run build`: production build
-- `npm run preview`: preview production build
-- `npm run lint`: run ESLint
-
-## Documentation and resources
-
-- Academic memory document: `docs/herya-app-memoria.docx`
-- Insomnia collection: `docs/herya-insomnia.json`
-- Product planning notes: `docs/PLANNING.md`
-- Backend Swagger guide: `herya-app-backend/SWAGGER_GUIDE.md`
-- Detailed backend docs: `herya-app-backend/README.md`
-
-## Architecture diagrams
-
-Recommended diagrams for technical documentation and memory:
-
-- Database ER diagram (Mongo models and relationships)
-- Navigation flow diagram (frontend routes and user flows)
-
-Suggested export format:
-
-- PNG for the final document
-- Mermaid source (`.mmd`) to keep diagrams editable
-
-## Testing and quality
+Local quality checks:
 
 Backend:
 
@@ -207,18 +181,34 @@ Frontend:
 ```bash
 cd herya-app-frontend
 npm run lint
+npm test
+npm run build
 ```
 
-## Common issues
+GitHub Actions workflows:
 
-- CORS error:
-  verify that `FRONTEND_URL` in backend matches the actual frontend URL.
+- Backend CI: .github/workflows/backend-ci-cd.yml
+- Frontend CI: .github/workflows/frontend-ci-cd.yml
 
-- `401 Unauthorized` in frontend:
-  verify the token exists in localStorage and `JWT_SECRET` has not changed.
+## Documentation and Resources
 
-- MongoDB connection error:
-  validate `DB_URL` and network access in MongoDB Atlas.
+- docs/herya-app-memoria.docx
+- docs/herya-insomnia.json
+- docs/PLANNING.md
+- docs/start-practice-architecture.md
+- herya-app-backend/SWAGGER_GUIDE.md
+- herya-app-backend/README.md
+
+## Common Issues
+
+- CORS errors:
+  Ensure FRONTEND_URL in backend .env matches your frontend URL.
+
+- Unauthorized requests (401):
+  Verify JWT is present and JWT_SECRET is stable.
+
+- MongoDB connection failures:
+  Check DB_URL and Atlas network/IP rules.
 
 - Upload failures:
-  verify `CLOUDINARY_*` credentials.
+  Validate CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.
