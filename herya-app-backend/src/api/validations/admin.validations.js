@@ -27,10 +27,7 @@ const getAllUsersValidation = [
 		.isLength({ min: 1 })
 		.withMessage("Search query must not be empty"),
 
-	query("page")
-		.optional()
-		.isInt({ min: 1 })
-		.withMessage("Page must be a positive integer"),
+	query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
 
 	query("limit")
 		.optional()
@@ -58,9 +55,7 @@ const updateUserRoleValidation = [
  * userIdParamValidation
  * Validates MongoDB ObjectId for user parameter
  */
-const userIdParamValidation = [
-	param("id").isMongoId().withMessage("Invalid user ID format"),
-];
+const userIdParamValidation = [param("id").isMongoId().withMessage("Invalid user ID format")];
 
 /**
  * createVKSequenceValidation
@@ -115,10 +110,7 @@ const updateVKSequenceValidation = [
 		.isLength({ min: 2, max: 255 })
 		.withMessage("English name must be between 2 and 255 characters"),
 
-	body("level")
-		.optional()
-		.isInt({ min: 1, max: 3 })
-		.withMessage("Level must be 1, 2, or 3"),
+	body("level").optional().isInt({ min: 1, max: 3 }).withMessage("Level must be 1, 2, or 3"),
 ];
 
 /**

@@ -8,12 +8,8 @@ const {
 	deleteMyProfileImage,
 } = require("../controllers/user.controller");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
-const {
-	authenticateToken,
-} = require("../../middlewares/authorization.middleware");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { authenticateToken } = require("../../middlewares/authorization.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 const {
 	updateProfileValidations,
 	changePasswordValidations,
@@ -345,11 +341,7 @@ usersRouter.get("/me/stats", getMyStats);
  *       500:
  *         description: Server error
  */
-usersRouter.put(
-	"/me/image",
-	uploadUserImage.single("profileImage"),
-	updateMyProfileImage,
-);
+usersRouter.put("/me/image", uploadUserImage.single("profileImage"), updateMyProfileImage);
 
 /**
  * @swagger

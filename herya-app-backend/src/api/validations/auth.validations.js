@@ -77,10 +77,7 @@ const forgotPasswordValidations = [
 		.withMessage("Please provide a valid email address")
 		.normalizeEmail(),
 
-	check("locale")
-		.optional()
-		.isIn(["es", "en"])
-		.withMessage("Locale must be either 'es' or 'en'"),
+	check("locale").optional().isIn(["es", "en"]).withMessage("Locale must be either 'es' or 'en'"),
 ];
 
 const resetPasswordValidations = [

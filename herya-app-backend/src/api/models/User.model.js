@@ -214,11 +214,7 @@ userSchema.methods.canAccessLevel = () => {
 };
 
 // METHOD: Mark sequence as completed
-userSchema.methods.markSequenceCompleted = function (
-	family,
-	level,
-	sequenceId,
-) {
+userSchema.methods.markSequenceCompleted = function (family, level, sequenceId) {
 	const existingIndex = this.vkProgression.completedSequences.findIndex(
 		(seq) =>
 			seq.family === family &&

@@ -1,11 +1,6 @@
 const express = require("express");
-const {
-	authenticateToken,
-	optionalAuth,
-} = require("../../middlewares/authorization.middleware");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { authenticateToken, optionalAuth } = require("../../middlewares/authorization.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 
 const {
 	getSequences,
@@ -64,12 +59,7 @@ const router = express.Router();
  *       500:
  *         description: Server error
  */
-router.get(
-	"/search",
-	searchSequencesValidation,
-	handleValidationErrors,
-	searchSequences,
-);
+router.get("/search", searchSequencesValidation, handleValidationErrors, searchSequences);
 
 /**
  * @swagger
@@ -184,13 +174,7 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/",
-	getSequencesValidation,
-	handleValidationErrors,
-	optionalAuth,
-	getSequences,
-);
+router.get("/", getSequencesValidation, handleValidationErrors, optionalAuth, getSequences);
 
 /**
  * @swagger
@@ -221,11 +205,6 @@ router.get(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/:id",
-	sequenceIdValidation,
-	handleValidationErrors,
-	getSequenceById,
-);
+router.get("/:id", sequenceIdValidation, handleValidationErrors, getSequenceById);
 
 module.exports = router;

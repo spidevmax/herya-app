@@ -51,10 +51,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("starts a planned session", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		const res = await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -65,10 +62,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("pauses an active session", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -81,10 +75,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("resumes a paused session via start", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -97,10 +88,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("advances to next block", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -115,17 +103,11 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("goes back to previous block", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
-		await request(app)
-			.post(`${BASE}/${id}/advance-block`)
-			.set(auth())
-			.send({ direction: "next" });
+		await request(app).post(`${BASE}/${id}/advance-block`).set(auth()).send({ direction: "next" });
 
 		const res = await request(app)
 			.post(`${BASE}/${id}/advance-block`)
@@ -137,10 +119,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("completes a session and updates user stats", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -162,10 +141,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("stores tutor support telemetry when completing a session", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -192,17 +168,11 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("abandons a session with partial completion rate", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
-		await request(app)
-			.post(`${BASE}/${id}/advance-block`)
-			.set(auth())
-			.send({ direction: "next" });
+		await request(app).post(`${BASE}/${id}/advance-block`).set(auth()).send({ direction: "next" });
 
 		const res = await request(app).post(`${BASE}/${id}/abandon`).set(auth());
 
@@ -213,10 +183,7 @@ describe("Guided Practice — full lifecycle", () => {
 	});
 
 	it("returns active session for recovery", async () => {
-		const create = await request(app)
-			.post(BASE)
-			.set(auth())
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth()).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 
 		await request(app).post(`${BASE}/${id}/start`).set(auth());
@@ -270,16 +237,10 @@ describe("Guided Practice — analytics", () => {
 		const auth = { Authorization: `Bearer ${token}` };
 
 		// Create and complete a session
-		const create = await request(app)
-			.post(BASE)
-			.set(auth)
-			.send(PLANNED_SESSION);
+		const create = await request(app).post(BASE).set(auth).send(PLANNED_SESSION);
 		const id = create.body.data._id;
 		await request(app).post(`${BASE}/${id}/start`).set(auth);
-		await request(app)
-			.post(`${BASE}/${id}/complete`)
-			.set(auth)
-			.send({ blocksCompleted: 3 });
+		await request(app).post(`${BASE}/${id}/complete`).set(auth).send({ blocksCompleted: 3 });
 
 		const res = await request(app).get(`${BASE}/analytics/practice`).set(auth);
 

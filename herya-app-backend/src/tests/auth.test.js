@@ -45,9 +45,7 @@ describe("Auth — POST /register", () => {
 	});
 
 	it("returns 400 when required fields are missing", async () => {
-		const res = await request(app)
-			.post(`${BASE}/register`)
-			.send({ email: "missing@test.com" });
+		const res = await request(app).post(`${BASE}/register`).send({ email: "missing@test.com" });
 		expect(res.status).toBe(400);
 	});
 });

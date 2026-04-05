@@ -118,13 +118,7 @@ const getSequenceById = async (req, res, next) => {
 			throw createError(404, "Sequence not found");
 		}
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Sequence retrieved successfully",
-			sequence,
-		);
+		return sendResponse(res, 200, true, "Sequence retrieved successfully", sequence);
 	} catch (error) {
 		return next(error);
 	}
@@ -253,9 +247,7 @@ const getRecommendedSequence = async (req, res, next) => {
 				.limit(3)
 				.populate("vkSequence");
 
-			const recentFamilies = recentSessions
-				.map((s) => s.vkSequence?.family)
-				.filter(Boolean);
+			const recentFamilies = recentSessions.map((s) => s.vkSequence?.family).filter(Boolean);
 
 			recommendedSequence = await VKSequence.findOne({
 				"therapeuticFocus.anatomicalFocus.area": mostProblematicArea,
@@ -286,16 +278,10 @@ const getRecommendedSequence = async (req, res, next) => {
 			}
 		}
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Recommendation generated successfully",
-			{
-				sequence: recommendedSequence,
-				reason,
-			},
-		);
+		return sendResponse(res, 200, true, "Recommendation generated successfully", {
+			sequence: recommendedSequence,
+			reason,
+		});
 	} catch (error) {
 		return next(error);
 	}
@@ -347,13 +333,7 @@ const searchSequences = async (req, res, next) => {
 			.sort({ score: { $meta: "textScore" } })
 			.limit(20);
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			`Found ${sequences.length} sequences`,
-			sequences,
-		);
+		return sendResponse(res, 200, true, `Found ${sequences.length} sequences`, sequences);
 	} catch (error) {
 		return next(error);
 	}

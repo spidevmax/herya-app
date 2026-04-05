@@ -15,9 +15,7 @@ describe("Users — GET /me", () => {
 			name: "Profile User",
 			email: "profile@test.com",
 		});
-		const res = await request(app)
-			.get(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 		expect(res.body.data).toHaveProperty("email", "profile@test.com");
@@ -79,9 +77,7 @@ describe("Users — PUT /me", () => {
 describe("Users — GET /me/stats", () => {
 	it("returns stats for the authenticated user", async () => {
 		const { token } = await createUser({ email: "stats@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/me/stats`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me/stats`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("totalSessions");
 		expect(res.body.data).toHaveProperty("totalMinutes");

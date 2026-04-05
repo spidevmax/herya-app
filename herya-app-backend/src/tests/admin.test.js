@@ -41,10 +41,7 @@ describe("Admin — Authorization", () => {
 	it("returns 401 on all routes without a token", async () => {
 		const routes = [
 			() => request(app).get(`${BASE}/users`),
-			() =>
-				request(app)
-					.put(`${BASE}/users/000000000000000000000000/role`)
-					.send({ role: "user" }),
+			() => request(app).put(`${BASE}/users/000000000000000000000000/role`).send({ role: "user" }),
 			() => request(app).delete(`${BASE}/users/000000000000000000000000`),
 			() => request(app).post(`${BASE}/poses`),
 			() => request(app).post(`${BASE}/breathing-patterns`),
@@ -59,9 +56,7 @@ describe("Admin — Authorization", () => {
 
 	it("returns 403 when a regular user tries to access admin routes", async () => {
 		const { token } = await createUser({ email: "regular@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/users`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/users`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(403);
 	});
 });
@@ -74,9 +69,7 @@ describe("Admin — GET /users", () => {
 		await createUser({ email: "user1@test.com" });
 		await createUser({ email: "user2@test.com" });
 
-		const res = await request(app)
-			.get(`${BASE}/users`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/users`).set("Authorization", `Bearer ${token}`);
 
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);

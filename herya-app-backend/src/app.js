@@ -64,9 +64,7 @@ const apiLimiter = rateLimit({
 // === Swagger Documentation (skip in test to avoid JSDoc parsing overhead) ===
 if (NODE_ENV !== "test") {
 	if (NODE_ENV === "production" && !process.env.FRONTEND_URL) {
-		console.warn(
-			"⚠️  FRONTEND_URL not defined in production. CORS may not work correctly.",
-		);
+		console.warn("⚠️  FRONTEND_URL not defined in production. CORS may not work correctly.");
 	}
 	const { swaggerUiMiddleware, swaggerUiSetup } = require("./config/swagger");
 	app.use("/api-docs", swaggerUiMiddleware, swaggerUiSetup);

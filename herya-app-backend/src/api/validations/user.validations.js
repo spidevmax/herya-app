@@ -51,16 +51,12 @@ const updateProfileValidations = [
 	check("preferences.practiceIntensity")
 		.optional()
 		.isIn(["gentle", "moderate", "vigorous"])
-		.withMessage(
-			'preferences.practiceIntensity must be one of: "gentle", "moderate", "vigorous"',
-		),
+		.withMessage('preferences.practiceIntensity must be one of: "gentle", "moderate", "vigorous"'),
 
 	check("preferences.sessionDuration")
 		.optional()
 		.isInt({ min: 1 })
-		.withMessage(
-			"preferences.sessionDuration must be a positive integer (minutes)",
-		),
+		.withMessage("preferences.sessionDuration must be a positive integer (minutes)"),
 
 	check("preferences.timeOfDay")
 		.optional()
@@ -77,9 +73,7 @@ const updateProfileValidations = [
 	check("preferences.notifications.frequency")
 		.optional()
 		.isIn(["daily", "weekly", "never"])
-		.withMessage(
-			'preferences.notifications.frequency must be one of: "daily", "weekly", "never"',
-		),
+		.withMessage('preferences.notifications.frequency must be one of: "daily", "weekly", "never"'),
 
 	check("preferences.notifications.enabled")
 		.optional()
@@ -89,9 +83,7 @@ const updateProfileValidations = [
 	check("preferences.notifications.reminderTime")
 		.optional()
 		.matches(/^([01]\d|2[0-3]):[0-5]\d$/)
-		.withMessage(
-			"preferences.notifications.reminderTime must be in HH:mm format",
-		),
+		.withMessage("preferences.notifications.reminderTime must be in HH:mm format"),
 
 	check("preferences.theme")
 		.optional()
@@ -107,17 +99,13 @@ const updateProfileValidations = [
 		.optional()
 		.trim()
 		.isLength({ max: 120 })
-		.withMessage(
-			"preferences.safetyAnchors.phrase must be 120 characters or less",
-		),
+		.withMessage("preferences.safetyAnchors.phrase must be 120 characters or less"),
 
 	check("preferences.safetyAnchors.bodyCue")
 		.optional()
 		.trim()
 		.isLength({ max: 120 })
-		.withMessage(
-			"preferences.safetyAnchors.bodyCue must be 120 characters or less",
-		),
+		.withMessage("preferences.safetyAnchors.bodyCue must be 120 characters or less"),
 ];
 
 /**

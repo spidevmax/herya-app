@@ -57,9 +57,7 @@ async function seedUsers() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(
-				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
-			);
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
 		// Valid values matching model enums
@@ -72,12 +70,8 @@ async function seedUsers() {
 			const intensity = validIntensity.includes(row.practiceIntensity)
 				? row.practiceIntensity
 				: "moderate";
-			const language = validLanguage.includes(row.language)
-				? row.language
-				: "en";
-			const timeOfDay = validTimeOfDay.includes(row.timeOfDay)
-				? row.timeOfDay
-				: "anytime";
+			const language = validLanguage.includes(row.language) ? row.language : "en";
+			const timeOfDay = validTimeOfDay.includes(row.timeOfDay) ? row.timeOfDay : "anytime";
 			const sessionDuration = parseInt(row.sessionDuration, 10) || 30;
 
 			const user = new User({

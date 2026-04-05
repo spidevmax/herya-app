@@ -37,13 +37,7 @@ const getMyProfile = async (req, res, next) => {
 		const userResponse = user.toObject();
 		delete userResponse.vkProgression;
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Profile retrieved successfully",
-			userResponse,
-		);
+		return sendResponse(res, 200, true, "Profile retrieved successfully", userResponse);
 	} catch (error) {
 		return next(error);
 	}
@@ -143,10 +137,7 @@ const updateMyProfile = async (req, res, next) => {
 			const preferences = req.body.preferences;
 
 			if (preferences.practiceIntensity) {
-				user.set(
-					"preferences.practiceIntensity",
-					preferences.practiceIntensity,
-				);
+				user.set("preferences.practiceIntensity", preferences.practiceIntensity);
 			}
 
 			if (preferences.sessionDuration !== undefined) {
@@ -208,13 +199,7 @@ const updateMyProfile = async (req, res, next) => {
 		const userResponse = updatedUser.toObject();
 		delete userResponse.password;
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Profile updated successfully",
-			userResponse,
-		);
+		return sendResponse(res, 200, true, "Profile updated successfully", userResponse);
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -422,9 +407,7 @@ const getMyStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0
-				? Math.round(totalMinutes / recentSessions.length)
-				: 0;
+			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
 
 		return sendResponse(res, 200, true, "Stats retrieved successfully", {
 			totalSessions: user.totalSessions,
@@ -493,13 +476,7 @@ const updateMyProfileImage = async (req, res, next) => {
 		const userResponse = updatedUser.toObject();
 		delete userResponse.password;
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Profile image updated successfully",
-			userResponse,
-		);
+		return sendResponse(res, 200, true, "Profile image updated successfully", userResponse);
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -550,13 +527,7 @@ const deleteMyProfileImage = async (req, res, next) => {
 		const userResponse = updatedUser.toObject();
 		delete userResponse.password;
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Profile image deleted successfully",
-			userResponse,
-		);
+		return sendResponse(res, 200, true, "Profile image deleted successfully", userResponse);
 	} catch (error) {
 		return next(error);
 	}

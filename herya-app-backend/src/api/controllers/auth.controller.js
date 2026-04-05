@@ -5,10 +5,7 @@ const { generateToken } = require("../../utils/token");
 const { deleteImgCloudinary } = require("../../utils/deleteImage");
 const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
-const {
-	isSmtpConfigured,
-	sendPasswordResetEmail,
-} = require("../../utils/mailer");
+const { isSmtpConfigured, sendPasswordResetEmail } = require("../../utils/mailer");
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
@@ -72,12 +69,9 @@ const exchangeGoogleCodeForUser = async (code) => {
 		throw createError(401, "Google token exchange did not return access token");
 	}
 
-	const userInfoResponse = await fetch(
-		"https://openidconnect.googleapis.com/v1/userinfo",
-		{
-			headers: { Authorization: `Bearer ${tokenPayload.access_token}` },
-		},
-	);
+	const userInfoResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+		headers: { Authorization: `Bearer ${tokenPayload.access_token}` },
+	});
 
 	if (!userInfoResponse.ok) {
 		throw createError(401, "Google user info could not be retrieved");
@@ -273,13 +267,7 @@ const me = async (req, res, next) => {
 			throw createError(404, "User not found");
 		}
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Authenticated user retrieved successfully",
-			user,
-		);
+		return sendResponse(res, 200, true, "Authenticated user retrieved successfully", user);
 	} catch (error) {
 		return next(error);
 	}
@@ -306,9 +294,7 @@ const googleAuthCallback = async (req, res) => {
 	try {
 		const code = req.query.code;
 		if (!code) {
-			return res.redirect(
-				buildFrontendAuthRedirect({ error: "missing_google_code" }),
-			);
+			return res.redirect(buildFrontendAuthRedirect({ error: "missing_google_code" }));
 		}
 
 		const profile = await exchangeGoogleCodeForUser(code);
@@ -317,9 +303,7 @@ const googleAuthCallback = async (req, res) => {
 
 		return res.redirect(buildFrontendAuthRedirect({ token }));
 	} catch (_error) {
-		return res.redirect(
-			buildFrontendAuthRedirect({ error: "google_auth_failed" }),
-		);
+		return res.redirect(buildFrontendAuthRedirect({ error: "google_auth_failed" }));
 	}
 };
 
@@ -342,10 +326,7 @@ const requestPasswordReset = async (req, res, next) => {
 		}
 
 		const resetToken = crypto.randomBytes(32).toString("hex");
-		const hashedToken = crypto
-			.createHash("sha256")
-			.update(resetToken)
-			.digest("hex");
+		const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
 
 		user.passwordResetToken = hashedToken;
 		user.passwordResetExpires = new Date(Date.now() + 1000 * 60 * 30);

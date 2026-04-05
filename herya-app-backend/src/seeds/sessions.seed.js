@@ -112,9 +112,7 @@ async function seedSessions() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(
-				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
-			);
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
 		let count = 0;
@@ -124,13 +122,8 @@ async function seedSessions() {
 			const sessionType = row.sessionType;
 
 			// Skip vk_sequence / complete_practice if no VKSequence was seeded
-			if (
-				!sequence &&
-				(sessionType === "vk_sequence" || sessionType === "complete_practice")
-			) {
-				console.log(
-					`⚠️  Skipping '${sessionType}' session – no VK sequence found`,
-				);
+			if (!sequence && (sessionType === "vk_sequence" || sessionType === "complete_practice")) {
+				console.log(`⚠️  Skipping '${sessionType}' session – no VK sequence found`);
 				continue;
 			}
 

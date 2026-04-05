@@ -14,13 +14,9 @@ const {
 	forgotPasswordValidations,
 	resetPasswordValidations,
 } = require("../validations/auth.validations");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 const { uploadUserImage } = require("../../middlewares/upload/user.upload");
-const {
-	authenticateToken,
-} = require("../../middlewares/authorization.middleware");
+const { authenticateToken } = require("../../middlewares/authorization.middleware");
 
 const authRouter = require("express").Router();
 
@@ -184,12 +180,7 @@ authRouter.post(
 	handleValidationErrors,
 	requestPasswordReset,
 );
-authRouter.post(
-	"/reset-password",
-	resetPasswordValidations,
-	handleValidationErrors,
-	resetPassword,
-);
+authRouter.post("/reset-password", resetPasswordValidations, handleValidationErrors, resetPassword);
 
 authRouter.get("/google", googleAuthStart);
 authRouter.get("/google/callback", googleAuthCallback);

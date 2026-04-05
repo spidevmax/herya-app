@@ -24,14 +24,9 @@ const {
 	getUserAnalytics,
 } = require("../controllers/admin.controller");
 
-const {
-	authenticateToken,
-	isAdmin,
-} = require("../../middlewares/authorization.middleware");
+const { authenticateToken, isAdmin } = require("../../middlewares/authorization.middleware");
 
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
 
 const { uploadPoseMixed } = require("../../middlewares/upload/pose.upload");
 
@@ -105,12 +100,7 @@ adminRouter.use(authenticateToken(), isAdmin);
  *       500:
  *         description: Server error
  */
-adminRouter.get(
-	"/users",
-	getAllUsersValidation,
-	handleValidationErrors,
-	getAllUsers,
-);
+adminRouter.get("/users", getAllUsersValidation, handleValidationErrors, getAllUsers);
 
 /**
  * @swagger
@@ -193,12 +183,7 @@ adminRouter.put(
  *       500:
  *         description: Server error
  */
-adminRouter.delete(
-	"/users/:id",
-	userIdParamValidation,
-	handleValidationErrors,
-	deleteUser,
-);
+adminRouter.delete("/users/:id", userIdParamValidation, handleValidationErrors, deleteUser);
 
 // ==================== VK SEQUENCE MANAGEMENT ====================
 
@@ -487,12 +472,7 @@ adminRouter.put(
  *       500:
  *         description: Server error
  */
-adminRouter.delete(
-	"/poses/:id",
-	resourceIdParamValidation,
-	handleValidationErrors,
-	deletePose,
-);
+adminRouter.delete("/poses/:id", resourceIdParamValidation, handleValidationErrors, deletePose);
 
 // ==================== BREATHING PATTERN MANAGEMENT ====================
 

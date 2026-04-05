@@ -59,8 +59,7 @@ const normalize = (value) =>
 		.trim()
 		.toLowerCase();
 
-const getPoseDifficultyRank = (pose) =>
-	DIFFICULTY_RANK[normalize(pose?.difficulty)] || 1;
+const getPoseDifficultyRank = (pose) => DIFFICULTY_RANK[normalize(pose?.difficulty)] || 1;
 
 const getRecommendedBreaths = (pose, sequenceDifficulty) => {
 	const difficultyKey = normalize(sequenceDifficulty);
@@ -159,9 +158,7 @@ const buildStructure = (row, allPoses, poseIndex) => {
 	const coreLimit = CORE_POSES_PER_LEVEL[level] || 4;
 
 	const familyPool = pickFamilyPoses(allPoses, row.family, difficulty);
-	const coreCandidates = uniquePoses(
-		sortPosesForSequence(familyPool, difficulty),
-	);
+	const coreCandidates = uniquePoses(sortPosesForSequence(familyPool, difficulty));
 	const corePoses = coreCandidates.slice(0, coreLimit).map((pose, index) => ({
 		pose: pose._id,
 		order: index + 1,
@@ -262,9 +259,7 @@ async function seedSequences() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(
-				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
-			);
+			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
 		// Helper: split pipe-separated string into array
@@ -277,9 +272,7 @@ async function seedSequences() {
 				: [];
 
 		const allPoses = await Pose.find({ isSystemPose: true })
-			.select(
-				"_id name romanizationName difficulty vkContext recommendedBreaths",
-			)
+			.select("_id name romanizationName difficulty vkContext recommendedBreaths")
 			.lean();
 
 		const poseIndex = buildPoseIndex(allPoses);
@@ -310,8 +303,7 @@ async function seedSequences() {
 
 			// METADATA
 			tags: toArray(row.tags),
-			isSystemSequence:
-				row.isSystemSequence !== false && row.isSystemSequence !== "false",
+			isSystemSequence: row.isSystemSequence !== false && row.isSystemSequence !== "false",
 		}));
 
 		// Upsert by family+level — writes full payload so structure stays synced with seeds.
