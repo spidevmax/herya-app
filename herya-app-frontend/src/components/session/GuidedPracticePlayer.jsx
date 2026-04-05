@@ -443,6 +443,7 @@ export default function GuidedPracticePlayer({
 						type="button"
 						onClick={timer.prevBlock}
 						disabled={timer.isFirstBlock}
+						aria-label={t("practice.aria_prev_block")}
 						className="w-11 h-11 rounded-full flex items-center justify-center border disabled:opacity-30 transition"
 						style={{
 							backgroundColor: "var(--color-surface-card)",
@@ -462,6 +463,7 @@ export default function GuidedPracticePlayer({
 									? timer.resume
 									: timer.start
 						}
+						aria-label={timer.isRunning ? t("practice.aria_pause") : t("practice.aria_play")}
 						className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 						style={{ backgroundColor: blockColor }}
 					>
@@ -476,6 +478,7 @@ export default function GuidedPracticePlayer({
 						type="button"
 						onClick={timer.nextBlock}
 						disabled={timer.isLastBlock}
+						aria-label={t("practice.aria_next_block")}
 						className="w-11 h-11 rounded-full flex items-center justify-center border disabled:opacity-30 transition"
 						style={{
 							backgroundColor: "var(--color-surface-card)",

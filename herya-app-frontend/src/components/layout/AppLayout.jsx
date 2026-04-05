@@ -90,7 +90,7 @@ export default function AppLayout() {
 			{/* Main content area */}
 			<div className="lg:ml-56 flex justify-center">
 				<div
-					className="w-full max-w-[430px] sm:max-w-[540px] lg:max-w-[680px] min-h-dvh flex flex-col"
+					className="w-full max-w-[430px] sm:max-w-[540px] lg:max-w-[680px] xl:max-w-[900px] min-h-dvh flex flex-col"
 					style={{ backgroundColor: "var(--color-surface)" }}
 				>
 					<AnimatePresence mode="wait">

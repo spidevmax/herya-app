@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Leaf, RotateCcw, Settings2 } from "lucide-react";
+import { Leaf, RotateCcw, Settings2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import {
@@ -19,7 +19,7 @@ import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
 import SessionBuilder from "@/components/session/SessionBuilder";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
-import { Button } from "@/components/ui";
+import { Button, StickyHeader } from "@/components/ui";
 import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-primary)";
@@ -833,28 +833,15 @@ export default function StartPractice() {
 	return (
 		<div className="flex flex-col min-h-dvh">
 			{/* Header */}
-			<div
-				className="sticky top-0 z-10 px-4 pt-4 pb-3 flex items-center gap-3 backdrop-blur-xl"
-				style={{
-					backgroundColor:
-						"color-mix(in srgb, var(--color-surface) 90%, transparent)",
+			<StickyHeader
+				onBack={() => {
+					if (phase === "build") setPhase("type");
+					else if (phase === "checkin") setPhase("build");
+					else if (phase === "type") navigate(-1);
+					else navigate("/");
 				}}
-			>
-				<button
-					type="button"
-					onClick={() => {
-						if (phase === "build") setPhase("type");
-						else if (phase === "checkin") setPhase("build");
-						else if (phase === "type") navigate(-1);
-						else navigate("/");
-					}}
-					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
-				>
-					<ArrowLeft size={20} style={{ color: "var(--color-text-primary)" }} />
-				</button>
-				<h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
-					{phase === "type"
+				title={
+					phase === "type"
 						? t("practice.start_practice")
 						: phase === "build"
 							? t("practice.build_session")
@@ -862,9 +849,9 @@ export default function StartPractice() {
 								? t("practice.check_in")
 								: phase === "practice"
 									? t("practice.in_progress")
-									: t("practice.journal")}
-				</h1>
-
+									: t("practice.journal")
+				}
+			>
 				{/* Check-in toggle (visible in build phase) */}
 				{phase === "build" && (
 					<button
@@ -883,7 +870,7 @@ export default function StartPractice() {
 						{t("practice.check_in")}
 					</button>
 				)}
-			</div>
+			</StickyHeader>
 
 			{/* Recovery banner */}
 			{showRecovery && persistence.recovered && phase === "type" && (
@@ -1247,6 +1234,7 @@ export default function StartPractice() {
 										max={10}
 										value={checkInEnergy}
 										onChange={(e) => setCheckInEnergy(+e.target.value)}
+										aria-label={t("practice.aria_energy_slider")}
 										className="w-full"
 										style={{ accentColor: "var(--color-primary)" }}
 									/>

@@ -152,7 +152,7 @@ export default function SessionHistory() {
 				/>
 			</div>
 
-			<div className="px-4 flex flex-col gap-3">
+			<div className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
 				{loading ? (
 					["s1", "s2", "s3", "s4"].map((k) => <SkeletonCard key={k} />)
 				) : sessions.length === 0 ? (

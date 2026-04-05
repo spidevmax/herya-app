@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
 	BookOpen,
-	ChevronLeft,
 	ChevronRight,
 	Clock,
 	Dumbbell,
@@ -11,7 +10,7 @@ import {
 } from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
-import { Badge, SkeletonCard } from "@/components/ui";
+import { Badge, SkeletonCard, StickyHeader } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function SequenceDetail() {
@@ -157,28 +156,10 @@ export default function SequenceDetail() {
 
 	return (
 		<div className="pb-6">
-			<div
-				className="sticky top-0 z-10 backdrop-blur-xl px-4 pt-4 pb-3 flex items-center gap-3"
-				style={{
-					backgroundColor:
-						"color-mix(in srgb, var(--color-surface) 90%, transparent)",
-				}}
-			>
-				<button
-					type="button"
-					onClick={() => navigate(-1)}
-					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
-				>
-					<ChevronLeft
-						size={20}
-						style={{ color: "var(--color-text-primary)" }}
-					/>
-				</button>
-				<h1 className="font-display text-lg font-semibold truncate text-[var(--color-text-primary)]">
-					{loading ? t("sequence_detail.loading") : seq?.englishName}
-				</h1>
-			</div>
+			<StickyHeader
+				onBack={() => navigate(-1)}
+				title={loading ? t("sequence_detail.loading") : seq?.englishName}
+			/>
 
 			{loading ? (
 				<div className="px-4 flex flex-col gap-4 mt-2">

@@ -90,6 +90,13 @@ export const translations = {
 			login_link: "Log in",
 			error: "Error creating account",
 		},
+		not_found: {
+			title: "Page not found",
+			description: "The page you're looking for doesn't exist or has been moved.",
+			go_home: "Go home",
+			go_library: "Browse library",
+			go_back: "Go back",
+		},
 		dashboard: {
 			greeting_morning: "Good morning",
 			greeting_afternoon: "Good afternoon",
@@ -976,6 +983,13 @@ export const translations = {
 			login_link: "Inicia sesión",
 			error: "Error al crear la cuenta",
 		},
+		not_found: {
+			title: "Pagina no encontrada",
+			description: "La pagina que buscas no existe o ha sido movida.",
+			go_home: "Ir al inicio",
+			go_library: "Ver biblioteca",
+			go_back: "Volver",
+		},
 		dashboard: {
 			greeting_morning: "Buenos días",
 			greeting_afternoon: "Buenas tardes",
@@ -1039,6 +1053,8 @@ export const translations = {
 			meditation: "Meditación",
 			complete_practice: "Práctica completa",
 			practice_label: "Tu práctica",
+			practiced: "practicado",
+			today: "hoy",
 			day_streak: "Racha: {n} días",
 			sessions_this_week: "{n} esta semana",
 			welcome_title: "¡Bienvenida!",

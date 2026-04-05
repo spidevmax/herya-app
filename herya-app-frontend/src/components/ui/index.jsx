@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
+	ArrowLeft,
 	BedSingle,
 	Circle,
 	Heart,
@@ -502,3 +503,28 @@ export const ConfirmModal = ({
 		</div>
 	);
 };
+
+// ── StickyHeader ─────────────────────────────────────────────────────────────
+export function StickyHeader({ onBack, title, children }) {
+	return (
+		<div className="sticky-header">
+			{onBack && (
+				<button
+					type="button"
+					onClick={onBack}
+					aria-label="Back"
+					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
+					style={{ backgroundColor: "var(--color-surface-card)" }}
+				>
+					<ArrowLeft size={20} style={{ color: "var(--color-text-primary)" }} />
+				</button>
+			)}
+			{title && (
+				<h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
+					{title}
+				</h1>
+			)}
+			{children}
+		</div>
+	);
+}

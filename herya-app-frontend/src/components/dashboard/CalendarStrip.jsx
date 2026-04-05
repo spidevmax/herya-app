@@ -108,7 +108,7 @@ export default function CalendarStrip({
 										? "white"
 										: "var(--color-text-secondary)",
 								boxShadow: d.isToday
-									? "0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 4px 12px rgba(78,139,106,0.35)"
+									? "0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 4px 12px color-mix(in srgb, var(--color-primary) 35%, transparent)"
 									: "none",
 							}}
 						>

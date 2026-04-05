@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-	ArrowLeft,
 	CheckCircle,
 	ClipboardList,
 	Clock,
@@ -23,7 +22,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import CycleBreathingPlayer from "@/components/session/CycleBreathingPlayer";
 import PostPracticeNudge from "@/components/session/PostPracticeNudge";
-import { Button } from "@/components/ui";
+import { Button, StickyHeader } from "@/components/ui";
 import { SESSION_TYPES } from "@/utils/constants";
 
 const MOOD_OPTIONS = [
@@ -403,19 +402,7 @@ export default function Session() {
 
 	return (
 		<div className="flex flex-col min-h-dvh">
-			<div className="sticky-header">
-				<button
-					type="button"
-					onClick={() => navigate(-1)}
-					aria-label={tr("ui.back", "Back")}
-					className="w-10 h-10 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-sm"
-				>
-					<ArrowLeft size={20} />
-				</button>
-				<h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
-					{sessionTypeLabel}
-				</h1>
-			</div>
+			<StickyHeader onBack={() => navigate(-1)} title={sessionTypeLabel} />
 
 			<div className="flex-1 px-4 pb-28 overflow-y-auto">
 				<AnimatePresence mode="wait">

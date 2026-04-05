@@ -109,3 +109,23 @@ export const chipColors = {
 	yellow: colors.secondary.base,
 	sage: colors.accent.base,
 };
+
+// Shared Framer Motion presets
+export const MOTION = {
+	fadeIn: { initial: { opacity: 0 }, animate: { opacity: 1 } },
+	slideUp: {
+		initial: { opacity: 0, y: 12 },
+		animate: { opacity: 1, y: 0 },
+		transition: { duration: 0.35 },
+	},
+	scaleIn: {
+		initial: { opacity: 0, scale: 0.95 },
+		animate: { opacity: 1, scale: 1 },
+		transition: { duration: 0.25 },
+	},
+	stagger: (delay = 0.06) => ({
+		initial: { opacity: 0, y: 12 },
+		animate: { opacity: 1, y: 0 },
+		transition: { delay },
+	}),
+};
