@@ -103,8 +103,8 @@ docker run -d --name herya-frontend -p 8080:80 ghcr.io/<owner>/herya-frontend:la
 
 Backend deployment:
 - Workflow: .github/workflows/backend-ci-cd.yml
-- Target: Railway
-- Runs only on push to main after CI and Docker smoke tests pass.
+- Target: CI only (lint/tests/build/smoke)
+- Production deploy should use Railway native GitHub autodeploy from `main`.
 
 Frontend deployment:
 - Workflow: .github/workflows/frontend-ci-cd.yml
@@ -112,10 +112,6 @@ Frontend deployment:
 - Runs only on push to main after CI and Docker smoke tests pass.
 
 Required GitHub Secrets:
-- `RAILWAY_TOKEN`
-- `RAILWAY_PROJECT_ID`
-- `RAILWAY_SERVICE_ID`
-- `RAILWAY_ENVIRONMENT_ID`
 - `VERCEL_TOKEN`
 - `VERCEL_ORG_ID`
 - `VERCEL_PROJECT_ID`
@@ -124,8 +120,8 @@ Deployment flow:
 1. Push to `main`.
 2. CI runs tests and build checks.
 3. Docker smoke tests validate the images.
-4. Backend deploys to Railway.
-5. Frontend deploys to Vercel.
+4. Railway deploys backend via its native GitHub integration.
+5. Frontend deploys to Vercel from GitHub Actions.
 
 If a deploy fails, check the job logs and verify the corresponding secret values in GitHub repository settings.
 
