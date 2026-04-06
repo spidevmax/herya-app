@@ -135,8 +135,24 @@ jobs:
           RAILWAY_SERVICE_ID: ${{ secrets.RAILWAY_SERVICE_ID }}
           RAILWAY_ENVIRONMENT_ID: ${{ secrets.RAILWAY_ENVIRONMENT_ID }}
         run: |
-          railway up \
-            --ci \
-            --project "$RAILWAY_PROJECT_ID" \
-            --service "$RAILWAY_SERVICE_ID" \
-            --environment "$RAILWAY_ENVIRONMENT_ID"
+          ATTEMPTS=5
+          for i in $(seq 1 "$ATTEMPTS"); do
+            echo "Deploy attempt $i/$ATTEMPTS"
+
+            if railway up \
+              --ci \
+              --project "$RAILWAY_PROJECT_ID" \
+              --service "$RAILWAY_SERVICE_ID" \
+              --environment "$RAILWAY_ENVIRONMENT_ID"; then
+              echo "Railway deploy succeeded"
+              exit 0
+            fi
+
+            if [ "$i" -lt "$ATTEMPTS" ]; then
+              echo "Railway deploy failed. Waiting 60s before retry..."
+              sleep 60
+            fi
+          done
+
+          echo "Railway deploy failed after $ATTEMPTS attempts"
+          exit 1
