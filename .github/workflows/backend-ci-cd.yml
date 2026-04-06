@@ -138,7 +138,7 @@ jobs:
           for i in $(seq 1 "$ATTEMPTS"); do
             echo "Deploy attempt $i/$ATTEMPTS"
 
-            if railway up herya-app-backend \
+            if railway up ./herya-app-backend \
               --ci \
               --path-as-root \
               --project "$RAILWAY_PROJECT_ID" \
