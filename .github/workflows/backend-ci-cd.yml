@@ -128,7 +128,6 @@ jobs:
         run: npm install -g @railway/cli@latest
 
       - name: Deploy backend to Railway
-        working-directory: herya-app-backend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
           RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
@@ -139,8 +138,9 @@ jobs:
           for i in $(seq 1 "$ATTEMPTS"); do
             echo "Deploy attempt $i/$ATTEMPTS"
 
-            if railway up \
+            if railway up herya-app-backend \
               --ci \
+              --path-as-root \
               --project "$RAILWAY_PROJECT_ID" \
               --service "$RAILWAY_SERVICE_ID" \
               --environment "$RAILWAY_ENVIRONMENT_ID"; then
