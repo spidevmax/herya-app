@@ -1,16 +1,15 @@
 # Herya
 
 Herya is a full-stack web application for personalized yoga practice with a
-Vinyasa Krama focus. It combines guided session building, reflective journaling,
-role-based workflows, and an admin content system.
+Vinyasa Krama focus. It combines guided session building, reflective journaling, role-based workflows and an admin content system.
 
 ## Overview
 
 Herya includes:
 
 - JWT-based authentication and role-aware access
-- Practice flows for three roles: user, tutor, and admin
-- Asana, breathing pattern, and Vinyasa Krama sequence exploration
+- Practice flows for three roles: user, tutor and admin
+- Asana, breathing pattern and Vinyasa Krama sequence exploration
 - Guided session creation and practice tracking
 - Post-practice journaling and insights
 - Admin tools for user and content management (poses, sequences, breathing)
