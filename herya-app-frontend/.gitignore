@@ -43,6 +43,7 @@ Thumbs.db
 # Build Outputs
 coverage
 .nyc_output
+.vercel/
 
 # Testing
 .firebase/
@@ -53,3 +54,4 @@ coverage
 tmp
 temp
 *.tmp
+.vercel

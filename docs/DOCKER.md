@@ -99,6 +99,36 @@ docker run -d --name herya-backend -p 3000:3000 ghcr.io/<owner>/herya-backend:la
 docker run -d --name herya-frontend -p 8080:80 ghcr.io/<owner>/herya-frontend:latest
 ```
 
+## CD With GitHub Actions
+
+Backend deployment:
+- Workflow: .github/workflows/backend-ci-cd.yml
+- Target: Railway
+- Runs only on push to main after CI and Docker smoke tests pass.
+
+Frontend deployment:
+- Workflow: .github/workflows/frontend-ci-cd.yml
+- Target: Vercel
+- Runs only on push to main after CI and Docker smoke tests pass.
+
+Required GitHub Secrets:
+- `RAILWAY_TOKEN`
+- `RAILWAY_PROJECT_ID`
+- `RAILWAY_SERVICE_ID`
+- `RAILWAY_ENVIRONMENT_ID`
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+Deployment flow:
+1. Push to `main`.
+2. CI runs tests and build checks.
+3. Docker smoke tests validate the images.
+4. Backend deploys to Railway.
+5. Frontend deploys to Vercel.
+
+If a deploy fails, check the job logs and verify the corresponding secret values in GitHub repository settings.
+
 ## Troubleshooting
 
 - CORS error in browser:

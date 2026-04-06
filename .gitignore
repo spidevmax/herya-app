@@ -49,6 +49,7 @@ dist
 build
 *.bundle.js
 coverage
+.vercel/
 
 # Temporary Files
 tmp
