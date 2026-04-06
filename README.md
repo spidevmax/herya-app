@@ -163,6 +163,17 @@ docker compose -f docker-compose.prod.yml --env-file .env down
 
 Detailed Docker documentation: docs/DOCKER.md
 
+## Deployment
+
+Production deployment uses a split setup:
+
+- Backend: Railway (native GitHub autodeploy from `main`, waiting for CI)
+- Frontend: Vercel (deployed from GitHub Actions after CI + smoke checks)
+
+Container image publishing to GHCR is also available via:
+
+- .github/workflows/docker-release.yml
+
 ## Available Scripts
 
 ### Backend (herya-app-backend)
@@ -187,7 +198,7 @@ Detailed Docker documentation: docs/DOCKER.md
 - npm run test:coverage: run tests with coverage
 - npm run test:watch: run Vitest in watch mode
 
-## Testing and CI
+## Testing and CI/CD
 
 Local quality checks:
 
@@ -212,6 +223,19 @@ GitHub Actions workflows:
 
 - Backend CI: .github/workflows/backend-ci-cd.yml
 - Frontend CI: .github/workflows/frontend-ci-cd.yml
+- Docker image release: .github/workflows/docker-release.yml
+
+Backend workflow includes:
+
+- Lint + tests + checks
+- Docker smoke test
+- No direct Railway CLI deploy from Actions (Railway autodeploy handles production)
+
+Frontend workflow includes:
+
+- Tests + build
+- Docker smoke test
+- Production deploy to Vercel on push to `main`
 
 ## Documentation and Resources
 
