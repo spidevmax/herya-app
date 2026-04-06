@@ -139,6 +139,30 @@ Default URLs:
 - Backend: http://localhost:3000
 - Swagger: http://localhost:3000/api-docs
 
+## Docker Quick Start
+
+Development stack (hot reload for frontend and backend):
+
+```bash
+docker compose up --build
+```
+
+Production-like local stack (frontend served by Nginx):
+
+```bash
+cp .env.docker.example .env
+docker compose -f docker-compose.prod.yml --env-file .env up --build -d
+```
+
+Stop containers:
+
+```bash
+docker compose down
+docker compose -f docker-compose.prod.yml --env-file .env down
+```
+
+Detailed Docker documentation: docs/DOCKER.md
+
 ## Available Scripts
 
 ### Backend (herya-app-backend)
