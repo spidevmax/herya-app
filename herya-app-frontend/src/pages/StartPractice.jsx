@@ -20,7 +20,7 @@ import SessionBuilder from "@/components/session/SessionBuilder";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
 import { Button, ConfirmModal, StickyHeader } from "@/components/ui";
-import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
+import { MOOD_OPTIONS, MOOD_COLORS } from "@/utils/constants";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-primary)";
 const PRACTICE_PRESETS = {
@@ -656,7 +656,10 @@ export default function StartPractice() {
 					// Ensure every block has durationMinutes >= 1
 					const safeBlocks = orderedBlocks.map((b) => ({
 						...b,
-						durationMinutes: Math.max(1, Math.round(Number(b.durationMinutes) || 1)),
+						durationMinutes: Math.max(
+							1,
+							Math.round(Number(b.durationMinutes) || 1),
+						),
 					}));
 
 					const payload = {
@@ -751,9 +754,15 @@ export default function StartPractice() {
 		setSaving(true);
 		try {
 			if (sessionId) {
+				const validMoodBefore = new Set(MOOD_OPTIONS);
+				const safeMoodBefore = Array.isArray(journalData.moodBefore)
+					? journalData.moodBefore.filter((m) => validMoodBefore.has(m))
+					: [];
+
 				await createJournalEntry({
 					session: sessionId,
 					...journalData,
+					moodBefore: safeMoodBefore.length > 0 ? safeMoodBefore : ["focused"],
 				});
 			}
 			await refreshUser();
@@ -1224,7 +1233,7 @@ export default function StartPractice() {
 									</div>
 								) : (
 									<div className="flex flex-wrap gap-2">
-										{GARDEN_MOOD_ORDER.map((m) => {
+										{MOOD_OPTIONS.map((m) => {
 											const selected = checkInMood.includes(m);
 											const color = getMoodColor(m);
 											return (

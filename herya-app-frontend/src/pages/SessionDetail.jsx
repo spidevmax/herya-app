@@ -56,7 +56,7 @@ const TYPE_CONFIG = {
 export default function SessionDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const [session, setSession] = useState(null);
 	const [loading, setLoading] = useState(true);
 	const [showDelete, setShowDelete] = useState(false);
@@ -191,7 +191,7 @@ export default function SessionDetail() {
 							</p>
 						)}
 						<p className="text-xs mt-1 text-[var(--color-text-muted)]">
-							{format.date(session.date || session.createdAt)}
+							{format.date(session.date || session.createdAt, lang)}
 						</p>
 					</div>
 				</div>

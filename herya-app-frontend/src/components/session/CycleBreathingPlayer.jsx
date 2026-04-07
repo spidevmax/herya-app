@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
 	Play,
@@ -132,7 +132,7 @@ export default function CycleBreathingPlayer({
 	});
 
 	// ── Play phase guide sound when phase changes ────────────────────────
-	const prevPhaseRef = useMemo(() => ({ current: null }), []);
+	const prevPhaseRef = useRef(null);
 	useEffect(() => {
 		if (!engine.isRunning || engine.isPausing) return;
 		const key = engine.currentPhaseKey;
@@ -147,7 +147,6 @@ export default function CycleBreathingPlayer({
 		engine.currentPhaseDuration,
 		audio,
 		profile.audio,
-		prevPhaseRef,
 	]);
 
 	// ── Reduced motion ───────────────────────────────────────────────────

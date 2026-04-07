@@ -41,6 +41,14 @@ export function AuthProvider({ children }) {
 		else setLoading(false);
 	}, [fetchMe]);
 
+	// Listen for 401 events from the axios interceptor
+	useEffect(() => {
+		const handleUnauthorized = () => setUser(null);
+		window.addEventListener("herya:unauthorized", handleUnauthorized);
+		return () =>
+			window.removeEventListener("herya:unauthorized", handleUnauthorized);
+	}, []);
+
 	const login = async (credentials) => {
 		const { data } = await authApi.login(credentials);
 		const { token, user: u } = data.data || data;
@@ -57,6 +65,11 @@ export function AuthProvider({ children }) {
 		localStorage.setItem("herya_user", JSON.stringify(u));
 		setUser(u);
 		return u;
+	};
+
+	const loginWithToken = async (token) => {
+		localStorage.setItem("herya_token", token);
+		await fetchMe();
 	};
 
 	const logout = async () => {
@@ -83,6 +96,7 @@ export function AuthProvider({ children }) {
 				user,
 				loading,
 				login,
+				loginWithToken,
 				register,
 				logout,
 				refreshUser,

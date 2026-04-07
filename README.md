@@ -139,6 +139,32 @@ Default URLs:
 - Backend: http://localhost:3000
 - Swagger: http://localhost:3000/api-docs
 
+## API Documentation
+
+The backend API contract is documented with Swagger/OpenAPI and served at:
+
+- http://localhost:3000/api-docs
+
+Authentication in Swagger:
+
+- Use the Authorize button and paste JWT as `Bearer your_jwt_token`.
+- You can obtain a token from `POST /api/v1/auth/register` or `POST /api/v1/auth/login`.
+
+Main API groups:
+
+- Auth
+- Users
+- Sessions
+- Journal Entries
+- Poses
+- Breathing Patterns
+- Sequences
+- Admin
+
+Detailed backend API guide:
+
+- herya-app-backend/SWAGGER_GUIDE.md
+
 ## Docker Quick Start
 
 Development stack (hot reload for frontend and backend):

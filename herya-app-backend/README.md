@@ -247,6 +247,8 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 | GET | `/api/v1/users/me` | ✅ user | Get authenticated user profile |
 | PUT | `/api/v1/users/me` | ✅ user | Update profile (name, preferences, goals…) |
 | PUT | `/api/v1/users/change-password` | ✅ user | Change password |
+| PUT | `/api/v1/users/me/image` | ✅ user | Upload or replace profile image |
+| DELETE | `/api/v1/users/me/image` | ✅ user | Delete profile image |
 | GET | `/api/v1/users/me/stats` | ✅ user | Get practice statistics (sessions, minutes, streak) |
 | DELETE | `/api/v1/users/me` | ✅ user | Delete account |
 
@@ -291,9 +293,16 @@ Valid `userLevel` values: `beginner`, `intermediate`, `advanced`
 | GET | `/api/v1/sessions` | ✅ user | List user's sessions |
 | POST | `/api/v1/sessions` | ✅ user | Create a new session |
 | GET | `/api/v1/sessions/stats` | ✅ user | Aggregated practice stats |
+| GET | `/api/v1/sessions/active/current` | ✅ user | Get current active guided session (if any) |
+| GET | `/api/v1/sessions/analytics/practice` | ✅ user | Get practice analytics summary |
 | GET | `/api/v1/sessions/:id` | ✅ user | Get session by ID |
 | PUT | `/api/v1/sessions/:id` | ✅ user | Update session |
 | DELETE | `/api/v1/sessions/:id` | ✅ user | Delete session |
+| POST | `/api/v1/sessions/:id/start` | ✅ user | Start or resume guided session |
+| POST | `/api/v1/sessions/:id/pause` | ✅ user | Pause guided session |
+| POST | `/api/v1/sessions/:id/advance-block` | ✅ user | Move to next/previous block in guided flow |
+| POST | `/api/v1/sessions/:id/complete` | ✅ user | Complete guided session |
+| POST | `/api/v1/sessions/:id/abandon` | ✅ user | Abandon guided session |
 
 **Create session body:**
 ```json
@@ -342,7 +351,7 @@ Valid `sessionType` values: `vk_sequence`, `pranayama`, `meditation`, `complete_
 |---|---|---|---|
 | GET | `/api/v1/sequences` | — | List all Vinyasa Krama sequences |
 | GET | `/api/v1/sequences/search?q=` | — | Search sequences by name and description |
-| GET | `/api/v1/sequences/stats/recommended` | ✅ user | Get recommended sequence by goal and level |
+| GET | `/api/v1/sequences/stats/recommended` | ✅ user | Get recommended sequence for authenticated user |
 | GET | `/api/v1/sequences/family/:family` | — | Filter sequences by VK family |
 | GET | `/api/v1/sequences/:id` | — | Get sequence by ID |
 
@@ -357,7 +366,7 @@ All admin routes require `role: "admin"`.
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/api/v1/admin/users` | ✅ admin | List all users (supports `?role`, `?search`, `?page`, `?limit`) |
-| PUT | `/api/v1/admin/users/:id/role` | ✅ admin | Update user role (`user` or `admin`) |
+| PUT | `/api/v1/admin/users/:id/role` | ✅ admin | Update user role (`user`, `tutor`, or `admin`) |
 | DELETE | `/api/v1/admin/users/:id` | ✅ admin | Delete user and all associated data |
 
 **Pose Management**
@@ -405,6 +414,7 @@ Tokens are issued on register and login. Include the header in every protected r
 
 **Roles:**
 - `user` — default role, access to own resources
+- `tutor` — elevated learning/support role (non-admin)
 - `admin` — full access including admin routes
 
 ---
@@ -526,11 +536,16 @@ npm test
 npm test -- --coverage
 ```
 
-**Test suites (45 tests total):**
+**Current test status:**
+
+- 8 suites passing
+- 102 tests passing
 
 | Suite | Tests |
 |---|---|
 | `auth.test.js` | Register, login, error cases |
+| `admin.test.js` | Admin auth, user management, content CRUD, analytics |
+| `guidedPractice.test.js` | Guided practice lifecycle and analytics |
 | `users.test.js` | Profile CRUD, password change, stats |
 | `poses.test.js` | List, search, category filter, get by ID |
 | `breathingPatterns.test.js` | List, search, recommended, progression, get by ID |

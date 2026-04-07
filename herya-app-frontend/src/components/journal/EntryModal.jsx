@@ -17,13 +17,13 @@ const toMoodTokens = (moods, prefix) => {
 };
 
 export const EntryModal = ({ entry, isOpen, onClose }) => {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const navigate = useNavigate();
 
 	if (!entry) return null;
 
 	const moods = entry.moodAfter || entry.moodBefore || [];
-	const created = format.date(entry.date || entry.createdAt);
+	const created = format.date(entry.date || entry.createdAt, lang);
 
 	const translateMoodLabel = (mood) => {
 		const key = `session.moods.${mood}`;

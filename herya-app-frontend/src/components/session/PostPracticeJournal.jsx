@@ -4,7 +4,11 @@ import { CheckCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 import PostPracticeNudge from "./PostPracticeNudge";
-import { GARDEN_MOOD_ORDER, MOOD_COLORS } from "@/utils/constants";
+import {
+	MOOD_AFTER_OPTIONS,
+	MOOD_OPTIONS,
+	MOOD_COLORS,
+} from "@/utils/constants";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-secondary)";
 const TUTOR_SIGNAL_AFTER_MAP = {
@@ -28,6 +32,8 @@ const SENSATION_OPTIONS = [
 	"warm",
 	"cool",
 ];
+const VALID_MOOD_BEFORE = new Set(MOOD_OPTIONS);
+const VALID_MOOD_AFTER = new Set(MOOD_AFTER_OPTIONS);
 
 export default function PostPracticeJournal({
 	sessionSummary,
@@ -67,13 +73,19 @@ export default function PostPracticeJournal({
 	const handleSave = () => {
 		const tutorSignalPreset =
 			TUTOR_SIGNAL_AFTER_MAP[signalAfter] || TUTOR_SIGNAL_AFTER_MAP.yellow;
-		const normalizedMoodBefore =
+		const normalizedMoodBeforeRaw =
 			checkInData?.mood?.length > 0 ? checkInData.mood : ["focused"];
-		const normalizedMoodAfter = isTutorMode
+		const normalizedMoodBefore = normalizedMoodBeforeRaw.filter((m) =>
+			VALID_MOOD_BEFORE.has(m),
+		);
+		const normalizedMoodAfterRaw = isTutorMode
 			? tutorSignalPreset.mood
 			: moodAfter.length > 0
 				? moodAfter
 				: ["calm"];
+		const normalizedMoodAfter = normalizedMoodAfterRaw.filter((m) =>
+			VALID_MOOD_AFTER.has(m),
+		);
 		const normalizedEnergyAfter = isTutorMode
 			? tutorSignalPreset.energy
 			: energyAfter;
@@ -82,7 +94,8 @@ export default function PostPracticeJournal({
 			: stressAfter;
 
 		onSave({
-			moodAfter: normalizedMoodAfter,
+			moodAfter:
+				normalizedMoodAfter.length > 0 ? normalizedMoodAfter : ["calm"],
 			signalAfter: isTutorMode ? signalAfter : null,
 			energyLevel: {
 				before: checkInData?.energyLevel || 5,
@@ -96,7 +109,8 @@ export default function PostPracticeJournal({
 			emotionalNotes,
 			gratitude,
 			insights: learnings,
-			moodBefore: normalizedMoodBefore,
+			moodBefore:
+				normalizedMoodBefore.length > 0 ? normalizedMoodBefore : ["focused"],
 		});
 	};
 
@@ -291,7 +305,7 @@ export default function PostPracticeJournal({
 					</div>
 				) : (
 					<div className="flex flex-wrap gap-2">
-						{GARDEN_MOOD_ORDER.map((m) => {
+						{MOOD_AFTER_OPTIONS.map((m) => {
 							const selected = moodAfter.includes(m);
 							const color = getMoodColor(m);
 							return (

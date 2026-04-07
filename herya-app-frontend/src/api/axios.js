@@ -13,14 +13,14 @@ api.interceptors.request.use((config) => {
 	return config;
 });
 
-// On 401 redirect to login
+// On 401 clear tokens and notify the app (AuthContext listens for this)
 api.interceptors.response.use(
 	(res) => res,
 	(err) => {
 		if (err.response?.status === 401) {
 			localStorage.removeItem("herya_token");
 			localStorage.removeItem("herya_user");
-			window.location.href = "/login";
+			window.dispatchEvent(new Event("herya:unauthorized"));
 		}
 		return Promise.reject(err);
 	},

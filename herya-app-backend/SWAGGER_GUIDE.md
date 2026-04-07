@@ -1,173 +1,158 @@
 # Swagger API Documentation Guide
 
-## 📚 Overview
+## Overview
 
-This backend is documented with **Swagger/OpenAPI 3.0** for interactive API exploration and testing.
+This backend uses Swagger/OpenAPI 3.0 generated from JSDoc annotations in route files.
+Swagger UI is the reference for request and response contracts during development.
 
-## 🚀 Accessing Swagger Documentation
+## Access
 
-Once the server is running, **Swagger documentation is available at:**
+When backend is running locally:
 
-```
 http://localhost:3000/api-docs
-```
 
-## 📖 What You Can Do in Swagger UI
+If you run with Docker and expose port 3000, the same URL applies.
 
-1. **Browse all endpoints** - See all available API routes organized by tags
-2. **Try endpoints** - Use "Try it out" button to test requests directly
-3. **View request/response schemas** - See data structure and validation rules
-4. **Authorize with JWT** - Click the "Authorize" button to add your authentication token
-5. **Copy curl commands** - Generate curl commands for manual testing
-6. **Download OpenAPI spec** - Get the raw OpenAPI JSON specification
+## Main Uses
 
-## 🔐 Authentication
+1. Browse all available endpoints by feature tags.
+2. Inspect schemas and validation constraints.
+3. Execute requests directly with Try it out.
+4. Test protected routes using JWT Bearer authorization.
+5. Export curl commands for manual testing.
 
-### Adding JWT Token
+## Authentication in Swagger
 
-1. Click the **"Authorize"** button in the top-right of Swagger UI
-2. Enter your token in exactly this format:
+Use Authorize and paste token in this format:
 
-```
-Bearer your_jwt_token_here
-```
+Bearer your_jwt_token
 
-3. Click **"Authorize"** to add the token to all subsequent requests
-4. Click **"Logout"** to remove the token
+Typical flow:
 
-### Getting a Token
+1. Call POST /api/v1/auth/register or POST /api/v1/auth/login.
+2. Copy token from response data.
+3. Paste into Authorize.
 
-1. **Register** a new user with `POST /api/v1/auth/register`
-2. **Login** with `POST /api/v1/auth/login`
-3. Copy the returned `token` value
-4. Use it for authenticated endpoints
+## API Route Map
 
-## 📦 API Sections
+Base prefix: /api/v1
 
-The API is organized into these main sections:
+### Auth
 
-### Authentication
-- `POST /api/v1/auth/register` - Create new user account
-- `POST /api/v1/auth/login` - Authenticate user
+- POST /auth/register
+- POST /auth/login
+- POST /auth/forgot-password
+- POST /auth/reset-password
+- GET /auth/google
+- GET /auth/google/callback
+- GET /auth/me
+- POST /auth/logout
 
 ### Users
-- `GET /api/v1/users/me` - Get my profile (requires auth)
-- `PUT /api/v1/users/me` - Update my profile (requires auth)
-- `PUT /api/v1/users/change-password` - Change password (requires auth)
-- `DELETE /api/v1/users/me` - Delete account (requires auth)
-- `GET /api/v1/users/me/stats` - Get practice statistics (requires auth)
 
-### Poses
-- `GET /api/v1/poses` - Get all poses (public)
-- `GET /api/v1/poses/search` - Search poses (public)
-- `GET /api/v1/poses/category/{category}` - Get poses by category (public)
-- `GET /api/v1/poses/family/{family}` - Get poses by VK family (public)
-- `GET /api/v1/poses/{id}` - Get pose details (public)
-- `GET /api/v1/poses/{id}/related` - Get related poses (public)
-
-### Journal Entries
-- `GET /api/v1/journal-entries` - Get all entries (requires auth)
-- `POST /api/v1/journal-entries` - Create entry (requires auth)
-- `GET /api/v1/journal-entries/{id}` - Get entry details (requires auth)
-- `PUT /api/v1/journal-entries/{id}` - Update entry (requires auth)
-- `DELETE /api/v1/journal-entries/{id}` - Delete entry (requires auth)
-- `GET /api/v1/journal-entries/digital-garden` - Get mood visualization (requires auth)
-
-### Breathing Patterns
-- `GET /api/v1/breathing-patterns` - Get all patterns (public)
-- `GET /api/v1/breathing-patterns/search` - Search patterns (public)
-- `GET /api/v1/breathing-patterns/recommended` - Get recommended pattern by goal/level (public)
-- `GET /api/v1/breathing-patterns/progression` - Get learning progression path (public)
-- `GET /api/v1/breathing-patterns/technique/{technique}` - Get patterns by technique (public)
-- `GET /api/v1/breathing-patterns/{id}` - Get pattern details (public)
+- GET /users/me
+- PUT /users/me
+- PUT /users/change-password
+- DELETE /users/me
+- GET /users/me/stats
+- PUT /users/me/image
+- DELETE /users/me/image
 
 ### Sessions
-- `GET /api/v1/sessions/stats` - Get aggregate practice statistics (requires auth)
-- `GET /api/v1/sessions` - Get all sessions (requires auth)
-- `POST /api/v1/sessions` - Create session (requires auth)
-- `GET /api/v1/sessions/{id}` - Get session details (requires auth)
-- `PUT /api/v1/sessions/{id}` - Update session (requires auth)
-- `DELETE /api/v1/sessions/{id}` - Delete session (requires auth)
+
+- GET /sessions/stats
+- GET /sessions/active/current
+- GET /sessions/analytics/practice
+- GET /sessions
+- POST /sessions
+- GET /sessions/:id
+- PUT /sessions/:id
+- DELETE /sessions/:id
+- POST /sessions/:id/start
+- POST /sessions/:id/pause
+- POST /sessions/:id/advance-block
+- POST /sessions/:id/complete
+- POST /sessions/:id/abandon
+
+### Journal Entries
+
+- GET /journal-entries
+- POST /journal-entries
+- GET /journal-entries/digital-garden
+- GET /journal-entries/:id
+- PUT /journal-entries/:id
+- DELETE /journal-entries/:id
+
+### Poses
+
+- GET /poses
+- GET /poses/search
+- GET /poses/category/:category
+- GET /poses/family/:family
+- GET /poses/:id
+- GET /poses/:id/related
+
+### Breathing Patterns
+
+- GET /breathing-patterns
+- GET /breathing-patterns/search
+- GET /breathing-patterns/recommended
+- GET /breathing-patterns/progression
+- GET /breathing-patterns/technique/:technique
+- GET /breathing-patterns/:id
 
 ### Sequences
-- `GET /api/v1/sequences` - Get all sequences (public)
-- `GET /api/v1/sequences/search` - Search sequences (public)
-- `GET /api/v1/sequences/stats/recommended` - Get recommended sequence for user (requires auth)
-- `GET /api/v1/sequences/family/{family}` - Get sequences by VK family (public, marks isAccessible with auth)
-- `GET /api/v1/sequences/{id}` - Get sequence details (public)
+
+- GET /sequences
+- GET /sequences/search
+- GET /sequences/family/:family
+- GET /sequences/stats/recommended
+- GET /sequences/:id
 
 ### Admin
 
-**User Management**
-- `GET /api/v1/admin/users` - List all users with pagination/search (admin only)
-- `PUT /api/v1/admin/users/{id}/role` - Change user role (admin only)
-- `DELETE /api/v1/admin/users/{id}` - Delete user + cascade data (admin only)
+- GET /admin/users
+- PUT /admin/users/:id/role
+- DELETE /admin/users/:id
+- POST /admin/sequences
+- PUT /admin/sequences/:id
+- DELETE /admin/sequences/:id
+- POST /admin/poses
+- PUT /admin/poses/:id
+- DELETE /admin/poses/:id
+- POST /admin/breathing-patterns
+- PUT /admin/breathing-patterns/:id
+- DELETE /admin/breathing-patterns/:id
+- GET /admin/analytics/dashboard
+- GET /admin/analytics/users/:userId
 
-**VK Sequence Management**
-- `POST /api/v1/admin/sequences` - Create system sequence (admin only)
-- `PUT /api/v1/admin/sequences/{id}` - Update sequence (admin only)
-- `DELETE /api/v1/admin/sequences/{id}` - Delete sequence (admin only)
+## Configuration Source
 
-**Pose Management**
-- `POST /api/v1/admin/poses` - Create system pose with media (admin only)
-- `PUT /api/v1/admin/poses/{id}` - Update pose and/or media (admin only)
-- `DELETE /api/v1/admin/poses/{id}` - Delete pose + Cloudinary media (admin only)
+Swagger setup lives in:
 
-**Breathing Pattern Management**
-- `POST /api/v1/admin/breathing-patterns` - Create system pattern (admin only)
-- `PUT /api/v1/admin/breathing-patterns/{id}` - Update pattern (admin only)
-- `DELETE /api/v1/admin/breathing-patterns/{id}` - Delete pattern (admin only)
+- src/config/swagger.js
 
-**Analytics**
-- `GET /api/v1/admin/analytics/dashboard` - Global platform statistics (admin only)
-- `GET /api/v1/admin/analytics/users/{userId}` - Detailed analytics per user (admin only)
+JSDoc annotations are scanned from:
 
-## 🛠️ Swagger Configuration
+- src/api/routes/*.js
 
-The Swagger configuration is in [src/config/swagger.js](src/config/swagger.js):
+## Documenting a New Endpoint
 
-```javascript
-const swaggerOptions = {
-  definition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Herya App API",
-      version: "1.0.0",
-      description: "Yoga app API for Vinyasa Krama practice...",
-    },
-    servers: [
-      { url: "http://localhost:3000", description: "Development" },
-      { url: "https://api.herya-app.com", description: "Production" },
-    ],
-  },
-  apis: ["./src/api/routes/*.js"],
-};
-```
-
-## 📝 Adding Documentation to New Endpoints
-
-Every endpoint should have Swagger documentation. Use this template:
+Add a JSDoc block above the route handler.
 
 ```javascript
 /**
  * @swagger
  * /api/v1/your-endpoint:
  *   get:
- *     summary: Brief description
- *     description: Detailed description of what this endpoint does
+ *     summary: Short summary
  *     tags:
- *       - Your Feature Name
+ *       - Your Tag
  *     security:
- *       - bearerAuth: []  // Remove this if endpoint is public
- *     parameters:
- *       - in: query
- *         name: paramName
- *         schema:
- *           type: string
- *         description: What this param does
+ *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Success response description
+ *         description: Success
  *       400:
  *         description: Bad request
  *       401:
@@ -175,60 +160,35 @@ Every endpoint should have Swagger documentation. Use this template:
  *       500:
  *         description: Server error
  */
-router.get("/your-endpoint", yourController);
+router.get("/your-endpoint", controllerFn);
 ```
 
-## 🚨 Common Issues
+Restart backend and refresh /api-docs.
 
-### Swagger not loading
-- Make sure server is running on port 3000
-- Check that `/api-docs` returns HTML (not JSON)
-- Browser may need hard refresh (Cmd+Shift+R or Ctrl+Shift+F5)
+## Common Issues
 
-### Authorization not working
-- Token format must include "Bearer " prefix
-- JWT_SECRET in .env must match token generation
-- Token expires after **1 day** (hardcoded in `src/utils/token.js`)
+### Swagger not available
 
-### Endpoints not showing up
-- Documentation must be in JSDoc comments (`/** @swagger ... */`)
-- Must be in `/src/api/routes/*.js` files
-- Restart server after adding new documentation
+1. Verify backend is running.
+2. Verify NODE_ENV is not test (Swagger is disabled in test).
+3. Refresh browser cache.
 
-## 📚 OpenAPI Resources
+### 401 in protected routes
 
-- [OpenAPI 3.0 Spec](https://spec.openapis.org/oas/v3.0.0)
-- [Swagger-JSDoc Documentation](https://github.com/Surnet/swagger-jsdoc)
-- [Swagger UI Demo](https://petstore.swagger.io/)
+1. Verify Bearer token format.
+2. Verify JWT_SECRET in running environment.
+3. Generate a new token if expired.
 
-## 🔗 Health Check
+### New endpoint missing in Swagger
 
-Check if API is running:
+1. Confirm annotation is in src/api/routes/*.js.
+2. Confirm annotation starts with @swagger.
+3. Restart server after edits.
+
+## Health Check
 
 ```bash
 curl http://localhost:3000/
 ```
 
-Should return:
-
-```json
-{
-  "message": "Herya App Backend - Vinyasa Krama Practice",
-  "status": "Server is running",
-  "version": "1.0.0",
-  "endpoints": {
-    "auth": "/api/v1/auth",
-    "admin": "/api/v1/admin",
-    "poses": "/api/v1/poses",
-    "breathingPatterns": "/api/v1/breathing-patterns",
-    "users": "/api/v1/users",
-    "journalEntries": "/api/v1/journal-entries",
-    "sessions": "/api/v1/sessions",
-    "sequences": "/api/v1/sequences"
-  }
-}
-```
-
----
-
-**Swagger automatically updates as you restart the server!** 🎉
+Expected response includes backend status and API route groups.

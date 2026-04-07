@@ -53,9 +53,10 @@ function SyncUserPreferences() {
 	useEffect(() => {
 		if (!user?.preferences) return;
 		const prefLang = user.preferences.language;
-		if (prefLang && prefLang !== lang) setLanguage(prefLang);
+		if (prefLang && prefLang !== lang && ["es", "en"].includes(prefLang))
+			setLanguage(prefLang);
 		const prefTheme = user.preferences.theme;
-		if (prefTheme) setTheme(prefTheme);
+		if (prefTheme && ["light", "dark"].includes(prefTheme)) setTheme(prefTheme);
 	}, [user, lang, setLanguage, setTheme]);
 
 	return null;

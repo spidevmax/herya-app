@@ -1,15 +1,26 @@
+const LOCALE_MAP = { en: "en-US", es: "es-ES" };
+const toLocale = (lang) => LOCALE_MAP[lang] || lang || "en-US";
+
 export const format = {
-	date: (d) => {
+	date: (d, lang) => {
 		if (!d) return "";
 		const dt = new Date(d);
 		const today = new Date();
-		const diff = Math.floor((today - dt) / 86400000);
-		if (diff === 0) return "Today";
-		if (diff === 1) return "Yesterday";
-		return dt.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+		// Compare by calendar date (DST-safe) instead of ms division
+		const dtDate = dt.toDateString();
+		const todayDate = today.toDateString();
+		const yesterday = new Date(today);
+		yesterday.setDate(yesterday.getDate() - 1);
+		if (dtDate === todayDate) return lang === "es" ? "Hoy" : "Today";
+		if (dtDate === yesterday.toDateString())
+			return lang === "es" ? "Ayer" : "Yesterday";
+		return dt.toLocaleDateString(toLocale(lang), {
+			month: "short",
+			day: "numeric",
+		});
 	},
-	time: (d) =>
-		new Date(d).toLocaleTimeString("en-US", {
+	time: (d, lang) =>
+		new Date(d).toLocaleTimeString(toLocale(lang), {
 			hour: "2-digit",
 			minute: "2-digit",
 		}),

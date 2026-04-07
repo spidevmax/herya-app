@@ -11,9 +11,11 @@ import {
 import { useNavigate } from "react-router-dom";
 import { SESSION_TYPES, VK_FAMILY_MAP } from "@/utils/constants";
 import { format } from "@/utils/helpers";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function RecentSessionCard({ session, index = 0 }) {
 	const navigate = useNavigate();
+	const { lang } = useLanguage();
 	const family = session.vkSequence?.family
 		? VK_FAMILY_MAP[session.vkSequence.family]
 		: null;
@@ -60,7 +62,7 @@ export default function RecentSessionCard({ session, index = 0 }) {
 					{session.vkSequence?.englishName || sessionType?.label || "Session"}
 				</p>
 				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-					{format.date(session.date || session.createdAt)}
+					{format.date(session.date || session.createdAt, lang)}
 				</p>
 			</div>
 			<div className="flex flex-col items-end gap-1 flex-shrink-0">

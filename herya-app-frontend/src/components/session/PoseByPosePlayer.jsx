@@ -422,7 +422,7 @@ export default function PoseByPosePlayer({
 					onClick={() => {
 						if (needsSecondSide) {
 							setSide("right");
-							setBreathCount(0);
+							setElapsedSec(0);
 						} else {
 							advancePose();
 						}
@@ -590,13 +590,13 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 								>
 									{t("guided.setup")}
 								</p>
-								{instructions.setup.map((s) => (
+								{instructions.setup.map((s, idx) => (
 									<p
 										key={s}
 										className="text-xs"
 										style={{ color: "var(--color-text-secondary)" }}
 									>
-										{i + 1}. {s}
+										{idx + 1}. {s}
 									</p>
 								))}
 							</div>
@@ -609,13 +609,13 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 								>
 									{t("guided.exit_pose")}
 								</p>
-								{instructions.exit.map((s) => (
+								{instructions.exit.map((s, idx) => (
 									<p
 										key={s}
 										className="text-xs"
 										style={{ color: "var(--color-text-secondary)" }}
 									>
-										{i + 1}. {s}
+										{idx + 1}. {s}
 									</p>
 								))}
 							</div>

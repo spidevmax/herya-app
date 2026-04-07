@@ -98,6 +98,7 @@ export const MOOD_COLORS = {
 	centered: "#74C69D",
 	light: "#FFC97A",
 	clear: "#48CAE4",
+	grateful: "#F6BD60",
 };
 
 export const GARDEN_MOOD_ORDER = [

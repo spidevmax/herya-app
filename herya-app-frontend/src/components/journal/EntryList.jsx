@@ -14,13 +14,13 @@ const toMoodTokens = (moods, prefix) => {
 };
 
 const EntryCard = ({ entry, onSelect }) => {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 
 	const entryId = entry?._id || entry?.id || entry?.session;
 	const practiceType = entry?.session?.sessionType || entry?.sessionType;
 	const moods = entry.moodAfter || entry.moodBefore || [];
 	const moodTokens = toMoodTokens(moods.slice(0, 2), `entry-${entryId}`);
-	const created = format.date(entry.date || entry.createdAt);
+	const created = format.date(entry.date || entry.createdAt, lang);
 
 	const translateMoodLabel = (mood) => {
 		const key = `session.moods.${mood}`;

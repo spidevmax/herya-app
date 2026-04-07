@@ -52,7 +52,6 @@ export default function SequencePicker({
 	}, [sequences, search]);
 
 	const selected = sequences.find((s) => s._id === selectedId);
-	const previewed = sequences.find((s) => s._id === previewId);
 
 	const handleSelect = (seq) => {
 		onSelect(seq);

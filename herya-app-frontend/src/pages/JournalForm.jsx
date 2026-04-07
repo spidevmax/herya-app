@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera, Check, ChevronLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -93,6 +93,15 @@ export default function JournalForm() {
 	const [fetchError, setFetchError] = useState(false);
 	const [saveError, setSaveError] = useState(null);
 	const [success, setSuccess] = useState(false);
+	const blobUrlsRef = useRef([]);
+
+	// Revoke all blob URLs on unmount to prevent memory leaks
+	useEffect(() => {
+		const urls = blobUrlsRef.current;
+		return () => {
+			for (const url of urls) URL.revokeObjectURL(url);
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!isEdit) return;
@@ -121,7 +130,8 @@ export default function JournalForm() {
 				payload.append("physicalSensations[]", s);
 			});
 			form.photos.forEach((p) => {
-				if (p instanceof File) payload.append("photos", p);
+				const file = p.file || p;
+				if (file instanceof File) payload.append("photos", file);
 			});
 
 			if (isEdit) {
@@ -355,17 +365,22 @@ export default function JournalForm() {
 								className="hidden"
 								onChange={(e) => {
 									const files = Array.from(e.target.files ?? []);
-									setForm((f) => ({ ...f, photos: [...f.photos, ...files] }));
+									const newEntries = files.map((file) => {
+										const url = URL.createObjectURL(file);
+										blobUrlsRef.current.push(url);
+										return { file, previewUrl: url };
+									});
+									setForm((f) => ({ ...f, photos: [...f.photos, ...newEntries] }));
 								}}
 							/>
 						</label>
 						{form.photos.length > 0 && (
 							<div className="flex gap-2 mt-3 overflow-x-auto pb-1 no-scrollbar">
 								{form.photos.map((p, i) => {
-									const url = p instanceof File ? URL.createObjectURL(p) : p;
+									const url = p.previewUrl || (typeof p === "string" ? p : "");
 									return (
 										<img
-											key={`photo-${url.slice(-8)}`}
+											key={url || `photo-${i}`}
 											src={url}
 											alt={t("journal_form.photo_alt", { n: i + 1 })}
 											className="w-20 h-20 rounded-xl object-cover flex-shrink-0"

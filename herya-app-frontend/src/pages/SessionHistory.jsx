@@ -39,7 +39,7 @@ const TYPE_FILTER_I18N = {
 	complete_practice: "session_history.filter_complete",
 };
 
-function SessionCard({ session, index, onClick, t }) {
+function SessionCard({ session, index, onClick, t, lang }) {
 	const color = TYPE_COLORS[session.sessionType] || "var(--color-primary)";
 	const TypeIcon = TYPE_ICONS[session.sessionType] || PersonStanding;
 	const label = t(TYPE_FILTER_I18N[session.sessionType] || `practice.type_${session.sessionType}`);
@@ -70,7 +70,7 @@ function SessionCard({ session, index, onClick, t }) {
 					{label}
 				</p>
 				<p className="text-[var(--color-text-muted)] text-xs mt-0.5">
-					{format.date(session.date || session.createdAt)}
+					{format.date(session.date || session.createdAt, lang)}
 				</p>
 				{session.duration && (
 					<p className="text-[var(--color-text-secondary)] text-xs">
@@ -90,7 +90,7 @@ function SessionCard({ session, index, onClick, t }) {
 
 export default function SessionHistory() {
 	const navigate = useNavigate();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const [sessions, setSessions] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [type, setType] = useState("");
@@ -171,6 +171,7 @@ export default function SessionHistory() {
 							index={i}
 							onClick={() => navigate(`/sessions/${s._id}`)}
 							t={t}
+							lang={lang}
 						/>
 					))
 				)}

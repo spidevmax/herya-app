@@ -7,6 +7,8 @@ import { requestPasswordReset } from "@/api/auth.api";
 import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
 import { useLanguage } from "@/context/LanguageContext";
 
+const isDev = import.meta.env.DEV;
+
 const ForgotPassword = () => {
 	const { t, lang } = useLanguage();
 	const [email, setEmail] = useState("");
@@ -22,7 +24,7 @@ const ForgotPassword = () => {
 		try {
 			const { data } = await requestPasswordReset({ email, locale: lang });
 			setSubmitted(true);
-			setResetUrl(data?.data?.resetUrl || "");
+			setResetUrl(isDev ? data?.data?.resetUrl || "" : "");
 		} catch (err) {
 			setError(err?.response?.data?.message || t("forgot_password.error"));
 		} finally {

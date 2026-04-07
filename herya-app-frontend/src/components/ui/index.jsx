@@ -1,5 +1,5 @@
 // Common UI primitives
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import {
 	ArrowLeft,
@@ -416,22 +416,60 @@ export const ConfirmModal = ({
 }) => {
 	const { t } = useLanguage();
 	const [phraseInput, setPhraseInput] = useState("");
+	const dialogRef = useRef(null);
 	const resolvedConfirmLabel = confirmLabel ?? t("ui.confirm");
 	const resolvedCancelLabel = cancelLabel ?? t("ui.cancel");
 	const closeAriaLabel = t("ui.close_modal");
 	const confirmBlocked = confirmPhrase ? phraseInput !== confirmPhrase : false;
+	const titleId = "confirm-modal-title";
+	const descId = description ? "confirm-modal-desc" : undefined;
 
 	useEffect(() => {
 		if (!open) setPhraseInput("");
 	}, [open]);
 
+	// Escape key handler
+	useEffect(() => {
+		if (!open || loading) return undefined;
+		const handleKeyDown = (e) => {
+			if (e.key === "Escape") onClose();
+		};
+		document.addEventListener("keydown", handleKeyDown);
+		return () => document.removeEventListener("keydown", handleKeyDown);
+	}, [open, loading, onClose]);
+
+	// Focus trap
+	const handleKeyDown = useCallback(
+		(e) => {
+			if (e.key !== "Tab" || !dialogRef.current) return;
+			const focusable = dialogRef.current.querySelectorAll(
+				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+			);
+			if (focusable.length === 0) return;
+			const first = focusable[0];
+			const last = focusable[focusable.length - 1];
+			if (e.shiftKey && document.activeElement === first) {
+				e.preventDefault();
+				last.focus();
+			} else if (!e.shiftKey && document.activeElement === last) {
+				e.preventDefault();
+				first.focus();
+			}
+		},
+		[],
+	);
+
 	if (!open) return null;
 
 	return (
 		<div
+			ref={dialogRef}
 			className="fixed inset-0 z-50 flex items-center justify-center p-4"
 			role="dialog"
 			aria-modal="true"
+			aria-labelledby={titleId}
+			aria-describedby={descId}
+			onKeyDown={handleKeyDown}
 		>
 			<button
 				type="button"
@@ -447,11 +485,17 @@ export const ConfirmModal = ({
 				className="relative w-full max-w-md rounded-2xl p-6 shadow-[var(--shadow-card-hover)]"
 				style={{ backgroundColor: "var(--color-surface-card)" }}
 			>
-				<h3 className="font-display text-lg font-semibold text-[var(--color-text-primary)]">
+				<h3
+					id={titleId}
+					className="font-display text-lg font-semibold text-[var(--color-text-primary)]"
+				>
 					{title}
 				</h3>
 				{description ? (
-					<p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+					<p
+						id={descId}
+						className="mt-2 text-sm text-[var(--color-text-secondary)]"
+					>
 						{description}
 					</p>
 				) : null}
