@@ -97,6 +97,7 @@ const userSchema = new mongoose.Schema(
 		totalSessions: { type: Number, default: 0 },
 		totalMinutes: { type: Number, default: 0 },
 		currentStreak: { type: Number, default: 0 },
+		bestStreak: { type: Number, default: 0 },
 		lastPracticeDate: { type: Date },
 
 		// VK-SPECIFIC PROGRESSION TRACKING

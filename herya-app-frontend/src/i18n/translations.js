@@ -490,11 +490,20 @@ export const translations = {
 			goals_hint: "Choose as many as you like",
 			interface_title: "Interface",
 			saved: "Saved!",
+			email: "Email",
 			save_error: "Could not save. Please try again.",
 			delete_confirm_phrase: "DELETE",
 			notifications_title: "Notifications",
 			days: "d",
 			notifications_disabled_hint: "You won't receive practice reminders.",
+			photo_invalid_type: "Only JPG, PNG, GIF and WebP images are allowed.",
+			photo_too_large: "Image must be smaller than 5 MB.",
+			photo_upload_error: "Could not upload photo. Please try again.",
+			validation: {
+				name_length: "Name must be between 2 and 50 characters.",
+				email_invalid: "Please enter a valid email address.",
+				duration_positive: "Duration must be at least 1 minute.",
+			},
 			option_labels: {
 				goals: {
 					increase_flexibility: "Flexibility",
@@ -1504,11 +1513,20 @@ export const translations = {
 			goals_hint: "Elige los que quieras",
 			interface_title: "Interfaz",
 			saved: "¡Guardado!",
+			email: "Correo electrónico",
 			save_error: "No se pudo guardar. Inténtalo de nuevo.",
 			delete_confirm_phrase: "ELIMINAR",
 			notifications_title: "Notificaciones",
 			days: "d",
 			notifications_disabled_hint: "No recibirás recordatorios de práctica.",
+			photo_invalid_type: "Solo se permiten imágenes JPG, PNG, GIF y WebP.",
+			photo_too_large: "La imagen debe ser menor de 5 MB.",
+			photo_upload_error: "No se pudo subir la foto. Inténtalo de nuevo.",
+			validation: {
+				name_length: "El nombre debe tener entre 2 y 50 caracteres.",
+				email_invalid: "Introduce una dirección de correo válida.",
+				duration_positive: "La duración debe ser al menos 1 minuto.",
+			},
 			option_labels: {
 				goals: {
 					increase_flexibility: "Flexibilidad",

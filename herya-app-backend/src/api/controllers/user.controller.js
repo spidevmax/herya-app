@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/User.model");
 const Session = require("../models/Session.model");
 const JournalEntry = require("../models/JournalEntry.model");
@@ -7,25 +8,20 @@ const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
 
 /**
+ * Strips internal fields from a user object before sending as a response.
+ */
+function sanitizeUser(user) {
+	const obj = user.toObject ? user.toObject() : { ...user };
+	delete obj.password;
+	delete obj.vkProgression;
+	return obj;
+}
+
+/**
  * Controller: getMyProfile
  * ------------------------
  * Retrieves the authenticated user's profile.
- *
- * Workflow:
- * 1. Uses `req.user._id` (set by authenticateToken middleware) to find the current user in the database.
- * 2. Excludes the password field using `.select("-password")`.
- * 3. Returns a 200 response with the user's profile data.
- *
- * Error Handling:
- * - Throws 404 if the user cannot be found.
- * - Any other errors are forwarded to the global error handler.
- *
- * Notes:
- * - Requires `authenticateToken` middleware to ensure `req.user` is available.
- * - Keeps practice-history fields internal to the account record.
- * - Ideal for displaying personal information on a “My Profile” page.
  */
-
 const getMyProfile = async (req, res, next) => {
 	try {
 		const user = await User.findById(req.user._id).select("-password");
@@ -34,10 +30,7 @@ const getMyProfile = async (req, res, next) => {
 			throw createError(404, "User not found");
 		}
 
-		const userResponse = user.toObject();
-		delete userResponse.vkProgression;
-
-		return sendResponse(res, 200, true, "Profile retrieved successfully", userResponse);
+		return sendResponse(res, 200, true, "Profile retrieved successfully", sanitizeUser(user));
 	} catch (error) {
 		return next(error);
 	}
@@ -47,35 +40,8 @@ const getMyProfile = async (req, res, next) => {
  * Controller: updateMyProfile
  * ---------------------------
  * Allows the authenticated user to update their own profile information and preferences.
- *
- * Workflow:
- * 1. Finds the user using `req.user._id`.
- * 2. Prevents changes to restricted fields:
- *    - Cannot change `role` (throws 403).
- *    - Cannot change `password` here (must use `/users/change-password`).
- *    - Cannot change practice-history metadata directly (throws 403).
- * 3. Updates allowed fields: `name`, `email`, `goals`, `preferences`, and profile image.
- * 4. Validates email uniqueness (checks no other user has that email).
- * 5. If a new image is uploaded, deletes the old one from Cloudinary after successful save.
- * 6. Saves and returns the updated user (excluding password).
- *
- * Error Handling:
- * - Throws 400 if email is already in use by another user.
- * - Throws 403 if the user tries to change restricted fields.
- * - Throws 404 if the user does not exist.
- * - Cleans up new image from Cloudinary if database save fails.
- *
- * Notes:
- * - Requires `authenticateToken` middleware.
- * - Uses `multer` with Cloudinary for image upload management.
- * - Returns sanitized user data without password.
- * - Deletes old image only after new save succeeds (prevents data loss).
  */
-
 const updateMyProfile = async (req, res, next) => {
-	let imageUploaded = false;
-	let oldImageId = null;
-
 	try {
 		const user = await User.findById(req.user._id);
 		if (!user) {
@@ -101,15 +67,12 @@ const updateMyProfile = async (req, res, next) => {
 			);
 		}
 
-		// Store old image ID for cleanup
-		oldImageId = user.profileImageId;
-
-		// Update allowed fields
-		if (req.body.name) {
+		// Update allowed fields — use !== undefined to allow empty strings / falsy values
+		if (req.body.name !== undefined) {
 			user.name = req.body.name.trim();
 		}
 
-		if (req.body.email) {
+		if (req.body.email !== undefined) {
 			// Check if email is already taken by another user
 			const existingUser = await User.findOne({
 				email: req.body.email.toLowerCase().trim(),
@@ -128,7 +91,7 @@ const updateMyProfile = async (req, res, next) => {
 		}
 
 		// Update goals (array of strings)
-		if (req.body.goals) {
+		if (req.body.goals !== undefined) {
 			user.goals = req.body.goals;
 		}
 
@@ -136,7 +99,7 @@ const updateMyProfile = async (req, res, next) => {
 		if (req.body.preferences) {
 			const preferences = req.body.preferences;
 
-			if (preferences.practiceIntensity) {
+			if (preferences.practiceIntensity !== undefined) {
 				user.set("preferences.practiceIntensity", preferences.practiceIntensity);
 			}
 
@@ -144,19 +107,19 @@ const updateMyProfile = async (req, res, next) => {
 				user.set("preferences.sessionDuration", preferences.sessionDuration);
 			}
 
-			if (preferences.timeOfDay) {
+			if (preferences.timeOfDay !== undefined) {
 				user.set("preferences.timeOfDay", preferences.timeOfDay);
 			}
 
-			if (preferences.notifications) {
+			if (preferences.notifications !== undefined) {
 				user.set("preferences.notifications", preferences.notifications);
 			}
 
-			if (preferences.language) {
+			if (preferences.language !== undefined) {
 				user.set("preferences.language", preferences.language);
 			}
 
-			if (preferences.theme) {
+			if (preferences.theme !== undefined) {
 				user.set("preferences.theme", preferences.theme);
 			}
 
@@ -164,7 +127,7 @@ const updateMyProfile = async (req, res, next) => {
 				user.set("preferences.lowStimMode", preferences.lowStimMode);
 			}
 
-			if (preferences.safetyAnchors) {
+			if (preferences.safetyAnchors !== undefined) {
 				const phrase =
 					typeof preferences.safetyAnchors.phrase === "string"
 						? preferences.safetyAnchors.phrase.trim()
@@ -181,30 +144,10 @@ const updateMyProfile = async (req, res, next) => {
 			}
 		}
 
-		// Handle profile image update
-		if (req.file) {
-			user.profileImageUrl = req.file.path;
-			user.profileImageId = req.file.filename;
-			imageUploaded = true;
-		}
-
 		const updatedUser = await user.save();
 
-		// Delete old image only after successful save
-		if (imageUploaded && oldImageId) {
-			await deleteImgCloudinary(oldImageId);
-		}
-
-		// Remove password from response
-		const userResponse = updatedUser.toObject();
-		delete userResponse.password;
-
-		return sendResponse(res, 200, true, "Profile updated successfully", userResponse);
+		return sendResponse(res, 200, true, "Profile updated successfully", sanitizeUser(updatedUser));
 	} catch (error) {
-		// Clean up new image if save failed
-		if (imageUploaded && req.file?.filename) {
-			await deleteImgCloudinary(req.file.filename);
-		}
 		return next(error);
 	}
 };
@@ -213,27 +156,7 @@ const updateMyProfile = async (req, res, next) => {
  * Controller: updateMyPassword
  * ----------------------------
  * Allows the authenticated user to securely change their password.
- *
- * Workflow:
- * 1. Extracts `currentPassword`, `newPassword`, and `confirmPassword` from the request body (validated by middleware).
- * 2. Finds the user by `req.user._id` and explicitly includes the password field.
- * 3. Compares the provided current password with the stored (hashed) password using bcrypt.compare().
- * 4. If valid, assigns the new password — triggering the bcrypt pre-save hook for hashing.
- * 5. Saves the user to the database.
- * 6. Returns a 200 response with no sensitive data.
- *
- * Error Handling:
- * - 400 if validation fails (handled by changePasswordValidations middleware before this function).
- * - 401 if current password is incorrect.
- * - 404 if the user is not found.
- *
- * Notes:
- * - All field validation and password strength checks are done by changePasswordValidations middleware.
- * - The password hashing occurs automatically via the `pre("save")` hook in the User model.
- * - `authenticateToken` middleware is required to access this route.
- * - Returns null instead of user object for security reasons.
  */
-
 const updateMyPassword = async (req, res, next) => {
 	try {
 		const { currentPassword, newPassword } = req.body;
@@ -259,71 +182,68 @@ const updateMyPassword = async (req, res, next) => {
 };
 
 /**
+ * Performs the database deletions for account removal, optionally within
+ * a MongoDB session (transaction).
+ */
+async function performAccountDeletion(userId, opts = {}) {
+	await JournalEntry.deleteMany({ user: userId }, opts);
+	await Session.deleteMany({ user: userId }, opts);
+	await User.findByIdAndDelete(userId, opts);
+}
+
+/**
  * Controller: deleteMyAccount
  * ---------------------------
  * Permanently deletes the authenticated user's account and all associated data.
- *
- * Workflow:
- * 1. Finds the user by `req.user._id`.
- * 2. Deletes the user's profile image from Cloudinary (if exists).
- * 3. Cascade deletes all journal entries:
- *    - Extracts and deletes all photos from Cloudinary
- *    - Extracts and deletes all voice notes from Cloudinary
- *    - Deletes journal entry documents
- * 4. Cascade deletes all sessions associated with the user.
- * 5. Deletes the user record from the database.
- * 6. Returns a 200 response confirming permanent deletion.
- *
- * Error Handling:
- * - Throws 404 if the user does not exist.
- * - Any other errors are passed to the global error handler via `next(error)`.
- *
- * Notes:
- * - Requires `authenticateToken` middleware (user must be logged in).
- * - This is a permanent operation — all user data is irrevocably deleted.
- * - Cascade deletes related data (sessions, journal entries, media files).
- * - Consider implementing soft-deletion if audit logs are required.
+ * Uses a MongoDB transaction when the deployment supports replica sets, and
+ * falls back to sequential deletes otherwise.
  */
-
 const deleteMyAccount = async (req, res, next) => {
 	try {
-		// Find the authenticated user
 		const user = await User.findById(req.user._id);
 
 		if (!user) {
 			throw createError(404, "User not found");
 		}
 
-		// Delete profile picture from Cloudinary
+		// Collect all Cloudinary IDs for batch deletion
+		const cloudinaryIds = [];
+
 		if (user.profileImageId) {
-			await deleteImgCloudinary(user.profileImageId);
+			cloudinaryIds.push(user.profileImageId);
 		}
 
-		// Delete all journal entries with their media
 		const journals = await JournalEntry.find({ user: req.user._id });
 		for (const journal of journals) {
-			// Delete photos
 			for (const photo of journal.photos) {
-				if (photo.cloudinaryId) {
-					await deleteImgCloudinary(photo.cloudinaryId);
-				}
+				if (photo.cloudinaryId) cloudinaryIds.push(photo.cloudinaryId);
 			}
-			// Delete voice notes
 			for (const voiceNote of journal.voiceNotes) {
-				if (voiceNote.cloudinaryId) {
-					await deleteImgCloudinary(voiceNote.cloudinaryId);
-				}
+				if (voiceNote.cloudinaryId) cloudinaryIds.push(voiceNote.cloudinaryId);
 			}
 		}
 
-		// Delete all journals
-		await JournalEntry.deleteMany({ user: req.user._id });
+		// Attempt transactional delete; fall back to sequential if not supported
+		let usedTransaction = false;
+		try {
+			const session = await mongoose.startSession();
+			session.startTransaction();
+			await performAccountDeletion(req.user._id, { session });
+			await session.commitTransaction();
+			session.endSession();
+			usedTransaction = true;
+		} catch {
+			// Transaction not supported (e.g. standalone MongoDB) — delete sequentially
+		}
 
-		// Delete all sessions
-		await Session.deleteMany({ user: req.user._id });
+		if (!usedTransaction) {
+			await performAccountDeletion(req.user._id);
+		}
 
-		// Delete user
-		await User.findByIdAndDelete(req.user._id);
+		// Delete Cloudinary assets in parallel AFTER the DB deletes succeed
+		if (cloudinaryIds.length > 0) {
+			await Promise.allSettled(cloudinaryIds.map((id) => deleteImgCloudinary(id)));
+		}
 
 		return sendResponse(
 			res,
@@ -341,25 +261,6 @@ const deleteMyAccount = async (req, res, next) => {
  * Controller: getMyStats
  * ----------------------
  * Retrieves comprehensive practice statistics for the authenticated user.
- *
- * Workflow:
- * 1. Fetches user document (for totalSessions, totalMinutes, currentStreak, lastPracticeDate).
- * 2. Queries completed sessions from the last 4 weeks with populated sequence data.
- * 3. Calculates additional metrics:
- *    - Sessions per week (breaks down across 4 weeks)
- *    - Most practiced VK families (top 5, sorted by frequency)
- *    - Average session duration
- * 4. Extracts practice history metrics for dashboard use.
- * 5. Returns comprehensive stats object for dashboard/analytics.
- *
- * Error Handling:
- * - 404: User not found
- *
- * Notes:
- * - Requires `authenticateToken` middleware.
- * - Combines cached data (user document) with calculated data (from sessions).
- * - Perfect for dashboard and profile stats pages.
- * - Analyzes last 4 weeks for trending metrics.
  */
 const getMyStats = async (req, res, next) => {
 	try {
@@ -413,6 +314,7 @@ const getMyStats = async (req, res, next) => {
 			totalSessions: user.totalSessions,
 			totalMinutes: user.totalMinutes,
 			currentStreak: user.currentStreak,
+			bestStreak: user.bestStreak,
 			lastPracticeDate: user.lastPracticeDate,
 			sessionsPerWeek,
 			mostPracticedFamilies,
@@ -428,20 +330,6 @@ const getMyStats = async (req, res, next) => {
  * Controller: updateMyProfileImage
  * --------------------------------
  * Updates only the authenticated user's profile image.
- *
- * Workflow:
- * 1. Requires an image file via multipart/form-data.
- * 2. Finds the user by `req.user._id`.
- * 3. Stores old image ID for cleanup.
- * 4. Updates profileImageUrl and profileImageId with new image data.
- * 5. Saves the user to the database.
- * 6. Deletes the old image from Cloudinary after successful save.
- * 7. Returns the updated user object without password.
- *
- * Error Handling:
- * - 400 if no image file is provided.
- * - 404 if the user is not found.
- * - Cleans up new image from Cloudinary if database save fails.
  */
 const updateMyProfileImage = async (req, res, next) => {
 	let imageUploaded = false;
@@ -472,11 +360,7 @@ const updateMyProfileImage = async (req, res, next) => {
 			await deleteImgCloudinary(oldImageId);
 		}
 
-		// Remove password from response
-		const userResponse = updatedUser.toObject();
-		delete userResponse.password;
-
-		return sendResponse(res, 200, true, "Profile image updated successfully", userResponse);
+		return sendResponse(res, 200, true, "Profile image updated successfully", sanitizeUser(updatedUser));
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -490,18 +374,6 @@ const updateMyProfileImage = async (req, res, next) => {
  * Controller: deleteMyProfileImage
  * --------------------------------
  * Deletes the authenticated user's profile image.
- *
- * Workflow:
- * 1. Finds the user by `req.user._id`.
- * 2. If user has a profile image:
- *    - Deletes the image from Cloudinary
- *    - Clears profileImageUrl and profileImageId from user record
- *    - Saves the updated user to the database
- * 3. Returns the updated user object without password.
- *
- * Error Handling:
- * - 404 if the user is not found.
- * - 400 if the user has no image to delete.
  */
 const deleteMyProfileImage = async (req, res, next) => {
 	try {
@@ -523,11 +395,7 @@ const deleteMyProfileImage = async (req, res, next) => {
 		user.profileImageId = null;
 		const updatedUser = await user.save();
 
-		// Remove password from response
-		const userResponse = updatedUser.toObject();
-		delete userResponse.password;
-
-		return sendResponse(res, 200, true, "Profile image deleted successfully", userResponse);
+		return sendResponse(res, 200, true, "Profile image deleted successfully", sanitizeUser(updatedUser));
 	} catch (error) {
 		return next(error);
 	}

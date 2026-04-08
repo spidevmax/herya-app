@@ -1,3 +1,4 @@
+const rateLimit = require("express-rate-limit");
 const {
 	getMyProfile,
 	updateMyProfile,
@@ -18,6 +19,21 @@ const {
 const usersRouter = require("express").Router();
 
 usersRouter.use(authenticateToken());
+
+// Stricter rate limit for profile write operations (20 req / 15 min)
+const profileWriteLimiter = rateLimit({
+	windowMs: 15 * 60 * 1000,
+	max: 20,
+	standardHeaders: true,
+	legacyHeaders: false,
+	message: {
+		success: false,
+		message: "Too many profile updates, please try again later.",
+	},
+	skip: () =>
+		(process.env.NODE_ENV || "development") === "test" ||
+		process.env.DISABLE_RATE_LIMITS !== "false",
+});
 
 /**
  * @swagger
@@ -45,7 +61,7 @@ usersRouter.use(authenticateToken());
  *                   type: string
  *                 role:
  *                   type: string
- *                   enum: [user, admin]
+ *                   enum: [user, tutor, admin]
  *                 profileImageUrl:
  *                   type: string
  *                 pronouns:
@@ -61,6 +77,8 @@ usersRouter.use(authenticateToken());
  *                 totalMinutes:
  *                   type: integer
  *                 currentStreak:
+ *                   type: integer
+ *                 bestStreak:
  *                   type: integer
  *                 lastPracticeDate:
  *                   type: string
@@ -96,7 +114,7 @@ usersRouter.get("/me", getMyProfile);
  * /api/v1/users/me:
  *   put:
  *     summary: Update my profile
- *     description: Update current user's profile information and optional profile image. Practice history metadata is system-managed and cannot be changed here.
+ *     description: Update current user's profile information. Profile image should be updated via PUT /me/image. Practice history metadata is system-managed and cannot be changed here.
  *     tags:
  *       - Users
  *     security:
@@ -104,7 +122,7 @@ usersRouter.get("/me", getMyProfile);
  *     requestBody:
  *       required: false
  *       content:
- *         multipart/form-data:
+ *         application/json:
  *           schema:
  *             type: object
  *             properties:
@@ -161,10 +179,6 @@ usersRouter.get("/me", getMyProfile);
  *                     type: string
  *                     enum: [light, dark]
  *                     example: dark
- *               profileImage:
- *                 type: string
- *                 format: binary
- *                 description: New profile image (jpg, png, webp, gif)
  *     responses:
  *       200:
  *         description: Profile updated successfully
@@ -176,12 +190,14 @@ usersRouter.get("/me", getMyProfile);
  *         description: Forbidden - attempted to change role, password, or practice history metadata
  *       404:
  *         description: User not found
+ *       429:
+ *         description: Too many profile updates
  *       500:
  *         description: Server error
  */
 usersRouter.put(
 	"/me",
-	uploadUserImage.single("profileImage"),
+	profileWriteLimiter,
 	...updateProfileValidations,
 	handleValidationErrors,
 	updateMyProfile,
@@ -230,6 +246,7 @@ usersRouter.put(
  */
 usersRouter.put(
 	"/change-password",
+	profileWriteLimiter,
 	...changePasswordValidations,
 	handleValidationErrors,
 	updateMyPassword,
@@ -278,6 +295,8 @@ usersRouter.delete("/me", deleteMyAccount);
  *                 totalMinutes:
  *                   type: integer
  *                 currentStreak:
+ *                   type: integer
+ *                 bestStreak:
  *                   type: integer
  *                 lastPracticeDate:
  *                   type: string
@@ -338,10 +357,12 @@ usersRouter.get("/me/stats", getMyStats);
  *         description: Unauthorized - missing or invalid token
  *       404:
  *         description: User not found
+ *       429:
+ *         description: Too many profile updates
  *       500:
  *         description: Server error
  */
-usersRouter.put("/me/image", uploadUserImage.single("profileImage"), updateMyProfileImage);
+usersRouter.put("/me/image", profileWriteLimiter, uploadUserImage.single("profileImage"), updateMyProfileImage);
 
 /**
  * @swagger
