@@ -1,4 +1,10 @@
-import { useEffect, useState } from "react";
+import {
+	useDeferredValue,
+	useEffect,
+	useId,
+	useMemo,
+	useState,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -88,6 +94,8 @@ const TIME_EFFECT_ORDER = {
 	anytime: ["balancing", "calming", "energizing", "cooling", "heating"],
 };
 
+const ALL_TAB_PREVIEW_LIMIT = 6;
+
 const getPalette = (item, type) => {
 	if (type === "breathing") {
 		return BREATHING_PALETTE[item.energyEffect] ?? BREATHING_PALETTE.default;
@@ -149,29 +157,86 @@ const getCardTitle = (item, fallbackItemLabel) =>
 const getCardSubtitle = (item) =>
 	item.romanizationName || item.sanskritName || item.romanizedName || "";
 
-function StatBox({ value, label, bg, color }) {
+const getCardType = (item, fallbackType) => item.__kind || fallbackType;
+
+const getItemId = (item) =>
+	item._id ||
+	item.id ||
+	item.slug ||
+	item.englishName ||
+	item.name ||
+	item.title;
+
+const filterByQuery = (item, query) => {
+	if (query.length < 2) return true;
+	return collectSearchText(item).toLowerCase().includes(query);
+};
+
+const filterByDifficulty = (item, difficultyFilter, type) => {
+	if (difficultyFilter === "all") return true;
+	if (type !== "sequences" && type !== "poses") return true;
+	return item.difficulty === difficultyFilter;
+};
+
+const filterByEffect = (item, effectFilter, type) => {
+	if (effectFilter === "all") return true;
+	if (type !== "breathing") return true;
+	return item.energyEffect === effectFilter;
+};
+
+const sortItems = (items, fallbackType, difficultyOrder, effectOrder) =>
+	[...items].sort((a, b) => {
+		const aType = getCardType(a, fallbackType);
+		const bType = getCardType(b, fallbackType);
+		const aDifficultyRank =
+			aType === "sequences" || aType === "poses"
+				? getPreferredOrderIndex(a.difficulty, difficultyOrder)
+				: 99;
+		const bDifficultyRank =
+			bType === "sequences" || bType === "poses"
+				? getPreferredOrderIndex(b.difficulty, difficultyOrder)
+				: 99;
+		if (aDifficultyRank !== bDifficultyRank)
+			return aDifficultyRank - bDifficultyRank;
+
+		const aEffectRank =
+			aType === "breathing"
+				? getPreferredOrderIndex(a.energyEffect, effectOrder)
+				: 99;
+		const bEffectRank =
+			bType === "breathing"
+				? getPreferredOrderIndex(b.energyEffect, effectOrder)
+				: 99;
+		if (aEffectRank !== bEffectRank) return aEffectRank - bEffectRank;
+
+		const aTitle = getCardTitle(a, "").toLowerCase();
+		const bTitle = getCardTitle(b, "").toLowerCase();
+		return aTitle.localeCompare(bTitle);
+	});
+
+const StatBox = ({ value, label, bg, color }) => {
 	return (
 		<div
-			className="flex flex-col items-center justify-center rounded-xl px-2 py-1.5 min-w-[44px]"
+			className="flex min-w-[44px] flex-col items-center justify-center rounded-xl px-2 py-1.5"
 			style={{ backgroundColor: bg }}
 		>
 			<span
-				className="text-sm font-bold leading-none font-display"
+				className="font-display text-sm font-bold leading-none"
 				style={{ color }}
 			>
 				{value}
 			</span>
 			<span
-				className="text-[9px] font-black uppercase tracking-[0.12em] mt-0.5"
+				className="mt-0.5 text-[9px] font-black uppercase tracking-[0.12em]"
 				style={{ color }}
 			>
 				{label}
 			</span>
 		</div>
 	);
-}
+};
 
-function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
+const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 	const palette = getPalette(item, type);
 	const borderColor = palette.border;
 	const title = getCardTitle(item, fallbackItemLabel);
@@ -207,7 +272,7 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 			onClick={onClick}
 			whileHover={{ y: -3, scale: 1.01 }}
 			whileTap={{ scale: 0.985 }}
-			className="relative w-full text-left rounded-[28px] overflow-hidden transition-shadow duration-200"
+			className="relative w-full overflow-hidden rounded-[28px] text-left transition-shadow duration-200"
 			style={{ boxShadow: "0 14px 0 rgba(0,0,0,0.08)" }}
 		>
 			<div
@@ -216,7 +281,7 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 			>
 				<div className="flex items-stretch">
 					<div
-						className="flex items-center justify-center flex-shrink-0"
+						className="flex shrink-0 items-center justify-center"
 						style={{
 							width: 88,
 							minHeight: 88,
@@ -228,11 +293,11 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 							<img
 								src={imageSrc}
 								alt={title}
-								className="w-full h-full object-cover"
+								className="h-full w-full object-cover"
 							/>
 						) : (
 							<div
-								className="w-full h-full flex items-center justify-center text-2xl font-black font-display"
+								className="font-display flex h-full w-full items-center justify-center text-2xl font-black"
 								style={{ color: borderColor }}
 							>
 								{monogram || "?"}
@@ -240,7 +305,7 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 						)}
 					</div>
 
-					<div className="flex-1 min-w-0 px-3 py-2.5 flex flex-col justify-center gap-0.5">
+					<div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-3 py-2.5">
 						<div className="flex items-start justify-between gap-2">
 							<div className="min-w-0">
 								<p
@@ -250,7 +315,7 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 									{typeLabel}
 								</p>
 								<h3
-									className="font-black text-base leading-tight truncate"
+									className="truncate text-base font-black leading-tight"
 									style={{ color: borderColor }}
 								>
 									{title}
@@ -259,7 +324,7 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 						</div>
 						{subtitle && subtitle !== title && (
 							<p
-								className="text-xs italic truncate font-medium"
+								className="truncate text-xs font-medium italic"
 								style={{ color: `${borderColor}bb` }}
 							>
 								{subtitle}
@@ -267,7 +332,7 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 						)}
 						{item.description && (
 							<p
-								className="text-xs leading-snug mt-1 line-clamp-2"
+								className="mt-1 line-clamp-2 text-xs leading-snug"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
 								{item.description}
@@ -277,13 +342,13 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 				</div>
 
 				<div
-					className="flex items-center justify-between px-3 py-2 gap-2"
+					className="flex items-center justify-between gap-2 px-3 py-2"
 					style={{
 						borderTop: `3px solid ${borderColor}`,
 						backgroundColor: `${borderColor}11`,
 					}}
 				>
-					<div className="flex gap-1.5 flex-wrap">
+					<div className="flex flex-wrap gap-1.5">
 						{stats.map((stat) => (
 							<StatBox
 								key={stat.label}
@@ -298,53 +363,13 @@ function RetroCard({ item, type, onClick, typeLabel, fallbackItemLabel }) {
 			</div>
 		</motion.button>
 	);
-}
-
-const getCardType = (item, fallbackType) => item.__kind || fallbackType;
-
-const filterByQuery = (item, query) => {
-	if (query.length < 2) return true;
-	return collectSearchText(item).toLowerCase().includes(query);
 };
 
-const filterByDifficulty = (item, difficultyFilter) =>
-	difficultyFilter === "all" ? true : item.difficulty === difficultyFilter;
-
-const filterByEffect = (item, effectFilter) =>
-	effectFilter === "all" ? true : item.energyEffect === effectFilter;
-
-const sortItems = (items, type, difficultyOrder, effectOrder) =>
-	[...items].sort((a, b) => {
-		const aDifficultyRank =
-			type === "sequences" || type === "poses"
-				? getPreferredOrderIndex(a.difficulty, difficultyOrder)
-				: 99;
-		const bDifficultyRank =
-			type === "sequences" || type === "poses"
-				? getPreferredOrderIndex(b.difficulty, difficultyOrder)
-				: 99;
-		if (aDifficultyRank !== bDifficultyRank)
-			return aDifficultyRank - bDifficultyRank;
-
-		const aEffectRank =
-			type === "breathing"
-				? getPreferredOrderIndex(a.energyEffect, effectOrder)
-				: 99;
-		const bEffectRank =
-			type === "breathing"
-				? getPreferredOrderIndex(b.energyEffect, effectOrder)
-				: 99;
-		if (aEffectRank !== bEffectRank) return aEffectRank - bEffectRank;
-
-		const aTitle = getCardTitle(a, "").toLowerCase();
-		const bTitle = getCardTitle(b, "").toLowerCase();
-		return aTitle.localeCompare(bTitle);
-	});
-
-export default function Library() {
+const Library = () => {
 	const navigate = useNavigate();
 	const { user } = useAuth();
 	const { t } = useLanguage();
+	const tabsId = useId();
 	const tr = (key, fallback) => {
 		const value = t(key);
 		return value === key ? fallback : value;
@@ -355,68 +380,15 @@ export default function Library() {
 	const [poses, setPoses] = useState([]);
 	const [breathing, setBreathing] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
+	const [failedTypes, setFailedTypes] = useState([]);
 	const [hasFetched, setHasFetched] = useState(false);
 	const [query, setQuery] = useState("");
-	const [debouncedQuery, setDebouncedQuery] = useState("");
 	const [difficultyFilter, setDifficultyFilter] = useState("all");
 	const [effectFilter, setEffectFilter] = useState("all");
+	const deferredQuery = useDeferredValue(query.trim().toLowerCase());
 
-	useEffect(() => {
-		const timeoutId = window.setTimeout(() => {
-			setDebouncedQuery(query.trim().toLowerCase());
-		}, 220);
-
-		return () => window.clearTimeout(timeoutId);
-	}, [query]);
-
-	useEffect(() => {
-		if (!tab) return;
-		setQuery("");
-		setDifficultyFilter("all");
-		setEffectFilter("all");
-	}, [tab]);
-
-	useEffect(() => {
-		if (hasFetched) return;
-		setLoading(true);
-		setError(false);
-
-		Promise.all([
-			getSequences({ limit: 50 }),
-			getPoses({ limit: 60 }),
-			getBreathingPatterns({ limit: 50 }),
-		])
-			.then(([seqRes, poseRes, breathRes]) => {
-				const seqPayload = seqRes.data?.data || seqRes.data || {};
-				const posePayload = poseRes.data?.data || poseRes.data || {};
-				const breathPayload = breathRes.data?.data || breathRes.data || {};
-
-				const seqList =
-					seqPayload.sequences ?? (Array.isArray(seqPayload) ? seqPayload : []);
-				const poseList =
-					posePayload.poses ?? (Array.isArray(posePayload) ? posePayload : []);
-				const breathList =
-					breathPayload.patterns ??
-					(Array.isArray(breathPayload) ? breathPayload : []);
-
-				setSequences(Array.isArray(seqList) ? seqList : []);
-				setPoses(Array.isArray(poseList) ? poseList : []);
-				setBreathing(Array.isArray(breathList) ? breathList : []);
-				setHasFetched(true);
-			})
-			.catch(() => {
-				setSequences([]);
-				setPoses([]);
-				setBreathing([]);
-				setError(true);
-			})
-			.finally(() => setLoading(false));
-	}, [hasFetched]);
-
-	const allTabLabel = tr("library.tabs_all", "All");
 	const tabs = [
-		{ key: "all", label: allTabLabel },
+		{ key: "all", label: tr("library.tabs_all", "All") },
 		{ key: "sequences", label: t("library.tabs_sequences", "Sequences") },
 		{ key: "poses", label: t("library.tabs_poses", "Poses") },
 		{ key: "breathing", label: t("library.tabs_breathing", "Breathing") },
@@ -424,43 +396,128 @@ export default function Library() {
 
 	const cardTypeLabel = (type) => getTypeLabel(type, t);
 
-	const items =
-		tab === "sequences"
-			? sequences.map((item) => ({ ...item, __kind: "sequences" }))
-			: tab === "poses"
-				? poses.map((item) => ({ ...item, __kind: "poses" }))
-				: tab === "breathing"
-					? breathing.map((item) => ({ ...item, __kind: "breathing" }))
-					: [
-							...sequences.map((item) => ({ ...item, __kind: "sequences" })),
-							...poses.map((item) => ({ ...item, __kind: "poses" })),
-							...breathing.map((item) => ({ ...item, __kind: "breathing" })),
-						];
+	const handleTabChange = (nextTab) => {
+		setTab(nextTab);
+		if (nextTab === "all") {
+			setDifficultyFilter("all");
+			setEffectFilter("all");
+		}
+		if (nextTab === "breathing") setDifficultyFilter("all");
+		if (nextTab === "sequences" || nextTab === "poses") setEffectFilter("all");
+	};
 
-	const difficultyOptions = [
-		"all",
-		...Array.from(
-			new Set(
-				items
-					.map((item) => item.difficulty)
-					.filter((value) => typeof value === "string" && value.length > 0),
-			),
-		),
-	];
-	const effectOptions = [
-		"all",
-		...Array.from(
-			new Set(
-				items
-					.map((item) => item.energyEffect)
-					.filter((value) => typeof value === "string" && value.length > 0),
-			),
-		),
-	];
+	const handleTabKeyDown = (event, index) => {
+		if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+		event.preventDefault();
+		const nextIndex =
+			event.key === "ArrowRight"
+				? (index + 1) % tabs.length
+				: (index - 1 + tabs.length) % tabs.length;
+		handleTabChange(tabs[nextIndex].key);
+	};
 
-	const showDifficultyFilters =
-		tab === "all" || tab === "sequences" || tab === "poses";
-	const showEffectFilters = tab === "all" || tab === "breathing";
+	useEffect(() => {
+		if (hasFetched) return;
+		setLoading(true);
+		setFailedTypes([]);
+
+		Promise.allSettled([
+			getSequences({ limit: 100 }),
+			getPoses({ limit: 100 }),
+			getBreathingPatterns({ limit: 100 }),
+		])
+			.then(([seqRes, poseRes, breathRes]) => {
+				const nextFailedTypes = [];
+
+				if (seqRes.status === "fulfilled") {
+					const seqPayload = seqRes.value.data?.data || seqRes.value.data || {};
+					const seqList =
+						seqPayload.sequences ?? (Array.isArray(seqPayload) ? seqPayload : []);
+					setSequences(Array.isArray(seqList) ? seqList : []);
+				} else {
+					setSequences([]);
+					nextFailedTypes.push("sequences");
+				}
+
+				if (poseRes.status === "fulfilled") {
+					const posePayload = poseRes.value.data?.data || poseRes.value.data || {};
+					const poseList =
+						posePayload.poses ?? (Array.isArray(posePayload) ? posePayload : []);
+					setPoses(Array.isArray(poseList) ? poseList : []);
+				} else {
+					setPoses([]);
+					nextFailedTypes.push("poses");
+				}
+
+				if (breathRes.status === "fulfilled") {
+					const breathPayload =
+						breathRes.value.data?.data || breathRes.value.data || {};
+					const breathList =
+						breathPayload.patterns ??
+						(Array.isArray(breathPayload) ? breathPayload : []);
+					setBreathing(Array.isArray(breathList) ? breathList : []);
+				} else {
+					setBreathing([]);
+					nextFailedTypes.push("breathing");
+				}
+
+				setFailedTypes(nextFailedTypes);
+				setHasFetched(true);
+			})
+			.finally(() => setLoading(false));
+	}, [hasFetched]);
+
+	const items = useMemo(
+		() =>
+			tab === "sequences"
+				? sequences.map((item) => ({ ...item, __kind: "sequences" }))
+				: tab === "poses"
+					? poses.map((item) => ({ ...item, __kind: "poses" }))
+					: tab === "breathing"
+						? breathing.map((item) => ({ ...item, __kind: "breathing" }))
+						: [
+								...sequences.map((item) => ({ ...item, __kind: "sequences" })),
+								...poses.map((item) => ({ ...item, __kind: "poses" })),
+								...breathing.map((item) => ({ ...item, __kind: "breathing" })),
+							],
+		[tab, sequences, poses, breathing],
+	);
+
+	const difficultyOptions = useMemo(
+		() => [
+			"all",
+			...Array.from(
+				new Set(
+					items
+						.filter((item) => {
+							const itemType = getCardType(item, tab);
+							return itemType === "sequences" || itemType === "poses";
+						})
+						.map((item) => item.difficulty)
+						.filter((value) => typeof value === "string" && value.length > 0),
+				),
+			),
+		],
+		[items, tab],
+	);
+
+	const effectOptions = useMemo(
+		() => [
+			"all",
+			...Array.from(
+				new Set(
+					items
+						.filter((item) => getCardType(item, tab) === "breathing")
+						.map((item) => item.energyEffect)
+						.filter((value) => typeof value === "string" && value.length > 0),
+				),
+			),
+		],
+		[items, tab],
+	);
+
+	const showDifficultyFilters = tab === "sequences" || tab === "poses";
+	const showEffectFilters = tab === "breathing";
 	const preferredIntensity = user?.preferences?.practiceIntensity || "moderate";
 	const preferredTimeOfDay = user?.preferences?.timeOfDay || "anytime";
 	const difficultyOrder =
@@ -469,69 +526,92 @@ export default function Library() {
 	const effectOrder =
 		TIME_EFFECT_ORDER[preferredTimeOfDay] || TIME_EFFECT_ORDER.anytime;
 
-	const filteredItems = items.filter(
-		(item) =>
-			filterByQuery(item, debouncedQuery) &&
-			filterByDifficulty(item, difficultyFilter) &&
-			filterByEffect(item, effectFilter),
+	const filteredItems = useMemo(
+		() =>
+			items.filter((item) => {
+				const itemType = getCardType(item, tab);
+				return (
+					filterByQuery(item, deferredQuery) &&
+					filterByDifficulty(item, difficultyFilter, itemType) &&
+					filterByEffect(item, effectFilter, itemType)
+				);
+			}),
+		[items, tab, deferredQuery, difficultyFilter, effectFilter],
 	);
-	const prioritizedItems = sortItems(
-		filteredItems,
-		tab,
-		difficultyOrder,
-		effectOrder,
+
+	const prioritizedItems = useMemo(
+		() => sortItems(filteredItems, tab, difficultyOrder, effectOrder),
+		[filteredItems, tab, difficultyOrder, effectOrder],
 	);
-	const groupedItems =
-		tab === "all"
-			? ["sequences", "poses", "breathing"].map((groupType) => {
-					const groupItems = prioritizedItems.filter(
-						(item) => getCardType(item, tab) === groupType,
-					);
-					return {
-						type: groupType,
-						label: cardTypeLabel(groupType),
-						count: groupItems.length,
-						items: groupItems,
-					};
-				})
-			: [];
+
+	const groupedItems = useMemo(
+		() =>
+			tab === "all"
+				? ["sequences", "poses", "breathing"].map((groupType) => {
+						const groupItems = prioritizedItems.filter(
+							(item) => getCardType(item, tab) === groupType,
+						);
+						return {
+							type: groupType,
+							label: getTypeLabel(groupType, t),
+							count: groupItems.length,
+							items: groupItems.slice(0, ALL_TAB_PREVIEW_LIMIT),
+						};
+					})
+				: [],
+		[prioritizedItems, tab, t],
+	);
 
 	const handleCardClick = (item, type) => {
-		if (type === "sequences") navigate(`/library/sequence/${item._id}`);
-		else if (type === "poses") navigate(`/library/pose/${item._id}`);
-		else if (type === "breathing") navigate(`/library/breathing/${item._id}`);
+		const itemId = getItemId(item);
+		if (!itemId) return;
+		if (type === "sequences") navigate(`/library/sequence/${itemId}`);
+		else if (type === "poses") navigate(`/library/pose/${itemId}`);
+		else if (type === "breathing") navigate(`/library/breathing/${itemId}`);
 	};
 
 	const emptyTitle =
-		tab === "sequences"
-			? t("library.empty_sequences", "No sequences yet")
-			: tab === "poses"
-				? t("library.empty_poses", "No poses yet")
-				: t("library.empty_patterns", "No patterns yet");
+		tab === "all"
+			? tr("library.title", "Library")
+			: tab === "sequences"
+				? t("library.empty_sequences", "No sequences yet")
+				: tab === "poses"
+					? t("library.empty_poses", "No poses yet")
+					: t("library.empty_patterns", "No patterns yet");
 	const emptyHint =
-		tab === "sequences"
-			? t("library.empty_sequences_hint", "Try another filter or search term.")
-			: tab === "poses"
-				? t("library.empty_poses_hint", "Try another filter or search term.")
-				: t(
-						"library.empty_patterns_hint",
-						"Try another filter or search term.",
-					);
+		tab === "all"
+			? tr(
+					"library.subtitle",
+					"Explore and study sequences, poses, and pranayama.",
+				)
+			: tab === "sequences"
+				? t("library.empty_sequences_hint", "Try another filter or search term.")
+				: tab === "poses"
+					? t("library.empty_poses_hint", "Try another filter or search term.")
+					: t(
+							"library.empty_patterns_hint",
+							"Try another filter or search term.",
+						);
 	const noResultsHint = tr("library.no_results", "No results found");
 	const clearFiltersLabel = tr("library.clear_filters", "Clear filters");
-	const errorTitle = tr("library.error_title", "Could not load content");
-	const errorHint = tr(
-		"library.error_hint",
-		"Check your connection and try again.",
-	);
+	const hasFatalError = failedTypes.length === 3;
+	const failedTypeLabels = failedTypes.map((type) => cardTypeLabel(type)).join(", ");
+	const warningTitle = tr("library.error_title", "Could not load content");
+	const warningHint =
+		failedTypes.length > 0
+			? `${tr("library.error_hint", "Check your connection and try again.")} ${failedTypeLabels}.`
+			: "";
 	const retryLabel = tr("library.retry", "Retry");
 	const resultCount = prioritizedItems.length;
 	const resultCountLabel = tr("library.result_count", "{n} items");
+	const searchLabel = tr("library.search", "Search the library");
+	const searchHelpText =
+		query.trim().length === 1 ? "Type at least 2 characters to search." : "";
 
 	return (
-		<div className="flex flex-col pt-4 pb-6 gap-4">
+		<div className="flex flex-col gap-4 pt-4 pb-6">
 			<div className="px-4">
-				<h1 className="text-3xl font-bold mb-1 text-[var(--color-text-primary)]">
+				<h1 className="mb-1 text-3xl font-bold text-[var(--color-text-primary)]">
 					{t("library.title", "Library")}
 				</h1>
 				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
@@ -543,18 +623,22 @@ export default function Library() {
 			</div>
 
 			<div
-				className="flex gap-2 px-4 overflow-x-auto pb-1"
+				className="flex gap-2 overflow-x-auto px-4 pb-1"
 				role="tablist"
 				aria-label={t("library.title", "Library")}
 			>
-				{tabs.map((tabItem) => (
+				{tabs.map((tabItem, index) => (
 					<button
 						key={tabItem.key}
 						type="button"
 						role="tab"
+						id={`${tabsId}-${tabItem.key}-tab`}
+						aria-controls={`${tabsId}-${tabItem.key}-panel`}
 						aria-selected={tab === tabItem.key}
-						onClick={() => setTab(tabItem.key)}
-						className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-bold transition-all border-2"
+						tabIndex={tab === tabItem.key ? 0 : -1}
+						onClick={() => handleTabChange(tabItem.key)}
+						onKeyDown={(event) => handleTabKeyDown(event, index)}
+						className="shrink-0 rounded-full border-2 px-4 py-2 text-sm font-bold transition-all"
 						style={{
 							backgroundColor:
 								tab === tabItem.key
@@ -577,21 +661,49 @@ export default function Library() {
 				<div className="relative">
 					<Search
 						size={18}
-						className="absolute left-4 top-1/2 -translate-y-1/2"
+						className="absolute top-1/2 left-4 -translate-y-1/2"
+						aria-hidden="true"
 						style={{ color: "var(--color-text-muted)" }}
 					/>
+					<label htmlFor={`${tabsId}-search`} className="sr-only">
+						{searchLabel}
+					</label>
 					<input
+						id={`${tabsId}-search`}
+						type="search"
 						value={query}
-						onChange={(e) => setQuery(e.target.value)}
-						placeholder={t("library.search", "Search the library")}
-						className="w-full pl-11 pr-4 py-2.5 rounded-2xl text-sm font-medium focus:outline-none transition border-2"
+						onChange={(event) => setQuery(event.target.value)}
+						placeholder={searchLabel}
+						aria-describedby={searchHelpText ? `${tabsId}-search-help` : undefined}
+						className="w-full rounded-2xl border-2 py-2.5 pr-11 pl-11 text-sm font-medium transition focus:outline-none"
 						style={{
 							backgroundColor: "var(--color-surface-card)",
 							borderColor: "var(--color-border)",
 							color: "var(--color-text-primary)",
 						}}
 					/>
+					{query ? (
+						<button
+							type="button"
+							onClick={() => setQuery("")}
+							aria-label="Clear search"
+							className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							<X size={16} aria-hidden="true" />
+						</button>
+					) : null}
 				</div>
+
+				{searchHelpText ? (
+					<p
+						id={`${tabsId}-search-help`}
+						className="mt-2 text-xs"
+						style={{ color: "var(--color-text-muted)" }}
+					>
+						{searchHelpText}
+					</p>
+				) : null}
 
 				<div className="mt-3 flex flex-col gap-2">
 					{showDifficultyFilters ? (
@@ -602,7 +714,7 @@ export default function Library() {
 									type="button"
 									aria-pressed={difficultyFilter === option}
 									onClick={() => setDifficultyFilter(option)}
-									className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border"
+									className="shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold"
 									style={{
 										backgroundColor:
 											difficultyFilter === option
@@ -634,7 +746,7 @@ export default function Library() {
 									type="button"
 									aria-pressed={effectFilter === option}
 									onClick={() => setEffectFilter(option)}
-									className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border"
+									className="shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold"
 									style={{
 										backgroundColor:
 											effectFilter === option
@@ -665,21 +777,37 @@ export default function Library() {
 								setDifficultyFilter("all");
 								setEffectFilter("all");
 							}}
-							className="self-start h-8 rounded-full border flex items-center justify-center gap-1.5 px-3 text-xs font-semibold"
+							className="flex h-8 items-center justify-center gap-1.5 self-start rounded-full border px-3 text-xs font-semibold"
 							style={{
 								backgroundColor: "var(--color-surface-card)",
 								color: "var(--color-text-secondary)",
 								borderColor: "var(--color-border)",
 							}}
 						>
-							<X size={14} />
+							<X size={14} aria-hidden="true" />
 							{clearFiltersLabel}
 						</button>
 					)}
 				</div>
 			</div>
 
-			{!loading && !error && resultCount > 0 && (
+			{!loading && failedTypes.length > 0 && (
+				<div className="px-4">
+					<div
+						className="rounded-2xl border px-4 py-3 text-sm"
+						style={{
+							backgroundColor: "var(--color-warning-bg)",
+							color: "var(--color-warning-text)",
+							borderColor: "var(--color-warning-border)",
+						}}
+					>
+						<p className="font-semibold">{warningTitle}</p>
+						<p className="mt-1">{warningHint}</p>
+					</div>
+				</div>
+			)}
+
+			{!loading && !hasFatalError && resultCount > 0 && (
 				<div className="px-4">
 					<p
 						className="text-xs font-medium"
@@ -690,7 +818,12 @@ export default function Library() {
 				</div>
 			)}
 
-			<div className="px-4 flex-1" role="tabpanel">
+			<div
+				className="flex-1 px-4"
+				role="tabpanel"
+				id={`${tabsId}-${tab}-panel`}
+				aria-labelledby={`${tabsId}-${tab}-tab`}
+			>
 				<AnimatePresence mode="wait">
 					{loading ? (
 						<div key="loading" className="flex flex-col gap-4">
@@ -698,23 +831,22 @@ export default function Library() {
 								<SkeletonCard key={key} />
 							))}
 						</div>
-					) : error ? (
-						<motion.div
-							key="error"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-						>
+					) : hasFatalError ? (
+						<motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 							<EmptyState
-								title={errorTitle}
-								description={errorHint}
+								title={warningTitle}
+								description={tr(
+									"library.error_hint",
+									"Check your connection and try again.",
+								)}
 								action={
 									<button
 										type="button"
 										onClick={() => {
-											setError(false);
+											setFailedTypes([]);
 											setHasFetched(false);
 										}}
-										className="mt-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white"
+										className="mt-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
 										style={{ backgroundColor: "var(--color-info)" }}
 									>
 										{retryLabel}
@@ -723,16 +855,10 @@ export default function Library() {
 							/>
 						</motion.div>
 					) : prioritizedItems.length === 0 ? (
-						<motion.div
-							key="empty"
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-						>
+						<motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
 							<EmptyState
 								title={emptyTitle}
-								description={
-									debouncedQuery.length >= 2 ? noResultsHint : emptyHint
-								}
+								description={deferredQuery.length >= 2 ? noResultsHint : emptyHint}
 							/>
 						</motion.div>
 					) : (
@@ -760,17 +886,10 @@ export default function Library() {
 													{group.count}
 												</span>
 											</div>
-											<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+											<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 												{group.items.map((item) => (
 													<RetroCard
-														key={
-															item._id ||
-															item.id ||
-															item.slug ||
-															item.englishName ||
-															item.name ||
-															item.title
-														}
+														key={getItemId(item)}
 														item={item}
 														type={getCardType(item, tab)}
 														typeLabel={cardTypeLabel(getCardType(item, tab))}
@@ -788,17 +907,10 @@ export default function Library() {
 									) : null,
 								)
 							) : (
-								<div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+								<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
 									{prioritizedItems.map((item) => (
 										<RetroCard
-											key={
-												item._id ||
-												item.id ||
-												item.slug ||
-												item.englishName ||
-												item.name ||
-												item.title
-											}
+											key={getItemId(item)}
 											item={item}
 											type={getCardType(item, tab)}
 											typeLabel={cardTypeLabel(getCardType(item, tab))}
@@ -819,4 +931,6 @@ export default function Library() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default Library;

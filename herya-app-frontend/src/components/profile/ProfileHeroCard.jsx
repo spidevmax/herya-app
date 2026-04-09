@@ -3,7 +3,7 @@ import { Camera } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
-function getUserInitials(name) {
+const getUserInitials = (name) => {
 	if (!name?.trim()) return "?";
 	return name
 		.trim()
@@ -12,14 +12,14 @@ function getUserInitials(name) {
 		.slice(0, 2)
 		.join("")
 		.toUpperCase();
-}
+};
 
-export default function ProfileHeroCard({
+const ProfileHeroCard = ({
 	user,
 	displayPronouns,
 	uploadingPhoto,
 	onAvatarClick,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const initials = getUserInitials(user?.name);
 	const currentStreak = user?.currentStreak ?? 0;
@@ -33,8 +33,7 @@ export default function ProfileHeroCard({
 			animate={{ opacity: 1, y: 0 }}
 			className="rounded-[32px] p-6 sm:p-8 text-white overflow-hidden relative"
 			style={{
-				backgroundImage:
-					"linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
+				backgroundImage: "var(--gradient-secondary)",
 				boxShadow: "var(--shadow-card-hover)",
 			}}
 		>
@@ -42,7 +41,7 @@ export default function ProfileHeroCard({
 				className="absolute inset-0 opacity-15 pointer-events-none"
 				style={{
 					backgroundImage:
-						"radial-gradient(circle at 20% 20%, white 0, transparent 30%), radial-gradient(circle at 80% 0%, white 0, transparent 22%), radial-gradient(circle at 100% 100%, rgba(255,255,255,0.65) 0, transparent 25%)",
+						"radial-gradient(circle at 20% 20%, color-mix(in srgb, white 100%, transparent) 0, transparent 30%), radial-gradient(circle at 80% 0%, color-mix(in srgb, white 100%, transparent) 0, transparent 22%), radial-gradient(circle at 100% 100%, color-mix(in srgb, white 65%, transparent) 0, transparent 25%)",
 				}}
 			/>
 			<div className="relative flex flex-col gap-6">
@@ -53,9 +52,9 @@ export default function ProfileHeroCard({
 						onClick={onAvatarClick}
 						className="relative shrink-0 group rounded-[28px] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
 						title={t("profile.change_photo")}
-						aria-label={t("profile.change_photo")}
-					>
-						<div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] bg-white/18 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20 shadow-[0_12px_30px_rgba(0,0,0,0.16)] relative">
+							aria-label={t("profile.change_photo")}
+						>
+							<div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] bg-white/18 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20 shadow-[var(--shadow-card-hover)] relative">
 							{user?.profileImageUrl ? (
 								<img
 									src={user.profileImageUrl}
@@ -143,4 +142,6 @@ export default function ProfileHeroCard({
 			</div>
 		</motion.div>
 	);
-}
+};
+
+export default ProfileHeroCard;

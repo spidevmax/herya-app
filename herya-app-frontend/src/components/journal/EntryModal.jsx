@@ -1,82 +1,106 @@
+import { useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { MOOD_COLORS } from "@/utils/constants";
 import { format } from "@/utils/helpers";
 import { useLanguage } from "@/context/LanguageContext";
-
-const toMoodTokens = (moods, prefix) => {
-	const seen = {};
-	return moods.map((mood) => {
-		seen[mood] = (seen[mood] ?? 0) + 1;
-		return {
-			mood,
-			key: `${prefix}-${mood}-${seen[mood]}`,
-		};
-	});
-};
+import {
+	resolveEntryId,
+	toMoodTokens,
+	translateMoodLabel,
+	translateWithFallback,
+	getMoodColorStyle,
+} from "@/utils/journalHelpers";
 
 export const EntryModal = ({ entry, isOpen, onClose }) => {
 	const { t, lang } = useLanguage();
 	const navigate = useNavigate();
+	const dialogRef = useRef(null);
+	const previousFocusRef = useRef(null);
 
-	if (!entry) return null;
+	// ── Escape key handler ───────────────────────────────────────────
+	useEffect(() => {
+		if (!isOpen) return;
+		const handler = (e) => {
+			if (e.key === "Escape") onClose();
+		};
+		document.addEventListener("keydown", handler);
+		return () => document.removeEventListener("keydown", handler);
+	}, [isOpen, onClose]);
 
-	const moods = entry.moodAfter || entry.moodBefore || [];
-	const created = format.date(entry.date || entry.createdAt, lang);
+	// ── Focus management: trap focus + restore on close ──────────────
+	useEffect(() => {
+		if (isOpen) {
+			previousFocusRef.current = document.activeElement;
+			// Wait for animation to paint, then focus first focusable
+			const timer = setTimeout(() => {
+				const firstFocusable = dialogRef.current?.querySelector(
+					'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+				);
+				firstFocusable?.focus();
+			}, 50);
+			return () => clearTimeout(timer);
+		}
+		// Restore focus when closing
+		previousFocusRef.current?.focus();
+	}, [isOpen]);
 
-	const translateMoodLabel = (mood) => {
-		const key = `session.moods.${mood}`;
-		const translated = t(key);
-		return translated === key ? mood : translated;
-	};
+	const handleKeyDown = useCallback((e) => {
+		if (e.key !== "Tab" || !dialogRef.current) return;
+		const focusable = dialogRef.current.querySelectorAll(
+			'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+		);
+		if (focusable.length === 0) return;
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		if (e.shiftKey && document.activeElement === first) {
+			e.preventDefault();
+			last.focus();
+		} else if (!e.shiftKey && document.activeElement === last) {
+			e.preventDefault();
+			first.focus();
+		}
+	}, []);
 
-	const translateWithFallback = (key, fallback) => {
-		const translated = t(key);
-		return translated === key ? fallback : translated;
-	};
-
+	// Compute derived data only when entry exists (but outside AnimatePresence
+	// so exit animations still work with stale data)
+	const entryId = entry ? resolveEntryId(entry) : null;
+	const moods = entry ? (entry.moodAfter || entry.moodBefore || []) : [];
+	const moodTokens = toMoodTokens(moods, `modal-${entryId || "none"}`);
+	const created = entry ? format.date(entry.date || entry.createdAt, lang) : "";
 	const durationMinutes = Math.max(
 		1,
 		Math.round(Number(entry?.session?.duration) || 0),
 	);
-
-	const resolveJournalEntryId = (value) => {
-		if (!value) return null;
-		if (typeof value === "string") return value;
-		if (typeof value === "number") return String(value);
-		if (typeof value === "object") {
-			if (value._id) return String(value._id);
-			if (value.id) return String(value.id);
-			return null;
-		}
-		return null;
-	};
-
-	const entryId =
-		resolveJournalEntryId(entry?._id) ||
-		resolveJournalEntryId(entry?.id) ||
-		resolveJournalEntryId(entry?.journalEntryId) ||
-		null;
-	const moodTokens = toMoodTokens(moods, `entry-${entryId || created}`);
 
 	const handleOpenEntry = () => {
 		if (!entryId) return;
 		navigate(`/journal/${encodeURIComponent(entryId)}/edit`);
 	};
 
+	const titleId = "journal-entry-modal-title";
+
 	return (
 		<AnimatePresence>
-			{isOpen && (
+			{isOpen && entry && (
 				<>
+					{/* Backdrop */}
 					<motion.div
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						className="fixed inset-0 bg-black/30 z-40"
 						onClick={onClose}
+						aria-hidden="true"
 					/>
+
+					{/* Dialog */}
 					<motion.div
+						ref={dialogRef}
+						role="dialog"
+						aria-modal="true"
+						aria-labelledby={titleId}
+						onKeyDown={handleKeyDown}
 						initial={{ y: "100%", opacity: 0 }}
 						animate={{ y: 0, opacity: 1 }}
 						exit={{ y: "100%", opacity: 0 }}
@@ -88,12 +112,15 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 						}}
 					>
 						<div className="px-6 pt-3 pb-6">
+							{/* Drag handle */}
 							<div className="w-10 h-1.5 rounded-full mx-auto mb-4 bg-[var(--color-border-soft)]" />
 
+							{/* Header */}
 							<div className="flex items-start justify-between mb-4 gap-3">
 								<div className="flex-1">
 									<p
-										className="font-display text-[24px] font-semibold leading-tight"
+										id={titleId}
+										className="font-display text-lg font-semibold leading-tight"
 										style={{ color: "var(--color-text-primary)" }}
 									>
 										{created}
@@ -106,6 +133,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-secondary)" }}
 										>
 											{translateWithFallback(
+												t,
 												"journal.view_entry",
 												"View full entry",
 											)}
@@ -116,6 +144,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-secondary)" }}
 										>
 											{translateWithFallback(
+												t,
 												"journal.view_entry",
 												"Entry details",
 											)}
@@ -133,25 +162,22 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 								</button>
 							</div>
 
+							{/* Mood chips */}
 							{moods.length > 0 && (
 								<div className="flex gap-1.5 flex-wrap mb-4">
 									{moodTokens.map(({ mood, key }) => (
 										<span
 											key={key}
 											className="text-xs px-2.5 py-1 rounded-full border"
-											style={{
-												backgroundColor:
-													(MOOD_COLORS[mood] || "var(--color-secondary)") + "18",
-												color: MOOD_COLORS[mood] || "var(--color-secondary)",
-												borderColor: (MOOD_COLORS[mood] || "var(--color-secondary)") + "35",
-											}}
+											style={getMoodColorStyle(mood)}
 										>
-											{translateMoodLabel(mood)}
+											{translateMoodLabel(t, mood)}
 										</span>
 									))}
 								</div>
 							)}
 
+							{/* Stats grid */}
 							<div className="grid grid-cols-2 gap-2 mb-4">
 								{entry.session?.sessionType && (
 									<div
@@ -166,6 +192,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-muted)" }}
 										>
 											{translateWithFallback(
+												t,
 												"journal.practice_type_label",
 												"Practice Type",
 											)}
@@ -175,6 +202,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-primary)" }}
 										>
 											{translateWithFallback(
+												t,
 												`journal.practice_types.${entry.session.sessionType}`,
 												entry.session.sessionType,
 											)}
@@ -195,6 +223,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-muted)" }}
 										>
 											{translateWithFallback(
+												t,
 												"session.duration_label",
 												"Duration",
 											)}
@@ -204,12 +233,13 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-primary)" }}
 										>
 											{durationMinutes}{" "}
-											{translateWithFallback("session_detail.minutes", "min")}
+											{translateWithFallback(t, "session_detail.minutes", "min")}
 										</p>
 									</div>
 								)}
 							</div>
 
+							{/* Text sections */}
 							<div className="space-y-3">
 								{entry.reflection && (
 									<div>
@@ -218,6 +248,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-muted)" }}
 										>
 											{translateWithFallback(
+												t,
 												"journal.reflection_label",
 												"Reflection",
 											)}
@@ -242,6 +273,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-muted)" }}
 										>
 											{translateWithFallback(
+												t,
 												"journal_form.insights",
 												"Insights",
 											)}

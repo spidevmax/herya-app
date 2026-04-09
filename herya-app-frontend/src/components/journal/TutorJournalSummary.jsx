@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { ShieldCheck } from "lucide-react";
+import { SurfaceCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
 const SIGNAL_SCORE = {
@@ -81,13 +82,7 @@ export const TutorJournalSummary = ({ entries }) => {
 		: t("journal.tutor_summary_no_data");
 
 	return (
-		<div
-			className="rounded-2xl p-4"
-			style={{
-				backgroundColor: "var(--color-surface-card)",
-				border: "1px solid var(--color-border-soft)",
-			}}
-		>
+		<SurfaceCard className="p-4 shadow-none">
 			<div className="flex items-center justify-between gap-3 mb-3">
 				<div>
 					<p
@@ -179,6 +174,6 @@ export const TutorJournalSummary = ({ entries }) => {
 					n: summary.transitionCount,
 				})}
 			</p>
-		</div>
+		</SurfaceCard>
 	);
 };

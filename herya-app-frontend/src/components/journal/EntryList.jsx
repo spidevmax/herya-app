@@ -1,52 +1,52 @@
-import { MOOD_COLORS } from "@/utils/constants";
-import { format } from "@/utils/helpers";
+import { useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { format } from "@/utils/helpers";
+import {
+	resolveEntryId,
+	toMoodTokens,
+	translateMoodLabel,
+	translateWithFallback,
+	getMoodColorStyle,
+} from "@/utils/journalHelpers";
+import { Card, LoadingSpinner, SurfaceCard } from "@/components/ui";
 
-const toMoodTokens = (moods, prefix) => {
-	const seen = {};
-	return moods.map((mood) => {
-		seen[mood] = (seen[mood] ?? 0) + 1;
-		return {
-			mood,
-			key: `${prefix}-${mood}-${seen[mood]}`,
-		};
-	});
-};
+// ── Skeleton ─────────────────────────────────────────────────────────────────
+export const EntryCardSkeleton = () => (
+	<SurfaceCard className="animate-pulse p-3.5 shadow-none">
+		<div className="flex items-start justify-between gap-2 mb-2.5">
+			<div className="min-w-0 flex-1">
+				<div className="skeleton h-5 w-28 rounded-lg mb-1.5" />
+				<div className="skeleton h-3 w-20 rounded-lg" />
+			</div>
+			<div className="flex gap-1">
+				<div className="skeleton h-6 w-14 rounded-full" />
+				<div className="skeleton h-6 w-14 rounded-full" />
+			</div>
+		</div>
+		<div className="skeleton h-3 w-full rounded-lg mb-1" />
+		<div className="skeleton h-3 w-3/4 rounded-lg" />
+	</SurfaceCard>
+);
 
+// ── Entry Card ───────────────────────────────────────────────────────────────
 const EntryCard = ({ entry, onSelect }) => {
 	const { t, lang } = useLanguage();
 
-	const entryId = entry?._id || entry?.id || entry?.session;
+	const entryId = resolveEntryId(entry);
 	const practiceType = entry?.session?.sessionType || entry?.sessionType;
 	const moods = entry.moodAfter || entry.moodBefore || [];
 	const moodTokens = toMoodTokens(moods.slice(0, 2), `entry-${entryId}`);
 	const created = format.date(entry.date || entry.createdAt, lang);
 
-	const translateMoodLabel = (mood) => {
-		const key = `session.moods.${mood}`;
-		const translated = t(key);
-		return translated === key ? mood : translated;
-	};
-
-	const translateWithFallback = (key, fallback) => {
-		const translated = t(key);
-		return translated === key ? fallback : translated;
-	};
-
 	return (
-		<button
-			type="button"
+		<Card
 			onClick={() => onSelect(entry)}
-			className="w-full rounded-2xl p-3.5 text-left transition duration-200 hover:shadow-md hover:-translate-y-[1px]"
-			style={{
-				backgroundColor: "var(--color-surface-card)",
-				border: "1px solid var(--color-border-soft)",
-			}}
+			className="w-full p-3.5 transition duration-200 hover:-translate-y-[1px] shadow-none"
 		>
 			<div className="flex items-start justify-between gap-2 mb-2.5">
 				<div className="min-w-0">
 					<p
-						className="font-display text-[24px] font-semibold leading-tight"
+						className="font-display text-lg font-semibold leading-tight"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{created}
@@ -57,6 +57,7 @@ const EntryCard = ({ entry, onSelect }) => {
 							style={{ color: "var(--color-text-secondary)" }}
 						>
 							{translateWithFallback(
+								t,
 								`journal.practice_types.${practiceType}`,
 								practiceType,
 							)}
@@ -70,13 +71,9 @@ const EntryCard = ({ entry, onSelect }) => {
 								<span
 									key={key}
 									className="text-xs px-2.5 py-1 rounded-full border"
-									style={{
-										backgroundColor: (MOOD_COLORS[mood] || "var(--color-secondary)") + "18",
-										color: MOOD_COLORS[mood] || "var(--color-secondary)",
-										borderColor: (MOOD_COLORS[mood] || "var(--color-secondary)") + "35",
-									}}
+									style={getMoodColorStyle(mood)}
 								>
-									{translateMoodLabel(mood)}
+									{translateMoodLabel(t, mood)}
 								</span>
 							))}
 							{moods.length > 2 && (
@@ -96,20 +93,63 @@ const EntryCard = ({ entry, onSelect }) => {
 					{entry.reflection}
 				</p>
 			)}
-		</button>
+		</Card>
 	);
 };
 
-export const EntryList = ({ entries, onSelectEntry }) => {
+// ── Entry List ───────────────────────────────────────────────────────────────
+export const EntryList = ({
+	entries,
+	onSelectEntry,
+	hasMore = false,
+	loadingMore = false,
+	onLoadMore,
+}) => {
+	const { t } = useLanguage();
+	const sentinelRef = useRef(null);
+
+	// Infinite scroll via IntersectionObserver
+	useEffect(() => {
+		if (!hasMore || !onLoadMore) return;
+		const sentinel = sentinelRef.current;
+		if (!sentinel) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting && !loadingMore) {
+					onLoadMore();
+				}
+			},
+			{ rootMargin: "200px" },
+		);
+		observer.observe(sentinel);
+		return () => observer.disconnect();
+	}, [hasMore, loadingMore, onLoadMore]);
+
 	return (
-		<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-			{entries.map((entry) => (
-				<EntryCard
-					key={entry?._id || entry?.id || entry?.session}
-					entry={entry}
-					onSelect={onSelectEntry}
-				/>
-			))}
+		<div className="flex flex-col gap-2.5">
+			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+				{entries.map((entry) => (
+					<EntryCard
+						key={resolveEntryId(entry)}
+						entry={entry}
+						onSelect={onSelectEntry}
+					/>
+				))}
+			</div>
+
+			{/* Load more sentinel / spinner */}
+			{hasMore && (
+				<div ref={sentinelRef} className="flex justify-center py-4">
+					{loadingMore && <LoadingSpinner size={24} />}
+				</div>
+			)}
+
+			{!hasMore && entries.length > 0 && (
+				<p className="text-center text-xs py-2 text-[var(--color-text-muted)]">
+					{t("journal.all_loaded") || "All entries loaded"}
+				</p>
+			)}
 		</div>
 	);
 };

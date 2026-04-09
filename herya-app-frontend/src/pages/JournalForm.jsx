@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Camera, Check, ChevronLeft } from "lucide-react";
+import { Camera, Check, ChevronLeft, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -8,6 +8,7 @@ import {
 	getJournalEntryById,
 	updateJournalEntry,
 } from "@/api/journalEntries.api";
+import { MOOD_OPTIONS } from "@/utils/constants";
 import { Button, MoodSelector } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -26,24 +27,35 @@ const SENSATIONS = [
 	"stiff_neck",
 ];
 
-function SensationChip({ label, active, onToggle }) {
+const AUTO_NAVIGATE_DELAY = 2500;
+
+const SensationChip = ({ label, active, onToggle }) => {
 	return (
 		<button
 			type="button"
 			onClick={onToggle}
+			aria-pressed={active}
 			className={`px-3 py-1.5 rounded-xl text-xs font-semibold border-2 transition-all ${active ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border-[var(--color-border-soft)]"}`}
 		>
 			{label}
 		</button>
 	);
-}
+};
 
-function SuccessOverlay({ onDone, t }) {
+const SuccessOverlay = ({ onDone, t }) => {
+	useEffect(() => {
+		const timer = setTimeout(onDone, AUTO_NAVIGATE_DELAY);
+		return () => clearTimeout(timer);
+	}, [onDone]);
+
 	return (
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-primary)] text-white"
+			className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-primary)] text-white cursor-pointer"
+			onClick={onDone}
+			role="status"
+			aria-live="polite"
 		>
 			<motion.div
 				initial={{ scale: 0 }}
@@ -69,16 +81,30 @@ function SuccessOverlay({ onDone, t }) {
 			</button>
 		</motion.div>
 	);
-}
+};
 
-export default function JournalForm() {
+const validateForm = (form, t) => {
+	const errors = [];
+	if (!form.moodBefore || !MOOD_OPTIONS.includes(form.moodBefore)) {
+		errors.push(t("journal_form.error_mood_required") || "Please select a mood before practice");
+	}
+	if (form.energyBefore < 1 || form.energyBefore > 10) {
+		errors.push(t("journal_form.error_energy_range") || "Energy must be between 1 and 10");
+	}
+	if (form.stressBefore < 1 || form.stressBefore > 10) {
+		errors.push(t("journal_form.error_stress_range") || "Stress must be between 1 and 10");
+	}
+	return errors;
+};
+
+const JournalForm = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const isEdit = Boolean(id);
 
 	const [form, setForm] = useState({
-		moodBefore: 3,
+		moodBefore: null,
 		energyBefore: 5,
 		stressBefore: 5,
 		moodAfter: null,
@@ -92,6 +118,7 @@ export default function JournalForm() {
 	const [fetching, setFetching] = useState(isEdit);
 	const [fetchError, setFetchError] = useState(false);
 	const [saveError, setSaveError] = useState(null);
+	const [validationErrors, setValidationErrors] = useState([]);
 	const [success, setSuccess] = useState(false);
 	const blobUrlsRef = useRef([]);
 
@@ -115,15 +142,23 @@ export default function JournalForm() {
 	}, [id, isEdit]);
 
 	const handleSave = async () => {
-		setLoading(true);
 		setSaveError(null);
+		setValidationErrors([]);
+
+		const errors = validateForm(form, t);
+		if (errors.length > 0) {
+			setValidationErrors(errors);
+			return;
+		}
+
+		setLoading(true);
 		try {
 			const payload = new FormData();
 			payload.append("moodBefore", form.moodBefore);
 			payload.append("energyBefore", form.energyBefore);
 			payload.append("stressBefore", form.stressBefore);
 			if (form.moodAfter) payload.append("moodAfter", form.moodAfter);
-			if (form.energyAfter) payload.append("energyAfter", form.energyAfter);
+			if (form.energyAfter != null) payload.append("energyAfter", form.energyAfter);
 			if (form.reflection) payload.append("reflection", form.reflection);
 			if (form.insights) payload.append("insights", form.insights);
 			form.physicalSensations.forEach((s) => {
@@ -140,8 +175,14 @@ export default function JournalForm() {
 				await createJournalEntry(payload);
 			}
 			setSuccess(true);
-		} catch {
-			setSaveError(true);
+		} catch (err) {
+			const serverMsg =
+				err?.response?.data?.message ||
+				err?.response?.data?.error ||
+				err?.message;
+			setSaveError(
+				serverMsg || t("journal_form.save_error") || "Failed to save entry",
+			);
 		} finally {
 			setLoading(false);
 		}
@@ -154,6 +195,22 @@ export default function JournalForm() {
 				? f.physicalSensations.filter((x) => x !== s)
 				: [...f.physicalSensations, s],
 		}));
+	};
+
+	const removePhoto = (indexToRemove) => {
+		setForm((f) => {
+			const removed = f.photos[indexToRemove];
+			if (removed?.previewUrl) {
+				URL.revokeObjectURL(removed.previewUrl);
+				blobUrlsRef.current = blobUrlsRef.current.filter(
+					(u) => u !== removed.previewUrl,
+				);
+			}
+			return {
+				...f,
+				photos: f.photos.filter((_, i) => i !== indexToRemove),
+			};
+		});
 	};
 
 	if (fetching) {
@@ -195,6 +252,7 @@ export default function JournalForm() {
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
+						aria-label={t("ui.go_back") || "Go back"}
 						className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-surface-card)] shadow-sm"
 					>
 						<ChevronLeft
@@ -210,6 +268,7 @@ export default function JournalForm() {
 				</div>
 
 				<div className="px-4 flex flex-col gap-6">
+					{/* Before section */}
 					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
 						<h3 className="mb-4 font-display font-bold text-[var(--color-text-primary)]">
 							{t("journal_form.before")}
@@ -220,19 +279,24 @@ export default function JournalForm() {
 							label={t("journal_form.how_feeling")}
 						/>
 						<div className="mt-4">
-							<div className="flex items-center justify-between mb-2">
-								<p className="text-sm font-semibold text-[var(--color-text-primary)]">
+							<label
+								htmlFor="energy-before"
+								className="flex items-center justify-between mb-2"
+							>
+								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
 									{t("journal_form.energy")}
-								</p>
+								</span>
 								<span className="text-sm font-bold text-[var(--color-primary)]">
 									{form.energyBefore}/10
 								</span>
-							</div>
+							</label>
 							<input
+								id="energy-before"
 								type="range"
 								min={1}
 								max={10}
 								value={form.energyBefore}
+								aria-label={t("journal_form.energy")}
 								onChange={(e) =>
 									setForm((f) => ({
 										...f,
@@ -243,19 +307,24 @@ export default function JournalForm() {
 							/>
 						</div>
 						<div className="mt-4">
-							<div className="flex items-center justify-between mb-2">
-								<p className="text-sm font-semibold text-[var(--color-text-primary)]">
+							<label
+								htmlFor="stress-before"
+								className="flex items-center justify-between mb-2"
+							>
+								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
 									{t("journal_form.stress")}
-								</p>
+								</span>
 								<span className="text-sm font-bold text-[var(--color-danger)]">
 									{form.stressBefore}/10
 								</span>
-							</div>
+							</label>
 							<input
+								id="stress-before"
 								type="range"
 								min={1}
 								max={10}
 								value={form.stressBefore}
+								aria-label={t("journal_form.stress")}
 								onChange={(e) =>
 									setForm((f) => ({
 										...f,
@@ -267,10 +336,11 @@ export default function JournalForm() {
 						</div>
 					</div>
 
-					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3 className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
+					{/* Sensations */}
+					<fieldset className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)] border-none">
+						<legend className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
 							{t("journal_form.sensations")}
-						</h3>
+						</legend>
 						<div className="flex flex-wrap gap-2">
 							{SENSATIONS.map((s) => (
 								<SensationChip
@@ -281,13 +351,18 @@ export default function JournalForm() {
 								/>
 							))}
 						</div>
-					</div>
+					</fieldset>
 
+					{/* Reflection */}
 					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3 className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
+						<label
+							htmlFor="reflection"
+							className="block mb-3 font-display font-bold text-[var(--color-text-primary)]"
+						>
 							{t("journal_form.reflection")}
-						</h3>
+						</label>
 						<textarea
+							id="reflection"
 							value={form.reflection}
 							onChange={(e) =>
 								setForm((f) => ({ ...f, reflection: e.target.value }))
@@ -298,11 +373,16 @@ export default function JournalForm() {
 						/>
 					</div>
 
+					{/* Insights */}
 					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3 className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
+						<label
+							htmlFor="insights"
+							className="block mb-3 font-display font-bold text-[var(--color-text-primary)]"
+						>
 							{t("journal_form.insights")}
-						</h3>
+						</label>
 						<textarea
+							id="insights"
 							value={form.insights}
 							onChange={(e) =>
 								setForm((f) => ({ ...f, insights: e.target.value }))
@@ -313,6 +393,7 @@ export default function JournalForm() {
 						/>
 					</div>
 
+					{/* After section */}
 					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
 						<h3 className="mb-4 font-display font-bold text-[var(--color-text-primary)]">
 							{t("journal_form.after")}
@@ -324,19 +405,24 @@ export default function JournalForm() {
 						/>
 						{form.moodAfter && (
 							<div className="mt-4">
-								<div className="flex items-center justify-between mb-2">
-									<p className="text-sm font-semibold text-[var(--color-text-primary)]">
+								<label
+									htmlFor="energy-after"
+									className="flex items-center justify-between mb-2"
+								>
+									<span className="text-sm font-semibold text-[var(--color-text-primary)]">
 										{t("journal_form.energy_after")}
-									</p>
+									</span>
 									<span className="text-sm font-bold text-[var(--color-primary)]">
 										{form.energyAfter ?? 5}/10
 									</span>
-								</div>
+								</label>
 								<input
+									id="energy-after"
 									type="range"
 									min={1}
 									max={10}
 									value={form.energyAfter ?? 5}
+									aria-label={t("journal_form.energy_after")}
 									onChange={(e) =>
 										setForm((f) => ({
 											...f,
@@ -349,6 +435,7 @@ export default function JournalForm() {
 						)}
 					</div>
 
+					{/* Photos */}
 					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
 						<h3 className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
 							{t("journal_form.photos")}
@@ -370,21 +457,38 @@ export default function JournalForm() {
 										blobUrlsRef.current.push(url);
 										return { file, previewUrl: url };
 									});
-									setForm((f) => ({ ...f, photos: [...f.photos, ...newEntries] }));
+									setForm((f) => ({
+										...f,
+										photos: [...f.photos, ...newEntries],
+									}));
+									e.target.value = "";
 								}}
 							/>
 						</label>
 						{form.photos.length > 0 && (
 							<div className="flex gap-2 mt-3 overflow-x-auto pb-1 no-scrollbar">
 								{form.photos.map((p, i) => {
-									const url = p.previewUrl || (typeof p === "string" ? p : "");
+									const url =
+										p.previewUrl || (typeof p === "string" ? p : "");
 									return (
-										<img
-											key={url || `photo-${i}`}
-											src={url}
-											alt={t("journal_form.photo_alt", { n: i + 1 })}
-											className="w-20 h-20 rounded-xl object-cover flex-shrink-0"
-										/>
+										<div
+											key={p.previewUrl || `photo-${url}`}
+											className="relative flex-shrink-0"
+										>
+											<img
+												src={url}
+												alt={t("journal_form.photo_alt", { n: i + 1 })}
+												className="w-20 h-20 rounded-xl object-cover"
+											/>
+											<button
+												type="button"
+												onClick={() => removePhoto(i)}
+												aria-label={t("journal_form.remove_photo") || "Remove photo"}
+												className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--color-danger)] text-white flex items-center justify-center shadow-sm"
+											>
+												<X size={12} />
+											</button>
+										</div>
 									);
 								})}
 							</div>
@@ -393,24 +497,53 @@ export default function JournalForm() {
 				</div>
 			</div>
 
-			{saveError && (
-				<motion.div
-					initial={{ opacity: 0, y: 8 }}
-					animate={{ opacity: 1, y: 0 }}
-					className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4"
-				>
-					<div
-						className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
-						style={{
-							backgroundColor: "var(--color-warning-bg)",
-							border: "1px solid var(--color-warning-border)",
-							color: "var(--color-text-primary)",
-						}}
+			{/* Validation errors */}
+			<AnimatePresence>
+				{validationErrors.length > 0 && (
+					<motion.div
+						initial={{ opacity: 0, y: 8 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: 8 }}
+						className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4"
 					>
-						{t("journal_form.save_error")}
-					</div>
-				</motion.div>
-			)}
+						<div
+							className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+							role="alert"
+							style={{
+								backgroundColor: "var(--color-error-bg)",
+								border: "1px solid var(--color-danger)",
+								color: "var(--color-error-text)",
+							}}
+						>
+							{validationErrors[0]}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			{/* Save error */}
+			<AnimatePresence>
+				{saveError && (
+					<motion.div
+						initial={{ opacity: 0, y: 8 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: 8 }}
+						className="fixed bottom-36 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4"
+					>
+						<div
+							className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
+							role="alert"
+							style={{
+								backgroundColor: "var(--color-warning-bg)",
+								border: "1px solid var(--color-warning-border)",
+								color: "var(--color-text-primary)",
+							}}
+						>
+							{saveError}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
 
 			<motion.div
 				initial={{ y: 80 }}
@@ -428,4 +561,6 @@ export default function JournalForm() {
 			</motion.div>
 		</>
 	);
-}
+};
+
+export default JournalForm;

@@ -17,36 +17,49 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
-export function Card({ children, className = "", onClick, hover = true }) {
+export const Card = ({ children, className = "", onClick, hover = true, ...props }) => {
+	const Component = onClick ? motion.button : motion.div;
+
 	return (
-		<motion.div
+		<Component
+			type={onClick ? "button" : undefined}
 			onClick={onClick}
 			whileHover={
 				hover && onClick ? { y: -2, boxShadow: "var(--shadow-card-hover)" } : {}
 			}
 			whileTap={onClick ? { scale: 0.98 } : {}}
-			className={`rounded-2xl shadow-[var(--shadow-card)] ${onClick ? "cursor-pointer" : ""} ${className}`}
-			style={{ backgroundColor: "var(--color-surface-card)" }}
+			className={`section-card ${onClick ? "cursor-pointer text-left" : ""} ${className}`}
+			{...props}
 		>
 			{children}
-		</motion.div>
+		</Component>
 	);
-}
+};
 
 // ── SearchBar ────────────────────────────────────────────────────────────────
-export const SearchBar = ({ value, onChange, placeholder = "Search...", clearLabel = "Clear search" }) => {
+export const SearchBar = ({
+	value,
+	onChange,
+	placeholder = "Search...",
+	clearLabel = "Clear search",
+	label,
+	className = "",
+}) => {
 	return (
-		<div className="relative">
+		<div className={`relative ${className}`}>
+			{label ? <label className="sr-only">{label}</label> : null}
 			<Search
 				size={18}
 				className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+				aria-hidden="true"
 			/>
 			<input
 				type="search"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				placeholder={placeholder}
-				className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] py-3 pl-11 pr-11 text-sm text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
+				aria-label={label || placeholder}
+				className="input-base bg-[var(--color-surface-card)] pr-11"
 			/>
 			{value ? (
 				<button
@@ -55,15 +68,73 @@ export const SearchBar = ({ value, onChange, placeholder = "Search...", clearLab
 					aria-label={clearLabel}
 					className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
 				>
-					<X size={16} />
-				</button>
-			) : null}
+						<X size={16} aria-hidden="true" />
+					</button>
+				) : null}
 		</div>
 	);
 };
 
+export const Input = ({
+	id,
+	label,
+	className = "",
+	inputClassName = "",
+	type = "text",
+	...props
+}) => (
+	<div className={className}>
+		{label ? (
+			<label
+				htmlFor={id}
+				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)]"
+			>
+				{label}
+			</label>
+		) : null}
+		<input id={id} type={type} className={`input-base px-4 ${inputClassName}`} {...props} />
+	</div>
+);
+
+export const SelectField = ({
+	id,
+	label,
+	className = "",
+	children,
+	...props
+}) => (
+	<div className={className}>
+		{label ? (
+			<label
+				htmlFor={id}
+				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)]"
+			>
+				{label}
+			</label>
+		) : null}
+		<select id={id} className="select-base" {...props}>
+			{children}
+		</select>
+	</div>
+);
+
+export const ChipButton = ({
+	children,
+	active = false,
+	className = "",
+	...props
+}) => (
+	<button
+		type="button"
+		className={`chip ${active ? "chip-active" : "chip-inactive"} border border-[var(--color-border-soft)] ${className}`}
+		{...props}
+	>
+		{children}
+	</button>
+);
+
 // ── Button ────────────────────────────────────────────────────────────────────
-export function Button({
+export const Button = ({
 	children,
 	variant = "primary",
 	size = "md",
@@ -71,7 +142,7 @@ export function Button({
 	disabled = false,
 	loading = false,
 	...props
-}) {
+}) => {
 	const variants = {
 		primary:
 			"bg-[var(--color-primary)] text-white shadow-[var(--shadow-button)] hover:brightness-95 active:scale-95",
@@ -96,6 +167,7 @@ export function Button({
 			: "font-medium";
 	return (
 		<button
+			type={props.type || "button"}
 			disabled={disabled || loading}
 			className={`inline-flex items-center justify-center gap-2 ${weightClass} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
 			{...props}
@@ -103,7 +175,7 @@ export function Button({
 			{loading ? <LoadingSpinner size={16} /> : children}
 		</button>
 	);
-}
+};
 
 // ── StatCard ──────────────────────────────────────────────────────────────────
 export const StatCard = ({
@@ -137,18 +209,41 @@ export const StatCard = ({
 };
 
 // ── TabBar ────────────────────────────────────────────────────────────────────
-export const TabBar = ({ tabs, active, onSelect, className = "" }) => {
+export const TabBar = ({
+	tabs,
+	active,
+	onSelect,
+	className = "",
+	ariaLabel = "Tabs",
+	idBase = "tabbar",
+}) => {
 	return (
 		<div
+			role="tablist"
+			aria-label={ariaLabel}
 			className={`flex gap-2 border-b border-[var(--color-border)] ${className}`}
 		>
-			{tabs.map((tab) => {
+			{tabs.map((tab, index) => {
 				const tabId = tab.id ?? tab.key;
 				return (
 					<button
 						type="button"
 						key={tabId}
+						role="tab"
+						id={`${idBase}-${tabId}-tab`}
+						aria-controls={`${idBase}-${tabId}-panel`}
+						aria-selected={active === tabId}
+						tabIndex={active === tabId ? 0 : -1}
 						onClick={() => onSelect(tabId)}
+						onKeyDown={(event) => {
+							if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+							event.preventDefault();
+							const nextIndex =
+								event.key === "ArrowRight"
+									? (index + 1) % tabs.length
+									: (index - 1 + tabs.length) % tabs.length;
+							onSelect(tabs[nextIndex].id ?? tabs[nextIndex].key);
+						}}
 						className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
 							active === tabId
 								? "border-[var(--color-primary)] text-[var(--color-primary)]"
@@ -242,7 +337,7 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 };
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
-export function Badge({ children, color = "var(--color-secondary)", className = "" }) {
+export const Badge = ({ children, color = "var(--color-secondary)", className = "" }) => {
 	return (
 		<span
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}
@@ -251,10 +346,10 @@ export function Badge({ children, color = "var(--color-secondary)", className = 
 			{children}
 		</span>
 	);
-}
+};
 
 // ── SkeletonCard ──────────────────────────────────────────────────────────────
-export function SkeletonCard({ lines = 3, className = "" }) {
+export const SkeletonCard = ({ lines = 3, className = "" }) => {
 	return (
 		<div
 			className={`rounded-2xl p-4 space-y-3 shadow-[var(--shadow-card)] ${className}`}
@@ -269,10 +364,10 @@ export function SkeletonCard({ lines = 3, className = "" }) {
 			))}
 		</div>
 	);
-}
+};
 
 // ── LoadingSpinner ────────────────────────────────────────────────────────────
-export function LoadingSpinner({ size = 20, color = "currentColor" }) {
+export const LoadingSpinner = ({ size = 20, color = "currentColor" }) => {
 	const { t } = useLanguage();
 	return (
 		<svg
@@ -295,21 +390,22 @@ export function LoadingSpinner({ size = 20, color = "currentColor" }) {
 			/>
 		</svg>
 	);
-}
+};
 
 // ── EmptyState ────────────────────────────────────────────────────────────────
-export function EmptyState({
+export const EmptyState = ({
 	title,
 	description,
 	illustration = null,
 	icon = null,
 	action,
-}) {
+	className = "",
+}) => {
 	return (
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="flex flex-col items-center justify-center text-center py-16 px-6"
+			className={`flex flex-col items-center justify-center text-center py-16 px-6 ${className}`}
 		>
 			{icon ? (
 				<motion.div className="mb-4 float" animate={{}} style={{}}>
@@ -331,10 +427,10 @@ export function EmptyState({
 			{action}
 		</motion.div>
 	);
-}
+};
 
 // ── ProgressBar ───────────────────────────────────────────────────────────────
-export function ProgressBar({ value, max, color = "var(--color-secondary)", className = "" }) {
+export const ProgressBar = ({ value, max, color = "var(--color-secondary)", className = "" }) => {
 	const pct = Math.min(100, Math.round((value / max) * 100));
 	return (
 		<div
@@ -350,17 +446,17 @@ export function ProgressBar({ value, max, color = "var(--color-secondary)", clas
 			/>
 		</div>
 	);
-}
+};
 
 // ── CircleProgress ────────────────────────────────────────────────────────────
-export function CircleProgress({
+export const CircleProgress = ({
 	value,
 	max,
 	size = 64,
 	stroke = 6,
 	color = "var(--color-secondary)",
 	children,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const r = (size - stroke) / 2;
 	const circ = 2 * Math.PI * r;
@@ -399,7 +495,7 @@ export function CircleProgress({
 			</div>
 		</div>
 	);
-}
+};
 
 // ── ConfirmModal ─────────────────────────────────────────────────────────────
 export const ConfirmModal = ({
@@ -549,7 +645,24 @@ export const ConfirmModal = ({
 };
 
 // ── StickyHeader ─────────────────────────────────────────────────────────────
-export function StickyHeader({ onBack, title, children }) {
+export const SurfaceCard = ({ children, className = "", ...props }) => (
+	<div className={`section-card ${className}`} {...props}>
+		{children}
+	</div>
+);
+
+export const PageHeader = ({ title, description, className = "", titleClassName = "" }) => (
+	<div className={`page-header ${className}`}>
+		<h1 className={`text-display-md text-[var(--color-text-primary)] ${titleClassName}`}>
+			{title}
+		</h1>
+		{description ? (
+			<p className="text-body-sm text-[var(--color-text-secondary)]">{description}</p>
+		) : null}
+	</div>
+);
+
+export const StickyHeader = ({ onBack, title, children }) => {
 	return (
 		<div className="sticky-header">
 			{onBack && (
@@ -564,11 +677,11 @@ export function StickyHeader({ onBack, title, children }) {
 				</button>
 			)}
 			{title && (
-				<h1 className="text-lg font-semibold text-[var(--color-text-primary)]">
+				<h1 className="text-title-md text-[var(--color-text-primary)]">
 					{title}
 				</h1>
 			)}
 			{children}
 		</div>
 	);
-}
+};

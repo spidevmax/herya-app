@@ -12,7 +12,7 @@ const NAV_ITEMS = [
 	{ to: "/profile", icon: User, labelKey: "nav.profile" },
 ];
 
-function DesktopSidebar() {
+const DesktopSidebar = () => {
 	const { t } = useLanguage();
 	const navigate = useNavigate();
 
@@ -75,9 +75,9 @@ function DesktopSidebar() {
 			</button>
 		</aside>
 	);
-}
+};
 
-export default function AppLayout() {
+const AppLayout = () => {
 	const location = useLocation();
 	return (
 		<div
@@ -109,4 +109,6 @@ export default function AppLayout() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default AppLayout;

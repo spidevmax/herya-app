@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function BottomNav() {
+const BottomNav = () => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 
@@ -82,4 +82,6 @@ export default function BottomNav() {
 			</div>
 		</nav>
 	);
-}
+};
+
+export default BottomNav;

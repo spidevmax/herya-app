@@ -5,7 +5,7 @@ import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
 
-export default function HeroCard({ sequence, reason, loading }) {
+const HeroCard = ({ sequence, reason, loading }) => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 
@@ -142,4 +142,6 @@ export default function HeroCard({ sequence, reason, loading }) {
 			</div>
 		</motion.div>
 	);
-}
+};
+
+export default HeroCard;
