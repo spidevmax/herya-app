@@ -233,13 +233,13 @@ router.get("/", getJournalEntriesValidation, handleValidationErrors, getJournalE
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Optional photos (max 10, max 10MB each)
+ *                 description: Optional photos (max 10, max 5MB each)
  *               voiceNotes:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
- *                 description: Optional voice notes (max 5, max 30MB each)
+ *                 description: Optional voice notes (max 5, max 10MB each)
  *     responses:
  *       201:
  *         description: Journal entry created successfully
@@ -469,12 +469,12 @@ router.get("/:id", journalIdValidation, handleValidationErrors, getJournalEntryB
  */
 router.put(
 	"/:id",
-	journalIdValidation,
-	handleValidationErrors,
 	uploadJournalMixed.fields([
 		{ name: "photos", maxCount: 10 },
 		{ name: "voiceNotes", maxCount: 5 },
 	]),
+	journalIdValidation,
+	handleValidationErrors,
 	updateJournalEntry,
 );
 

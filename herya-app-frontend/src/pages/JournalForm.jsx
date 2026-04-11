@@ -86,20 +86,13 @@ const SuccessOverlay = ({ onDone, t }) => {
 const validateForm = (form, t) => {
 	const errors = [];
 	if (!form.moodBefore || !MOOD_OPTIONS.includes(form.moodBefore)) {
-		errors.push(
-			t("journal_form.error_mood_required") ||
-				"Please select a mood before practice",
-		);
+		errors.push(t("journal_form.error_mood_required"));
 	}
 	if (form.energyBefore < 1 || form.energyBefore > 10) {
-		errors.push(
-			t("journal_form.error_energy_range") || "Energy must be between 1 and 10",
-		);
+		errors.push(t("journal_form.error_energy_range"));
 	}
 	if (form.stressBefore < 1 || form.stressBefore > 10) {
-		errors.push(
-			t("journal_form.error_stress_range") || "Stress must be between 1 and 10",
-		);
+		errors.push(t("journal_form.error_stress_range"));
 	}
 	return errors;
 };
@@ -205,7 +198,7 @@ const JournalForm = () => {
 				err?.response?.data?.error ||
 				err?.message;
 			setSaveError(
-				serverMsg || t("journal_form.save_error") || "Failed to save entry",
+				serverMsg || t("journal_form.save_error"),
 			);
 		} finally {
 			setLoading(false);
@@ -257,7 +250,7 @@ const JournalForm = () => {
 					className="mt-4 text-sm font-semibold"
 					style={{ color: "var(--color-primary)" }}
 				>
-					{"\u2190"} {t("ui.cancel")}
+					← {t("ui.go_back")}
 				</button>
 			</div>
 		);
@@ -276,7 +269,7 @@ const JournalForm = () => {
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
-						aria-label={t("ui.go_back") || "Go back"}
+						aria-label={t("ui.go_back")}
 						className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-surface-card)] shadow-sm"
 					>
 						<ChevronLeft
@@ -507,7 +500,7 @@ const JournalForm = () => {
 												type="button"
 												onClick={() => removePhoto(i)}
 												aria-label={
-													t("journal_form.remove_photo") || "Remove photo"
+													t("journal_form.remove_photo")
 												}
 												className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--color-danger)] text-white flex items-center justify-center shadow-sm"
 											>

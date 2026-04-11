@@ -147,7 +147,7 @@ export const EntryList = ({
 
 			{!hasMore && entries.length > 0 && (
 				<p className="text-center text-xs py-2 text-[var(--color-text-muted)]">
-					{t("journal.all_loaded") || "All entries loaded"}
+					{t("journal.all_loaded")}
 				</p>
 			)}
 		</div>

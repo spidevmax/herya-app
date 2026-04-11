@@ -188,7 +188,7 @@ export const JournalFilters = ({
 										htmlFor="journal-filter-from"
 										className="sr-only"
 									>
-										{t("journal.date_from") || "From date"}
+										{t("journal.date_from")}
 									</label>
 									<input
 										id="journal-filter-from"
@@ -196,7 +196,7 @@ export const JournalFilters = ({
 										value={dateFrom}
 										onChange={(e) => onDateFromChange(e.target.value)}
 										max={dateTo || undefined}
-										aria-label={t("journal.date_from") || "From date"}
+										aria-label={t("journal.date_from")}
 										className="select-base h-10 bg-[var(--color-surface)]"
 										style={{
 											color: "var(--color-text-primary)",
@@ -209,7 +209,7 @@ export const JournalFilters = ({
 										htmlFor="journal-filter-to"
 										className="sr-only"
 									>
-										{t("journal.date_to") || "To date"}
+										{t("journal.date_to")}
 									</label>
 									<input
 										id="journal-filter-to"
@@ -217,7 +217,7 @@ export const JournalFilters = ({
 										value={dateTo}
 										onChange={(e) => onDateToChange(e.target.value)}
 										min={dateFrom || undefined}
-										aria-label={t("journal.date_to") || "To date"}
+										aria-label={t("journal.date_to")}
 										className="select-base h-10 bg-[var(--color-surface)]"
 										style={{
 											color: "var(--color-text-primary)",
