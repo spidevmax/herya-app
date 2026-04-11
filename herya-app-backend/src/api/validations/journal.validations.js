@@ -108,20 +108,27 @@ const journalValidations = [
 		.isInt({ min: 1, max: 10 })
 		.withMessage("Stress level must be between 1 and 10"),
 
+	// Only validate signalAfter if present and only required for tutor role
 	check("signalAfter")
-		.optional()
+		.if((value, { req }) => req.user && req.user.role === "tutor")
+		.notEmpty()
+		.withMessage("signalAfter is required for tutor role")
 		.isIn(["green", "yellow", "red"])
 		.withMessage('signalAfter must be one of: "green", "yellow", "red"'),
 
 	check("difficultyFeedback")
 		.optional()
 		.isIn(["too_easy", "just_right", "too_hard"])
-		.withMessage('difficultyFeedback must be one of: "too_easy", "just_right", "too_hard"'),
+		.withMessage(
+			'difficultyFeedback must be one of: "too_easy", "just_right", "too_hard"',
+		),
 
 	check("pacingFeedback")
 		.optional()
 		.isIn(["too_slow", "perfect", "too_fast"])
-		.withMessage('pacingFeedback must be one of: "too_slow", "perfect", "too_fast"'),
+		.withMessage(
+			'pacingFeedback must be one of: "too_slow", "perfect", "too_fast"',
+		),
 ];
 
 /**
@@ -161,16 +168,25 @@ const journalIdValidation = [
  * router.get("/", getJournalEntriesValidation, handleValidationErrors, getJournalEntries);
  */
 const getJournalEntriesValidation = [
-	check("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+	check("page")
+		.optional()
+		.isInt({ min: 1 })
+		.withMessage("Page must be a positive integer"),
 
 	check("limit")
 		.optional()
 		.isInt({ min: 1, max: 100 })
 		.withMessage("Limit must be between 1 and 100"),
 
-	check("startDate").optional().isISO8601().withMessage("Start date must be a valid ISO 8601 date"),
+	check("startDate")
+		.optional()
+		.isISO8601()
+		.withMessage("Start date must be a valid ISO 8601 date"),
 
-	check("endDate").optional().isISO8601().withMessage("End date must be a valid ISO 8601 date"),
+	check("endDate")
+		.optional()
+		.isISO8601()
+		.withMessage("End date must be a valid ISO 8601 date"),
 
 	check("sequenceFamily")
 		.optional()

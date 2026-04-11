@@ -178,6 +178,7 @@ export const translations = {
 				"Start your first session to begin tracking your progress.",
 			error_title: "Could not load your data",
 			error_hint: "Something went wrong. Tap to retry.",
+			default_name: "Yogi",
 		},
 		library: {
 			title: "Library",
@@ -237,6 +238,14 @@ export const translations = {
 			poses_side: "Side:",
 			poses_type: "Type:",
 			poses_cautions: "Cautions:",
+			clear_search: "Clear search",
+			search_min_chars: "Type at least 2 characters to search.",
+			stat_level: "LEVEL",
+			stat_family: "FAMILY",
+			stat_poses: "POSES",
+			stat_type: "TYPE",
+			stat_effect: "EFFECT",
+			see_all: "View all",
 		},
 		hero: {
 			welcome: "Welcome!",
@@ -405,6 +414,7 @@ export const translations = {
 			preparation: "Preparation",
 			continuation: "Continuation",
 			counterposes: "Counterposes",
+			profile_label: "Pose Profile",
 		},
 		session_detail: {
 			title: "Session details",
@@ -421,6 +431,17 @@ export const translations = {
 			delete_title: "Delete session?",
 			delete_description: "This action cannot be undone.",
 			delete_confirm: "Delete",
+		},
+		session_history: {
+			title: "Session History",
+			empty_title: "No sessions yet",
+			empty_hint: "Complete a session to track your progress here.",
+			load_more: "Load more",
+			filter_all: "All sessions",
+			filter_vk: "Vinyasa Krama",
+			filter_pranayama: "Pranayama",
+			filter_meditation: "Meditation",
+			filter_complete: "Complete Practice",
 		},
 		profile: {
 			title: "Profile",
@@ -731,6 +752,10 @@ export const translations = {
 				complete_practice: "Complete Practice",
 			},
 			no_reflection: "No reflection",
+			date_from: "From date",
+			date_to: "To date",
+			all_loaded: "All entries loaded",
+			reflection_label: "Reflection",
 		},
 		journal_form: {
 			save_error: "Could not save. Please try again.",
@@ -983,8 +1008,8 @@ export const translations = {
 			// Meditation instructions
 			meditation_intro: "Introduction",
 			meditation_main: "Practice",
-			meditation_close: "Closing",
-			meditation_silence: "Sit in stillness. Follow your breath.",
+			meditation_close: "Cierre",
+			meditation_silence: "Siéntate en quietud. Sigue tu respiración.",
 			meditation_guided_intro:
 				"Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
 			meditation_guided_main:
@@ -1002,13 +1027,13 @@ export const translations = {
 			meditation_mantra_main:
 				"Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
 			meditation_mantra_close:
-				"Let the mantra fade naturally. Sit in the silence it leaves. When ready, return to the room.",
+				"Let the mantra fade naturally. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
 			meditation_viz_intro:
-				"Close your eyes and take several cleansing breaths. Allow your mind to become a calm, clear space for visualization.",
+				"Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
 			meditation_viz_main:
 				"Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
 			meditation_viz_close:
-				"Let the image gently fade. Carry the feeling of peace with you as you return to the present moment.",
+				"Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
 			meditation_silent_intro:
 				"Settle into stillness. There are no instructions to follow. Simply be present with whatever arises.",
 			meditation_silent_close:
@@ -1178,7 +1203,7 @@ export const translations = {
 			meditation: "Meditación",
 			complete_practice: "Práctica completa",
 			practice_label: "Tu práctica",
-			practiced: "practicado",
+			practiced: "practiced",
 			today: "hoy",
 			day_streak: "Racha: {n} días",
 			sessions_this_week: "{n} esta semana",
@@ -1195,6 +1220,7 @@ export const translations = {
 			no_sessions_hint: "Empieza tu primera sesión para ver tu progreso.",
 			error_title: "No se pudieron cargar los datos",
 			error_hint: "Algo salió mal. Toca para reintentar.",
+			default_name: "Yogui",
 		},
 		library: {
 			title: "Biblioteca",
@@ -1254,6 +1280,14 @@ export const translations = {
 			poses_side: "Lado:",
 			poses_type: "Tipo:",
 			poses_cautions: "Precauciones:",
+			clear_search: "Limpiar búsqueda",
+			search_min_chars: "Escribe al menos 2 caracteres para buscar.",
+			stat_level: "NIVEL",
+			stat_family: "FAMILIA",
+			stat_poses: "POSTURAS",
+			stat_type: "TIPO",
+			stat_effect: "EFECTO",
+			see_all: "Ver todo",
 		},
 		hero: {
 			welcome: "¡Bienvenida!",
@@ -1393,6 +1427,11 @@ export const translations = {
 			empty_title: "Sin sesiones aún",
 			empty_hint: "Completa una sesión para rastrear tu progreso aquí.",
 			load_more: "Cargar más",
+			filter_all: "Todas las sesiones",
+			filter_vk: "Vinyasa Krama",
+			filter_pranayama: "Pranayama",
+			filter_meditation: "Meditación",
+			filter_complete: "Práctica completa",
 		},
 		breathing_detail: {
 			not_found: "Patrón de respiración no encontrado",
@@ -1428,6 +1467,7 @@ export const translations = {
 			preparation: "Preparación",
 			continuation: "Continuación",
 			counterposes: "Contraposturas",
+			profile_label: "Perfil de postura",
 		},
 		session_detail: {
 			title: "Detalle de sesión",
@@ -1761,10 +1801,34 @@ export const translations = {
 				complete_practice: "Práctica completa",
 			},
 			no_reflection: "Sin reflexión",
+			date_from: "Desde",
+			date_to: "Hasta",
+			all_loaded: "Todas las entradas cargadas",
+			reflection_label: "Reflexión",
 		},
 		journal_form: {
 			save_error: "No se pudo guardar. Inténtalo de nuevo.",
 			fetch_error: "No se pudo cargar esta entrada.",
+			before: "Before practice",
+			after: "After practice",
+			how_feeling: "How are you feeling?",
+			how_feeling_after: "How do you feel now?",
+			energy: "Energy",
+			energy_after: "Energy after",
+			stress: "Stress",
+			stress_after: "Stress after",
+			sensations: "Physical sensations",
+			reflection: "Reflection",
+			reflection_placeholder: "How was your practice today?",
+			insights: "Insights",
+			insights_placeholder: "Any insights or learnings?",
+			photos: "Photos",
+			photos_hint: "Add photos (optional)",
+			remove_photo: "Remove photo",
+			save: "Save Entry",
+			save_changes: "Save Changes",
+			edit_title: "Edit Journal Entry",
+			new_title: "New Journal Entry",
 		},
 		sensations_map: {
 			tight_shoulders: "Hombros tensos",
@@ -2018,27 +2082,27 @@ export const translations = {
 		meditation_close: "Cierre",
 		meditation_silence: "Siéntate en quietud. Sigue tu respiración.",
 		meditation_guided_intro:
-			"Encuentra una posición sentada cómoda. Cierra suavemente los ojos. Toma tres respiraciones profundas para llegar a este momento.",
+			"Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
 		meditation_guided_main:
-			"Deja que tu atención descanse en el ritmo natural de tu respiración. Cuando tu mente divague, tráela de vuelta suavemente sin juicio.",
+			"Let your attention rest on the natural rhythm of your breath. When your mind wanders, gently bring it back without judgment.",
 		meditation_guided_close:
-			"Comienza a profundizar tu respiración. Trae suavemente la conciencia de vuelta a tu cuerpo. Cuando estés listo, abre los ojos.",
+			"Begin to deepen your breath. Gently bring awareness back to your body. When you're ready, open your eyes.",
 		meditation_breath_intro:
 			"Acomódate en tu postura. Deja que tu columna esté erguida y tus hombros relajados. Comienza a notar el flujo natural de tu respiración.",
 		meditation_breath_main:
-			"Observa cada inhalación y exhalación. Nota dónde sientes más la respiración — fosas nasales, pecho o abdomen. Simplemente observa sin cambiar.",
+			"Observe each inhalation and exhalation. Notice where you feel the breath most — nostrils, chest, or belly. Simply observe without changing.",
 		meditation_breath_close:
-			"Lentamente amplía tu conciencia de la respiración a todo tu cuerpo. Toma una respiración profunda y abre suavemente los ojos.",
+			"Slowly widen your awareness from the breath to your whole body. Take a deep breath in and gently open your eyes.",
 		meditation_mantra_intro:
-			"Encuentra tu centro. Elige un mantra o intención que resuene contigo hoy. Puede ser una sola palabra o una frase corta.",
+			"Find your center. Choose a mantra or intention that resonates with you today. It can be a single word or short phrase.",
 		meditation_mantra_main:
-			"Repite silenciosamente tu mantra con cada exhalación. Deja que la vibración de las palabras se asiente en tu conciencia.",
+			"Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
 		meditation_mantra_close:
-			"Deja que el mantra se desvanezca naturalmente. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
+			"Let the mantra fade naturally. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
 		meditation_viz_intro:
 			"Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
 		meditation_viz_main:
-			"Imagina una luz cálida y sanadora rodeándote. Con cada respiración, deja que disuelva la tensión y te llene de paz.",
+			"Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
 		meditation_viz_close:
 			"Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
 		meditation_silent_intro:

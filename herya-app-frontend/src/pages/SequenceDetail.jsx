@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
+import { colorMix } from "@/utils/libraryHelpers";
 import { Badge, SkeletonCard, StickyHeader } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -178,12 +179,7 @@ export default function SequenceDetail() {
 						animate={{ opacity: 1, scale: 1 }}
 						className="rounded-3xl p-6 relative overflow-hidden"
 						style={{
-							background:
-								"linear-gradient(135deg, " +
-								family.color +
-								", " +
-								family.color +
-								"AA)",
+							background: `linear-gradient(135deg, ${family.color}, ${colorMix(family.color, 67)})`,
 						}}
 					>
 						<div className="absolute right-4 bottom-4 opacity-20 float select-none">
@@ -267,7 +263,7 @@ export default function SequenceDetail() {
 								{seq.level ? (
 									<div
 										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${family.color}12` }}
+										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
 										<p
 											className="text-[10px] font-bold uppercase tracking-widest"
@@ -286,7 +282,7 @@ export default function SequenceDetail() {
 								{seq.difficulty ? (
 									<div
 										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${family.color}12` }}
+										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
 										<p
 											className="text-[10px] font-bold uppercase tracking-widest"
@@ -307,7 +303,7 @@ export default function SequenceDetail() {
 								estimatedDuration.max ? (
 									<div
 										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${family.color}12` }}
+										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
 										<p
 											className="text-[10px] font-bold uppercase tracking-widest"
@@ -333,7 +329,7 @@ export default function SequenceDetail() {
 								{seq.family ? (
 									<div
 										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${family.color}12` }}
+										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
 										<p
 											className="text-[10px] font-bold uppercase tracking-widest"
@@ -503,7 +499,7 @@ export default function SequenceDetail() {
 												nextSequence.name
 											}
 											className="rounded-xl px-3 py-2 border"
-											style={{ borderColor: `${family.color}33` }}
+											style={{ borderColor: `${colorMix(family.color, 20)}` }}
 										>
 											<p
 												className="text-sm font-semibold"
@@ -565,7 +561,7 @@ export default function SequenceDetail() {
 												<li
 													key={pose.id}
 													className="rounded-xl border"
-													style={{ borderColor: `${family.color}33` }}
+													style={{ borderColor: `${colorMix(family.color, 20)}` }}
 												>
 													{pose.poseId ? (
 														<button
@@ -575,7 +571,7 @@ export default function SequenceDetail() {
 															}
 															aria-label={`${viewPoseLabel}: ${pose.name}`}
 															className="group w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left transition hover:brightness-95 hover:-translate-y-[1px] cursor-pointer"
-															style={{ backgroundColor: `${family.color}0F` }}
+															style={{ backgroundColor: `${colorMix(family.color, 6)}` }}
 														>
 															<div className="min-w-0">
 																<p
@@ -609,7 +605,7 @@ export default function SequenceDetail() {
 																	<span
 																		className="text-xs font-semibold px-2 py-1 rounded-lg"
 																		style={{
-																			backgroundColor: `${family.color}22`,
+																			backgroundColor: `${colorMix(family.color, 13)}`,
 																			color: family.color,
 																		}}
 																	>
@@ -633,7 +629,7 @@ export default function SequenceDetail() {
 													) : (
 														<div
 															className="w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3"
-															style={{ backgroundColor: `${family.color}0F` }}
+															style={{ backgroundColor: `${colorMix(family.color, 6)}` }}
 														>
 															<div className="min-w-0">
 																<p
@@ -666,7 +662,7 @@ export default function SequenceDetail() {
 																<span
 																	className="text-xs font-semibold px-2 py-1 rounded-lg"
 																	style={{
-																		backgroundColor: `${family.color}22`,
+																		backgroundColor: `${colorMix(family.color, 13)}`,
 																		color: family.color,
 																	}}
 																>
@@ -689,7 +685,7 @@ export default function SequenceDetail() {
 							className="rounded-2xl p-5 border"
 							style={{
 								backgroundColor: "var(--color-surface-card)",
-								borderColor: `${family.color}33`,
+								borderColor: `${colorMix(family.color, 20)}`,
 							}}
 						>
 							<h3

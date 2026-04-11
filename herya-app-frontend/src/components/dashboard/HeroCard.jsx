@@ -10,20 +10,19 @@ const HeroCard = ({ sequence, reason, loading }) => {
 	const { t } = useLanguage();
 
 	if (loading)
-		return <div className="mx-4 lg:mx-0 rounded-3xl h-52 skeleton" />;
+		return <div className="rounded-3xl h-52 skeleton" />;
 
 	if (!sequence) {
 		return (
 			<div
-				className="mx-4 lg:mx-0 rounded-3xl p-6 text-white"
+				className="rounded-3xl p-6 text-white"
 				style={{
 					background:
 						"linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
 				}}
 			>
 				<h2
-					className="text-2xl font-semibold mb-2"
-
+					className="font-display text-2xl font-bold tracking-tight mb-2"
 				>
 					{t("dashboard.welcome_title")}
 				</h2>
@@ -59,7 +58,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 
 	return (
 		<motion.div
-			className="mx-4 lg:mx-0 rounded-3xl overflow-hidden cursor-pointer"
+			className="rounded-3xl overflow-hidden cursor-pointer"
 			onClick={handleCardClick}
 			onKeyDown={handleCardKeyDown}
 			role="button"
@@ -97,8 +96,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					<div className="mb-2" />
 				)}
 				<h2
-					className="relative text-2xl font-semibold text-white leading-tight mb-1"
-
+					className="relative font-display text-2xl font-bold tracking-tight text-white leading-tight mb-1"
 				>
 					{sequence.englishName}
 				</h2>

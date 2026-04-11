@@ -760,8 +760,8 @@ export default function StartPractice() {
 					: [];
 
 				await createJournalEntry({
-					session: sessionId,
 					...journalData,
+					session: sessionId,
 					moodBefore: safeMoodBefore.length > 0 ? safeMoodBefore : ["focused"],
 				});
 			}

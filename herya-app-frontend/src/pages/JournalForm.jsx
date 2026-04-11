@@ -86,13 +86,20 @@ const SuccessOverlay = ({ onDone, t }) => {
 const validateForm = (form, t) => {
 	const errors = [];
 	if (!form.moodBefore || !MOOD_OPTIONS.includes(form.moodBefore)) {
-		errors.push(t("journal_form.error_mood_required") || "Please select a mood before practice");
+		errors.push(
+			t("journal_form.error_mood_required") ||
+				"Please select a mood before practice",
+		);
 	}
 	if (form.energyBefore < 1 || form.energyBefore > 10) {
-		errors.push(t("journal_form.error_energy_range") || "Energy must be between 1 and 10");
+		errors.push(
+			t("journal_form.error_energy_range") || "Energy must be between 1 and 10",
+		);
 	}
 	if (form.stressBefore < 1 || form.stressBefore > 10) {
-		errors.push(t("journal_form.error_stress_range") || "Stress must be between 1 and 10");
+		errors.push(
+			t("journal_form.error_stress_range") || "Stress must be between 1 and 10",
+		);
 	}
 	return errors;
 };
@@ -154,11 +161,28 @@ const JournalForm = () => {
 		setLoading(true);
 		try {
 			const payload = new FormData();
-			payload.append("moodBefore", form.moodBefore);
-			payload.append("energyBefore", form.energyBefore);
-			payload.append("stressBefore", form.stressBefore);
-			if (form.moodAfter) payload.append("moodAfter", form.moodAfter);
-			if (form.energyAfter != null) payload.append("energyAfter", form.energyAfter);
+			// Backend expects arrays for moods
+			if (Array.isArray(form.moodBefore)) {
+				form.moodBefore.forEach((m) => {
+					payload.append("moodBefore[]", m);
+				});
+			} else if (form.moodBefore) {
+				payload.append("moodBefore[]", form.moodBefore);
+			}
+			if (Array.isArray(form.moodAfter)) {
+				form.moodAfter.forEach((m) => {
+					payload.append("moodAfter[]", m);
+				});
+			} else if (form.moodAfter) {
+				payload.append("moodAfter[]", form.moodAfter);
+			}
+			// Send energyLevel and stressLevel as objects with before/after keys
+			payload.append("energyLevel[before]", form.energyBefore);
+			if (form.energyAfter != null)
+				payload.append("energyLevel[after]", form.energyAfter);
+			payload.append("stressLevel[before]", form.stressBefore);
+			if (form.stressAfter != null)
+				payload.append("stressLevel[after]", form.stressAfter);
 			if (form.reflection) payload.append("reflection", form.reflection);
 			if (form.insights) payload.append("insights", form.insights);
 			form.physicalSensations.forEach((s) => {
@@ -468,8 +492,7 @@ const JournalForm = () => {
 						{form.photos.length > 0 && (
 							<div className="flex gap-2 mt-3 overflow-x-auto pb-1 no-scrollbar">
 								{form.photos.map((p, i) => {
-									const url =
-										p.previewUrl || (typeof p === "string" ? p : "");
+									const url = p.previewUrl || (typeof p === "string" ? p : "");
 									return (
 										<div
 											key={p.previewUrl || `photo-${url}`}
@@ -483,7 +506,9 @@ const JournalForm = () => {
 											<button
 												type="button"
 												onClick={() => removePhoto(i)}
-												aria-label={t("journal_form.remove_photo") || "Remove photo"}
+												aria-label={
+													t("journal_form.remove_photo") || "Remove photo"
+												}
 												className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--color-danger)] text-white flex items-center justify-center shadow-sm"
 											>
 												<X size={12} />

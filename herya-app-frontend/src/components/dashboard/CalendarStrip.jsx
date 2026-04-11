@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef } from "react";
+import { Check } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { DAY_LABELS } from "@/utils/constants";
 
@@ -45,7 +46,7 @@ export default function CalendarStrip({
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-3 px-4 lg:px-0">
+			<div className="flex items-center justify-between mb-3 ">
 				<span
 					className="text-[11px] font-bold uppercase tracking-[0.1em]"
 					style={{ color: "var(--color-text-muted)" }}
@@ -74,7 +75,7 @@ export default function CalendarStrip({
 			</div>
 			<div
 				ref={stripRef}
-				className="flex gap-2 overflow-x-auto px-4 lg:px-0 pb-1"
+				className="flex gap-2 overflow-x-auto  pb-1"
 			>
 				{days.map((d, i) => (
 					<motion.div
@@ -112,7 +113,7 @@ export default function CalendarStrip({
 									: "none",
 							}}
 						>
-							{d.practiced && !d.isToday ? "✓" : d.day}
+							{d.practiced && !d.isToday ? <Check size={16} strokeWidth={3} /> : d.day}
 						</div>
 					</motion.div>
 				))}

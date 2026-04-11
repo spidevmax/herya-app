@@ -4,14 +4,21 @@ const { createUser, createSession } = require("./helpers");
 
 const BASE = "/api/v1/journal-entries";
 
-const JOURNAL_PAYLOAD = (sessionId) => ({
-	session: sessionId,
-	moodBefore: ["stressed", "anxious"],
-	moodAfter: ["calm", "peaceful"],
-	signalAfter: "yellow",
-	energyLevel: { before: 4, after: 8 },
-	stressLevel: { before: 7, after: 3 },
-});
+// Accepts options to simulate different roles
+const JOURNAL_PAYLOAD = (sessionId, opts = {}) => {
+	const base = {
+		session: sessionId,
+		moodBefore: ["stressed", "anxious"],
+		moodAfter: ["calm", "peaceful"],
+		energyLevel: { before: 4, after: 8 },
+		stressLevel: { before: 7, after: 3 },
+	};
+	// Only include signalAfter for tutor role
+	if (opts.role === "tutor") {
+		base.signalAfter = "yellow";
+	}
+	return base;
+};
 
 describe("Journal Entries — GET /", () => {
 	it("returns 401 without a token", async () => {
@@ -21,7 +28,9 @@ describe("Journal Entries — GET /", () => {
 
 	it("returns an empty list for a new user", async () => {
 		const { token } = await createUser({ email: "journal-list@test.com" });
-		const res = await request(app).get(BASE).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(BASE)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 		expect(Array.isArray(res.body.data.journals)).toBe(true);
@@ -35,12 +44,13 @@ describe("Journal Entries — POST /", () => {
 		const res = await request(app)
 			.post(BASE)
 			.set("Authorization", `Bearer ${token}`)
-			.send(JOURNAL_PAYLOAD(session._id));
+			.send(JOURNAL_PAYLOAD(session._id)); // user role: no signalAfter
 		expect(res.status).toBe(201);
 		expect(res.body.data).toHaveProperty("session");
 		expect(res.body.data.energyLevel.before).toBe(4);
 		expect(res.body.data.energyLevel.after).toBe(8);
-		expect(res.body.data).toHaveProperty("signalAfter", "yellow");
+		// For user role, signalAfter should not be present
+		expect(res.body.data).not.toHaveProperty("signalAfter");
 	});
 
 	it("returns 400 when required fields are missing", async () => {
@@ -62,7 +72,9 @@ describe("Journal Entries — GET /:id", () => {
 			.set("Authorization", `Bearer ${token}`)
 			.send(JOURNAL_PAYLOAD(session._id));
 		const id = create.body.data._id;
-		const res = await request(app).get(`${BASE}/${id}`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.get(`${BASE}/${id}`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("_id", id);
 	});
@@ -103,7 +115,9 @@ describe("Journal Entries — DELETE /:id", () => {
 			.set("Authorization", `Bearer ${token}`)
 			.send(JOURNAL_PAYLOAD(session._id));
 		const id = create.body.data._id;
-		const res = await request(app).delete(`${BASE}/${id}`).set("Authorization", `Bearer ${token}`);
+		const res = await request(app)
+			.delete(`${BASE}/${id}`)
+			.set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 	});
 });

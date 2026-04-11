@@ -188,7 +188,7 @@ export const StatCard = ({
 		<div
 			className="rounded-xl p-3 flex flex-col gap-2"
 			style={{
-				backgroundColor: `${color}15`,
+				backgroundColor: `color-mix(in srgb, ${color} 8%, transparent)`,
 				borderLeft: `3px solid ${color}`,
 			}}
 		>
@@ -341,7 +341,7 @@ export const Badge = ({ children, color = "var(--color-secondary)", className = 
 	return (
 		<span
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}
-			style={{ backgroundColor: `${color}20`, color }}
+			style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, color }}
 		>
 			{children}
 		</span>

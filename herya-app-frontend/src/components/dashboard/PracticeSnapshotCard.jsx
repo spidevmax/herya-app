@@ -121,7 +121,7 @@ export default function PracticeSnapshotCard({
 				</p>
 				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
 					{hasPendingSession
-						? t(`practice.${pendingSession.sessionType}`)
+						? t(`dashboard.${pendingSession.sessionType}`)
 						: t("dashboard.reminder_short_practice")}
 				</p>
 			</div>

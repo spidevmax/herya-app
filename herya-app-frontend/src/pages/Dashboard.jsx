@@ -101,8 +101,8 @@ export default function Dashboard() {
 					>
 						{t(greetingKey)},
 					</p>
-					<h1 className="text-2xl font-semibold text-[var(--color-primary)]">
-						{user?.name?.split(" ")[0] ?? "Yogi"}
+					<h1 className="font-display text-2xl font-bold tracking-tight text-[var(--color-primary)]">
+						{user?.name?.split(" ")[0] ?? t("dashboard.default_name")}
 					</h1>
 				</div>
 			</motion.div>
@@ -283,7 +283,7 @@ export default function Dashboard() {
 							{completedSessions.length > 0 ? (
 								<>
 									<h2
-										className="text-[11px] font-bold uppercase tracking-[0.1em]"
+										className="font-display text-[11px] font-bold uppercase tracking-[0.1em]"
 										style={{ color: "var(--color-text-muted)" }}
 									>
 										{t("dashboard.recent_practice")}

@@ -17,6 +17,7 @@ import {
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
 import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import { translateWithFallback } from "@/utils/libraryHelpers";
 
 const DIFF_COLORS = {
 	beginner: "var(--color-info)",
@@ -102,8 +103,8 @@ export default function PoseDetail() {
 		target: heroRef,
 		offset: ["start start", "end start"],
 	});
-	const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
-	const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+	const heroY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? ["0%", "0%"] : ["0%", "14%"]);
+	const heroScale = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [1, 1] : [1, 1.08]);
 
 	useEffect(() => {
 		Promise.allSettled([getPoseById(id), getRelatedPoses(id)])
@@ -219,6 +220,7 @@ export default function PoseDetail() {
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
+					aria-label={t("pose_detail.back")}
 					className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm"
 				>
 					<ChevronLeft size={20} className="text-[var(--color-text-primary)]" />
@@ -275,7 +277,7 @@ export default function PoseDetail() {
 								}}
 							>
 								<Sparkles size={12} />
-								Pose Profile
+								{translateWithFallback(t, "pose_detail.profile_label", "Pose Profile")}
 							</div>
 						</div>
 
@@ -708,7 +710,7 @@ export default function PoseDetail() {
 											<RelatedPoseChip
 												key={p._id}
 												pose={p}
-												onClick={() => navigate(`/poses/${p._id}`)}
+												onClick={() => navigate(`/library/pose/${p._id}`)}
 											/>
 										))}
 									</div>
@@ -724,7 +726,7 @@ export default function PoseDetail() {
 											<RelatedPoseChip
 												key={p._id}
 												pose={p}
-												onClick={() => navigate(`/poses/${p._id}`)}
+												onClick={() => navigate(`/library/pose/${p._id}`)}
 											/>
 										))}
 									</div>
@@ -740,7 +742,7 @@ export default function PoseDetail() {
 											<RelatedPoseChip
 												key={p._id}
 												pose={p}
-												onClick={() => navigate(`/poses/${p._id}`)}
+												onClick={() => navigate(`/library/pose/${p._id}`)}
 											/>
 										))}
 									</div>

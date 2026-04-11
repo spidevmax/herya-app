@@ -15,6 +15,7 @@ import { FilterChips, SkeletonCard, EmptyState } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
+import { colorMix } from "@/utils/libraryHelpers";
 
 const TYPE_ICONS = {
 	vk_sequence: PersonStanding,
@@ -57,7 +58,7 @@ function SessionCard({ session, index, onClick, t, lang }) {
 		>
 			<div
 				className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-				style={{ backgroundColor: `${color}15` }}
+				style={{ backgroundColor: colorMix(color, 8) }}
 			>
 				{family?.emoji ? (
 					<span className="text-2xl">{family.emoji}</span>

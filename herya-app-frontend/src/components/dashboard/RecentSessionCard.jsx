@@ -9,19 +9,17 @@ import {
 	XCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SESSION_TYPES, VK_FAMILY_MAP } from "@/utils/constants";
+import { VK_FAMILY_MAP } from "@/utils/constants";
 import { format } from "@/utils/helpers";
 import { useLanguage } from "@/context/LanguageContext";
+import { colorMix } from "@/utils/libraryHelpers";
 
 export default function RecentSessionCard({ session, index = 0 }) {
 	const navigate = useNavigate();
-	const { lang } = useLanguage();
+	const { t, lang } = useLanguage();
 	const family = session.vkSequence?.family
 		? VK_FAMILY_MAP[session.vkSequence.family]
 		: null;
-	const sessionType = SESSION_TYPES.find(
-		(s) => s.value === session.sessionType,
-	);
 	const TYPE_ICON_MAP = {
 		vk_sequence: PersonStanding,
 		pranayama: Wind,
@@ -46,7 +44,7 @@ export default function RecentSessionCard({ session, index = 0 }) {
 			/>
 			<div
 				className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-				style={{ backgroundColor: `${color}20` }}
+				style={{ backgroundColor: colorMix(color, 12) }}
 			>
 				{family?.emoji ? (
 					<span className="text-xl">{family.emoji}</span>
@@ -59,7 +57,7 @@ export default function RecentSessionCard({ session, index = 0 }) {
 					className="font-semibold text-sm truncate"
 					style={{ color: "var(--color-text-primary)" }}
 				>
-					{session.vkSequence?.englishName || sessionType?.label || "Session"}
+					{session.vkSequence?.englishName || t(`dashboard.${session.sessionType}`) || t("dashboard.sessions")}
 				</p>
 				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
 					{format.date(session.date || session.createdAt, lang)}

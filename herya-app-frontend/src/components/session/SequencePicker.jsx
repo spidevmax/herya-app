@@ -99,10 +99,7 @@ export default function SequencePicker({
 				{open ? (
 					<ChevronUp size={16} style={{ color: "var(--color-text-muted)" }} />
 				) : (
-					<ChevronDown
-						size={16}
-						style={{ color: "var(--color-text-muted)" }}
-					/>
+					<ChevronDown size={16} style={{ color: "var(--color-text-muted)" }} />
 				)}
 			</button>
 
@@ -124,10 +121,7 @@ export default function SequencePicker({
 							className="flex items-center gap-2 px-3 py-2 border-b"
 							style={{ borderColor: "var(--color-border-soft)" }}
 						>
-							<Search
-								size={14}
-								style={{ color: "var(--color-text-muted)" }}
-							/>
+							<Search size={14} style={{ color: "var(--color-text-muted)" }} />
 							<input
 								type="text"
 								value={search}
@@ -139,10 +133,7 @@ export default function SequencePicker({
 							/>
 							{search && (
 								<button type="button" onClick={() => setSearch("")}>
-									<X
-										size={14}
-										style={{ color: "var(--color-text-muted)" }}
-									/>
+									<X size={14} style={{ color: "var(--color-text-muted)" }} />
 								</button>
 							)}
 						</div>
@@ -217,23 +208,30 @@ export default function SequencePicker({
 												</div>
 											</div>
 
-											{/* Preview button */}
-											<button
-												type="button"
+											{/* Preview button (fix: not a button inside button) */}
+											<span
+												role="button"
+												tabIndex={0}
 												onClick={(e) => {
 													e.stopPropagation();
-													setPreviewId(
-														previewId === seq._id ? null : seq._id,
-													);
+													setPreviewId(previewId === seq._id ? null : seq._id);
 												}}
-												className="p-1.5 rounded-lg shrink-0"
+												onKeyDown={(e) => {
+													if (e.key === "Enter" || e.key === " ") {
+														e.stopPropagation();
+														setPreviewId(
+															previewId === seq._id ? null : seq._id,
+														);
+													}
+												}}
+												className="p-1.5 rounded-lg shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
 												style={{
 													color: "var(--color-text-muted)",
 												}}
 												aria-label={t("guided.preview_sequence")}
 											>
 												<Eye size={14} />
-											</button>
+											</span>
 
 											{selectedId === seq._id && (
 												<Check
@@ -304,10 +302,7 @@ function SequencePreview({ sequence }) {
 						if (!pose) return null;
 						const name = pose.romanizationName || pose.name || "—";
 						return (
-							<div
-								key={cp._id || i}
-								className="flex items-center gap-2 py-1"
-							>
+							<div key={cp._id || i} className="flex items-center gap-2 py-1">
 								<span
 									className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
 									style={{
@@ -328,8 +323,7 @@ function SequencePreview({ sequence }) {
 									<div
 										className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
 										style={{
-											backgroundColor:
-												"var(--color-primary-light, #EEF2FF)",
+											backgroundColor: "var(--color-primary-light, #EEF2FF)",
 										}}
 									>
 										<PersonStanding

@@ -38,7 +38,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				icon: Sparkles,
 				message: t("dashboard.reminder_short_practice"),
 				accent: "var(--color-primary)",
-				bg: "linear-gradient(135deg, var(--color-primary)15, var(--color-secondary)12)",
+				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 15%, transparent), color-mix(in srgb, var(--color-secondary) 12%, transparent))",
 			};
 		}
 
@@ -47,7 +47,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				icon: Sparkles,
 				message: t("dashboard.reminder_keep_going"),
 				accent: "var(--color-secondary)",
-				bg: "linear-gradient(135deg, var(--color-secondary)14, var(--color-primary)10)",
+				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-secondary) 14%, transparent), color-mix(in srgb, var(--color-primary) 10%, transparent))",
 			};
 		}
 
@@ -56,7 +56,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				icon: Droplets,
 				message: t("dashboard.reminder_water"),
 				accent: "var(--color-primary)",
-				bg: "linear-gradient(135deg, var(--color-primary)12, var(--color-primary-light)18)",
+				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 12%, transparent), color-mix(in srgb, var(--color-primary-light) 18%, transparent))",
 			};
 		}
 
@@ -65,7 +65,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				icon: Sparkles,
 				message: t("dashboard.reminder_breathe"),
 				accent: "var(--color-secondary)",
-				bg: "linear-gradient(135deg, var(--color-secondary)10, var(--color-accent)12)",
+				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-secondary) 10%, transparent), color-mix(in srgb, var(--color-accent) 12%, transparent))",
 			};
 		}
 
@@ -73,7 +73,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 			icon: Droplets,
 			message: t("dashboard.reminder_water"),
 			accent: "var(--color-primary)",
-			bg: "linear-gradient(135deg, var(--color-primary)12, var(--color-secondary)10)",
+			bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 12%, transparent), color-mix(in srgb, var(--color-secondary) 10%, transparent))",
 		};
 	}, [sessions.length, streak, t, user?.preferences?.timeOfDay]);
 
@@ -96,7 +96,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				initial={{ opacity: 0, y: -8 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -8 }}
-				className="px-4 lg:px-0"
+				className=""
 			>
 				<div
 					className="rounded-3xl p-4 shadow-[var(--shadow-card)] border"

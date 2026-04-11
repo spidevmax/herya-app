@@ -13,12 +13,9 @@ import {
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import { DIFF_COLORS as SHARED_DIFF_COLORS, colorMix, translateWithFallback } from "@/utils/libraryHelpers";
 
-const DIFF_COLORS = {
-	beginner: "var(--color-success)",
-	intermediate: "var(--color-warning)",
-	advanced: "var(--color-danger)",
-};
+const DIFF_COLORS = SHARED_DIFF_COLORS;
 
 const ENERGY_ICONS = {
 	calming: Waves,
@@ -34,7 +31,7 @@ function RatioBox({ label, value, color }) {
 			<div
 				className="w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold border-2 font-display"
 				style={{
-					backgroundColor: `${color}18`,
+					backgroundColor: colorMix(color, 9),
 					borderColor: color,
 					color,
 				}}
@@ -116,12 +113,13 @@ export default function BreathingDetail() {
 			<div
 				className="relative px-4 pt-12 pb-8 flex flex-col items-center gap-3"
 				style={{
-					background: `linear-gradient(135deg, ${diffColor}22, ${diffColor}08)`,
+					background: `linear-gradient(135deg, ${colorMix(diffColor, 13)}, ${colorMix(diffColor, 3)})`,
 				}}
 			>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
+					aria-label={t("breathing_detail.back")}
 					className="absolute top-4 left-4 w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
 					style={{
 						backgroundColor: "var(--color-surface-card)",
@@ -146,7 +144,7 @@ export default function BreathingDetail() {
 				</div>
 
 				<div className="text-center">
-					<h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+					<h1 className="font-display text-2xl font-bold tracking-tight text-[var(--color-text-primary)]">
 						{pattern.romanizationName}
 					</h1>
 					{pattern.iastName && (
@@ -169,7 +167,7 @@ export default function BreathingDetail() {
 						className="px-3 py-1 rounded-full text-xs font-bold text-white"
 						style={{ backgroundColor: diffColor }}
 					>
-						{pattern.difficulty}
+						{translateWithFallback(t, `library.${pattern.difficulty}`, pattern.difficulty)}
 					</span>
 					{pattern.energyEffect && (
 						<span
@@ -181,7 +179,7 @@ export default function BreathingDetail() {
 						>
 							<span className="inline-flex items-center gap-1">
 								<EnergyIcon size={13} />
-								{pattern.energyEffect}
+								{translateWithFallback(t, `library.effects.${pattern.energyEffect}`, pattern.energyEffect)}
 							</span>
 						</span>
 					)}
@@ -246,7 +244,7 @@ export default function BreathingDetail() {
 						className="rounded-2xl p-4"
 						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
-						<h3 className="font-bold mb-3 text-[var(--color-text-primary)]">
+						<h3 className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
 							{t("breathing_detail.benefits")}
 						</h3>
 						<ul className="flex flex-col gap-2">
@@ -267,7 +265,7 @@ export default function BreathingDetail() {
 				{/* Step-by-step instructions */}
 				{instructions.length > 0 && (
 					<div>
-						<h3 className="font-bold mb-3 text-[var(--color-text-primary)]">
+						<h3 className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
 							{t("breathing_detail.instructions")}
 						</h3>
 						<ol className="flex flex-col gap-3">
