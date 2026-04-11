@@ -8,7 +8,7 @@ import {
 	getJournalEntryById,
 	updateJournalEntry,
 } from "@/api/journalEntries.api";
-import { MOOD_OPTIONS } from "@/utils/constants";
+import { MOOD_OPTIONS, MOOD_AFTER_OPTIONS } from "@/utils/constants";
 import { Button, MoodSelector } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -85,7 +85,8 @@ const SuccessOverlay = ({ onDone, t }) => {
 
 const validateForm = (form, t) => {
 	const errors = [];
-	if (!form.moodBefore || !MOOD_OPTIONS.includes(form.moodBefore)) {
+	const moodArr = Array.isArray(form.moodBefore) ? form.moodBefore : [];
+	if (moodArr.length === 0) {
 		errors.push(t("journal_form.error_mood_required"));
 	}
 	if (form.energyBefore < 1 || form.energyBefore > 10) {
@@ -104,15 +105,17 @@ const JournalForm = () => {
 	const isEdit = Boolean(id);
 
 	const [form, setForm] = useState({
-		moodBefore: null,
+		moodBefore: [],
 		energyBefore: 5,
 		stressBefore: 5,
-		moodAfter: null,
+		moodAfter: [],
 		energyAfter: null,
+		stressAfter: null,
 		reflection: "",
 		insights: "",
 		physicalSensations: [],
 		photos: [],
+		session: null,
 	});
 	const [loading, setLoading] = useState(false);
 	const [fetching, setFetching] = useState(isEdit);
@@ -135,7 +138,27 @@ const JournalForm = () => {
 		getJournalEntryById(id)
 			.then((r) => {
 				const e = r.data?.data || r.data;
-				if (e) setForm((f) => ({ ...f, ...e }));
+				if (e) {
+					setForm((f) => ({
+						...f,
+						moodBefore: Array.isArray(e.moodBefore) ? e.moodBefore : [],
+						moodAfter: Array.isArray(e.moodAfter) ? e.moodAfter : [],
+						energyBefore: e.energyLevel?.before ?? 5,
+						energyAfter: e.energyLevel?.after ?? null,
+						stressBefore: e.stressLevel?.before ?? 5,
+						stressAfter: e.stressLevel?.after ?? null,
+						reflection: e.emotionalNotes || "",
+						insights: e.insights || "",
+						physicalSensations: Array.isArray(e.physicalSensations)
+							? e.physicalSensations
+							: [],
+						photos: (e.photos || []).map((p) => ({
+							previewUrl: p.url,
+							cloudinaryId: p.cloudinaryId,
+						})),
+						session: e.session?._id || e.session || null,
+					}));
+				}
 			})
 			.catch(() => setFetchError(true))
 			.finally(() => setFetching(false));
@@ -154,20 +177,18 @@ const JournalForm = () => {
 		setLoading(true);
 		try {
 			const payload = new FormData();
+			// Session ID (required for create)
+			if (form.session) payload.append("session", form.session);
 			// Backend expects arrays for moods
 			if (Array.isArray(form.moodBefore)) {
 				form.moodBefore.forEach((m) => {
 					payload.append("moodBefore[]", m);
 				});
-			} else if (form.moodBefore) {
-				payload.append("moodBefore[]", form.moodBefore);
 			}
 			if (Array.isArray(form.moodAfter)) {
 				form.moodAfter.forEach((m) => {
 					payload.append("moodAfter[]", m);
 				});
-			} else if (form.moodAfter) {
-				payload.append("moodAfter[]", form.moodAfter);
 			}
 			// Send energyLevel and stressLevel as objects with before/after keys
 			payload.append("energyLevel[before]", form.energyBefore);
@@ -176,7 +197,8 @@ const JournalForm = () => {
 			payload.append("stressLevel[before]", form.stressBefore);
 			if (form.stressAfter != null)
 				payload.append("stressLevel[after]", form.stressAfter);
-			if (form.reflection) payload.append("reflection", form.reflection);
+			if (form.reflection)
+				payload.append("emotionalNotes", form.reflection);
 			if (form.insights) payload.append("insights", form.insights);
 			form.physicalSensations.forEach((s) => {
 				payload.append("physicalSensations[]", s);
@@ -419,36 +441,67 @@ const JournalForm = () => {
 							value={form.moodAfter}
 							onChange={(v) => setForm((f) => ({ ...f, moodAfter: v }))}
 							label={t("journal_form.how_feeling_after")}
+							options={MOOD_AFTER_OPTIONS}
 						/>
-						{form.moodAfter && (
-							<div className="mt-4">
-								<label
-									htmlFor="energy-after"
-									className="flex items-center justify-between mb-2"
-								>
-									<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-										{t("journal_form.energy_after")}
-									</span>
-									<span className="text-sm font-bold text-[var(--color-primary)]">
-										{form.energyAfter ?? 5}/10
-									</span>
-								</label>
-								<input
-									id="energy-after"
-									type="range"
-									min={1}
-									max={10}
-									value={form.energyAfter ?? 5}
-									aria-label={t("journal_form.energy_after")}
-									onChange={(e) =>
-										setForm((f) => ({
-											...f,
-											energyAfter: Number(e.target.value),
-										}))
-									}
-									className="w-full accent-[var(--color-primary)]"
-								/>
-							</div>
+						{form.moodAfter.length > 0 && (
+							<>
+								<div className="mt-4">
+									<label
+										htmlFor="energy-after"
+										className="flex items-center justify-between mb-2"
+									>
+										<span className="text-sm font-semibold text-[var(--color-text-primary)]">
+											{t("journal_form.energy_after")}
+										</span>
+										<span className="text-sm font-bold text-[var(--color-primary)]">
+											{form.energyAfter ?? 5}/10
+										</span>
+									</label>
+									<input
+										id="energy-after"
+										type="range"
+										min={1}
+										max={10}
+										value={form.energyAfter ?? 5}
+										aria-label={t("journal_form.energy_after")}
+										onChange={(e) =>
+											setForm((f) => ({
+												...f,
+												energyAfter: Number(e.target.value),
+											}))
+										}
+										className="w-full accent-[var(--color-primary)]"
+									/>
+								</div>
+								<div className="mt-4">
+									<label
+										htmlFor="stress-after"
+										className="flex items-center justify-between mb-2"
+									>
+										<span className="text-sm font-semibold text-[var(--color-text-primary)]">
+											{t("journal_form.stress_after")}
+										</span>
+										<span className="text-sm font-bold text-[var(--color-danger)]">
+											{form.stressAfter ?? 5}/10
+										</span>
+									</label>
+									<input
+										id="stress-after"
+										type="range"
+										min={1}
+										max={10}
+										value={form.stressAfter ?? 5}
+										aria-label={t("journal_form.stress_after")}
+										onChange={(e) =>
+											setForm((f) => ({
+												...f,
+												stressAfter: Number(e.target.value),
+											}))
+										}
+										className="w-full accent-[var(--color-danger)]"
+									/>
+								</div>
+							</>
 						)}
 					</div>
 

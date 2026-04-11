@@ -214,8 +214,114 @@ const getJournalEntriesValidation = [
 		.withMessage('Sort by must be one of: "date", "mood", "energy"'),
 ];
 
+/**
+ * Validation Rules: updateJournalValidations (PUT - Update)
+ * ---------------------------------------------------------
+ * Validates journal entry update request body.
+ * All fields are optional (partial update), but validated when present.
+ */
+const updateJournalValidations = [
+	check("moodBefore")
+		.optional()
+		.isArray({ min: 1 })
+		.withMessage("moodBefore must be a non-empty array"),
+
+	check("moodBefore.*")
+		.optional()
+		.isIn([
+			"calm",
+			"anxious",
+			"energized",
+			"tired",
+			"focused",
+			"stressed",
+			"happy",
+			"sad",
+			"grounded",
+			"restless",
+			"peaceful",
+			"overwhelmed",
+			"motivated",
+			"discouraged",
+			"scattered",
+			"irritated",
+		])
+		.withMessage("Invalid mood value in moodBefore"),
+
+	check("moodAfter")
+		.optional()
+		.isArray({ min: 1 })
+		.withMessage("moodAfter must be a non-empty array"),
+
+	check("moodAfter.*")
+		.optional()
+		.isIn([
+			"calm",
+			"anxious",
+			"energized",
+			"tired",
+			"focused",
+			"stressed",
+			"happy",
+			"sad",
+			"grounded",
+			"restless",
+			"peaceful",
+			"overwhelmed",
+			"motivated",
+			"discouraged",
+			"renewed",
+			"centered",
+			"light",
+			"clear",
+			"scattered",
+			"irritated",
+		])
+		.withMessage("Invalid mood value in moodAfter"),
+
+	check("energyLevel.before")
+		.optional()
+		.isInt({ min: 1, max: 10 })
+		.withMessage("Energy level must be between 1 and 10"),
+
+	check("energyLevel.after")
+		.optional()
+		.isInt({ min: 1, max: 10 })
+		.withMessage("Energy level must be between 1 and 10"),
+
+	check("stressLevel.before")
+		.optional()
+		.isInt({ min: 1, max: 10 })
+		.withMessage("Stress level must be between 1 and 10"),
+
+	check("stressLevel.after")
+		.optional()
+		.isInt({ min: 1, max: 10 })
+		.withMessage("Stress level must be between 1 and 10"),
+
+	check("signalAfter")
+		.optional()
+		.isIn(["green", "yellow", "red"])
+		.withMessage('signalAfter must be one of: "green", "yellow", "red"'),
+
+	check("difficultyFeedback")
+		.optional()
+		.isIn(["too_easy", "just_right", "too_hard"])
+		.withMessage(
+			'difficultyFeedback must be one of: "too_easy", "just_right", "too_hard"',
+		),
+
+	check("pacingFeedback")
+		.optional()
+		.isIn(["too_slow", "perfect", "too_fast"])
+		.withMessage(
+			'pacingFeedback must be one of: "too_slow", "perfect", "too_fast"',
+		),
+];
+
 module.exports = {
 	journalValidations,
 	journalIdValidation,
 	getJournalEntriesValidation,
+	updateJournalValidations,
 };

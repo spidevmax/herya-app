@@ -803,6 +803,8 @@ const advanceBlock = async (req, res, next) => {
 		if (!session) throw createError(404, "Session not found");
 		if (session.user.toString() !== req.user._id.toString())
 			throw createError(403, "Access denied");
+		if (session.status !== "active" && session.status !== "paused")
+			throw createError(400, "Blocks can only be advanced on active or paused sessions");
 
 		const { direction = "next" } = req.body;
 		const currentIdx = session.timerData.currentBlockIndex || 0;
@@ -836,6 +838,8 @@ const completeGuidedSession = async (req, res, next) => {
 		if (!session) throw createError(404, "Session not found");
 		if (session.user.toString() !== req.user._id.toString())
 			throw createError(403, "Access denied");
+		if (session.status === "completed" || session.status === "abandoned")
+			throw createError(400, "Session has already ended");
 
 		const now = new Date();
 		const startedAt = session.timerData.startedAt || now;
@@ -886,6 +890,8 @@ const abandonSession = async (req, res, next) => {
 		if (!session) throw createError(404, "Session not found");
 		if (session.user.toString() !== req.user._id.toString())
 			throw createError(403, "Access denied");
+		if (session.status === "completed" || session.status === "abandoned")
+			throw createError(400, "Session has already ended");
 
 		session.status = "abandoned";
 		session.completed = false;

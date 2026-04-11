@@ -264,15 +264,38 @@ const MOOD_ICONS = {
 	calm: Moon,
 	focused: Target,
 	tired: BedSingle,
-	stiff: Circle,
 	peaceful: Leaf,
-	grateful: Heart,
 	anxious: Wind,
+	happy: Heart,
 };
 
-export const MoodSelector = ({ value, onChange, label }) => {
+export const MoodSelector = ({ value, onChange, label, options }) => {
 	const { t } = useLanguage();
-	const moods = Object.keys(MOOD_ICONS);
+	const moods = options || [
+		"calm",
+		"anxious",
+		"energized",
+		"tired",
+		"focused",
+		"stressed",
+		"happy",
+		"sad",
+		"grounded",
+		"restless",
+		"peaceful",
+		"overwhelmed",
+		"motivated",
+		"discouraged",
+	];
+	const selected = Array.isArray(value) ? value : value ? [value] : [];
+
+	const toggle = (mood) => {
+		if (selected.includes(mood)) {
+			onChange(selected.filter((m) => m !== mood));
+		} else {
+			onChange([...selected, mood]);
+		}
+	};
 
 	return (
 		<div className="flex flex-col gap-3">
@@ -284,15 +307,16 @@ export const MoodSelector = ({ value, onChange, label }) => {
 			<div className="grid grid-cols-4 gap-2">
 				{moods.map((mood) => {
 					const MoodIcon = MOOD_ICONS[mood] || Circle;
+					const isSelected = selected.includes(mood);
 					return (
 						<motion.button
 							key={mood}
 							type="button"
-							onClick={() => onChange(mood)}
+							onClick={() => toggle(mood)}
 							whileHover={{ scale: 1.05 }}
 							whileTap={{ scale: 0.95 }}
 							className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
-								value === mood
+								isSelected
 									? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
 									: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
 							}`}

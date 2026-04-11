@@ -222,13 +222,8 @@ export default function GuidedPracticePlayer({
 
 	const hasGuidedPlayer = isGuidedVK || isGuidedPranayama || isGuidedMeditation;
 
-	// For guided blocks the sub-player drives playback, so start the global
-	// timer automatically. Non-guided blocks wait for the user to press play.
-	useEffect(() => {
-		if (hasGuidedPlayer && !timer.isRunning && timer.globalElapsedSec === 0) {
-			startTimerWithBackend();
-		}
-	}, [hasGuidedPlayer, timer.isRunning, timer.globalElapsedSec, startTimerWithBackend]);
+	// Whether the session has never been started (user hasn't pressed play yet)
+	const isWaitingToStart = !timer.isRunning && timer.globalElapsedSec === 0;
 
 	return (
 		<div className="flex flex-col gap-5 pt-2 pb-4">
@@ -307,8 +302,8 @@ export default function GuidedPracticePlayer({
 						exit={{ opacity: 0, y: -20 }}
 						transition={{ duration: 0.3 }}
 					>
-						{/* Guided VK Player */}
-						{isGuidedVK && (
+						{/* Guided VK Player — only render when timer is running */}
+						{isGuidedVK && !isWaitingToStart && (
 							<PoseByPosePlayer
 								sequence={sequencesData[currentBlock.vkSequence]}
 								level={currentBlock.level || "beginner"}
@@ -322,8 +317,8 @@ export default function GuidedPracticePlayer({
 							/>
 						)}
 
-						{/* Guided Pranayama Player */}
-						{isGuidedPranayama && (
+						{/* Guided Pranayama Player — only render when timer is running */}
+						{isGuidedPranayama && !isWaitingToStart && (
 							<CycleBreathingPlayer
 								pattern={patternsData[currentBlock.breathingPattern]}
 								config={currentBlock.config || {}}
@@ -331,8 +326,8 @@ export default function GuidedPracticePlayer({
 							/>
 						)}
 
-						{/* Guided Meditation Player */}
-						{isGuidedMeditation && (
+						{/* Guided Meditation Player — only render when timer is running */}
+						{isGuidedMeditation && !isWaitingToStart && (
 							<PhasedMeditationPlayer
 								meditationType={currentBlock.meditationType || "guided"}
 								durationMinutes={currentBlock.durationMinutes || 10}
@@ -355,13 +350,65 @@ export default function GuidedPracticePlayer({
 							/>
 						)}
 
+						{/* Start overlay — shown before user presses play (all block types) */}
+						{isWaitingToStart && hasGuidedPlayer && (
+							<div
+								className="rounded-2xl p-6 text-center"
+								style={{
+									backgroundColor: "var(--color-surface-card)",
+									border: `2px solid color-mix(in srgb, ${blockColor} 30%, transparent)`,
+								}}
+							>
+								<p
+									className="text-xs font-semibold uppercase tracking-widest mb-2"
+									style={{ color: blockColor }}
+								>
+									{t("practice.block_label", {
+										current: timer.currentBlockIndex + 1,
+										total: blocks.length,
+									})}
+								</p>
+								<div className="mb-3 flex justify-center">
+									<BlockIcon
+										size={44}
+										strokeWidth={2.2}
+										style={{ color: blockColor }}
+									/>
+								</div>
+								<h3 className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+									{currentBlock.label}
+								</h3>
+								<p
+									className="text-sm mb-5"
+									style={{ color: "var(--color-text-secondary)" }}
+								>
+									{t(`practice.type_${currentBlock.blockType}`)} · {currentBlock.durationMinutes}m
+								</p>
+								<motion.button
+									whileTap={{ scale: 0.92 }}
+									onClick={startTimerWithBackend}
+									aria-label={t("practice.aria_play")}
+									className="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg"
+									style={{ backgroundColor: blockColor }}
+								>
+									<Play size={32} className="ml-1" />
+								</motion.button>
+								<p
+									className="text-xs mt-3"
+									style={{ color: "var(--color-text-muted)" }}
+								>
+									{t("practice.tap_to_start")}
+								</p>
+							</div>
+						)}
+
 						{/* Fallback: Timer-only card (non-guided or missing data) */}
 						{!hasGuidedPlayer && (
 							<div
 								className="rounded-2xl p-6 text-center"
 								style={{
 									backgroundColor: "var(--color-surface-card)",
-									border: `2px solid ${blockColor}30`,
+									border: `2px solid color-mix(in srgb, ${blockColor} 30%, transparent)`,
 								}}
 							>
 								<p
@@ -429,8 +476,8 @@ export default function GuidedPracticePlayer({
 				<div
 					className="flex items-center gap-3 px-4 py-3 rounded-xl"
 					style={{
-						backgroundColor: `${BLOCK_TYPE_COLORS[nextBlock.blockType]}08`,
-						border: `1px solid ${BLOCK_TYPE_COLORS[nextBlock.blockType]}20`,
+						backgroundColor: `color-mix(in srgb, ${BLOCK_TYPE_COLORS[nextBlock.blockType]} 8%, transparent)`,
+						border: `1px solid color-mix(in srgb, ${BLOCK_TYPE_COLORS[nextBlock.blockType]} 20%, transparent)`,
 					}}
 				>
 					<ChevronRight
@@ -456,8 +503,8 @@ export default function GuidedPracticePlayer({
 				</div>
 			)}
 
-			{/* Controls — only show play/pause and skip for non-guided blocks */}
-			{!hasGuidedPlayer && (
+			{/* Controls — hidden during "waiting to start" overlay for guided blocks */}
+			{!isWaitingToStart && (
 				<div className="flex items-center justify-center gap-3 pt-2">
 					<button
 						type="button"

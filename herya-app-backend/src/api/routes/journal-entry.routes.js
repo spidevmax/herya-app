@@ -14,6 +14,7 @@ const {
 	journalValidations,
 	journalIdValidation,
 	getJournalEntriesValidation,
+	updateJournalValidations,
 } = require("../validations/journal.validations");
 
 const router = express.Router();
@@ -474,6 +475,7 @@ router.put(
 		{ name: "voiceNotes", maxCount: 5 },
 	]),
 	journalIdValidation,
+	updateJournalValidations,
 	handleValidationErrors,
 	updateJournalEntry,
 );

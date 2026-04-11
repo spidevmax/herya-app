@@ -278,25 +278,12 @@ export default function SessionDetail() {
 						<div className="flex flex-col gap-2">
 							{Object.entries(session.vkFeedback).map(([k, v]) => (
 								<div key={k} className="flex items-center justify-between">
-									<p className="text-xs text-[var(--color-text-secondary)] capitalize">
-										{k.replace(/([A-Z])/g, " $1")}
+									<p className="text-xs text-[var(--color-text-secondary)]">
+										{t(`session_detail.feedback_${k}`)}
 									</p>
-									<div className="flex gap-0.5">
-										{Array.from({ length: 5 }, (_, idx) => idx + 1).map(
-											(star) => (
-												<div
-													key={`star-${k}-${star}`}
-													className="w-2 h-2 rounded-full"
-													style={{
-														backgroundColor:
-															star <= v
-																? "var(--color-primary)"
-																: "var(--color-surface-secondary)",
-													}}
-												/>
-											),
-										)}
-									</div>
+									<Badge color="var(--color-primary)">
+										{t(`session_detail.feedback_val_${v}`)}
+									</Badge>
 								</div>
 							))}
 						</div>
