@@ -269,7 +269,7 @@ const MOOD_ICONS = {
 	happy: Heart,
 };
 
-export const MoodSelector = ({ value, onChange, label, options }) => {
+export const MoodSelector = ({ value, onChange, label, options, maxSelection = 5 }) => {
 	const { t } = useLanguage();
 	const moods = options || [
 		"calm",
@@ -286,13 +286,16 @@ export const MoodSelector = ({ value, onChange, label, options }) => {
 		"overwhelmed",
 		"motivated",
 		"discouraged",
+		"scattered",
+		"irritated",
 	];
 	const selected = Array.isArray(value) ? value : value ? [value] : [];
+	const atLimit = selected.length >= maxSelection;
 
 	const toggle = (mood) => {
 		if (selected.includes(mood)) {
 			onChange(selected.filter((m) => m !== mood));
-		} else {
+		} else if (!atLimit) {
 			onChange([...selected, mood]);
 		}
 	};
@@ -300,25 +303,34 @@ export const MoodSelector = ({ value, onChange, label, options }) => {
 	return (
 		<div className="flex flex-col gap-3">
 			{label && (
-				<p className="text-sm font-medium text-[var(--color-text-primary)]">
-					{label}
-				</p>
+				<div className="flex items-center justify-between">
+					<p className="text-sm font-medium text-[var(--color-text-primary)]">
+						{label}
+					</p>
+					<p className="text-xs text-[var(--color-text-muted)]">
+						{selected.length}/{maxSelection}
+					</p>
+				</div>
 			)}
 			<div className="grid grid-cols-4 gap-2">
 				{moods.map((mood) => {
 					const MoodIcon = MOOD_ICONS[mood] || Circle;
 					const isSelected = selected.includes(mood);
+					const isDisabled = atLimit && !isSelected;
 					return (
 						<motion.button
 							key={mood}
 							type="button"
 							onClick={() => toggle(mood)}
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
+							disabled={isDisabled}
+							whileHover={isDisabled ? {} : { scale: 1.05 }}
+							whileTap={isDisabled ? {} : { scale: 0.95 }}
 							className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
 								isSelected
 									? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
-									: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+									: isDisabled
+										? "bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border border-[var(--color-border-soft)] opacity-40 cursor-not-allowed"
+										: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
 							}`}
 						>
 							<span className="mb-1">

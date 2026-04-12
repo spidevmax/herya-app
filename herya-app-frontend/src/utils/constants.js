@@ -84,6 +84,8 @@ export const MOOD_OPTIONS = [
 	"overwhelmed",
 	"motivated",
 	"discouraged",
+	"scattered",
+	"irritated",
 ];
 
 export const MOOD_AFTER_OPTIONS = [

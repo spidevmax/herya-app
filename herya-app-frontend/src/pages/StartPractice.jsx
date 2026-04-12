@@ -219,6 +219,7 @@ export default function StartPractice() {
 		isTutorUser && practicePreset === PRACTICE_PRESETS.TUTOR;
 	const [checkInMood, setCheckInMood] = useState([]);
 	const [checkInEnergy, setCheckInEnergy] = useState(5);
+	const [checkInStress, setCheckInStress] = useState(5);
 	const [checkInIntention, setCheckInIntention] = useState("");
 	const [tutorSignal, setTutorSignal] = useState("yellow");
 	const [recommendedPreset, setRecommendedPreset] = useState(null);
@@ -770,7 +771,15 @@ export default function StartPractice() {
 			setPhase("done");
 		} catch (err) {
 			console.error("Failed to save journal:", err);
-			setError(t("practice.error_save_journal"));
+			const data = err?.response?.data;
+			const firstValidationMsg =
+				data?.errors?.[0]?.message || data?.errors?.[0]?.msg;
+			const backendMsg = firstValidationMsg || data?.message || null;
+			setError(
+				backendMsg && backendMsg !== "Validation error"
+					? `${t("practice.error_save_journal")} (${backendMsg})`
+					: t("practice.error_save_journal"),
+			);
 		} finally {
 			setSaving(false);
 		}
@@ -1292,6 +1301,30 @@ export default function StartPractice() {
 										className="text-sm font-medium mb-3"
 										style={{ color: "var(--color-text-primary)" }}
 									>
+										{t("practice.checkin_stress", { n: checkInStress })}
+									</p>
+									<input
+										type="range"
+										min={1}
+										max={10}
+										value={checkInStress}
+										onChange={(e) => setCheckInStress(+e.target.value)}
+										aria-label={t("practice.checkin_stress", { n: checkInStress })}
+										className="w-full"
+										style={{ accentColor: "var(--color-danger)" }}
+									/>
+								</div>
+							)}
+
+							{!isTutorPractice && (
+								<div
+									className="rounded-2xl p-5"
+									style={{ backgroundColor: "var(--color-surface-card)" }}
+								>
+									<p
+										className="text-sm font-medium mb-3"
+										style={{ color: "var(--color-text-primary)" }}
+									>
 										{t("practice.checkin_intention")}
 									</p>
 									<input
@@ -1363,6 +1396,7 @@ export default function StartPractice() {
 										? {
 												mood: checkInMood,
 												energyLevel: checkInEnergy,
+												stressLevel: checkInStress,
 												signal: isTutorPractice ? tutorSignal : null,
 												intention: checkInIntention,
 											}

@@ -584,6 +584,28 @@ export default function GuidedPracticePlayer({
 							>
 								{t("practice.safe_pause_subtitle")}
 							</p>
+
+							{/* Co-regulation breathing circle */}
+							<div className="flex flex-col items-center py-3">
+								<motion.div
+									animate={{ scale: [1, 1.3, 1] }}
+									transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+									className="w-16 h-16 rounded-full flex items-center justify-center"
+									style={{
+										backgroundColor: "color-mix(in srgb, var(--color-primary) 15%, transparent)",
+										border: "2px solid var(--color-primary)",
+									}}
+								>
+									<Leaf size={24} style={{ color: "var(--color-primary)" }} />
+								</motion.div>
+								<p
+									className="text-[11px] mt-2"
+									style={{ color: "var(--color-text-muted)" }}
+								>
+									{t("practice.safe_pause_breathe")}
+								</p>
+							</div>
+
 							<div
 								className="text-xs"
 								style={{ color: "var(--color-text-secondary)" }}
@@ -646,12 +668,21 @@ export default function GuidedPracticePlayer({
 									</Button>
 								</div>
 							)}
-							<p
-								className="text-sm font-bold"
-								style={{ color: "var(--color-primary)" }}
-							>
-								{t("practice.safe_pause_timer", { n: safePauseRemaining })}
-							</p>
+							{safePauseRemaining > 0 ? (
+								<p
+									className="text-sm font-bold"
+									style={{ color: "var(--color-primary)" }}
+								>
+									{t("practice.safe_pause_timer", { n: safePauseRemaining })}
+								</p>
+							) : (
+								<p
+									className="text-sm font-semibold"
+									style={{ color: "var(--color-text-primary)" }}
+								>
+									{t("practice.safe_pause_expired")}
+								</p>
+							)}
 							<div className="flex gap-2">
 								<Button
 									variant="outline"

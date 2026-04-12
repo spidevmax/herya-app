@@ -85,9 +85,13 @@ const SuccessOverlay = ({ onDone, t }) => {
 
 const validateForm = (form, t) => {
 	const errors = [];
-	const moodArr = Array.isArray(form.moodBefore) ? form.moodBefore : [];
-	if (moodArr.length === 0) {
+	const moodBeforeArr = Array.isArray(form.moodBefore) ? form.moodBefore : [];
+	if (moodBeforeArr.length === 0) {
 		errors.push(t("journal_form.error_mood_required"));
+	}
+	const moodAfterArr = Array.isArray(form.moodAfter) ? form.moodAfter : [];
+	if (moodAfterArr.length === 0) {
+		errors.push(t("journal_form.error_mood_after_required"));
 	}
 	if (form.energyBefore < 1 || form.energyBefore > 10) {
 		errors.push(t("journal_form.error_energy_range"));
@@ -151,7 +155,9 @@ const JournalForm = () => {
 						insights: e.insights || "",
 						physicalSensations: Array.isArray(e.physicalSensations)
 							? e.physicalSensations
-							: [],
+							: typeof e.physicalSensations === "string" && e.physicalSensations
+								? e.physicalSensations.split(",").map((s) => s.trim()).filter(Boolean)
+								: [],
 						photos: (e.photos || []).map((p) => ({
 							previewUrl: p.url,
 							cloudinaryId: p.cloudinaryId,
@@ -191,18 +197,17 @@ const JournalForm = () => {
 				});
 			}
 			// Send energyLevel and stressLevel as objects with before/after keys
+			// Model requires both before and after — default after to 5 if not set
 			payload.append("energyLevel[before]", form.energyBefore);
-			if (form.energyAfter != null)
-				payload.append("energyLevel[after]", form.energyAfter);
+			payload.append("energyLevel[after]", form.energyAfter ?? 5);
 			payload.append("stressLevel[before]", form.stressBefore);
-			if (form.stressAfter != null)
-				payload.append("stressLevel[after]", form.stressAfter);
+			payload.append("stressLevel[after]", form.stressAfter ?? 5);
 			if (form.reflection)
 				payload.append("emotionalNotes", form.reflection);
 			if (form.insights) payload.append("insights", form.insights);
-			form.physicalSensations.forEach((s) => {
-				payload.append("physicalSensations[]", s);
-			});
+			if (form.physicalSensations.length > 0) {
+				payload.append("physicalSensations", form.physicalSensations.join(", "));
+			}
 			form.photos.forEach((p) => {
 				const file = p.file || p;
 				if (file instanceof File) payload.append("photos", file);
@@ -443,66 +448,62 @@ const JournalForm = () => {
 							label={t("journal_form.how_feeling_after")}
 							options={MOOD_AFTER_OPTIONS}
 						/>
-						{form.moodAfter.length > 0 && (
-							<>
-								<div className="mt-4">
-									<label
-										htmlFor="energy-after"
-										className="flex items-center justify-between mb-2"
-									>
-										<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-											{t("journal_form.energy_after")}
-										</span>
-										<span className="text-sm font-bold text-[var(--color-primary)]">
-											{form.energyAfter ?? 5}/10
-										</span>
-									</label>
-									<input
-										id="energy-after"
-										type="range"
-										min={1}
-										max={10}
-										value={form.energyAfter ?? 5}
-										aria-label={t("journal_form.energy_after")}
-										onChange={(e) =>
-											setForm((f) => ({
-												...f,
-												energyAfter: Number(e.target.value),
-											}))
-										}
-										className="w-full accent-[var(--color-primary)]"
-									/>
-								</div>
-								<div className="mt-4">
-									<label
-										htmlFor="stress-after"
-										className="flex items-center justify-between mb-2"
-									>
-										<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-											{t("journal_form.stress_after")}
-										</span>
-										<span className="text-sm font-bold text-[var(--color-danger)]">
-											{form.stressAfter ?? 5}/10
-										</span>
-									</label>
-									<input
-										id="stress-after"
-										type="range"
-										min={1}
-										max={10}
-										value={form.stressAfter ?? 5}
-										aria-label={t("journal_form.stress_after")}
-										onChange={(e) =>
-											setForm((f) => ({
-												...f,
-												stressAfter: Number(e.target.value),
-											}))
-										}
-										className="w-full accent-[var(--color-danger)]"
-									/>
-								</div>
-							</>
-						)}
+						<div className="mt-4">
+							<label
+								htmlFor="energy-after"
+								className="flex items-center justify-between mb-2"
+							>
+								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
+									{t("journal_form.energy_after")}
+								</span>
+								<span className="text-sm font-bold text-[var(--color-primary)]">
+									{form.energyAfter ?? 5}/10
+								</span>
+							</label>
+							<input
+								id="energy-after"
+								type="range"
+								min={1}
+								max={10}
+								value={form.energyAfter ?? 5}
+								aria-label={t("journal_form.energy_after")}
+								onChange={(e) =>
+									setForm((f) => ({
+										...f,
+										energyAfter: Number(e.target.value),
+									}))
+								}
+								className="w-full accent-[var(--color-primary)]"
+							/>
+						</div>
+						<div className="mt-4">
+							<label
+								htmlFor="stress-after"
+								className="flex items-center justify-between mb-2"
+							>
+								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
+									{t("journal_form.stress_after")}
+								</span>
+								<span className="text-sm font-bold text-[var(--color-danger)]">
+									{form.stressAfter ?? 5}/10
+								</span>
+							</label>
+							<input
+								id="stress-after"
+								type="range"
+								min={1}
+								max={10}
+								value={form.stressAfter ?? 5}
+								aria-label={t("journal_form.stress_after")}
+								onChange={(e) =>
+									setForm((f) => ({
+										...f,
+										stressAfter: Number(e.target.value),
+									}))
+								}
+								className="w-full accent-[var(--color-danger)]"
+							/>
+						</div>
 					</div>
 
 					{/* Photos */}

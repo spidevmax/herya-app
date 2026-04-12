@@ -108,11 +108,9 @@ const journalValidations = [
 		.isInt({ min: 1, max: 10 })
 		.withMessage("Stress level must be between 1 and 10"),
 
-	// Only validate signalAfter if present and only required for tutor role
+	// Only validate signalAfter enum when present (tutor mode sends it, adult mode doesn't)
 	check("signalAfter")
-		.if((value, { req }) => req.user && req.user.role === "tutor")
-		.notEmpty()
-		.withMessage("signalAfter is required for tutor role")
+		.optional({ values: "null" })
 		.isIn(["green", "yellow", "red"])
 		.withMessage('signalAfter must be one of: "green", "yellow", "red"'),
 

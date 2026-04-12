@@ -96,13 +96,13 @@ export default function PostPracticeJournal({
 		onSave({
 			moodAfter:
 				normalizedMoodAfter.length > 0 ? normalizedMoodAfter : ["calm"],
-			signalAfter: isTutorMode ? signalAfter : null,
+			...(isTutorMode ? { signalAfter } : {}),
 			energyLevel: {
 				before: checkInData?.energyLevel || 5,
 				after: normalizedEnergyAfter,
 			},
 			stressLevel: {
-				before: checkInData?.stressLevel || 5,
+				before: checkInData?.stressLevel ?? 5,
 				after: normalizedStressAfter,
 			},
 			physicalSensations: physicalSensations.join(", "),
