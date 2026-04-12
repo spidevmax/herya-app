@@ -364,7 +364,11 @@ function resolveProfile(base, ratio, baseDur) {
 		exhale: (ratio.exhale || 0) * baseDur,
 		holdAfterExhale: (ratio.holdAfterExhale || 0) * baseDur,
 	};
-	const activePhases = base.phaseOrder.filter((k) => phaseDurations[k] > 0);
+	// Build activePhases from the canonical order, including any phase whose
+	// ratio produces a non-zero duration — even if the profile's phaseOrder
+	// omits it. This ensures that a backend ratio like 1:1:1 correctly
+	// activates the hold phase even for techniques that default to 0 hold.
+	const activePhases = PHASE_KEYS.filter((k) => phaseDurations[k] > 0);
 
 	return {
 		...base,

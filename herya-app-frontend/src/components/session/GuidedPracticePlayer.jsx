@@ -440,31 +440,51 @@ export default function GuidedPracticePlayer({
 									{t(`practice.type_${currentBlock.blockType}`)}
 								</p>
 
-								{/* Block timer circle */}
-								<div className="flex justify-center mb-4">
-									<CircleProgress
-										value={timer.blockElapsedSec}
-										max={(currentBlock.durationMinutes || 1) * 60}
-										size={120}
-										stroke={8}
-										color={blockColor}
-									>
-										<div className="text-center">
-											<p
-												className="text-2xl font-bold"
-												style={{ color: "var(--color-text-primary)" }}
-											>
-												{formatTime(timer.blockRemainingSec)}
-											</p>
-											<p
-												className="text-[10px] font-medium"
-												style={{ color: "var(--color-text-muted)" }}
-											>
-												{t("practice.block_remaining")}
-											</p>
-										</div>
-									</CircleProgress>
-								</div>
+								{isWaitingToStart ? (
+									<>
+										<motion.button
+											whileTap={{ scale: 0.92 }}
+											onClick={startTimerWithBackend}
+											aria-label={t("practice.aria_play")}
+											className="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg"
+											style={{ backgroundColor: blockColor }}
+										>
+											<Play size={32} className="ml-1" />
+										</motion.button>
+										<p
+											className="text-xs mt-3"
+											style={{ color: "var(--color-text-muted)" }}
+										>
+											{t("practice.tap_to_start")}
+										</p>
+									</>
+								) : (
+									/* Block timer circle — only shown after user presses play */
+									<div className="flex justify-center mb-4">
+										<CircleProgress
+											value={timer.blockElapsedSec}
+											max={(currentBlock.durationMinutes || 1) * 60}
+											size={120}
+											stroke={8}
+											color={blockColor}
+										>
+											<div className="text-center">
+												<p
+													className="text-2xl font-bold"
+													style={{ color: "var(--color-text-primary)" }}
+												>
+													{formatTime(timer.blockRemainingSec)}
+												</p>
+												<p
+													className="text-[10px] font-medium"
+													style={{ color: "var(--color-text-muted)" }}
+												>
+													{t("practice.block_remaining")}
+												</p>
+											</div>
+										</CircleProgress>
+									</div>
+								)}
 							</div>
 						)}
 					</motion.div>

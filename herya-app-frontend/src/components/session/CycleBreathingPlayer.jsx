@@ -89,10 +89,16 @@ export default function CycleBreathingPlayer({
 		return profile.phaseDurations;
 	}, [config.customRatio, pattern, profile]);
 
-	const activePhases = useMemo(
-		() => profile.activePhases.filter((k) => phaseDurations[k] > 0),
-		[profile.activePhases, phaseDurations],
-	);
+	// When a customRatio is provided, derive active phases from the full
+	// canonical phase order instead of profile.activePhases, which was
+	// pre-filtered against the *default* ratio and may have dropped phases
+	// (e.g. "hold") that the custom ratio now enables.
+	const activePhases = useMemo(() => {
+		const source = config.customRatio
+			? ["inhale", "hold", "exhale", "holdAfterExhale"]
+			: profile.activePhases;
+		return source.filter((k) => phaseDurations[k] > 0);
+	}, [config.customRatio, profile.activePhases, phaseDurations]);
 
 	const targetCycles =
 		config.cycles || pattern?.recommendedPractice?.cycles?.default || 10;
