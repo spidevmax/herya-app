@@ -27,7 +27,7 @@ export default function AuthBrandHeader({
 				<div className="absolute -left-1 bottom-1 h-3 w-3 rounded-full bg-white/15 blur-[1px]" />
 				<img
 					src="/android-chrome-512x512.png"
-					alt="Herya logo"
+					alt={t("ui.herya_logo_alt")}
 					className="relative h-14 w-14 rounded-[1rem] object-cover sm:h-16 sm:w-16"
 				/>
 			</div>

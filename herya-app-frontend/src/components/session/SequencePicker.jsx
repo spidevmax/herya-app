@@ -13,8 +13,11 @@ import { useLanguage } from "@/context/LanguageContext";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
 import SafetyBanner from "./SafetyBanner";
 
-const formatFamily = (family) =>
-	VK_FAMILY_MAP[family]?.label || family?.replace(/[_-]/g, " ") || "";
+const formatFamily = (family, t) => {
+	const entry = VK_FAMILY_MAP[family];
+	if (entry?.labelKey && t) return t(entry.labelKey);
+	return entry?.label || family?.replace(/[_-]/g, " ") || "";
+};
 
 const difficultyColor = (d) => {
 	switch (d) {
@@ -82,7 +85,7 @@ export default function SequencePicker({
 							{selected.englishName}
 						</p>
 						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-							{formatFamily(selected.family)} ·{" "}
+							{formatFamily(selected.family, t)} ·{" "}
 							{t(`library.${selected.difficulty}`)} ·{" "}
 							{selected.structure?.corePoses?.length || 0}{" "}
 							{t("guided.poses_count")}
@@ -184,7 +187,7 @@ export default function SequencePicker({
 															color: "var(--color-text-muted)",
 														}}
 													>
-														{formatFamily(seq.family)}
+														{formatFamily(seq.family, t)}
 													</span>
 													<span
 														className="text-[10px]"

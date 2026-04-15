@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Check, Minus, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 import PostPracticeNudge from "./PostPracticeNudge";
@@ -284,20 +284,29 @@ export default function PostPracticeJournal({
 									: signal === "yellow"
 										? "var(--color-signal-yellow)"
 										: "var(--color-signal-red)";
+							const SignalIcon =
+								signal === "green"
+									? Check
+									: signal === "yellow"
+										? Minus
+										: X;
 							return (
 								<button
 									type="button"
 									key={signal}
+									aria-pressed={selected}
 									onClick={() => setSignalAfter(signal)}
-									className="rounded-xl px-3 py-2 text-xs font-semibold transition"
+									className="rounded-xl px-3 py-2.5 text-xs font-semibold transition flex items-center justify-center gap-1.5 min-h-[48px]"
 									style={{
 										backgroundColor: selected
 											? signalColor
 											: "var(--color-surface)",
 										color: selected ? "white" : "var(--color-text-secondary)",
-										border: `1px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
+										border: `2px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
 									}}
+									aria-label={t(`practice.signal_${signal}`)}
 								>
+									<SignalIcon size={16} strokeWidth={3} />
 									{t(`practice.signal_${signal}`)}
 								</button>
 							);

@@ -134,6 +134,12 @@ const sessionSchema = new mongoose.Schema(
 	{
 		user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
+		// Optional link to a child profile (tutor mode)
+		childProfile: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "ChildProfile",
+		},
+
 		sessionType: {
 			type: String,
 			enum: ["vk_sequence", "pranayama", "meditation", "complete_practice"],

@@ -13,6 +13,7 @@ const {
 	abandonSession,
 	getActiveSession,
 	getPracticeAnalytics,
+	getTutorAnalytics,
 } = require("../controllers/session.controller");
 const { authenticateToken } = require("../../middlewares/authorization.middleware");
 const { handleValidationErrors } = require("../../middlewares/validation.middleware");
@@ -80,6 +81,7 @@ router.use(authenticateToken());
 router.get("/stats", getSessionStats);
 router.get("/active/current", getActiveSession);
 router.get("/analytics/practice", getPracticeAnalytics);
+router.get("/analytics/tutor", getTutorAnalytics);
 
 /**
  * @swagger

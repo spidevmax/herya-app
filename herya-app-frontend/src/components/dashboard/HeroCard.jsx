@@ -3,7 +3,7 @@ import { ArrowRight, Clock, Dumbbell, PersonStanding } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
+import { LEVEL_LABELS, LEVEL_LABEL_KEYS, VK_FAMILY_MAP } from "@/utils/constants";
 
 const HeroCard = ({ sequence, reason, loading }) => {
 	const navigate = useNavigate();
@@ -115,7 +115,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
 						<Dumbbell size={13} className="text-white/80" />
 						<span className="text-white text-xs font-semibold">
-							{LEVEL_LABELS[sequence.level] ?? sequence.difficulty}
+							{LEVEL_LABEL_KEYS[sequence.level] ? t(LEVEL_LABEL_KEYS[sequence.level]) : (LEVEL_LABELS[sequence.level] ?? sequence.difficulty)}
 						</span>
 					</div>
 				</div>

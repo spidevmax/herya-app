@@ -12,6 +12,8 @@ const usersRouter = require("./api/routes/user.routes");
 const journalEntriesRouter = require("./api/routes/journal-entry.routes");
 const sessionsRouter = require("./api/routes/session.routes");
 const sequencesRouter = require("./api/routes/sequence.routes");
+const childProfilesRouter = require("./api/routes/child-profile.routes");
+const sessionTemplatesRouter = require("./api/routes/session-template.routes");
 
 const NODE_ENV = process.env.NODE_ENV || "development";
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
@@ -85,6 +87,8 @@ app.get("/", (_req, res) => {
 			journalEntries: "/api/v1/journal-entries",
 			sessions: "/api/v1/sessions",
 			sequences: "/api/v1/sequences",
+			childProfiles: "/api/v1/child-profiles",
+			sessionTemplates: "/api/v1/session-templates",
 		},
 	});
 });
@@ -98,6 +102,8 @@ app.use("/api/v1/users", apiLimiter, usersRouter);
 app.use("/api/v1/journal-entries", apiLimiter, journalEntriesRouter);
 app.use("/api/v1/sessions", apiLimiter, sessionsRouter);
 app.use("/api/v1/sequences", apiLimiter, sequencesRouter);
+app.use("/api/v1/child-profiles", apiLimiter, childProfilesRouter);
+app.use("/api/v1/session-templates", apiLimiter, sessionTemplatesRouter);
 
 // === Error Handling ===
 app.use((_req, _res, next) => {

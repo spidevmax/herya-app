@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useMemo, useRef } from "react";
 import { Check } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { DAY_LABELS } from "@/utils/constants";
+import { DAY_LABEL_KEYS } from "@/utils/constants";
 
 const toLocalIsoDate = (date) => {
 	const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -21,7 +21,7 @@ function getCalendarDays(sessionDates = []) {
 		return {
 			date: d,
 			iso,
-			label: DAY_LABELS[d.getDay()],
+			labelKey: DAY_LABEL_KEYS[d.getDay()],
 			day: d.getDate(),
 			practiced: practiced.has(iso),
 			isToday,
@@ -84,7 +84,7 @@ export default function CalendarStrip({
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: i * 0.03 }}
 						className="flex-shrink-0 flex flex-col items-center gap-1 w-10"
-						aria-label={`${d.label} ${d.day}${d.practiced ? ` — ${t("dashboard.practiced")}` : ""}${d.isToday ? ` — ${t("dashboard.today")}` : ""}`}
+						aria-label={`${t(d.labelKey)} ${d.day}${d.practiced ? ` — ${t("dashboard.practiced")}` : ""}${d.isToday ? ` — ${t("dashboard.today")}` : ""}`}
 					>
 						<span
 							className="text-[10px] font-semibold"
@@ -94,7 +94,7 @@ export default function CalendarStrip({
 									: "var(--color-text-muted)",
 							}}
 						>
-							{d.label}
+							{t(d.labelKey)}
 						</span>
 						<div
 							className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all"

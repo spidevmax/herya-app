@@ -19,3 +19,5 @@ export const abandonSession = (id, data = {}) =>
 	api.post(`/sessions/${id}/abandon`, data);
 export const getPracticeAnalytics = () =>
 	api.get("/sessions/analytics/practice");
+export const getTutorAnalytics = (params) =>
+	api.get("/sessions/analytics/tutor", { params });

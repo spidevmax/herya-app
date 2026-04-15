@@ -9,7 +9,7 @@ import {
 	PersonStanding,
 } from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
-import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
+import { VK_FAMILY_MAP, LEVEL_LABELS, LEVEL_LABEL_KEYS } from "@/utils/constants";
 import { colorMix } from "@/utils/libraryHelpers";
 import { Badge, SkeletonCard, StickyHeader } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
@@ -194,7 +194,7 @@ export default function SequenceDetail() {
 							)}
 						</div>
 						<span className="text-white/80 text-xs font-bold uppercase tracking-widest">
-							{family.label}
+							{family.labelKey ? t(family.labelKey) : family.label}
 						</span>
 						<h2 className="font-display text-2xl font-bold text-white mt-1 mb-1">
 							{seq.englishName}
@@ -213,7 +213,7 @@ export default function SequenceDetail() {
 							{seq.level && (
 								<Badge className="text-white bg-white/20 border-0">
 									<Dumbbell size={12} />
-									{LEVEL_LABELS[seq.level] ?? seq.level}
+									{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
 								</Badge>
 							)}
 							{seq.difficulty && (
@@ -275,7 +275,7 @@ export default function SequenceDetail() {
 											className="text-sm font-semibold mt-0.5"
 											style={{ color: "var(--color-text-primary)" }}
 										>
-											{LEVEL_LABELS[seq.level] ?? seq.level}
+											{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
 										</p>
 									</div>
 								) : null}

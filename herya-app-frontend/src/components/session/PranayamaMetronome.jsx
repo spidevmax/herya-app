@@ -88,7 +88,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 									}
 						}
 					>
-						{p.name}
+						{p.nameKey ? t(p.nameKey) : p.name}
 					</button>
 				))}
 			</div>

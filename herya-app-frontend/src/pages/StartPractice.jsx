@@ -19,6 +19,9 @@ import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
 import SessionBuilder from "@/components/session/SessionBuilder";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
+import SessionTemplatePicker from "@/components/session/SessionTemplatePicker";
+import SessionRewards from "@/components/session/SessionRewards";
+import ChildProfileManager from "@/components/tutor/ChildProfileManager";
 import { Button, ConfirmModal, StickyHeader } from "@/components/ui";
 import { MOOD_OPTIONS, MOOD_COLORS } from "@/utils/constants";
 
@@ -229,6 +232,7 @@ export default function StartPractice() {
 	const [hasManualPresetChoice, setHasManualPresetChoice] = useState(false);
 	const [recommendationApplied, setRecommendationApplied] = useState(false);
 	const [dashboardPresetApplied, setDashboardPresetApplied] = useState(false);
+	const [selectedChild, setSelectedChild] = useState(null);
 
 	useEffect(() => {
 		if (user?.preferences?.lowStimMode === undefined) return;
@@ -240,6 +244,12 @@ export default function StartPractice() {
 			isTutorUser ? PRACTICE_PRESETS.TUTOR : PRACTICE_PRESETS.ADULT,
 		);
 	}, [isTutorUser]);
+
+	// B5: Apply child's sensory preferences when a child profile is selected
+	useEffect(() => {
+		if (!selectedChild?.sensoryPreferences) return;
+		setLowStimMode(Boolean(selectedChild.sensoryPreferences.lowStimDefault));
+	}, [selectedChild]);
 
 	useEffect(() => {
 		let mounted = true;
@@ -670,6 +680,7 @@ export default function StartPractice() {
 						status: "planned",
 						...(sanitizedCheckIn ? { checkIn: sanitizedCheckIn } : {}),
 						...(recommendationContext ? { recommendationContext } : {}),
+						...(selectedChild?._id ? { childProfile: selectedChild._id } : {}),
 					};
 
 					const res = await createSession(payload);
@@ -865,6 +876,14 @@ export default function StartPractice() {
 				>
 					{t("practice.done_subtitle")}
 				</p>
+
+				<SessionRewards
+					totalSessions={(user?.totalSessions ?? 0) + 1}
+					currentStreak={user?.currentStreak ?? 0}
+					blocksCompleted={sessionSummary?.blocksCompleted ?? 0}
+					compact
+				/>
+
 				<div className="flex gap-3">
 					<Button variant="outline" onClick={() => navigate("/sessions")}>
 						{t("practice.view_history")}
@@ -1173,6 +1192,30 @@ export default function StartPractice() {
 									</div>
 								</div>
 							)}
+							{/* Child profile selector — tutor only */}
+							{isTutorUser && (
+								<ChildProfileManager
+									selectedChildId={selectedChild?._id}
+									onSelectChild={setSelectedChild}
+									compact
+								/>
+							)}
+
+							{/* Session templates — save/load */}
+							<SessionTemplatePicker
+								sessionType={practiceType}
+								blocks={blocks}
+								totalMinutes={totalMinutes}
+								preset={practicePreset}
+								childProfileId={selectedChild?._id}
+								onLoadTemplate={(tplBlocks, tplMinutes, tplType) => {
+									setBlocks(tplBlocks);
+									setTotalMinutes(tplMinutes);
+									if (tplType) setPracticeType(tplType);
+								}}
+								visible={phase === "build"}
+							/>
+
 							<SessionBuilder
 								practiceType={practiceType}
 								initialBlocks={
@@ -1366,7 +1409,7 @@ export default function StartPractice() {
 								patternsData={patternsData}
 								lowStimMode={lowStimMode}
 								isTutorMode={isTutorPractice}
-								safetyAnchors={user?.preferences?.safetyAnchors}
+								safetyAnchors={selectedChild?.safetyAnchors || user?.preferences?.safetyAnchors}
 								onComplete={handleComplete}
 								onAbandon={handleAbandon}
 								onSaveProgress={handleSaveProgress}

@@ -9,6 +9,41 @@ export const translations = {
 			close_modal: "Close modal",
 			hyrax_illustration: "Hyrax illustration",
 			type_to_confirm: "Type {phrase} to confirm",
+			herya_logo_alt: "Herya logo",
+		},
+		constants: {
+			family_tadasana: "Tadasana",
+			family_standing_asymmetric: "Standing Asymmetric",
+			family_standing_symmetric: "Standing Symmetric",
+			family_one_leg_standing: "One Leg Standing",
+			family_seated: "Seated",
+			family_supine: "Supine",
+			family_prone: "Prone",
+			family_inverted: "Inverted",
+			family_meditative: "Meditative",
+			family_bow_sequence: "Bow",
+			family_triangle_sequence: "Triangle",
+			family_sun_salutation: "Sun Salutation",
+			family_vajrasana_variations: "Vajrasana",
+			family_lotus_variations: "Lotus",
+			level_1: "Beginner",
+			level_2: "Intermediate",
+			level_3: "Advanced",
+			session_type_vk_sequence: "VK Sequence",
+			session_type_pranayama: "Pranayama",
+			session_type_meditation: "Meditation",
+			session_type_complete_practice: "Complete Practice",
+			day_sun: "Sun",
+			day_mon: "Mon",
+			day_tue: "Tue",
+			day_wed: "Wed",
+			day_thu: "Thu",
+			day_fri: "Fri",
+			day_sat: "Sat",
+			pranayama_box_breath: "Box Breath",
+			pranayama_4_7_8: "4-7-8",
+			pranayama_equal_breath: "Equal Breath",
+			pranayama_relaxing: "Relaxing",
 		},
 		nav: {
 			home: "Home",
@@ -35,6 +70,8 @@ export const translations = {
 			no_account: "No account?",
 			register_link: "Register",
 			error: "Invalid credentials",
+			show_password: "Show password",
+			hide_password: "Hide password",
 		},
 		auth_callback: {
 			completing: "Completing sign-in...",
@@ -70,6 +107,12 @@ export const translations = {
 			invalid_token: "Invalid or missing reset token",
 			back_to_login: "Back to login",
 			error: "Could not reset password",
+			mismatch: "Passwords don't match",
+			back: "Back",
+			new_password_label: "New password",
+			confirm_password_label: "Confirm password",
+			success_title: "All set",
+			success_message: "Your password has been successfully reset. Redirecting to login...",
 		},
 		register: {
 			title: "Start your practice",
@@ -958,6 +1001,7 @@ export const translations = {
 			safe_pause_timer: "{n}s remaining",
 			safe_pause_expired: "Ready to decide? Resume softly or end for now.",
 			safe_pause_resume: "Resume softly",
+			safe_pause_try_different: "Try something different",
 			safe_pause_end: "End for now",
 			tutor_summary_green:
 				"Today helped regulation. Keep the same pace next time.",
@@ -986,6 +1030,65 @@ export const translations = {
 			confirm_back_desc:
 				"Going back will discard the blocks you have configured.",
 			confirm_back_yes: "Discard",
+
+			// Session templates (B6)
+			templates_title: "Saved templates",
+			templates_empty: "No templates saved yet",
+			save_template: "Save template",
+			load_template: "Load template",
+			delete_template: "Delete template",
+			template_name_placeholder: "Name this session setup…",
+			template_used: "Used {n} time(s)",
+
+			// Visual schedule (B1)
+			visual_schedule_label: "Session schedule",
+			visual_schedule_title: "Schedule",
+			visual_schedule_step: "Step {n}",
+
+			// Transition warning (B2)
+			transition_next: "Next up",
+			transition_countdown: "Starting in…",
+			transition_warning_aria: "Next block: {label} in {n} seconds",
+
+			// Rewards (B4)
+			rewards_label: "Your progress",
+			rewards_title: "Progress",
+			growth_seed: "Seed",
+			growth_sprout: "Sprout",
+			growth_flower: "Flower",
+			growth_tree: "Tree",
+			streak_days: "{n}-day streak",
+			blocks_stars: "{n} star(s)",
+		},
+		tutor: {
+			child_profiles_title: "Child profiles",
+			add_child: "Add child",
+			no_children: "No child profiles yet",
+			child_age: "{n} years old",
+			edit_child: "Edit child",
+			edit_child_title: "Edit child profile",
+			new_child_title: "New child profile",
+			child_name: "Child's name",
+			child_age_placeholder: "Age (3–18)",
+			avatar_color: "Avatar colour",
+			sensory_prefs: "Sensory preferences",
+			theme_light: "Light",
+			theme_dark: "Dark",
+			theme_nature: "Nature",
+			theme_ocean: "Ocean",
+			theme_sunset: "Sunset",
+			sound_nature: "Nature sounds",
+			sound_simple_tones: "Simple tones",
+			sound_silence: "Silence",
+			animation_slow: "Slow animations",
+			animation_normal: "Normal animations",
+			animation_reduced: "Reduced motion",
+			safety_anchors: "Safety anchors",
+			anchor_phrase_placeholder: 'Calming phrase (e.g. "You are safe")',
+			anchor_body_cue_placeholder: 'Body cue (e.g. "Hands on belly")',
+			child_notes_placeholder: "Notes about this child (optional)",
+			save_changes: "Save changes",
+			create_child: "Create profile",
 		},
 		guided: {
 			// General
@@ -1054,8 +1157,8 @@ export const translations = {
 			// Meditation instructions
 			meditation_intro: "Introduction",
 			meditation_main: "Practice",
-			meditation_close: "Cierre",
-			meditation_silence: "Siéntate en quietud. Sigue tu respiración.",
+			meditation_close: "Close",
+			meditation_silence: "Sit in stillness. Follow your breath.",
 			meditation_guided_intro:
 				"Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
 			meditation_guided_main:
@@ -1073,13 +1176,13 @@ export const translations = {
 			meditation_mantra_main:
 				"Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
 			meditation_mantra_close:
-				"Let the mantra fade naturally. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
+				"Let the mantra fade naturally. Sit in the silence it leaves behind. When you're ready, come back to the room.",
 			meditation_viz_intro:
-				"Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
+				"Close your eyes and take several cleansing breaths. Allow your mind to become a clear space for visualization.",
 			meditation_viz_main:
 				"Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
 			meditation_viz_close:
-				"Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
+				"Let the image gently fade. Carry the feeling of peace with you as you return to the present moment.",
 			meditation_silent_intro:
 				"Settle into stillness. There are no instructions to follow. Simply be present with whatever arises.",
 			meditation_silent_close:
@@ -1097,6 +1200,41 @@ export const translations = {
 			close_modal: "Cerrar modal",
 			hyrax_illustration: "Ilustración de damán",
 			type_to_confirm: "Escribe {phrase} para confirmar",
+			herya_logo_alt: "Logo de Herya",
+		},
+		constants: {
+			family_tadasana: "Tadasana",
+			family_standing_asymmetric: "Asimétrica de pie",
+			family_standing_symmetric: "Simétrica de pie",
+			family_one_leg_standing: "Una pierna de pie",
+			family_seated: "Sentada",
+			family_supine: "Supina",
+			family_prone: "Prona",
+			family_inverted: "Invertida",
+			family_meditative: "Meditativa",
+			family_bow_sequence: "Arco",
+			family_triangle_sequence: "Triángulo",
+			family_sun_salutation: "Saludo al sol",
+			family_vajrasana_variations: "Vajrasana",
+			family_lotus_variations: "Loto",
+			level_1: "Principiante",
+			level_2: "Intermedio",
+			level_3: "Avanzado",
+			session_type_vk_sequence: "Secuencia VK",
+			session_type_pranayama: "Pranayama",
+			session_type_meditation: "Meditación",
+			session_type_complete_practice: "Práctica completa",
+			day_sun: "Dom",
+			day_mon: "Lun",
+			day_tue: "Mar",
+			day_wed: "Mié",
+			day_thu: "Jue",
+			day_fri: "Vie",
+			day_sat: "Sáb",
+			pranayama_box_breath: "Respiración cuadrada",
+			pranayama_4_7_8: "4-7-8",
+			pranayama_equal_breath: "Respiración igual",
+			pranayama_relaxing: "Relajante",
 		},
 		nav: {
 			home: "Inicio",
@@ -1123,6 +1261,8 @@ export const translations = {
 			no_account: "¿Sin cuenta?",
 			register_link: "Regístrate",
 			error: "Credenciales incorrectas",
+			show_password: "Mostrar contraseña",
+			hide_password: "Ocultar contraseña",
 		},
 		auth_callback: {
 			completing: "Completando inicio de sesión...",
@@ -1159,6 +1299,12 @@ export const translations = {
 			invalid_token: "Token de restablecimiento inválido o ausente",
 			back_to_login: "Volver a iniciar sesión",
 			error: "No se pudo restablecer la contraseña",
+			mismatch: "Las contraseñas no coinciden",
+			back: "Volver",
+			new_password_label: "Nueva contraseña",
+			confirm_password_label: "Confirmar contraseña",
+			success_title: "¡Listo!",
+			success_message: "Tu contraseña se ha restablecido correctamente. Redirigiendo al inicio de sesión...",
 		},
 		register: {
 			title: "Comienza tu práctica",
@@ -1250,7 +1396,7 @@ export const translations = {
 			meditation: "Meditación",
 			complete_practice: "Práctica completa",
 			practice_label: "Tu práctica",
-			practiced: "practiced",
+			practiced: "practicado",
 			today: "hoy",
 			day_streak: "Racha: {n} días",
 			sessions_this_week: "{n} esta semana",
@@ -2057,6 +2203,7 @@ export const translations = {
 			safe_pause_timer: "{n}s restantes",
 			safe_pause_expired: "¿Listos para decidir? Reanudar suave o terminar por hoy.",
 			safe_pause_resume: "Reanudar suave",
+			safe_pause_try_different: "Probar algo diferente",
 			safe_pause_end: "Terminar por hoy",
 			tutor_summary_green:
 				"Hoy ayudó a regularse. Mantén este ritmo la próxima vez.",
@@ -2084,6 +2231,65 @@ export const translations = {
 			confirm_back_title: "¿Descartar sesión?",
 			confirm_back_desc: "Volver descartará los bloques que has configurado.",
 			confirm_back_yes: "Descartar",
+
+			// Plantillas de sesión (B6)
+			templates_title: "Plantillas guardadas",
+			templates_empty: "Aún no hay plantillas guardadas",
+			save_template: "Guardar plantilla",
+			load_template: "Cargar plantilla",
+			delete_template: "Eliminar plantilla",
+			template_name_placeholder: "Nombre para esta configuración…",
+			template_used: "Usada {n} vez/veces",
+
+			// Horario visual (B1)
+			visual_schedule_label: "Horario de sesión",
+			visual_schedule_title: "Horario",
+			visual_schedule_step: "Paso {n}",
+
+			// Aviso de transición (B2)
+			transition_next: "A continuación",
+			transition_countdown: "Empieza en…",
+			transition_warning_aria: "Siguiente bloque: {label} en {n} segundos",
+
+			// Recompensas (B4)
+			rewards_label: "Tu progreso",
+			rewards_title: "Progreso",
+			growth_seed: "Semilla",
+			growth_sprout: "Brote",
+			growth_flower: "Flor",
+			growth_tree: "Árbol",
+			streak_days: "Racha de {n} día(s)",
+			blocks_stars: "{n} estrella(s)",
+		},
+		tutor: {
+			child_profiles_title: "Perfiles de niños",
+			add_child: "Añadir niño",
+			no_children: "Aún no hay perfiles de niños",
+			child_age: "{n} años",
+			edit_child: "Editar niño",
+			edit_child_title: "Editar perfil del niño",
+			new_child_title: "Nuevo perfil de niño",
+			child_name: "Nombre del niño",
+			child_age_placeholder: "Edad (3–18)",
+			avatar_color: "Color del avatar",
+			sensory_prefs: "Preferencias sensoriales",
+			theme_light: "Claro",
+			theme_dark: "Oscuro",
+			theme_nature: "Naturaleza",
+			theme_ocean: "Océano",
+			theme_sunset: "Atardecer",
+			sound_nature: "Sonidos de naturaleza",
+			sound_simple_tones: "Tonos simples",
+			sound_silence: "Silencio",
+			animation_slow: "Animaciones lentas",
+			animation_normal: "Animaciones normales",
+			animation_reduced: "Movimiento reducido",
+			safety_anchors: "Anclas de seguridad",
+			anchor_phrase_placeholder: 'Frase calmante (ej. "Estás a salvo")',
+			anchor_body_cue_placeholder: 'Señal corporal (ej. "Manos al abdomen")',
+			child_notes_placeholder: "Notas sobre este niño (opcional)",
+			save_changes: "Guardar cambios",
+			create_child: "Crear perfil",
 		},
 		guided: {
 			// General
@@ -2155,33 +2361,33 @@ export const translations = {
 			meditation_close: "Cierre",
 			meditation_silence: "Siéntate en quietud. Sigue tu respiración.",
 			meditation_guided_intro:
-				"Find a comfortable seated position. Close your eyes gently. Take three deep breaths to arrive in this moment.",
+				"Encuentra una posición sentada cómoda. Cierra los ojos suavemente. Toma tres respiraciones profundas para llegar a este momento.",
 			meditation_guided_main:
-				"Let your attention rest on the natural rhythm of your breath. When your mind wanders, gently bring it back without judgment.",
+				"Deja que tu atención descanse en el ritmo natural de tu respiración. Cuando tu mente divague, tráela de vuelta con amabilidad y sin juicio.",
 			meditation_guided_close:
-				"Begin to deepen your breath. Gently bring awareness back to your body. When you're ready, open your eyes.",
+				"Comienza a profundizar tu respiración. Trae la conciencia de vuelta a tu cuerpo con suavidad. Cuando estés listo/a, abre los ojos.",
 			meditation_breath_intro:
 				"Acomódate en tu postura. Deja que tu columna esté erguida y tus hombros relajados. Comienza a notar el flujo natural de tu respiración.",
 			meditation_breath_main:
-				"Observe each inhalation and exhalation. Notice where you feel the breath most — nostrils, chest, or belly. Simply observe without changing.",
+				"Observa cada inhalación y exhalación. Nota dónde sientes más la respiración — fosas nasales, pecho o abdomen. Simplemente observa sin cambiar nada.",
 			meditation_breath_close:
-				"Slowly widen your awareness from the breath to your whole body. Take a deep breath in and gently open your eyes.",
+				"Amplía lentamente tu conciencia de la respiración a todo tu cuerpo. Toma una respiración profunda y abre los ojos con suavidad.",
 			meditation_mantra_intro:
-				"Find your center. Choose a mantra or intention that resonates with you today. It can be a single word or short phrase.",
+				"Encuentra tu centro. Elige un mantra o intención que resuene contigo hoy. Puede ser una sola palabra o una frase corta.",
 			meditation_mantra_main:
-				"Silently repeat your mantra with each exhale. Let the vibration of the words settle into your awareness.",
+				"Repite tu mantra en silencio con cada exhalación. Deja que la vibración de las palabras se asiente en tu conciencia.",
 			meditation_mantra_close:
-				"Let the mantra fade naturally. Siéntate en el silencio que deja. Cuando estés listo, vuelve a la sala.",
+				"Deja que el mantra se desvanezca de forma natural. Siéntate en el silencio que deja. Cuando estés listo/a, vuelve a la sala.",
 			meditation_viz_intro:
 				"Cierra los ojos y toma varias respiraciones purificadoras. Permite que tu mente se convierta en un espacio claro para la visualización.",
 			meditation_viz_main:
-				"Imagine a warm, healing light surrounding you. With each breath, let it dissolve tension and fill you with peace.",
+				"Imagina una luz cálida y sanadora rodeándote. Con cada respiración, deja que disuelva la tensión y te llene de paz.",
 			meditation_viz_close:
 				"Deja que la imagen se desvanezca suavemente. Lleva contigo la sensación de paz al volver al momento presente.",
 			meditation_silent_intro:
 				"Acomódate en la quietud. No hay instrucciones que seguir. Simplemente estate presente con lo que surja.",
 			meditation_silent_close:
-				"Trae suavemente tu conciencia de vuelta. Nota los sonidos a tu alrededor, la sensación de tu cuerpo. Abre los ojos cuando estés listo.",
+				"Trae suavemente tu conciencia de vuelta. Nota los sonidos a tu alrededor, la sensación de tu cuerpo. Abre los ojos cuando estés listo/a.",
 		},
 	},
 };

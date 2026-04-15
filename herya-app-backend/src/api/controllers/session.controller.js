@@ -1037,6 +1037,173 @@ const getPracticeAnalytics = async (req, res, next) => {
 	}
 };
 
+/**
+ * GET /api/v1/sessions/tutor-analytics
+ * Per-child analytics for tutors: regulation trends, safe-pause frequency,
+ * completion rate, preferred techniques, and adaptive difficulty recommendation.
+ *
+ * Query params:
+ * - childProfile (optional): filter by child profile ID
+ * - weeks (optional, default 8): look-back window in weeks
+ */
+const getTutorAnalytics = async (req, res, next) => {
+	try {
+		const weeks = Math.min(52, Math.max(1, Number(req.query.weeks) || 8));
+		const since = new Date();
+		since.setDate(since.getDate() - weeks * 7);
+
+		const filter = {
+			user: req.user._id,
+			date: { $gte: since },
+		};
+		if (req.query.childProfile) {
+			filter.childProfile = req.query.childProfile;
+		}
+
+		const sessions = await Session.find(filter)
+			.select("_id date status completed completionRate sessionType duration checkIn tutorSupport plannedBlocks childProfile")
+			.sort({ date: -1 })
+			.lean();
+
+		const sessionIds = sessions.map((s) => s._id);
+		const journals = sessionIds.length > 0
+			? await JournalEntry.find({ user: req.user._id, session: { $in: sessionIds } })
+					.select("session signalAfter stressLevel")
+					.lean()
+			: [];
+
+		const journalBySession = new Map(
+			journals.map((j) => [String(j.session), j]),
+		);
+
+		const signalRank = { green: 2, yellow: 1, red: 0 };
+
+		// --- Regulation trends (per-session signal before → after) ---
+		const regulationTrend = [];
+		for (const s of sessions) {
+			const journal = journalBySession.get(String(s._id));
+			const before = s.checkIn?.signal;
+			const after = journal?.signalAfter;
+			if (before && after) {
+				regulationTrend.push({
+					date: s.date,
+					before,
+					after,
+					improved: signalRank[after] > signalRank[before],
+					steady: signalRank[after] === signalRank[before],
+				});
+			}
+		}
+
+		// --- Safe pause frequency ---
+		const safePauseSessions = sessions.filter(
+			(s) => (s.tutorSupport?.safePauseCount || 0) > 0,
+		);
+		const totalSafePauses = safePauseSessions.reduce(
+			(sum, s) => sum + (s.tutorSupport?.safePauseCount || 0),
+			0,
+		);
+
+		// --- Completion rate ---
+		const completedSessions = sessions.filter((s) => s.completed);
+		const completionRate = sessions.length > 0
+			? Math.round((completedSessions.length / sessions.length) * 100)
+			: 0;
+
+		// --- Preferred techniques (block types that appear most) ---
+		const techniqueCounts = {};
+		for (const s of sessions) {
+			if (!Array.isArray(s.plannedBlocks)) continue;
+			for (const block of s.plannedBlocks) {
+				const key = block.blockType;
+				techniqueCounts[key] = (techniqueCounts[key] || 0) + 1;
+			}
+		}
+		const preferredTechniques = Object.entries(techniqueCounts)
+			.sort((a, b) => b[1] - a[1])
+			.map(([technique, count]) => ({ technique, count }));
+
+		// --- Adaptive difficulty recommendation ---
+		const adaptiveDifficulty = computeAdaptiveDifficulty(sessions, regulationTrend);
+
+		sendResponse(res, 200, true, "Tutor analytics retrieved", {
+			period: { weeks, since },
+			sessionCount: sessions.length,
+			completionRate,
+			regulationTrend: regulationTrend.slice(0, 30),
+			safePauseStats: {
+				totalPauses: totalSafePauses,
+				sessionsWithPauses: safePauseSessions.length,
+				averagePerSession: sessions.length > 0
+					? Math.round((totalSafePauses / sessions.length) * 10) / 10
+					: 0,
+			},
+			preferredTechniques,
+			adaptiveDifficulty,
+		});
+	} catch (err) {
+		next(err);
+	}
+};
+
+/**
+ * Computes adaptive difficulty recommendation based on session history.
+ * Returns suggested duration, complexity level, and reasoning.
+ */
+function computeAdaptiveDifficulty(sessions, regulationTrend) {
+	const completed = sessions.filter((s) => s.completed);
+	const abandoned = sessions.filter((s) => s.status === "abandoned");
+	const completionRate = sessions.length > 0
+		? completed.length / sessions.length
+		: 1;
+
+	const avgDuration = completed.length > 0
+		? Math.round(completed.reduce((sum, s) => sum + (s.duration || 0), 0) / completed.length)
+		: 5;
+
+	const recentRegulation = regulationTrend.slice(0, 5);
+	const improvedCount = recentRegulation.filter((r) => r.improved).length;
+	const worsenedCount = recentRegulation.filter((r) => !r.improved && !r.steady).length;
+
+	let suggestedDuration = avgDuration;
+	let complexity = "maintain";
+	const reasons = [];
+
+	// If completion rate is low, suggest shorter sessions
+	if (completionRate < 0.5 && sessions.length >= 3) {
+		suggestedDuration = Math.max(3, Math.round(avgDuration * 0.7));
+		complexity = "simplify";
+		reasons.push("low_completion_rate");
+	}
+	// If regulation is worsening, keep it gentle
+	else if (worsenedCount > improvedCount && recentRegulation.length >= 3) {
+		suggestedDuration = Math.max(3, avgDuration);
+		complexity = "simplify";
+		reasons.push("regulation_declining");
+	}
+	// If doing well, gradually increase
+	else if (completionRate >= 0.8 && improvedCount >= 2 && sessions.length >= 4) {
+		suggestedDuration = Math.min(15, Math.round(avgDuration * 1.2));
+		complexity = "increase";
+		reasons.push("strong_progress");
+	}
+	// Steady — maintain
+	else {
+		reasons.push("maintaining_pace");
+	}
+
+	// Suggest simpler ratios if frequently abandoned
+	const suggestSimplerRatios = abandoned.length > 2 && completionRate < 0.6;
+
+	return {
+		suggestedDurationMinutes: suggestedDuration,
+		complexity,
+		suggestSimplerRatios,
+		reasons,
+		dataPoints: sessions.length,
+	};
+}
+
 module.exports = {
 	createSession,
 	getSessions,
@@ -1051,4 +1218,5 @@ module.exports = {
 	abandonSession,
 	getActiveSession,
 	getPracticeAnalytics,
+	getTutorAnalytics,
 };

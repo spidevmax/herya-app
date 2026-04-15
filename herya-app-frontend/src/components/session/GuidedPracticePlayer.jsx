@@ -10,6 +10,7 @@ import {
 	Leaf,
 	PersonStanding,
 	Wind,
+	Shuffle,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button, ProgressBar, CircleProgress, ConfirmModal } from "@/components/ui";
@@ -17,6 +18,8 @@ import useSessionTimer from "@/hooks/useSessionTimer";
 import PoseByPosePlayer from "./PoseByPosePlayer";
 import CycleBreathingPlayer from "./CycleBreathingPlayer";
 import PhasedMeditationPlayer from "./PhasedMeditationPlayer";
+import VisualSchedule from "./VisualSchedule";
+import TransitionWarning from "./TransitionWarning";
 
 const formatTime = (totalSec) => {
 	const m = Math.floor(totalSec / 60);
@@ -52,6 +55,8 @@ export default function GuidedPracticePlayer({
 	const timer = useSessionTimer(blocks);
 	const [abandonModalOpen, setAbandonModalOpen] = useState(false);
 	const [safePauseOpen, setSafePauseOpen] = useState(false);
+	const [transitionVisible, setTransitionVisible] = useState(false);
+	const pendingTransitionRef = useRef(null);
 	const [safePauseRemaining, setSafePauseRemaining] = useState(90);
 	const [safePauseCount, setSafePauseCount] = useState(0);
 	const [anchorUsed, setAnchorUsed] = useState(false);
@@ -189,14 +194,29 @@ export default function GuidedPracticePlayer({
 		}
 	};
 
-	// When a guided sub-player completes its block, advance
+	// When a guided sub-player completes its block, show transition warning (tutor) or advance
 	const handleBlockPlayerComplete = useCallback(() => {
 		if (timer.isLastBlock) {
 			handleFinish();
+			return;
+		}
+		if (isTutorMode && blocks[timer.currentBlockIndex + 1]) {
+			timer.pause();
+			pendingTransitionRef.current = () => {
+				timer.resume();
+				timer.nextBlock();
+			};
+			setTransitionVisible(true);
 		} else {
 			timer.nextBlock();
 		}
-	}, [timer.isLastBlock, timer.nextBlock, handleFinish]);
+	}, [timer.isLastBlock, timer.nextBlock, timer.pause, timer.resume, timer.currentBlockIndex, handleFinish, isTutorMode, blocks]);
+
+	const handleTransitionEnd = useCallback(() => {
+		setTransitionVisible(false);
+		pendingTransitionRef.current?.();
+		pendingTransitionRef.current = null;
+	}, []);
 
 	const currentBlock = timer.currentBlock;
 	const nextBlock = blocks[timer.currentBlockIndex + 1] || null;
@@ -291,6 +311,15 @@ export default function GuidedPracticePlayer({
 					/>
 				))}
 			</div>
+
+			{/* Visual schedule — predictability board for tutor mode */}
+			{isTutorMode && (
+				<VisualSchedule
+					blocks={blocks}
+					currentBlockIndex={timer.currentBlockIndex}
+					compact
+				/>
+			)}
 
 			{/* Current block content */}
 			<AnimatePresence mode="wait">
@@ -578,10 +607,15 @@ export default function GuidedPracticePlayer({
 				</div>
 			)}
 
-			{/* Finish / Abandon */}
+			{/* Finish / Abandon — Tutor mode safe pause with choice-based exit */}
 			{isTutorMode && (
 				<>
-					<Button variant="outline" className="w-full" onClick={openSafePause}>
+					<Button
+						variant="outline"
+						className="w-full min-h-[48px]"
+						onClick={openSafePause}
+						aria-label={t("practice.safe_pause")}
+					>
 						{t("practice.safe_pause")}
 					</Button>
 					{safePauseOpen && (
@@ -591,6 +625,8 @@ export default function GuidedPracticePlayer({
 								backgroundColor: "var(--color-surface-card)",
 								borderColor: "var(--color-border-soft)",
 							}}
+							role="dialog"
+							aria-label={t("practice.safe_pause_title")}
 						>
 							<p
 								className="text-sm font-semibold"
@@ -615,6 +651,7 @@ export default function GuidedPracticePlayer({
 										backgroundColor: "color-mix(in srgb, var(--color-primary) 15%, transparent)",
 										border: "2px solid var(--color-primary)",
 									}}
+									aria-hidden="true"
 								>
 									<Leaf size={24} style={{ color: "var(--color-primary)" }} />
 								</motion.div>
@@ -680,7 +717,12 @@ export default function GuidedPracticePlayer({
 										variant={anchorUsed ? "primary" : "outline"}
 										size="sm"
 										onClick={() => setAnchorUsed(true)}
-										className="mt-2"
+										className="mt-2 min-h-[48px]"
+										aria-label={
+											anchorUsed
+												? t("practice.safe_pause_anchor_used")
+												: t("practice.safe_pause_anchor_mark_used")
+										}
 									>
 										{anchorUsed
 											? t("practice.safe_pause_anchor_used")
@@ -692,6 +734,7 @@ export default function GuidedPracticePlayer({
 								<p
 									className="text-sm font-bold"
 									style={{ color: "var(--color-primary)" }}
+									aria-live="polite"
 								>
 									{t("practice.safe_pause_timer", { n: safePauseRemaining })}
 								</p>
@@ -703,15 +746,38 @@ export default function GuidedPracticePlayer({
 									{t("practice.safe_pause_expired")}
 								</p>
 							)}
-							<div className="flex gap-2">
+
+							{/* Choice-based exit: resume, try different, or end */}
+							<div className="flex flex-col gap-2">
 								<Button
 									variant="outline"
-									className="flex-1"
+									className="w-full min-h-[48px]"
 									onClick={closeSafePauseAndResume}
+									aria-label={t("practice.safe_pause_resume")}
 								>
 									{t("practice.safe_pause_resume")}
 								</Button>
-								<Button className="flex-1" onClick={handleAbandon}>
+								{!timer.isLastBlock && (
+									<Button
+										variant="ghost"
+										className="w-full min-h-[48px] flex items-center justify-center gap-2"
+										onClick={() => {
+											setSafePauseOpen(false);
+											timer.nextBlock();
+											if (timer.globalElapsedSec > 0) timer.resume();
+											else startTimerWithBackend();
+										}}
+										aria-label={t("practice.safe_pause_try_different")}
+									>
+										<Shuffle size={16} />
+										{t("practice.safe_pause_try_different")}
+									</Button>
+								)}
+								<Button
+									className="w-full min-h-[48px]"
+									onClick={handleAbandon}
+									aria-label={t("practice.safe_pause_end")}
+								>
 									{t("practice.safe_pause_end")}
 								</Button>
 							</div>
@@ -748,6 +814,13 @@ export default function GuidedPracticePlayer({
 				confirmLabel={t("practice.abandon_confirm")}
 				cancelLabel={t("practice.abandon_cancel")}
 				danger
+			/>
+
+			{/* Transition warning overlay — 5s countdown before block switch (tutor mode) */}
+			<TransitionWarning
+				nextBlock={blocks[timer.currentBlockIndex + 1] || null}
+				visible={transitionVisible}
+				onCountdownEnd={handleTransitionEnd}
 			/>
 		</div>
 	);
