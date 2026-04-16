@@ -112,7 +112,8 @@ export const translations = {
 			new_password_label: "New password",
 			confirm_password_label: "Confirm password",
 			success_title: "All set",
-			success_message: "Your password has been successfully reset. Redirecting to login...",
+			success_message:
+				"Your password has been successfully reset. Redirecting to login...",
 		},
 		register: {
 			title: "Start your practice",
@@ -261,6 +262,36 @@ export const translations = {
 				balancing: "Balancing",
 				cooling: "Cooling",
 				heating: "Heating",
+			},
+			categories: {
+				standing: "Standing",
+				sitting_meditation: "Seated / Meditation",
+				reclining: "Reclining",
+				inverted: "Inverted",
+				balancing: "Balancing",
+				forward_bend: "Forward bend",
+				backbend: "Backbend",
+				twisting: "Twisting",
+				hip_opening: "Hip opening",
+				core_strength: "Core strength",
+				arm_balance: "Arm balance",
+				restorative: "Restorative",
+			},
+			families: {
+				tadasana: "Tadasana",
+				standing_asymmetric: "Standing Asymmetric",
+				standing_symmetric: "Standing Symmetric",
+				one_leg_standing: "One Leg Standing",
+				seated: "Seated",
+				supine: "Supine",
+				prone: "Prone",
+				inverted: "Inverted",
+				meditative: "Meditative",
+				bow_sequence: "Bow",
+				triangle_sequence: "Triangle",
+				sun_salutation: "Sun Salutation",
+				vajrasana_variations: "Vajrasana",
+				lotus_variations: "Lotus",
 			},
 			no_results: "No results found",
 			clear_filters: "Clear filters",
@@ -425,6 +456,9 @@ export const translations = {
 			key_poses: "Key Poses",
 			minutes: "min",
 			start: "Start This Practice",
+			view_pose: "View pose",
+			enter_from: "Enter from {pose}",
+			return_to: "Return to {pose}",
 		},
 		breathing_detail: {
 			not_found: "Breathing pattern not found",
@@ -461,6 +495,54 @@ export const translations = {
 			continuation: "Continuation",
 			counterposes: "Counterposes",
 			profile_label: "Pose Profile",
+		},
+		anatomy: {
+			// muscles
+			quads: "Quads",
+			quadriceps: "Quadriceps",
+			glutes: "Glutes",
+			core: "Core",
+			shoulders: "Shoulders",
+			hamstrings: "Hamstrings",
+			calves: "Calves",
+			"hip flexors": "Hip flexors",
+			"hip abductors": "Hip abductors",
+			obliques: "Obliques",
+			"hip external rotators": "Hip external rotators",
+			"ankle stabilizers": "Ankle stabilizers",
+			hips: "Hips",
+			chest: "Chest",
+			serratus: "Serratus",
+			abs: "Abs",
+			"entire spine": "Entire spine",
+			"entire body": "Entire body",
+			"nervous system": "Nervous system",
+			"inner thighs": "Inner thighs",
+			"erector spinae": "Erector spinae",
+			triceps: "Triceps",
+			trapezius: "Trapezius",
+			neck: "Neck",
+			"shoulder rotators": "Shoulder rotators",
+			"spine": "Spine",
+			feet: "Feet",
+			"left hamstring": "Left hamstring",
+			"left hip rotators": "Left hip rotators",
+			"right hamstring": "Right hamstring",
+			"right hip rotators": "Right hip rotators",
+			// joints
+			ankles: "Ankles",
+			knees: "Knees",
+			wrists: "Wrists",
+			elbows: "Elbows",
+			hip: "Hip",
+			knee: "Knee",
+			ankle: "Ankle",
+			"left knee": "Left knee",
+			"left hip": "Left hip",
+			"left ankle": "Left ankle",
+			"right knee": "Right knee",
+			"right hip": "Right hip",
+			"right ankle": "Right ankle",
 		},
 		session_detail: {
 			title: "Session details",
@@ -842,7 +924,8 @@ export const translations = {
 			edit_title: "Edit Journal Entry",
 			new_title: "New Journal Entry",
 			error_mood_required: "Please select at least one mood before practice",
-			error_mood_after_required: "Please select at least one mood after practice",
+			error_mood_after_required:
+				"Please select at least one mood after practice",
 			error_energy_range: "Energy must be between 1 and 10",
 			error_stress_range: "Stress must be between 1 and 10",
 			photo_alt: "Entry photo {n}",
@@ -864,7 +947,7 @@ export const translations = {
 		practice: {
 			start_practice: "Start Practice",
 			select_type_title: "Choose a practice",
-			select_type_subtitle: "Pick one to begin",
+			select_type_subtitle: "Select the type of practice you want to do today",
 			type_vk_sequence: "Vinyasa Krama",
 			type_vk_sequence_desc: "Sequences and postures",
 			type_pranayama: "Pranayama",
@@ -1093,9 +1176,7 @@ export const translations = {
 		guided: {
 			// General
 			guided: "Guided",
-			free: "Timer only",
 			mode_guided: "Guided mode",
-			mode_free: "Free mode",
 			play: "Play",
 			pause: "Pause",
 			reset: "Reset",
@@ -1304,7 +1385,8 @@ export const translations = {
 			new_password_label: "Nueva contraseña",
 			confirm_password_label: "Confirmar contraseña",
 			success_title: "¡Listo!",
-			success_message: "Tu contraseña se ha restablecido correctamente. Redirigiendo al inicio de sesión...",
+			success_message:
+				"Tu contraseña se ha restablecido correctamente. Redirigiendo al inicio de sesión...",
 		},
 		register: {
 			title: "Comienza tu práctica",
@@ -1452,6 +1534,36 @@ export const translations = {
 				balancing: "Equilibrante",
 				cooling: "Refrescante",
 				heating: "Calentante",
+			},
+			categories: {
+				standing: "De pie",
+				sitting_meditation: "Sentada / Meditación",
+				reclining: "Reclinada",
+				inverted: "Invertida",
+				balancing: "Equilibrio",
+				forward_bend: "Flexión adelante",
+				backbend: "Extensión",
+				twisting: "Torsión",
+				hip_opening: "Apertura de caderas",
+				core_strength: "Fuerza del core",
+				arm_balance: "Equilibrio de brazos",
+				restorative: "Restaurativa",
+			},
+			families: {
+				tadasana: "Tadasana",
+				standing_asymmetric: "De pie asimétrica",
+				standing_symmetric: "De pie simétrica",
+				one_leg_standing: "Sobre una pierna",
+				seated: "Sentada",
+				supine: "Supina",
+				prone: "Prona",
+				inverted: "Invertida",
+				meditative: "Meditativa",
+				bow_sequence: "Arco",
+				triangle_sequence: "Triángulo",
+				sun_salutation: "Saludo al sol",
+				vajrasana_variations: "Vajrasana",
+				lotus_variations: "Loto",
 			},
 			no_results: "No se encontraron resultados",
 			clear_filters: "Limpiar filtros",
@@ -1616,6 +1728,9 @@ export const translations = {
 			key_poses: "Posturas clave",
 			minutes: "min",
 			start: "Empezar esta práctica",
+			view_pose: "Ver postura",
+			enter_from: "Entrar desde {pose}",
+			return_to: "Volver a {pose}",
 		},
 		session_history: {
 			title: "Historial de Sesiones",
@@ -1663,6 +1778,54 @@ export const translations = {
 			continuation: "Continuación",
 			counterposes: "Contraposturas",
 			profile_label: "Perfil de postura",
+		},
+		anatomy: {
+			// músculos
+			quads: "Cuádriceps",
+			quadriceps: "Cuádriceps",
+			glutes: "Glúteos",
+			core: "Core",
+			shoulders: "Hombros",
+			hamstrings: "Isquiotibiales",
+			calves: "Pantorrillas",
+			"hip flexors": "Flexores de cadera",
+			"hip abductors": "Abductores de cadera",
+			obliques: "Oblicuos",
+			"hip external rotators": "Rotadores ext. de cadera",
+			"ankle stabilizers": "Estabilizadores de tobillo",
+			hips: "Caderas",
+			chest: "Pecho",
+			serratus: "Serrato",
+			abs: "Abdominales",
+			"entire spine": "Columna completa",
+			"entire body": "Cuerpo completo",
+			"nervous system": "Sistema nervioso",
+			"inner thighs": "Aductores",
+			"erector spinae": "Erector espinal",
+			triceps: "Tríceps",
+			trapezius: "Trapecio",
+			neck: "Cuello",
+			"shoulder rotators": "Rotadores del hombro",
+			"spine": "Columna",
+			feet: "Pies",
+			"left hamstring": "Isquiotibial izquierdo",
+			"left hip rotators": "Rotadores de cadera izq.",
+			"right hamstring": "Isquiotibial derecho",
+			"right hip rotators": "Rotadores de cadera der.",
+			// articulaciones
+			ankles: "Tobillos",
+			knees: "Rodillas",
+			wrists: "Muñecas",
+			elbows: "Codos",
+			hip: "Cadera",
+			knee: "Rodilla",
+			ankle: "Tobillo",
+			"left knee": "Rodilla izquierda",
+			"left hip": "Cadera izquierda",
+			"left ankle": "Tobillo izquierdo",
+			"right knee": "Rodilla derecha",
+			"right hip": "Cadera derecha",
+			"right ankle": "Tobillo derecho",
 		},
 		session_detail: {
 			title: "Detalle de sesión",
@@ -2039,8 +2202,10 @@ export const translations = {
 			save_changes: "Guardar cambios",
 			edit_title: "Editar entrada del diario",
 			new_title: "Nueva entrada del diario",
-			error_mood_required: "Selecciona al menos un estado de ánimo antes de la práctica",
-			error_mood_after_required: "Selecciona al menos un estado de ánimo después de la práctica",
+			error_mood_required:
+				"Selecciona al menos un estado de ánimo antes de la práctica",
+			error_mood_after_required:
+				"Selecciona al menos un estado de ánimo después de la práctica",
 			error_energy_range: "La energía debe estar entre 1 y 10",
 			error_stress_range: "El estrés debe estar entre 1 y 10",
 			photo_alt: "Foto de la entrada {n}",
@@ -2062,7 +2227,8 @@ export const translations = {
 		practice: {
 			start_practice: "Iniciar Práctica",
 			select_type_title: "Elige una práctica",
-			select_type_subtitle: "Elige una para empezar",
+			select_type_subtitle:
+				"Selecciona el tipo de práctica que quieres hacer hoy",
 			type_vk_sequence: "Vinyasa Krama",
 			type_vk_sequence_desc: "Secuencias y posturas",
 			type_pranayama: "Pranayama",
@@ -2151,7 +2317,8 @@ export const translations = {
 			dist_manual: "Manual",
 			warn_insufficient_time:
 				"Tiempo insuficiente para todas las posturas a duración mínima",
-			warn_manual_overflow: "Los tiempos manuales superan la duración del bloque",
+			warn_manual_overflow:
+				"Los tiempos manuales superan la duración del bloque",
 			warn_invalid_duration: "Define primero la duración del bloque",
 			natural_duration: "Natural",
 			total: "Total",
@@ -2201,7 +2368,8 @@ export const translations = {
 			safe_pause_anchor_used: "Ancla usada",
 			safe_pause_breathe: "Respiren juntos despacio",
 			safe_pause_timer: "{n}s restantes",
-			safe_pause_expired: "¿Listos para decidir? Reanudar suave o terminar por hoy.",
+			safe_pause_expired:
+				"¿Listos para decidir? Reanudar suave o terminar por hoy.",
 			safe_pause_resume: "Reanudar suave",
 			safe_pause_try_different: "Probar algo diferente",
 			safe_pause_end: "Terminar por hoy",
@@ -2294,30 +2462,28 @@ export const translations = {
 		guided: {
 			// General
 			guided: "Guiado",
-			free: "Solo temporizador",
 			mode_guided: "Modo guiado",
-			mode_free: "Modo libre",
 			play: "Reproducir",
 			pause: "Pausar",
 			reset: "Reiniciar",
-	
+
 			// Safety
 			safety_warning: "Contraindicaciones",
 			contraindications: "Contraindicaciones",
-	
+
 			// Sequence picker
 			search_sequences: "Buscar secuencias...",
 			preview_sequence: "Vista previa",
 			poses_count: "posturas",
 			no_poses_data: "Sin datos de posturas",
-	
+
 			// Breathing picker
 			search_patterns: "Buscar patrones...",
 			cycles: "Ciclos",
 			ratio: "Ratio",
 			estimated_duration: "Duración estimada",
 			cycle_config: "Configuración de ciclos",
-	
+
 			// Pose player
 			pose: "Postura",
 			prev_pose: "Postura anterior",
@@ -2336,17 +2502,17 @@ export const translations = {
 			no_alignment_data: "Sin datos de alineación disponibles",
 			no_mistakes_data: "Sin errores comunes listados",
 			no_benefits_data: "Sin beneficios listados",
-	
+
 			// Tabs
 			tab_alignment: "Alineación",
 			tab_breathing: "Respiración",
 			tab_mistakes: "Errores",
 			tab_benefits: "Beneficios",
-	
+
 			// Cycle breathing player
 			cycle_progress: "Ciclo {current} de {total}",
 			pause_between: "Descanso",
-	
+
 			// Meditation player
 			phase_intro: "Intro",
 			phase_main: "Principal",
@@ -2354,7 +2520,7 @@ export const translations = {
 			bell_interval: "Campana",
 			bell_off: "Sin",
 			bell_every: "Campana cada {n} min",
-	
+
 			// Meditation instructions
 			meditation_intro: "Introducción",
 			meditation_main: "Práctica",

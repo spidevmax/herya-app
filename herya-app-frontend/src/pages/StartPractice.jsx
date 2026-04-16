@@ -1,41 +1,45 @@
-import { useState, useCallback, useMemo, useEffect } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Leaf, RotateCcw, Settings2 } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { getBreathingPatternById } from "@/api/breathing.api";
 import {
+	createJournalEntry,
+	getJournalEntries,
+} from "@/api/journalEntries.api";
+import { getSequenceById } from "@/api/sequences.api";
+import {
+	abandonSession,
+	completeGuidedSession,
 	createSession,
 	startSessionTimer,
-	completeGuidedSession,
-	abandonSession,
 } from "@/api/sessions.api";
-import { getSequenceById } from "@/api/sequences.api";
-import { getBreathingPatternById } from "@/api/breathing.api";
-import { createJournalEntry } from "@/api/journalEntries.api";
-import { getJournalEntries } from "@/api/journalEntries.api";
-import useSessionPersistence from "@/hooks/useSessionPersistence";
-import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
-import SessionBuilder from "@/components/session/SessionBuilder";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
+import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
+import SessionBuilder from "@/components/session/SessionBuilder";
 import SessionTemplatePicker from "@/components/session/SessionTemplatePicker";
-import SessionRewards from "@/components/session/SessionRewards";
 import ChildProfileManager from "@/components/tutor/ChildProfileManager";
 import { Button, ConfirmModal, StickyHeader } from "@/components/ui";
-import { MOOD_OPTIONS, MOOD_COLORS } from "@/utils/constants";
+import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
+import useSessionPersistence from "@/hooks/useSessionPersistence";
+import { MOOD_COLORS, MOOD_OPTIONS } from "@/utils/constants";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-primary)";
+
 const PRACTICE_PRESETS = {
 	ADULT: "adult",
 	TUTOR: "tutor",
 };
 const TUTOR_MAX_TOTAL_MINUTES = 12;
+
 const TUTOR_SIGNAL_MAP = {
 	green: { mood: ["calm"], energy: 4 },
 	yellow: { mood: ["focused"], energy: 5 },
 	red: { mood: ["anxious"], energy: 7 },
 };
+
 const SIGNAL_SCORES = {
 	green: 2,
 	yellow: 1,
@@ -877,13 +881,6 @@ export default function StartPractice() {
 					{t("practice.done_subtitle")}
 				</p>
 
-				<SessionRewards
-					totalSessions={(user?.totalSessions ?? 0) + 1}
-					currentStreak={user?.currentStreak ?? 0}
-					blocksCompleted={sessionSummary?.blocksCompleted ?? 0}
-					compact
-				/>
-
 				<div className="flex gap-3">
 					<Button variant="outline" onClick={() => navigate("/sessions")}>
 						{t("practice.view_history")}
@@ -1029,169 +1026,6 @@ export default function StartPractice() {
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-4"
 						>
-							{isTutorUser && (
-								<div
-									className="rounded-2xl p-4 border"
-									style={{
-										backgroundColor: "var(--color-surface-card)",
-										borderColor: "var(--color-border-soft)",
-									}}
-								>
-									<div className="flex items-start gap-3">
-										<div
-											className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-											style={{
-												backgroundColor: "var(--color-primary-light, #EEF2FF)",
-												color: "var(--color-primary)",
-											}}
-										>
-											<Leaf size={18} />
-										</div>
-										<div className="flex-1 min-w-0">
-											<p
-												className="text-sm font-semibold"
-												style={{ color: "var(--color-text-primary)" }}
-											>
-												{t("practice.tutor_support_title")}
-											</p>
-											<p
-												className="text-xs mt-0.5"
-												style={{ color: "var(--color-text-secondary)" }}
-											>
-												{t("practice.tutor_support_subtitle")}
-											</p>
-										</div>
-									</div>
-									<div className="flex flex-wrap gap-2 mt-4">
-										<button
-											type="button"
-											onClick={() => {
-												setHasManualPresetChoice(true);
-												setRecommendationApplied(false);
-												applyPracticePreset(PRACTICE_PRESETS.ADULT);
-											}}
-											className="px-3 py-2 rounded-xl text-xs font-semibold transition"
-											style={{
-												backgroundColor:
-													practicePreset === PRACTICE_PRESETS.ADULT
-														? "var(--color-primary)"
-														: "var(--color-surface)",
-												color:
-													practicePreset === PRACTICE_PRESETS.ADULT
-														? "white"
-														: "var(--color-text-secondary)",
-												border: `1px solid ${
-													practicePreset === PRACTICE_PRESETS.ADULT
-														? "var(--color-primary)"
-														: "var(--color-border-soft)"
-												}`,
-											}}
-										>
-											{t("practice.preset_adult")}
-										</button>
-										{isTutorUser && (
-											<button
-												type="button"
-												onClick={() => {
-													setHasManualPresetChoice(true);
-													setRecommendationApplied(false);
-													applyPracticePreset(PRACTICE_PRESETS.TUTOR);
-												}}
-												className="px-3 py-2 rounded-xl text-xs font-semibold transition"
-												style={{
-													backgroundColor:
-														practicePreset === PRACTICE_PRESETS.TUTOR
-															? "var(--color-primary)"
-															: "var(--color-surface)",
-													color:
-														practicePreset === PRACTICE_PRESETS.TUTOR
-															? "white"
-															: "var(--color-text-secondary)",
-													border: `1px solid ${
-														practicePreset === PRACTICE_PRESETS.TUTOR
-															? "var(--color-primary)"
-															: "var(--color-border-soft)"
-													}`,
-												}}
-											>
-												{t("practice.preset_tutor")}
-											</button>
-										)}
-										<button
-											type="button"
-											onClick={() => setLowStimMode((value) => !value)}
-											className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold transition"
-											style={{
-												backgroundColor: lowStimMode
-													? "var(--color-primary)"
-													: "var(--color-surface)",
-												color: lowStimMode
-													? "white"
-													: "var(--color-text-secondary)",
-												border: `1px solid ${lowStimMode ? "var(--color-primary)" : "var(--color-border-soft)"}`,
-											}}
-											aria-pressed={lowStimMode}
-										>
-											<Leaf size={12} />
-											{t("practice.low_stim_mode")}
-										</button>
-										<p
-											className="text-[11px] leading-tight self-center"
-											style={{ color: "var(--color-text-muted)" }}
-										>
-											{practicePreset === PRACTICE_PRESETS.TUTOR
-												? t("practice.preset_tutor_hint")
-												: t("practice.low_stim_mode_hint")}
-										</p>
-										{isTutorUser && recommendedPreset && (
-											<div
-												className="w-full mt-1 rounded-xl p-3 border flex items-center gap-3"
-												style={{
-													backgroundColor: "var(--color-surface)",
-													borderColor: "var(--color-border-soft)",
-												}}
-											>
-												<div className="flex-1 min-w-0">
-													<p
-														className="text-[11px] font-semibold"
-														style={{ color: "var(--color-text-primary)" }}
-													>
-														{t("practice.reco_title")}:{" "}
-														{recommendedPreset === PRACTICE_PRESETS.TUTOR
-															? t("practice.reco_tutor")
-															: t("practice.reco_adult")}
-													</p>
-													<p
-														className="text-[11px]"
-														style={{ color: "var(--color-text-muted)" }}
-													>
-														{t(recommendationReasonKey)}
-													</p>
-													{recommendationApplied && (
-														<p
-															className="text-[10px] mt-1"
-															style={{ color: "var(--color-primary)" }}
-														>
-															{t("practice.reco_applied")}
-														</p>
-													)}
-												</div>
-												<Button
-													variant="outline"
-													size="sm"
-													onClick={() => {
-														setHasManualPresetChoice(true);
-														setRecommendationApplied(true);
-														applyPracticePreset(recommendedPreset);
-													}}
-												>
-													{t("practice.reco_apply")}
-												</Button>
-											</div>
-										)}
-									</div>
-								</div>
-							)}
 							{/* Child profile selector — tutor only */}
 							{isTutorUser && (
 								<ChildProfileManager
@@ -1352,7 +1186,9 @@ export default function StartPractice() {
 										max={10}
 										value={checkInStress}
 										onChange={(e) => setCheckInStress(+e.target.value)}
-										aria-label={t("practice.checkin_stress", { n: checkInStress })}
+										aria-label={t("practice.checkin_stress", {
+											n: checkInStress,
+										})}
 										className="w-full"
 										style={{ accentColor: "var(--color-danger)" }}
 									/>
@@ -1409,7 +1245,10 @@ export default function StartPractice() {
 								patternsData={patternsData}
 								lowStimMode={lowStimMode}
 								isTutorMode={isTutorPractice}
-								safetyAnchors={selectedChild?.safetyAnchors || user?.preferences?.safetyAnchors}
+								safetyAnchors={
+									selectedChild?.safetyAnchors ||
+									user?.preferences?.safetyAnchors
+								}
 								onComplete={handleComplete}
 								onAbandon={handleAbandon}
 								onSaveProgress={handleSaveProgress}

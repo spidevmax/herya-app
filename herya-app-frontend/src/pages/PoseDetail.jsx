@@ -17,7 +17,7 @@ import {
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
 import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { translateWithFallback } from "@/utils/libraryHelpers";
+import { translateWithFallback, localizedName, localized, localizedArray } from "@/utils/libraryHelpers";
 
 const DIFF_COLORS = {
 	beginner: "var(--color-info)",
@@ -62,9 +62,10 @@ const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
 	</motion.div>
 );
 
-function RelatedPoseChip({ pose, onClick }) {
+function RelatedPoseChip({ pose, onClick, lang }) {
 	const relatedImage =
 		pose.image || pose.media?.thumbnail?.url || pose.media?.images?.[0]?.url;
+	const displayName = localizedName(pose, lang);
 
 	return (
 		<button
@@ -76,7 +77,7 @@ function RelatedPoseChip({ pose, onClick }) {
 				{relatedImage ? (
 					<img
 						src={relatedImage}
-						alt={pose.englishName}
+						alt={displayName}
 						className="w-full h-full object-cover"
 					/>
 				) : (
@@ -84,7 +85,7 @@ function RelatedPoseChip({ pose, onClick }) {
 				)}
 			</div>
 			<p className="text-[10px] text-center text-[var(--color-text-secondary)] font-medium leading-tight line-clamp-2">
-				{pose.englishName}
+				{displayName}
 			</p>
 		</button>
 	);
@@ -93,7 +94,7 @@ function RelatedPoseChip({ pose, onClick }) {
 export default function PoseDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const heroRef = useRef(null);
 	const prefersReducedMotion = useReducedMotion();
 	const [pose, setPose] = useState(null);
@@ -158,11 +159,11 @@ export default function PoseDetail() {
 		advanced: t("library.advanced"),
 	};
 
-	const benefits = normalizeList(pose.benefits);
-	const contraindications = normalizeList(pose.contraindications);
+	const benefits = localizedArray(pose, "benefits", lang).length > 0 ? localizedArray(pose, "benefits", lang) : normalizeList(pose.benefits);
+	const contraindications = localizedArray(pose, "contraindications", lang).length > 0 ? localizedArray(pose, "contraindications", lang) : normalizeList(pose.contraindications);
 	const targetMuscles = normalizeList(pose.targetMuscles);
 	const jointFocus = normalizeList(pose.jointFocus);
-	const commonMistakes = normalizeList(pose.commonMistakes);
+	const commonMistakes = localizedArray(pose, "commonMistakes", lang).length > 0 ? localizedArray(pose, "commonMistakes", lang) : normalizeList(pose.commonMistakes);
 	const props = normalizeList(pose.props);
 	const aliases = normalizeList(pose.alias);
 	const setupSteps = normalizeList(pose.instructions?.setup);
@@ -171,7 +172,7 @@ export default function PoseDetail() {
 	const exitSteps = normalizeList(pose.instructions?.exit);
 	const keyPoints = normalizeList(pose.alignmentDetails?.keyPoints);
 	const recommendedBreaths = pose.recommendedBreaths?.[pose.difficulty];
-	const poseDisplayName = pose.englishName || pose.name;
+	const poseDisplayName = localizedName(pose, lang);
 	const poseDisplayRomanized = pose.romanizedName || pose.romanizationName;
 	const poseDisplaySanskrit = pose.sanskritName;
 	const poseImage =
@@ -350,7 +351,7 @@ export default function PoseDetail() {
 										</p>
 									</div>
 								)}
-								{pose.breathingCue && (
+								{(localized(pose, "breathingCue", lang) || pose.breathingCue) && (
 									<div
 										className="rounded-xl px-3 py-2.5 border"
 										style={{
@@ -364,14 +365,14 @@ export default function PoseDetail() {
 											{t("pose_detail.breathe")}
 										</p>
 										<p className="text-sm font-semibold text-[var(--color-text-primary)] line-clamp-1 mt-0.5">
-											{formatValue(pose.breathingCue)}
+											{formatValue(localized(pose, "breathingCue", lang))}
 										</p>
 									</div>
 								)}
 							</div>
 						)}
 
-						{pose.description && (
+						{(localized(pose, "description", lang) || pose.description) && (
 							<p
 								className="mt-4 text-[var(--color-text-secondary)] text-sm leading-relaxed border-l-2 pl-3"
 								style={{
@@ -379,7 +380,7 @@ export default function PoseDetail() {
 										"color-mix(in srgb, var(--color-primary) 28%, transparent)",
 								}}
 							>
-								{pose.description}
+								{localized(pose, "description", lang)}
 							</p>
 						)}
 					</div>
@@ -423,12 +424,12 @@ export default function PoseDetail() {
 									: ""}
 							</p>
 						)}
-						{formatValue(pose.breathingCue) && (
+						{formatValue(localized(pose, "breathingCue", lang) || pose.breathingCue) && (
 							<p>
 								<b className="text-[var(--color-text-primary)]">
 									{t("pose_detail.breathe")}
 								</b>{" "}
-								{formatValue(pose.breathingCue)}
+								{formatValue(localized(pose, "breathingCue", lang))}
 							</p>
 						)}
 					</div>
@@ -455,7 +456,7 @@ export default function PoseDetail() {
 						<div className="flex flex-wrap gap-2">
 							{targetMuscles.map((muscle) => (
 								<Badge key={`muscle-${muscle}`} color="var(--color-success)">
-									{muscle}
+									{translateWithFallback(t, `anatomy.${muscle}`, muscle)}
 								</Badge>
 							))}
 						</div>
@@ -471,7 +472,7 @@ export default function PoseDetail() {
 						<div className="flex flex-wrap gap-2">
 							{jointFocus.map((joint) => (
 								<Badge key={`joint-${joint}`} color="var(--color-warning)">
-									{joint}
+									{translateWithFallback(t, `anatomy.${joint}`, joint)}
 								</Badge>
 							))}
 						</div>
@@ -710,6 +711,7 @@ export default function PoseDetail() {
 											<RelatedPoseChip
 												key={p._id}
 												pose={p}
+												lang={lang}
 												onClick={() => navigate(`/library/pose/${p._id}`)}
 											/>
 										))}
@@ -726,6 +728,7 @@ export default function PoseDetail() {
 											<RelatedPoseChip
 												key={p._id}
 												pose={p}
+												lang={lang}
 												onClick={() => navigate(`/library/pose/${p._id}`)}
 											/>
 										))}
@@ -742,6 +745,7 @@ export default function PoseDetail() {
 											<RelatedPoseChip
 												key={p._id}
 												pose={p}
+												lang={lang}
 												onClick={() => navigate(`/library/pose/${p._id}`)}
 											/>
 										))}

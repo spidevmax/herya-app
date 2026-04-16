@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
+import { localizedName, localized } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
 const formatFamily = (family, t) => {
@@ -37,7 +38,7 @@ export default function SequencePicker({
 	selectedId,
 	onSelect,
 }) {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [previewId, setPreviewId] = useState(null);
@@ -48,6 +49,7 @@ export default function SequencePicker({
 		return sequences.filter(
 			(s) =>
 				s.englishName?.toLowerCase().includes(q) ||
+				s.spanishName?.toLowerCase().includes(q) ||
 				s.sanskritName?.toLowerCase().includes(q) ||
 				s.family?.toLowerCase().includes(q) ||
 				s.difficulty?.toLowerCase().includes(q),
@@ -82,7 +84,7 @@ export default function SequencePicker({
 							className="text-sm font-semibold truncate"
 							style={{ color: "var(--color-text-primary)" }}
 						>
-							{selected.englishName}
+							{localizedName(selected, lang)}
 						</p>
 						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
 							{formatFamily(selected.family, t)} ·{" "}
@@ -169,7 +171,7 @@ export default function SequencePicker({
 														color: "var(--color-text-primary)",
 													}}
 												>
-													{seq.englishName}
+													{localizedName(seq, lang)}
 												</p>
 												<div className="flex items-center gap-2 mt-0.5">
 													<span
@@ -279,7 +281,7 @@ export default function SequencePicker({
 }
 
 function SequencePreview({ sequence }) {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const poses = sequence.structure?.corePoses || [];
 
 	return (
@@ -288,12 +290,12 @@ function SequencePreview({ sequence }) {
 			style={{ borderColor: "var(--color-border-soft)" }}
 		>
 			{/* Therapeutic focus */}
-			{sequence.therapeuticFocus?.primaryBenefit && (
+			{(localized(sequence.therapeuticFocus, "primaryBenefit", lang) || sequence.therapeuticFocus?.primaryBenefit) && (
 				<p
 					className="text-xs mt-2 mb-2 italic"
 					style={{ color: "var(--color-text-secondary)" }}
 				>
-					{sequence.therapeuticFocus.primaryBenefit}
+					{localized(sequence.therapeuticFocus, "primaryBenefit", lang)}
 				</p>
 			)}
 
@@ -303,7 +305,7 @@ function SequencePreview({ sequence }) {
 					{poses.map((cp, i) => {
 						const pose = cp.pose;
 						if (!pose) return null;
-						const name = pose.romanizationName || pose.name || "—";
+						const name = localizedName(pose, lang) || pose.romanizationName || pose.name || "—";
 						return (
 							<div key={cp._id || i} className="flex items-center gap-2 py-1">
 								<span

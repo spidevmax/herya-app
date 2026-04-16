@@ -99,6 +99,37 @@ export const getPalette = (item, type) => {
 	return PALETTE[item.difficulty] ?? PALETTE.default;
 };
 
+// ── Localized field helpers ─────────────────────────────────────────────────
+// Pick the correct language variant of a field from API data.
+// Usage: localized(item, "name", lang) → item.nameEs || item.name (when lang=es)
+export const localized = (item, field, lang) => {
+	if (!item) return undefined;
+	if (lang === "es") {
+		const esKey = `${field}Es`;
+		if (item[esKey]) return item[esKey];
+	}
+	return item[field];
+};
+
+// For the special case of sequence/pose display name:
+// spanishName / englishName / name / romanizationName
+export const localizedName = (item, lang) => {
+	if (!item) return "";
+	if (lang === "es" && item.spanishName) return item.spanishName;
+	if (lang === "es" && item.nameEs) return item.nameEs;
+	return item.englishName || item.name || item.romanizationName || "";
+};
+
+// For arrays (benefits, contraindications, commonMistakes):
+export const localizedArray = (item, field, lang) => {
+	if (!item) return [];
+	if (lang === "es") {
+		const esKey = `${field}Es`;
+		if (Array.isArray(item[esKey]) && item[esKey].length > 0) return item[esKey];
+	}
+	return Array.isArray(item[field]) ? item[field] : [];
+};
+
 // ── Card helpers ────────────────────────────────────────────────────────────
 export const getMonogram = (title) =>
 	String(title || "")
@@ -109,8 +140,12 @@ export const getMonogram = (title) =>
 		.join("")
 		.toUpperCase();
 
-export const getCardTitle = (item, fallbackItemLabel) =>
-	item.englishName || item.name || item.romanizationName || fallbackItemLabel;
+export const getCardTitle = (item, fallbackItemLabel, lang) => {
+	if (lang === "es") {
+		return item.spanishName || item.nameEs || item.englishName || item.name || item.romanizationName || fallbackItemLabel;
+	}
+	return item.englishName || item.name || item.romanizationName || fallbackItemLabel;
+};
 
 export const getCardSubtitle = (item) =>
 	item.romanizationName || item.sanskritName || item.romanizedName || "";
@@ -146,11 +181,14 @@ export const getSequencePoseCount = (item) => {
 export const collectSearchText = (item) =>
 	[
 		item.englishName,
+		item.spanishName,
 		item.name,
+		item.nameEs,
 		item.sanskritName,
 		item.romanizationName,
 		item.romanizedName,
 		item.description,
+		item.descriptionEs,
 		item.family,
 		item.energyEffect,
 		item.difficulty,

@@ -13,7 +13,7 @@ import {
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { DIFF_COLORS as SHARED_DIFF_COLORS, colorMix, translateWithFallback } from "@/utils/libraryHelpers";
+import { DIFF_COLORS as SHARED_DIFF_COLORS, colorMix, translateWithFallback, localized, localizedArray } from "@/utils/libraryHelpers";
 
 const DIFF_COLORS = SHARED_DIFF_COLORS;
 
@@ -51,7 +51,7 @@ function RatioBox({ label, value, color }) {
 export default function BreathingDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const [pattern, setPattern] = useState(null);
 	const [loading, setLoading] = useState(true);
 
@@ -101,7 +101,7 @@ export default function BreathingDetail() {
 	const ratio = pattern.patternRatio ?? {};
 	const diffColor = DIFF_COLORS[pattern.difficulty] ?? "var(--color-primary)";
 	const EnergyIcon = ENERGY_ICONS[pattern.energyEffect] ?? Wind;
-	const benefits = pattern.benefits ?? [];
+	const benefits = localizedArray(pattern, "benefits", lang).length > 0 ? localizedArray(pattern, "benefits", lang) : (pattern.benefits ?? []);
 	const instructions = pattern.instructions ?? [];
 	const ratioStr = pattern.patternRatio
 		? `${ratio.inhale ?? 1}:${ratio.hold ?? 0}:${ratio.exhale ?? 1}:${ratio.holdAfterExhale ?? 0}`
@@ -188,12 +188,12 @@ export default function BreathingDetail() {
 
 			<div className="px-4 pt-5 flex flex-col gap-5">
 				{/* Description */}
-				{pattern.description && (
+				{(localized(pattern, "description", lang) || pattern.description) && (
 					<p
 						className="text-sm leading-relaxed"
 						style={{ color: "var(--color-text-secondary)" }}
 					>
-						{pattern.description}
+						{localized(pattern, "description", lang)}
 					</p>
 				)}
 

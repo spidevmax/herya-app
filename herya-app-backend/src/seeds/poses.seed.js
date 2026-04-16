@@ -57,6 +57,7 @@ async function seedPoses() {
 
 			return {
 				name: row.name?.trim(),
+				nameEs: row.nameEs?.trim() || undefined,
 				romanizationName: row.romanizationName?.trim(),
 				iastName: row.iastName?.trim(),
 				sanskritName: row.sanskritName?.trim(),
@@ -81,25 +82,29 @@ async function seedPoses() {
 				chakraRelated: chakra || undefined,
 				energyEffect: row.energyEffect?.trim() || undefined,
 				benefits: parseArray(row.benefits),
+				benefitsEs: parseArray(row.benefitsEs),
 				contraindications: parseArray(row.contraindications),
+				contraindicationsEs: parseArray(row.contraindicationsEs),
 				commonMistakes: parseArray(row.commonMistakes),
+				commonMistakesEs: parseArray(row.commonMistakesEs),
 				breathingCue: row.breathingCue?.trim(),
+				breathingCueEs: row.breathingCueEs?.trim() || undefined,
 				tags: parseArray(row.tags),
 				isSystemPose: row.isSystemPose === "true",
 			};
 		});
 
-		// Upsert by romanizationName — adds new poses without overwriting existing ones
+		// Upsert by romanizationName — updates existing poses with latest seed data
 		const ops = poses.map((pose) => ({
 			updateOne: {
 				filter: { romanizationName: pose.romanizationName },
-				update: { $setOnInsert: pose },
+				update: { $set: pose },
 				upsert: true,
 			},
 		}));
 		const result = await Pose.bulkWrite(ops);
 		console.log(
-			`✅ Poses seeded: ${result.upsertedCount} inserted, ${result.matchedCount} already existed`,
+			`✅ Poses seeded: ${result.upsertedCount} inserted, ${result.modifiedCount} updated`,
 		);
 	} catch (error) {
 		console.error("❌ Error seeding poses:", error.message);

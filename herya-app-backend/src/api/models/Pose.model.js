@@ -53,6 +53,7 @@ const poseSchema = new mongoose.Schema(
 	{
 		// IDENTIFICATION
 		name: { type: String, required: true, trim: true },
+		nameEs: { type: String, trim: true },
 		romanizationName: { type: String, required: true, trim: true },
 		iastName: { type: String, required: true, trim: true },
 		sanskritName: { type: String, required: true, trim: true },
@@ -293,15 +294,19 @@ const poseSchema = new mongoose.Schema(
 		},
 
 		benefits: [{ type: String, trim: true }],
+		benefitsEs: [{ type: String, trim: true }],
 		contraindications: [{ type: String, trim: true }],
+		contraindicationsEs: [{ type: String, trim: true }],
 
 		breathingCue: {
 			type: String,
 			trim: true,
 			default: "Breathe steadily and deeply",
 		},
+		breathingCueEs: { type: String, trim: true },
 
 		commonMistakes: [{ type: String, trim: true }],
+		commonMistakesEs: [{ type: String, trim: true }],
 
 		// ANATOMICAL FOCUS
 		targetMuscles: [{ type: String, trim: true }],

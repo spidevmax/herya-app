@@ -284,7 +284,9 @@ async function seedSequences() {
 			difficulty: row.difficulty?.trim() || "beginner",
 			sanskritName: row.sanskritName?.trim(),
 			englishName: row.englishName?.trim(),
+			spanishName: row.spanishName?.trim() || undefined,
 			description: row.description?.trim() || undefined,
+			descriptionEs: row.descriptionEs?.trim() || undefined,
 
 			// PRACTICE
 			estimatedDuration: {
@@ -296,6 +298,7 @@ async function seedSequences() {
 			// THERAPEUTIC ASPECTS
 			therapeuticFocus: {
 				primaryBenefit: row["therapeuticFocus.primaryBenefit"]?.trim(),
+				primaryBenefitEs: row["therapeuticFocus.primaryBenefitEs"]?.trim() || undefined,
 			},
 
 			// VK STRUCTURE (complete seed)

@@ -8,7 +8,7 @@ import {
 } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
-import StartPractice from "./StartPractice";
+import StartPractice from "../pages/StartPractice";
 
 let mockUser = null;
 

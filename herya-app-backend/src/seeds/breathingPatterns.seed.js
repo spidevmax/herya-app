@@ -45,6 +45,7 @@ async function seedBreathingPatterns() {
 			sanskritName: row.sanskritName?.trim(),
 			alias: toArray(row.alias),
 			description: row.description?.trim(),
+			descriptionEs: row.descriptionEs?.trim() || undefined,
 
 			// CLASSIFICATION
 			difficulty: row.difficulty?.trim() || "beginner",
@@ -120,8 +121,11 @@ async function seedBreathingPatterns() {
 
 			// BENEFITS AND CONTRAINDICATIONS
 			benefits: toArray(row.benefits),
+			benefitsEs: toArray(row.benefitsEs),
 			contraindications: toArray(row.contraindications),
+			contraindicationsEs: toArray(row.contraindicationsEs),
 			warnings: row.warnings?.trim() || undefined,
+			warningsEs: row.warningsEs?.trim() || undefined,
 
 			// VK CONTEXT
 			vkContext: {
@@ -143,17 +147,17 @@ async function seedBreathingPatterns() {
 			isSystemPattern: toBool(row.isSystemPattern),
 		}));
 
-		// Upsert by romanizationName — adds new patterns without overwriting existing ones
+		// Upsert by romanizationName — updates existing patterns with latest seed data
 		const ops = breathingPatterns.map((pattern) => ({
 			updateOne: {
 				filter: { romanizationName: pattern.romanizationName },
-				update: { $setOnInsert: pattern },
+				update: { $set: pattern },
 				upsert: true,
 			},
 		}));
 		const result = await BreathingPattern.bulkWrite(ops);
 		console.log(
-			`✅ Breathing patterns seeded: ${result.upsertedCount} inserted, ${result.matchedCount} already existed`,
+			`✅ Breathing patterns seeded: ${result.upsertedCount} inserted, ${result.modifiedCount} updated`,
 		);
 	} catch (error) {
 		console.error("❌ Error seeding breathing patterns:", error.message);

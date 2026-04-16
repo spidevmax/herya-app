@@ -10,14 +10,14 @@ import {
 } from "lucide-react";
 import { getSequenceById } from "@/api/sequences.api";
 import { VK_FAMILY_MAP, LEVEL_LABELS, LEVEL_LABEL_KEYS } from "@/utils/constants";
-import { colorMix } from "@/utils/libraryHelpers";
+import { colorMix, localizedName, localized } from "@/utils/libraryHelpers";
 import { Badge, SkeletonCard, StickyHeader } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function SequenceDetail() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const tr = (key, fallback) => {
 		const value = t(key);
 		return value === key ? fallback : value;
@@ -41,10 +41,19 @@ export default function SequenceDetail() {
 		: null;
 
 	const getPoseName = (pose, fallback) =>
-		pose?.englishName || pose?.name || pose?.romanizationName || fallback;
+		localizedName(pose, lang) || pose?.romanizationName || fallback;
 
 	const getPoseSubtitle = (pose) =>
 		pose?.romanizationName || pose?.sanskritName || null;
+
+	const localizeInstruction = (instruction) => {
+		if (!instruction) return null;
+		const enterMatch = instruction.match(/^Enter from (.+)$/);
+		if (enterMatch) return t("sequence_detail.enter_from", { pose: enterMatch[1] });
+		const returnMatch = instruction.match(/^Return to (.+)$/);
+		if (returnMatch) return t("sequence_detail.return_to", { pose: returnMatch[1] });
+		return instruction;
+	};
 
 	const buildPoseItem = (
 		pose,
@@ -66,7 +75,7 @@ export default function SequenceDetail() {
 			name: resolvedName,
 			subtitle: typeof pose === "object" ? getPoseSubtitle(pose) : null,
 			breaths,
-			instruction,
+			instruction: localizeInstruction(instruction),
 		};
 	};
 
@@ -85,9 +94,7 @@ export default function SequenceDetail() {
 
 	const getItemName = (item, fallback) => {
 		if (typeof item === "string") return item;
-		return (
-			item?.englishName || item?.name || item?.romanizationName || fallback
-		);
+		return localizedName(item, lang) || item?.romanizationName || fallback;
 	};
 
 	const sequenceSections = [
@@ -159,7 +166,7 @@ export default function SequenceDetail() {
 		<div className="pb-6">
 			<StickyHeader
 				onBack={() => navigate(-1)}
-				title={loading ? t("sequence_detail.loading") : seq?.englishName}
+				title={loading ? t("sequence_detail.loading") : localizedName(seq, lang)}
 			/>
 
 			{loading ? (
@@ -197,7 +204,7 @@ export default function SequenceDetail() {
 							{family.labelKey ? t(family.labelKey) : family.label}
 						</span>
 						<h2 className="font-display text-2xl font-bold text-white mt-1 mb-1">
-							{seq.englishName}
+							{localizedName(seq, lang)}
 						</h2>
 						<p className="text-white/70 text-sm italic mb-4">
 							{seq.sanskritName}
@@ -218,13 +225,13 @@ export default function SequenceDetail() {
 							)}
 							{seq.difficulty && (
 								<Badge className="text-white bg-white/20 border-0 capitalize">
-									{seq.difficulty}
+									{tr(`library.${seq.difficulty}`, seq.difficulty)}
 								</Badge>
 							)}
 						</div>
 					</motion.div>
 
-					{seq.description && (
+					{(localized(seq, "description", lang) || seq.description) && (
 						<div
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
@@ -239,7 +246,7 @@ export default function SequenceDetail() {
 								className="text-sm leading-relaxed"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
-								{seq.description}
+								{localized(seq, "description", lang)}
 							</p>
 						</div>
 					)}
@@ -294,7 +301,7 @@ export default function SequenceDetail() {
 											className="text-sm font-semibold mt-0.5 capitalize"
 											style={{ color: "var(--color-text-primary)" }}
 										>
-											{seq.difficulty}
+											{tr(`library.${seq.difficulty}`, seq.difficulty)}
 										</p>
 									</div>
 								) : null}
@@ -360,7 +367,7 @@ export default function SequenceDetail() {
 							>
 								{tr("sequence_detail.therapeutic_focus", "Therapeutic focus")}
 							</h3>
-							{therapeuticFocus.primaryBenefit ? (
+							{(localized(therapeuticFocus, "primaryBenefit", lang) || therapeuticFocus.primaryBenefit) ? (
 								<p
 									className="text-sm leading-relaxed"
 									style={{ color: "var(--color-text-secondary)" }}
@@ -371,7 +378,7 @@ export default function SequenceDetail() {
 									>
 										{tr("sequence_detail.primary_benefit", "Primary benefit")}:
 									</span>
-									{therapeuticFocus.primaryBenefit}
+									{localized(therapeuticFocus, "primaryBenefit", lang)}
 								</p>
 							) : null}
 							{Array.isArray(therapeuticFocus.targetConditions) &&

@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import {
 	ChevronLeft,
 	Frown,
@@ -9,11 +7,14 @@ import {
 	Trash2,
 	Wind,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { getSessionById, deleteSession } from "@/api/sessions.api";
 import { ConfirmModal, SkeletonCard, Badge } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
+import { format } from "@/utils/helpers";
+import { localizedName } from "@/utils/libraryHelpers";
 
 const toUniqueMoodTokens = (moods, prefix) => {
 	const seen = {};
@@ -129,11 +130,11 @@ export default function SessionDetail() {
 		cfg.fallback ||
 		session.sessionType;
 	const sessionTitle =
-		session.sessionType === "vk_sequence" && session.vkSequence?.englishName
-			? session.vkSequence.englishName
+		session.sessionType === "vk_sequence" && session.vkSequence
+			? localizedName(session.vkSequence, lang)
 			: sessionTypeLabel;
 	const family = session.vkFamily
-		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
+		? VK_FAMILIES.find((f) => f.id === session.vkFamily)
 		: null;
 
 	return (

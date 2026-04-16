@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown, ChevronUp, Check, X, Wind } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, ChevronDown, ChevronUp, Search, Wind, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import SafetyBanner from "./SafetyBanner";
 
@@ -86,9 +86,8 @@ export default function BreathingPatternPicker({
 							{selected.romanizationName}
 						</p>
 						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-							{getRatioDisplay(selected)} ·{" "}
-							{formatHuman(selected.energyEffect)} ·{" "}
-							{t(`library.${selected.difficulty}`)}
+							{getRatioDisplay(selected)} · {formatHuman(selected.energyEffect)}{" "}
+							· {t(`library.${selected.difficulty}`)}
 						</p>
 					</div>
 				) : (
@@ -102,10 +101,7 @@ export default function BreathingPatternPicker({
 				{open ? (
 					<ChevronUp size={16} style={{ color: "var(--color-text-muted)" }} />
 				) : (
-					<ChevronDown
-						size={16}
-						style={{ color: "var(--color-text-muted)" }}
-					/>
+					<ChevronDown size={16} style={{ color: "var(--color-text-muted)" }} />
 				)}
 			</button>
 
@@ -127,10 +123,7 @@ export default function BreathingPatternPicker({
 							className="flex items-center gap-2 px-3 py-2 border-b"
 							style={{ borderColor: "var(--color-border-soft)" }}
 						>
-							<Search
-								size={14}
-								style={{ color: "var(--color-text-muted)" }}
-							/>
+							<Search size={14} style={{ color: "var(--color-text-muted)" }} />
 							<input
 								type="text"
 								value={search}
@@ -138,14 +131,10 @@ export default function BreathingPatternPicker({
 								placeholder={t("guided.search_patterns")}
 								className="flex-1 text-sm bg-transparent outline-none"
 								style={{ color: "var(--color-text-primary)" }}
-								autoFocus
 							/>
 							{search && (
 								<button type="button" onClick={() => setSearch("")}>
-									<X
-										size={14}
-										style={{ color: "var(--color-text-muted)" }}
-									/>
+									<X size={14} style={{ color: "var(--color-text-muted)" }} />
 								</button>
 							)}
 						</div>

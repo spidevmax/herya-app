@@ -2,109 +2,110 @@ const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000/api/v1";
 
 const VK_FAMILIES = [
 	{
-		key: "tadasana",
+		id: 1,
 		labelKey: "constants.family_tadasana",
 		label: "Tadasana",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-tadasana)",
 	},
 	{
-		key: "standing_asymmetric",
+		id: 2,
 		labelKey: "constants.family_standing_asymmetric",
 		label: "Standing Asymmetric",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-standing-asymmetric)",
 	},
 	{
-		key: "standing_symmetric",
+		id: 3,
 		labelKey: "constants.family_standing_symmetric",
 		label: "Standing Symmetric",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-standing-symmetric)",
 	},
 	{
-		key: "one_leg_standing",
+		id: 4,
 		labelKey: "constants.family_one_leg_standing",
 		label: "One Leg Standing",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-one-leg-standing)",
 	},
 	{
-		key: "seated",
+		id: 5,
 		labelKey: "constants.family_seated",
 		label: "Seated",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-seated)",
 	},
 	{
-		key: "supine",
+		id: 6,
 		labelKey: "constants.family_supine",
 		label: "Supine",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-supine)",
 	},
 	{
-		key: "prone",
+		id: 7,
 		labelKey: "constants.family_prone",
 		label: "Prone",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-prone)",
 	},
 	{
-		key: "inverted",
+		id: 8,
 		labelKey: "constants.family_inverted",
 		label: "Inverted",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-inverted)",
 	},
 	{
-		key: "meditative",
+		id: 9,
 		labelKey: "constants.family_meditative",
 		label: "Meditative",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-meditative)",
 	},
 	{
-		key: "bow_sequence",
+		id: 10,
 		labelKey: "constants.family_bow_sequence",
 		label: "Bow",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-bow-sequence)",
 	},
 	{
-		key: "triangle_sequence",
+		id: 11,
 		labelKey: "constants.family_triangle_sequence",
 		label: "Triangle",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-triangle-sequence)",
 	},
 	{
-		key: "sun_salutation",
+		id: 12,
 		labelKey: "constants.family_sun_salutation",
 		label: "Sun Salutation",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-sun-salutation)",
 	},
 	{
-		key: "vajrasana_variations",
+		id: 13,
 		labelKey: "constants.family_vajrasana_variations",
 		label: "Vajrasana",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-vajrasana-variations)",
 	},
 	{
-		key: "lotus_variations",
+		id: 14,
 		labelKey: "constants.family_lotus_variations",
 		label: "Lotus",
-		emoji: null,
+		emoji: "🧍",
 		color: "var(--color-family-lotus-variations)",
 	},
 ];
 
-const VK_FAMILY_MAP = Object.fromEntries(VK_FAMILIES.map((f) => [f.key, f]));
+const VK_FAMILY_MAP = Object.fromEntries(VK_FAMILIES.map((f) => [f.id, f]));
 
 const LEVEL_LABELS = { 1: "Beginner", 2: "Intermediate", 3: "Advanced" };
-export const LEVEL_LABEL_KEYS = {
+
+const LEVEL_LABEL_KEYS = {
 	1: "constants.level_1",
 	2: "constants.level_2",
 	3: "constants.level_3",
@@ -208,6 +209,7 @@ const SESSION_TYPES = [
 ];
 
 const DAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
 const DAY_LABEL_KEYS = [
 	"constants.day_sun",
 	"constants.day_mon",

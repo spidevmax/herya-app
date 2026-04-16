@@ -4,10 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { LEVEL_LABELS, LEVEL_LABEL_KEYS, VK_FAMILY_MAP } from "@/utils/constants";
+import { localizedName } from "@/utils/libraryHelpers";
 
 const HeroCard = ({ sequence, reason, loading }) => {
 	const navigate = useNavigate();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 
 	if (loading)
 		return <div className="rounded-3xl h-52 skeleton" />;
@@ -98,7 +99,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 				<h2
 					className="relative font-display text-2xl font-bold tracking-tight text-white leading-tight mb-1"
 				>
-					{sequence.englishName}
+					{localizedName(sequence, lang)}
 				</h2>
 				<p className="relative text-white/80 text-xs font-medium italic mb-4">
 					{sequence.sanskritName}

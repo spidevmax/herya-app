@@ -74,6 +74,7 @@ const breathingPatternSchema = new mongoose.Schema(
 			required: true,
 			trim: true,
 		},
+		descriptionEs: { type: String, trim: true },
 
 		// CLASSIFICATION
 		difficulty: {
@@ -256,8 +257,11 @@ const breathingPatternSchema = new mongoose.Schema(
 
 		// BENEFITS AND CONTRAINDICATIONS
 		benefits: [{ type: String, trim: true }],
+		benefitsEs: [{ type: String, trim: true }],
 		contraindications: [{ type: String, trim: true }],
+		contraindicationsEs: [{ type: String, trim: true }],
 		warnings: { type: String, trim: true },
+		warningsEs: { type: String, trim: true },
 
 		// VK CONTEXT
 		vkContext: {

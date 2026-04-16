@@ -107,7 +107,9 @@ const vkSequenceSchema = new mongoose.Schema(
 
 		sanskritName: { type: String, required: true, trim: true },
 		englishName: { type: String, required: true, trim: true },
+		spanishName: { type: String, trim: true },
 		description: { type: String, trim: true },
+		descriptionEs: { type: String, trim: true },
 
 		// VK STRUCTURE
 		structure: {
@@ -203,6 +205,7 @@ const vkSequenceSchema = new mongoose.Schema(
 				required: true,
 				trim: true,
 			},
+			primaryBenefitEs: { type: String, trim: true },
 
 			targetConditions: [{ type: String, trim: true }],
 

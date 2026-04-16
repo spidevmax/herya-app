@@ -1,26 +1,29 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { motion, AnimatePresence, Reorder } from "framer-motion";
+import { AnimatePresence, motion, Reorder } from "framer-motion";
 import {
-	Plus,
-	X,
-	Clock,
-	GripVertical,
+	AlertTriangle,
+	ArrowLeftRight,
+	BookOpen,
 	ChevronDown,
 	ChevronUp,
-	PersonStanding,
-	BookOpen,
-	Timer,
+	Clock,
+	GripVertical,
 	Minus,
-	ArrowLeftRight,
-	AlertTriangle,
+	PersonStanding,
+	Plus,
+	Timer,
+	X,
 } from "lucide-react";
-import { getSequences } from "@/api/sequences.api";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { getBreathingPatterns } from "@/api/breathing.api";
-import { useLanguage } from "@/context/LanguageContext";
+import { getSequences } from "@/api/sequences.api";
 import { Button } from "@/components/ui";
-import SequencePicker from "./SequencePicker";
+import { useLanguage } from "@/context/LanguageContext";
+import {
+	distributePoseTime,
+	formatPoseDuration,
+} from "@/utils/distributePoseTime";
 import BreathingPatternPicker from "./BreathingPatternPicker";
-import { distributePoseTime, formatPoseDuration } from "@/utils/distributePoseTime";
+import SequencePicker from "./SequencePicker";
 
 const MEDITATION_STYLES = [
 	"guided",
@@ -244,18 +247,26 @@ export default function SessionBuilder({
 		}
 	};
 
-	const canStart = blocks.length > 0 && blocks.every((block) => {
-		if (!isBlockConfigured(block)) return false;
-		// VK blocks must have a valid duration
-		if (block.blockType === "vk_sequence" && (!block.durationMinutes || block.durationMinutes <= 0)) {
-			return false;
-		}
-		// Pranayama blocks must have a computable duration > 0
-		if (block.blockType === "pranayama" && getEffectiveBlockDurationMinutes(block) <= 0) {
-			return false;
-		}
-		return true;
-	});
+	const canStart =
+		blocks.length > 0 &&
+		blocks.every((block) => {
+			if (!isBlockConfigured(block)) return false;
+			// VK blocks must have a valid duration
+			if (
+				block.blockType === "vk_sequence" &&
+				(!block.durationMinutes || block.durationMinutes <= 0)
+			) {
+				return false;
+			}
+			// Pranayama blocks must have a computable duration > 0
+			if (
+				block.blockType === "pranayama" &&
+				getEffectiveBlockDurationMinutes(block) <= 0
+			) {
+				return false;
+			}
+			return true;
+		});
 
 	const handleStart = () => {
 		if (!canStart) return;
@@ -522,24 +533,19 @@ function BlockCard({
 					{index + 1}. {blockTypeLabel(block.blockType)}
 				</span>
 
-				{/* Guided toggle */}
-				<button
-					type="button"
-					onClick={() => onUpdate({ guided: !block.guided })}
-					className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold transition"
+				{/* Siempre guiado */}
+				<span
+					className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
 					style={{
-						backgroundColor: block.guided
-							? `${color}15`
-							: "var(--color-surface)",
-						color: block.guided ? color : "var(--color-text-muted)",
-						border: `1px solid ${block.guided ? color : "var(--color-border-soft)"}`,
+						backgroundColor: `${color}15`,
+						color,
+						border: `1px solid ${color}`,
 					}}
-					aria-pressed={block.guided}
-					title={block.guided ? t("guided.mode_guided") : t("guided.mode_free")}
+					title={t("guided.mode_guided")}
 				>
-					{block.guided ? <BookOpen size={10} /> : <Timer size={10} />}
-					{block.guided ? t("guided.guided") : t("guided.free")}
-				</button>
+					<BookOpen size={10} />
+					{t("guided.guided")}
+				</span>
 
 				<span
 					className="ml-auto text-xs font-medium"
@@ -600,13 +606,18 @@ function BlockCard({
 									{vkDistribution && vkDistribution.poses.length > 0 && (
 										<VKPoseBreakdown
 											distribution={vkDistribution}
-											distributionMode={block.config?.distributionMode || "auto"}
+											distributionMode={
+												block.config?.distributionMode || "auto"
+											}
 											onChangeMode={(mode) =>
 												onUpdate({
 													config: {
 														...block.config,
 														distributionMode: mode,
-														manualOverrides: mode === "manual" ? (block.config?.manualOverrides || {}) : {},
+														manualOverrides:
+															mode === "manual"
+																? block.config?.manualOverrides || {}
+																: {},
 													},
 												})
 											}
@@ -923,8 +934,12 @@ function VKPoseBreakdown({
 									onClick={() => onChangeMode(mode)}
 									className="px-2 py-0.5 rounded-md text-[10px] font-semibold transition"
 									style={{
-										backgroundColor: distributionMode === mode ? color : "transparent",
-										color: distributionMode === mode ? "white" : "var(--color-text-muted)",
+										backgroundColor:
+											distributionMode === mode ? color : "transparent",
+										color:
+											distributionMode === mode
+												? "white"
+												: "var(--color-text-muted)",
 									}}
 								>
 									{t(`practice.dist_${mode}`)}
@@ -960,9 +975,7 @@ function VKPoseBreakdown({
 						key={p.index}
 						className="flex items-center gap-2 px-2 py-1.5 rounded-lg"
 						style={{
-							backgroundColor: p.manual
-								? `${color}08`
-								: "transparent",
+							backgroundColor: p.manual ? `${color}08` : "transparent",
 						}}
 					>
 						{/* Pose name */}
@@ -992,7 +1005,9 @@ function VKPoseBreakdown({
 							<div className="flex items-center gap-1">
 								<button
 									type="button"
-									onClick={() => onManualOverride(p.index, Math.max(12, p.totalSec - 5))}
+									onClick={() =>
+										onManualOverride(p.index, Math.max(12, p.totalSec - 5))
+									}
 									className="w-5 h-5 rounded flex items-center justify-center"
 									style={{
 										backgroundColor: "var(--color-surface-card)",
@@ -1022,10 +1037,7 @@ function VKPoseBreakdown({
 								</button>
 							</div>
 						) : (
-							<span
-								className="text-xs font-bold"
-								style={{ color }}
-							>
+							<span className="text-xs font-bold" style={{ color }}>
 								{formatPoseDuration(p.totalSec)}
 							</span>
 						)}

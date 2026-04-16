@@ -1,20 +1,20 @@
-import { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-	ClipboardList,
 	ChevronLeft,
 	ChevronRight,
+	ClipboardList,
 	Leaf,
 	PersonStanding,
 	Star,
 	Wind,
 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getSessions } from "@/api/sessions.api";
 import { FilterChips, SkeletonCard, EmptyState } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { format } from "@/utils/helpers";
 import { VK_FAMILIES } from "@/utils/constants";
+import { format } from "@/utils/helpers";
 import { colorMix } from "@/utils/libraryHelpers";
 
 const TYPE_ICONS = {
@@ -31,7 +31,14 @@ const TYPE_COLORS = {
 	complete_practice: "var(--color-warning)",
 };
 
-const TYPE_FILTER_KEYS = ["", "vk_sequence", "pranayama", "meditation", "complete_practice"];
+const TYPE_FILTER_KEYS = [
+	"",
+	"vk_sequence",
+	"pranayama",
+	"meditation",
+	"complete_practice",
+];
+
 const TYPE_FILTER_I18N = {
 	"": "session_history.filter_all",
 	vk_sequence: "session_history.filter_vk",
@@ -43,7 +50,10 @@ const TYPE_FILTER_I18N = {
 function SessionCard({ session, index, onClick, t, lang }) {
 	const color = TYPE_COLORS[session.sessionType] || "var(--color-primary)";
 	const TypeIcon = TYPE_ICONS[session.sessionType] || PersonStanding;
-	const label = t(TYPE_FILTER_I18N[session.sessionType] || `practice.type_${session.sessionType}`);
+	const label = t(
+		TYPE_FILTER_I18N[session.sessionType] ||
+			`practice.type_${session.sessionType}`,
+	);
 	const family = session.vkFamily
 		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
 		: null;

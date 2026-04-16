@@ -7,9 +7,10 @@ import {
 	getMonogram,
 	getSequencePoseCount,
 	colorMix,
+	translateWithFallback,
+	localized,
 } from "@/utils/libraryHelpers";
 import { useLanguage } from "@/context/LanguageContext";
-import { translateWithFallback } from "@/utils/libraryHelpers";
 
 const StatBox = ({ value, label, bg, color }) => (
 	<div
@@ -32,25 +33,32 @@ const StatBox = ({ value, label, bg, color }) => (
 );
 
 const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const tr = (key, fallback) => translateWithFallback(t, key, fallback);
 
 	const palette = getPalette(item, type);
 	const borderColor = palette.border;
-	const title = getCardTitle(item, fallbackItemLabel);
+	const title = getCardTitle(item, fallbackItemLabel, lang);
 	const subtitle = getCardSubtitle(item);
 	const monogram = getMonogram(title) || typeLabel.slice(0, 2).toUpperCase();
 	const imageSrc =
 		item.image || item.media?.thumbnail?.url || item.media?.images?.[0]?.url;
 
+	const translateDifficulty = (d) => d ? tr(`library.${d}`, d) : "—";
+	const translateFamily = (f) => f ? tr(`library.families.${f}`, String(f).replace(/_/g, " ")) : "—";
+	const translateCategory = (c) => {
+		if (!c) return "—";
+		const cat = Array.isArray(c) ? c[0] : c;
+		return cat ? tr(`library.categories.${cat}`, String(cat).replace(/_/g, " ")) : "—";
+	};
+	const translateEffect = (e) => e ? tr(`library.effects.${e}`, e) : "—";
+
 	const stats =
 		type === "sequences"
 			? [
-					{ value: item.level ?? "—", label: tr("library.stat_level", "LEVEL") },
+					{ value: tr(`library.level_${item.level}`, item.level ?? "—"), label: tr("library.stat_level", "LEVEL") },
 					{
-						value: item.family
-							? String(item.family).replace(/_/g, " ").toUpperCase()
-							: "—",
+						value: translateFamily(item.family),
 						label: tr("library.stat_family", "FAMILY"),
 					},
 					{
@@ -61,21 +69,21 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 			: type === "poses"
 				? [
 						{
-							value: item.difficulty ?? "—",
+							value: translateDifficulty(item.difficulty),
 							label: tr("library.stat_level", "LEVEL"),
 						},
 						{
-							value: item.poseType ?? item.category ?? "—",
+							value: translateCategory(item.poseType ?? item.category),
 							label: tr("library.stat_type", "TYPE"),
 						},
 					]
 				: [
 						{
-							value: item.energyEffect ?? "—",
+							value: translateEffect(item.energyEffect),
 							label: tr("library.stat_effect", "EFFECT"),
 						},
 						{
-							value: item.breathType ?? item.category ?? "—",
+							value: translateCategory(item.breathType ?? item.category),
 							label: tr("library.stat_type", "TYPE"),
 						},
 					];
@@ -146,12 +154,12 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 								{subtitle}
 							</p>
 						)}
-						{item.description && (
+						{(localized(item, "description", lang) || item.description) && (
 							<p
 								className="mt-1 line-clamp-2 text-xs leading-snug"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
-								{item.description}
+								{localized(item, "description", lang)}
 							</p>
 						)}
 					</div>
