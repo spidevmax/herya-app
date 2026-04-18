@@ -29,18 +29,103 @@ const SENSATIONS = [
 
 const AUTO_NAVIGATE_DELAY = 2500;
 
+const CARD_STYLE = {
+	border: "1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
+	background:
+		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 94%, white 6%) 0%, var(--color-surface-card) 100%)",
+};
+
+const SOFT_PANEL_STYLE = {
+	border: "1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+	background:
+		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+};
+
 const SensationChip = ({ label, active, onToggle }) => {
 	return (
 		<button
 			type="button"
 			onClick={onToggle}
 			aria-pressed={active}
-			className={`px-3 py-1.5 rounded-xl text-xs font-semibold border-2 transition-all ${active ? "bg-[var(--color-primary)] text-white border-[var(--color-primary)]" : "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border-[var(--color-border-soft)]"}`}
+			className="px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 hover:-translate-y-0.5"
+			style={{
+				background: active
+					? "linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%)"
+					: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+				color: active ? "white" : "var(--color-text-secondary)",
+				borderColor: active
+					? "var(--color-primary)"
+					: "color-mix(in srgb, var(--color-border-soft) 75%, transparent)",
+				boxShadow: active
+					? "0 10px 24px rgba(32, 73, 158, 0.14)"
+					: "none",
+			}}
 		>
 			{label}
 		</button>
 	);
 };
+
+const JournalCard = ({ title, subtitle = null, children }) => (
+	<section className="rounded-[28px] p-5 shadow-[var(--shadow-card)] sm:p-6" style={CARD_STYLE}>
+		<div className="mb-4">
+			<h2 className="m-0 font-display text-2xl font-bold text-[var(--color-text-primary)]">
+				{title}
+			</h2>
+			{subtitle && (
+				<p className="mt-1 mb-0 text-sm text-[var(--color-text-muted)]">
+					{subtitle}
+				</p>
+			)}
+		</div>
+		{children}
+	</section>
+);
+
+const SliderPanel = ({
+	id,
+	label,
+	value,
+	onChange,
+	accent,
+	lowLabel,
+	highLabel,
+}) => (
+	<div className="rounded-2xl p-4" style={SOFT_PANEL_STYLE}>
+		<div className="mb-3 flex items-center justify-between gap-3">
+			<label
+				htmlFor={id}
+				className="text-sm font-semibold text-[var(--color-text-primary)]"
+			>
+				{label}
+			</label>
+			<span
+				className="min-w-[56px] rounded-full px-2.5 py-1 text-center text-xs font-bold"
+				style={{
+					backgroundColor: `color-mix(in srgb, ${accent} 14%, white 86%)`,
+					color: accent,
+				}}
+			>
+				{value}/10
+			</span>
+		</div>
+		<input
+			id={id}
+			type="range"
+			min={1}
+			max={10}
+			value={value}
+			aria-label={label}
+			onChange={onChange}
+			className="w-full"
+			style={{ accentColor: accent }}
+		/>
+		<div className="mt-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
+			<span>{lowLabel}</span>
+			<span>{highLabel}</span>
+		</div>
+	</div>
+);
 
 const SuccessOverlay = ({ onDone, t }) => {
 	useEffect(() => {
@@ -291,101 +376,81 @@ const JournalForm = () => {
 				)}
 			</AnimatePresence>
 
-			<div className="flex flex-col pt-4 pb-28">
-				<div className="flex items-center gap-3 px-4 mb-6">
+			<div className="flex flex-col pt-4 pb-36">
+				<div className="flex items-center gap-4 px-4 mb-6">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
 						aria-label={t("ui.go_back")}
-						className="flex h-9 w-9 items-center justify-center rounded-full bg-[var(--color-surface-card)] shadow-sm"
+						className="flex h-12 w-12 items-center justify-center rounded-full shadow-[var(--shadow-card)]"
+						style={SOFT_PANEL_STYLE}
 					>
 						<ChevronLeft
-							size={20}
+							size={24}
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
-					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
-						{isEdit
-							? t("journal_form.edit_title")
-							: t("journal_form.new_title")}
-					</h1>
+					<div>
+						<h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+							{isEdit
+								? t("journal_form.edit_title")
+								: t("journal_form.new_title")}
+						</h1>
+						<p className="m-0 text-sm text-[var(--color-text-muted)]">
+							Review your state before and after practice in one place.
+						</p>
+					</div>
 				</div>
 
 				<div className="px-4 flex flex-col gap-6">
 					{/* Before section */}
-					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3 className="mb-4 font-display font-bold text-[var(--color-text-primary)]">
-							{t("journal_form.before")}
-						</h3>
+					<JournalCard
+						title={t("journal_form.before")}
+						subtitle="Capture how you arrived to the practice."
+					>
 						<MoodSelector
 							value={form.moodBefore}
 							onChange={(v) => setForm((f) => ({ ...f, moodBefore: v }))}
 							label={t("journal_form.how_feeling")}
 						/>
-						<div className="mt-4">
-							<label
-								htmlFor="energy-before"
-								className="flex items-center justify-between mb-2"
-							>
-								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-									{t("journal_form.energy")}
-								</span>
-								<span className="text-sm font-bold text-[var(--color-primary)]">
-									{form.energyBefore}/10
-								</span>
-							</label>
-							<input
+						<div className="mt-5 grid gap-4 lg:grid-cols-2">
+							<SliderPanel
 								id="energy-before"
-								type="range"
-								min={1}
-								max={10}
+								label={t("journal_form.energy")}
 								value={form.energyBefore}
-								aria-label={t("journal_form.energy")}
 								onChange={(e) =>
 									setForm((f) => ({
 										...f,
 										energyBefore: Number(e.target.value),
 									}))
 								}
-								className="w-full accent-[var(--color-primary)]"
+								accent="var(--color-primary)"
+								lowLabel="Low"
+								highLabel="High"
 							/>
-						</div>
-						<div className="mt-4">
-							<label
-								htmlFor="stress-before"
-								className="flex items-center justify-between mb-2"
-							>
-								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-									{t("journal_form.stress")}
-								</span>
-								<span className="text-sm font-bold text-[var(--color-danger)]">
-									{form.stressBefore}/10
-								</span>
-							</label>
-							<input
+							<SliderPanel
 								id="stress-before"
-								type="range"
-								min={1}
-								max={10}
+								label={t("journal_form.stress")}
 								value={form.stressBefore}
-								aria-label={t("journal_form.stress")}
 								onChange={(e) =>
 									setForm((f) => ({
 										...f,
 										stressBefore: Number(e.target.value),
 									}))
 								}
-								className="w-full accent-[var(--color-danger)]"
+								accent="var(--color-danger)"
+								lowLabel="Soft"
+								highLabel="Intense"
 							/>
 						</div>
-					</div>
+					</JournalCard>
 
 					{/* Sensations */}
-					<fieldset className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)] border-none">
-						<legend className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
-							{t("journal_form.sensations")}
-						</legend>
-						<div className="flex flex-wrap gap-2">
+					<JournalCard
+						title={t("journal_form.sensations")}
+						subtitle="Mark the sensations that stood out most in your body."
+					>
+						<div className="flex flex-wrap gap-2.5">
 							{SENSATIONS.map((s) => (
 								<SensationChip
 									key={s}
@@ -395,13 +460,16 @@ const JournalForm = () => {
 								/>
 							))}
 						</div>
-					</fieldset>
+					</JournalCard>
 
 					{/* Reflection */}
-					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
+					<JournalCard
+						title={t("journal_form.reflection")}
+						subtitle="Write down what feels emotionally present."
+					>
 						<label
 							htmlFor="reflection"
-							className="block mb-3 font-display font-bold text-[var(--color-text-primary)]"
+							className="sr-only"
 						>
 							{t("journal_form.reflection")}
 						</label>
@@ -413,15 +481,19 @@ const JournalForm = () => {
 							}
 							placeholder={t("journal_form.reflection_placeholder")}
 							rows={4}
-							className="w-full resize-none rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							style={SOFT_PANEL_STYLE}
 						/>
-					</div>
+					</JournalCard>
 
 					{/* Insights */}
-					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
+					<JournalCard
+						title={t("journal_form.insights")}
+						subtitle="Keep one or two key learnings from the practice."
+					>
 						<label
 							htmlFor="insights"
-							className="block mb-3 font-display font-bold text-[var(--color-text-primary)]"
+							className="sr-only"
 						>
 							{t("journal_form.insights")}
 						</label>
@@ -433,85 +505,67 @@ const JournalForm = () => {
 							}
 							placeholder={t("journal_form.insights_placeholder")}
 							rows={3}
-							className="w-full resize-none rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-3 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							style={SOFT_PANEL_STYLE}
 						/>
-					</div>
+					</JournalCard>
 
 					{/* After section */}
-					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3 className="mb-4 font-display font-bold text-[var(--color-text-primary)]">
-							{t("journal_form.after")}
-						</h3>
+					<JournalCard
+						title={t("journal_form.after")}
+						subtitle="Notice what shifted once the practice ended."
+					>
 						<MoodSelector
 							value={form.moodAfter}
 							onChange={(v) => setForm((f) => ({ ...f, moodAfter: v }))}
 							label={t("journal_form.how_feeling_after")}
 							options={MOOD_AFTER_OPTIONS}
 						/>
-						<div className="mt-4">
-							<label
-								htmlFor="energy-after"
-								className="flex items-center justify-between mb-2"
-							>
-								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-									{t("journal_form.energy_after")}
-								</span>
-								<span className="text-sm font-bold text-[var(--color-primary)]">
-									{form.energyAfter ?? 5}/10
-								</span>
-							</label>
-							<input
+						<div className="mt-5 grid gap-4 lg:grid-cols-2">
+							<SliderPanel
 								id="energy-after"
-								type="range"
-								min={1}
-								max={10}
+								label={t("journal_form.energy_after")}
 								value={form.energyAfter ?? 5}
-								aria-label={t("journal_form.energy_after")}
 								onChange={(e) =>
 									setForm((f) => ({
 										...f,
 										energyAfter: Number(e.target.value),
 									}))
 								}
-								className="w-full accent-[var(--color-primary)]"
+								accent="var(--color-primary)"
+								lowLabel="Low"
+								highLabel="High"
 							/>
-						</div>
-						<div className="mt-4">
-							<label
-								htmlFor="stress-after"
-								className="flex items-center justify-between mb-2"
-							>
-								<span className="text-sm font-semibold text-[var(--color-text-primary)]">
-									{t("journal_form.stress_after")}
-								</span>
-								<span className="text-sm font-bold text-[var(--color-danger)]">
-									{form.stressAfter ?? 5}/10
-								</span>
-							</label>
-							<input
+							<SliderPanel
 								id="stress-after"
-								type="range"
-								min={1}
-								max={10}
+								label={t("journal_form.stress_after")}
 								value={form.stressAfter ?? 5}
-								aria-label={t("journal_form.stress_after")}
 								onChange={(e) =>
 									setForm((f) => ({
 										...f,
 										stressAfter: Number(e.target.value),
 									}))
 								}
-								className="w-full accent-[var(--color-danger)]"
+								accent="var(--color-danger)"
+								lowLabel="Soft"
+								highLabel="Intense"
 							/>
 						</div>
-					</div>
+					</JournalCard>
 
 					{/* Photos */}
-					<div className="rounded-3xl bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)]">
-						<h3 className="mb-3 font-display font-bold text-[var(--color-text-primary)]">
-							{t("journal_form.photos")}
-						</h3>
-						<label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[var(--color-border-soft)] p-6 transition hover:border-[var(--color-primary)]">
+					<JournalCard
+						title={t("journal_form.photos")}
+						subtitle="Optional snapshots that help you remember the context."
+					>
+						<label
+							className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[24px] p-6 transition hover:border-[var(--color-primary)]"
+							style={{
+								...SOFT_PANEL_STYLE,
+								borderStyle: "dashed",
+								borderWidth: "2px",
+							}}
+						>
 							<Camera size={32} style={{ color: "var(--color-primary)" }} />
 							<p className="text-sm text-[var(--color-text-secondary)]">
 								{t("journal_form.photos_hint")}
@@ -565,7 +619,7 @@ const JournalForm = () => {
 								})}
 							</div>
 						)}
-					</div>
+					</JournalCard>
 				</div>
 			</div>
 
@@ -620,16 +674,26 @@ const JournalForm = () => {
 			<motion.div
 				initial={{ y: 80 }}
 				animate={{ y: 0 }}
-				className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-[430px] px-4"
+				className="fixed bottom-6 left-1/2 z-20 -translate-x-1/2 w-full max-w-[560px] px-4"
 			>
-				<Button
-					size="lg"
-					className="w-full"
-					onClick={handleSave}
-					loading={loading}
+				<div
+					className="rounded-[28px] p-3 shadow-[0_18px_44px_rgba(20,38,74,0.16)] backdrop-blur-sm"
+					style={{
+						background:
+							"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 90%, white 10%) 0%, color-mix(in srgb, var(--color-surface-card) 96%, transparent) 100%)",
+						border:
+							"1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
+					}}
 				>
-					{isEdit ? t("journal_form.save_changes") : t("journal_form.save")}
-				</Button>
+					<Button
+						size="lg"
+						className="w-full"
+						onClick={handleSave}
+						loading={loading}
+					>
+						{isEdit ? t("journal_form.save_changes") : t("journal_form.save")}
+					</Button>
+				</div>
 			</motion.div>
 		</>
 	);

@@ -304,15 +304,25 @@ export const MoodSelector = ({ value, onChange, label, options, maxSelection = 5
 		<fieldset className="flex flex-col gap-3 m-0 p-0 border-0">
 			{label && (
 				<header className="flex items-center justify-between">
-					<legend className="text-sm font-medium text-[var(--color-text-primary)] p-0">
+					<legend className="text-base font-semibold text-[var(--color-text-primary)] p-0 tracking-[-0.01em]">
 						{label}
 					</legend>
-					<p className="text-xs text-[var(--color-text-muted)]" aria-live="polite">
+					<p
+						className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+						style={{
+							color: "var(--color-text-muted)",
+							backgroundColor:
+								"color-mix(in srgb, var(--color-surface) 88%, white 12%)",
+							border:
+								"1px solid color-mix(in srgb, var(--color-border-soft) 70%, transparent)",
+						}}
+						aria-live="polite"
+					>
 						{selected.length}/{maxSelection}
 					</p>
 				</header>
 			)}
-			<ul className="grid grid-cols-4 gap-2 list-none m-0 p-0">
+			<ul className="grid grid-cols-2 gap-3 list-none m-0 p-0 md:grid-cols-3 xl:grid-cols-4">
 				{moods.map((mood) => {
 					const MoodIcon = MOOD_ICONS[mood] || Circle;
 					const isSelected = selected.includes(mood);
@@ -321,23 +331,47 @@ export const MoodSelector = ({ value, onChange, label, options, maxSelection = 5
 						<li key={mood}>
 							<motion.button
 								type="button"
-								onClick={() => toggle(mood)}
-								disabled={isDisabled}
-								aria-pressed={isSelected}
-								whileHover={isDisabled ? {} : { scale: 1.05 }}
-								whileTap={isDisabled ? {} : { scale: 0.95 }}
-								className={`w-full flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
+							onClick={() => toggle(mood)}
+							disabled={isDisabled}
+							aria-pressed={isSelected}
+							whileHover={isDisabled ? {} : { y: -2, scale: 1.01 }}
+							whileTap={isDisabled ? {} : { scale: 0.985 }}
+							className="w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[22px] transition-all text-sm font-medium min-h-[120px]"
+							style={{
+								background: isSelected
+									? "linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%)"
+									: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 92%, white 8%) 0%, var(--color-surface-card) 100%)",
+								color: isSelected
+									? "white"
+									: isDisabled
+										? "var(--color-text-muted)"
+										: "var(--color-text-secondary)",
+								border: `1px solid ${
 									isSelected
-										? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
-										: isDisabled
-											? "bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border border-[var(--color-border-soft)] opacity-40 cursor-not-allowed"
-											: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
-								}`}
+										? "color-mix(in srgb, var(--color-primary) 80%, black 20%)"
+										: "color-mix(in srgb, var(--color-border-soft) 72%, transparent)"
+								}`,
+								boxShadow: isSelected
+									? "0 16px 36px rgba(32, 73, 158, 0.18)"
+									: "0 8px 20px rgba(25, 40, 72, 0.04)",
+								opacity: isDisabled ? 0.4 : 1,
+								cursor: isDisabled ? "not-allowed" : "pointer",
+							}}
 							>
-								<span aria-hidden="true" className="mb-1">
-									<MoodIcon size={20} strokeWidth={2.2} />
+								<span
+									aria-hidden="true"
+									className="flex h-11 w-11 items-center justify-center rounded-full"
+									style={{
+										backgroundColor: isSelected
+											? "rgba(255,255,255,0.16)"
+											: "color-mix(in srgb, var(--color-primary) 6%, white 94%)",
+									}}
+								>
+									<MoodIcon size={22} strokeWidth={2.2} />
 								</span>
-								<span>{t(`session.moods.${mood}`)}</span>
+								<span className="capitalize text-center leading-tight">
+									{t(`session.moods.${mood}`)}
+								</span>
 							</motion.button>
 						</li>
 					);
