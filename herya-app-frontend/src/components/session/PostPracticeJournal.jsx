@@ -35,6 +35,111 @@ const SENSATION_OPTIONS = [
 const VALID_MOOD_BEFORE = new Set(MOOD_OPTIONS);
 const VALID_MOOD_AFTER = new Set(MOOD_AFTER_OPTIONS);
 
+function JournalSection({
+	title,
+	subtitle = null,
+	children,
+	tone = "default",
+}) {
+	const toneStyles = {
+		default: {
+			border: "1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
+			background:
+				"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 94%, white 6%) 0%, var(--color-surface-card) 100%)",
+		},
+		soft: {
+			border: "1px solid color-mix(in srgb, var(--color-secondary) 12%, var(--color-border-soft) 88%)",
+			background:
+				"linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 5%, var(--color-surface-card) 95%) 0%, var(--color-surface-card) 100%)",
+		},
+	};
+
+	return (
+		<section
+			className="rounded-[28px] p-5 sm:p-6"
+			style={toneStyles[tone] || toneStyles.default}
+		>
+			<div className="mb-4 flex items-start justify-between gap-4">
+				<div>
+					<h3
+						className="m-0 text-lg font-semibold tracking-[-0.01em]"
+						style={{ color: "var(--color-text-primary)" }}
+					>
+						{title}
+					</h3>
+					{subtitle && (
+						<p
+							className="mt-1 text-sm m-0"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{subtitle}
+						</p>
+					)}
+				</div>
+			</div>
+			{children}
+		</section>
+	);
+}
+
+function PostPracticeSlider({
+	id,
+	label,
+	value,
+	onChange,
+	accent,
+	trackTint,
+	lowLabel,
+	highLabel,
+}) {
+	return (
+		<div
+			className="rounded-2xl p-4"
+			style={{
+				background:
+					"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+				border: "1px solid color-mix(in srgb, var(--color-border-soft) 70%, transparent)",
+			}}
+		>
+			<div className="mb-3 flex items-center justify-between gap-3">
+				<label
+					htmlFor={id}
+					className="text-sm font-medium"
+					style={{ color: "var(--color-text-primary)" }}
+				>
+					{label}
+				</label>
+				<span
+					className="min-w-[52px] rounded-full px-2.5 py-1 text-center text-xs font-semibold"
+					style={{
+						backgroundColor: trackTint,
+						color: accent,
+					}}
+				>
+					{value}/10
+				</span>
+			</div>
+			<input
+				id={id}
+				type="range"
+				min={1}
+				max={10}
+				value={value}
+				onChange={onChange}
+				className="w-full"
+				style={{ accentColor: accent }}
+			/>
+			<div
+				className="mt-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.08em]"
+				style={{ color: "var(--color-text-muted)" }}
+			>
+				<span>{lowLabel}</span>
+				<span>{highLabel}</span>
+			</div>
+		</div>
+	);
+}
+
 export default function PostPracticeJournal({
 	sessionSummary,
 	checkInData,
@@ -273,18 +378,19 @@ export default function PostPracticeJournal({
 			</section>
 
 			{/* Mood after */}
-			<fieldset
-				className="rounded-2xl p-5 border-0"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
-			>
-				<legend
-					className="text-sm font-medium mb-3"
-					style={{ color: "var(--color-text-primary)" }}
-				>
-					{isTutorMode
+			<JournalSection
+				title={
+					isTutorMode
 						? t("practice.checkout_signal")
-						: t("practice.journal_mood_after")}
-				</legend>
+						: t("practice.journal_mood_after")
+				}
+				subtitle={
+					isTutorMode
+						? null
+						: "Choose up to three words that best match your state right now."
+				}
+				tone="soft"
+			>
 				{isTutorMode ? (
 					<div className="grid grid-cols-3 gap-2">
 						{["green", "yellow", "red"].map((signal) => {
@@ -324,7 +430,7 @@ export default function PostPracticeJournal({
 						})}
 					</div>
 				) : (
-					<div className="flex flex-wrap gap-2">
+					<div className="flex flex-wrap gap-2.5">
 						{MOOD_AFTER_OPTIONS.map((m) => {
 							const selected = moodAfter.includes(m);
 							const color = getMoodColor(m);
@@ -333,10 +439,16 @@ export default function PostPracticeJournal({
 									type="button"
 									key={m}
 									onClick={() => toggleMood(m)}
-									className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
+									className="px-4 py-2 rounded-full text-sm font-semibold capitalize transition-transform duration-200 hover:-translate-y-0.5"
 									style={{
-										backgroundColor: selected ? color : "var(--color-surface)",
+										background: selected
+											? `linear-gradient(135deg, ${color} 0%, color-mix(in srgb, ${color} 82%, black 18%) 100%)`
+											: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
 										color: selected ? "white" : "var(--color-text-secondary)",
+										border: `1px solid ${selected ? color : "color-mix(in srgb, var(--color-border-soft) 75%, transparent)"}`,
+										boxShadow: selected
+											? "0 10px 24px rgba(25, 40, 72, 0.12)"
+											: "none",
 									}}
 								>
 									{t(`session.moods.${m}`)}
@@ -345,90 +457,78 @@ export default function PostPracticeJournal({
 						})}
 					</div>
 				)}
-			</fieldset>
+			</JournalSection>
 
 			{/* Energy & Stress */}
 			{!isTutorMode && (
-				<section
-					aria-label={t("practice.journal_energy_after", { n: energyAfter })}
-					className="rounded-2xl p-5 flex flex-col gap-4"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
+				<JournalSection
+					title="Body Check"
+					subtitle="A quick read of your current energy and nervous system load."
 				>
-					<div>
-						<label
-							htmlFor="post-practice-energy"
-							className="text-sm font-medium mb-2 block"
-							style={{ color: "var(--color-text-primary)" }}
-						>
-							{t("practice.journal_energy_after", { n: energyAfter })}
-						</label>
-						<input
+					<section
+						aria-label={t("practice.journal_energy_after", { n: energyAfter })}
+						className="grid gap-4 lg:grid-cols-2"
+					>
+						<PostPracticeSlider
 							id="post-practice-energy"
-							type="range"
-							min={1}
-							max={10}
+							label={t("practice.journal_energy_after", { n: energyAfter })}
 							value={energyAfter}
 							onChange={(e) => setEnergyAfter(+e.target.value)}
-							className="w-full"
-							style={{ accentColor: "var(--color-secondary)" }}
+							accent="var(--color-secondary)"
+							trackTint="color-mix(in srgb, var(--color-secondary) 14%, white 86%)"
+							lowLabel="Low"
+							highLabel="High"
 						/>
-					</div>
-					<div>
-						<label
-							htmlFor="post-practice-stress"
-							className="text-sm font-medium mb-2 block"
-							style={{ color: "var(--color-text-primary)" }}
-						>
-							{t("practice.journal_stress_after", { n: stressAfter })}
-						</label>
-						<input
+						<PostPracticeSlider
 							id="post-practice-stress"
-							type="range"
-							min={1}
-							max={10}
+							label={t("practice.journal_stress_after", { n: stressAfter })}
 							value={stressAfter}
 							onChange={(e) => setStressAfter(+e.target.value)}
-							className="w-full"
-							style={{ accentColor: "var(--color-accent)" }}
+							accent="var(--color-accent)"
+							trackTint="color-mix(in srgb, var(--color-accent) 14%, white 86%)"
+							lowLabel="Soft"
+							highLabel="Intense"
 						/>
-					</div>
-				</section>
+					</section>
+				</JournalSection>
 			)}
 
 			{/* Physical sensations */}
 			{!isTutorMode && (
-				<fieldset
-					className="rounded-2xl p-5 border-0"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
+				<JournalSection
+					title={t("practice.journal_sensations")}
+					subtitle="Notice the clearest body sensations that are present after practice."
 				>
-					<legend
-						className="text-sm font-medium mb-3"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{t("practice.journal_sensations")}
-					</legend>
-					<div className="flex flex-wrap gap-2">
+					<div className="flex flex-wrap gap-2.5">
 						{SENSATION_OPTIONS.map((s) => (
 							<button
 								type="button"
 								key={s}
 								aria-pressed={physicalSensations.includes(s)}
 								onClick={() => toggleSensation(s)}
-								className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
+								className="px-4 py-2 rounded-full text-sm font-semibold capitalize transition-transform duration-200 hover:-translate-y-0.5"
 								style={{
-									backgroundColor: physicalSensations.includes(s)
-										? "var(--color-accent)"
-										: "var(--color-surface)",
+									background: physicalSensations.includes(s)
+										? "linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 82%, black 18%) 100%)"
+										: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
 									color: physicalSensations.includes(s)
 										? "white"
 										: "var(--color-text-secondary)",
+									border: `1px solid ${
+										physicalSensations.includes(s)
+											? "var(--color-accent)"
+											: "color-mix(in srgb, var(--color-border-soft) 75%, transparent)"
+									}`,
+									boxShadow: physicalSensations.includes(s)
+										? "0 10px 24px rgba(25, 40, 72, 0.12)"
+										: "none",
 								}}
 							>
 								{t(`practice.sensation_${s}`)}
 							</button>
 						))}
 					</div>
-				</fieldset>
+				</JournalSection>
 			)}
 
 			{/* Free-form notes */}
