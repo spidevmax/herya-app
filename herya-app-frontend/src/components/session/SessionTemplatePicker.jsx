@@ -112,14 +112,15 @@ export default function SessionTemplatePicker({
 	if (!visible) return null;
 
 	return (
-		<div
+		<section
+			aria-label={t("practice.templates_title")}
 			className="rounded-2xl p-4"
 			style={{
 				backgroundColor: "var(--color-surface-card)",
 				border: "1px solid var(--color-border-soft)",
 			}}
 		>
-			<div className="flex items-center justify-between mb-3">
+			<header className="flex items-center justify-between mb-3">
 				<p
 					className="text-[10px] font-bold uppercase tracking-[0.1em]"
 					style={{ color: "var(--color-text-muted)" }}
@@ -142,7 +143,7 @@ export default function SessionTemplatePicker({
 						{t("practice.save_template")}
 					</button>
 				)}
-			</div>
+			</header>
 
 			{/* Save form */}
 			<AnimatePresence>
@@ -246,6 +247,6 @@ export default function SessionTemplatePicker({
 					))}
 				</div>
 			)}
-		</div>
+		</section>
 	);
 }

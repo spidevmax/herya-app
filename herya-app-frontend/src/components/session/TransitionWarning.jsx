@@ -68,28 +68,28 @@ export default function TransitionWarning({
 					exit={{ opacity: 0, scale: 0.9 }}
 					className="fixed inset-0 z-50 flex items-center justify-center p-6"
 					style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-					role="alert"
+					role="alertdialog"
 					aria-live="assertive"
-					aria-label={t("practice.transition_warning_aria", {
-						block: nextBlock.label,
-						n: remaining,
-					})}
+					aria-labelledby="transition-warning-title"
+					aria-describedby="transition-warning-desc"
 				>
-					<motion.div
+					<motion.section
+						aria-labelledby="transition-warning-title"
 						className="rounded-3xl p-6 text-center max-w-xs w-full"
 						style={{
 							backgroundColor: "var(--color-surface-card)",
 							border: `3px solid ${color}`,
 						}}
 					>
-						<div
+						<span
+							aria-hidden="true"
 							className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"
 							style={{
 								backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
 							}}
 						>
 							<Icon size={32} style={{ color }} />
-						</div>
+						</span>
 
 						<p
 							className="text-xs font-bold uppercase tracking-widest mb-1"
@@ -99,6 +99,7 @@ export default function TransitionWarning({
 						</p>
 
 						<h3
+							id="transition-warning-title"
 							className="text-lg font-semibold mb-1"
 							style={{ color: "var(--color-text-primary)" }}
 						>
@@ -106,6 +107,7 @@ export default function TransitionWarning({
 						</h3>
 
 						<p
+							id="transition-warning-desc"
 							className="text-sm mb-4"
 							style={{ color: "var(--color-text-secondary)" }}
 						>
@@ -114,15 +116,16 @@ export default function TransitionWarning({
 						</p>
 
 						{/* Countdown */}
-						<motion.div
+						<motion.p
 							key={remaining}
+							aria-live="polite"
 							initial={{ scale: 1.4, opacity: 0 }}
 							animate={{ scale: 1, opacity: 1 }}
 							className="text-4xl font-bold"
 							style={{ color }}
 						>
 							{remaining}
-						</motion.div>
+						</motion.p>
 
 						<p
 							className="text-xs mt-2"
@@ -130,7 +133,7 @@ export default function TransitionWarning({
 						>
 							{t("practice.transition_countdown")}
 						</p>
-					</motion.div>
+					</motion.section>
 				</motion.div>
 			)}
 		</AnimatePresence>

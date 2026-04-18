@@ -29,7 +29,8 @@ export default function PracticePreferencesCard({
 			: inputStyle;
 
 	return (
-		<div
+		<section
+			aria-label={t("profile.practice_preferences")}
 			className="rounded-3xl p-5 sm:p-6 space-y-5 shadow-[var(--shadow-card)]"
 			style={cardStyle}
 		>
@@ -248,6 +249,6 @@ export default function PracticePreferencesCard({
 					</label>
 				</div>
 			</div>
-		</div>
+		</section>
 	);
 }

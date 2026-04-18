@@ -342,9 +342,9 @@ export default function SessionBuilder({
 	}
 
 	return (
-		<div className="flex flex-col gap-4 pt-2">
+		<section aria-label={t("practice.build_session_title")} className="flex flex-col gap-4 pt-2">
 			{/* Header with total time */}
-			<div className="flex items-center justify-end">
+			<header className="flex items-center justify-end">
 				<div
 					className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold"
 					style={{
@@ -355,7 +355,7 @@ export default function SessionBuilder({
 					<Clock size={14} />
 					{totalMinutes} min
 				</div>
-			</div>
+			</header>
 
 			<h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
 				{t("practice.build_session_title")}
@@ -456,7 +456,7 @@ export default function SessionBuilder({
 			>
 				{t("practice.start_session")} ({totalMinutes} min)
 			</Button>
-		</div>
+		</section>
 	);
 }
 
@@ -507,7 +507,7 @@ function BlockCard({
 	]);
 
 	return (
-		<motion.div
+		<motion.article
 			layout
 			initial={{ opacity: 0, x: 20 }}
 			animate={{ opacity: 1, x: 0 }}
@@ -520,7 +520,7 @@ function BlockCard({
 			}}
 		>
 			{/* Header */}
-			<div className="flex items-center gap-2 px-3 py-2">
+			<header className="flex items-center gap-2 px-3 py-2">
 				<GripVertical
 					size={16}
 					className="cursor-grab"
@@ -573,7 +573,7 @@ function BlockCard({
 				>
 					<X size={14} />
 				</button>
-			</div>
+			</header>
 
 			{/* Expanded config */}
 			<AnimatePresence>
@@ -873,7 +873,7 @@ function BlockCard({
 					</motion.div>
 				)}
 			</AnimatePresence>
-		</motion.div>
+		</motion.article>
 	);
 }
 

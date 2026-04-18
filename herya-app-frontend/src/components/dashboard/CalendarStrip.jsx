@@ -45,8 +45,8 @@ export default function CalendarStrip({
 	}, []);
 
 	return (
-		<div>
-			<div className="flex items-center justify-between mb-3 ">
+		<section aria-label={t("dashboard.practice_label")}>
+			<header className="flex items-center justify-between mb-3 ">
 				<span
 					className="text-[11px] font-bold uppercase tracking-[0.1em]"
 					style={{ color: "var(--color-text-muted)" }}
@@ -72,13 +72,14 @@ export default function CalendarStrip({
 						{t("dashboard.day_streak", { n: streak })}
 					</span>
 				</div>
-			</div>
-			<div
+			</header>
+			<ol
 				ref={stripRef}
+				aria-label={t("dashboard.practice_label")}
 				className="flex gap-2 overflow-x-auto  pb-1"
 			>
 				{days.map((d, i) => (
-					<motion.div
+					<motion.li
 						key={d.iso}
 						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -115,9 +116,9 @@ export default function CalendarStrip({
 						>
 							{d.practiced && !d.isToday ? <Check size={16} strokeWidth={3} /> : d.day}
 						</div>
-					</motion.div>
+					</motion.li>
 				))}
-			</div>
-		</div>
+			</ol>
+		</section>
 	);
 }

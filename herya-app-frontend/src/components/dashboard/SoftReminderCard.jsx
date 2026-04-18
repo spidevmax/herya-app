@@ -98,7 +98,8 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				exit={{ opacity: 0, y: -8 }}
 				className=""
 			>
-				<div
+				<aside
+					aria-label={t("dashboard.reminder_label")}
 					className="rounded-3xl p-4 shadow-[var(--shadow-card)] border"
 					style={{
 						background: reminder.bg,
@@ -137,7 +138,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 							<X size={14} style={{ color: "var(--color-text-muted)" }} />
 						</button>
 					</div>
-				</div>
+				</aside>
 			</motion.div>
 		</AnimatePresence>
 	);

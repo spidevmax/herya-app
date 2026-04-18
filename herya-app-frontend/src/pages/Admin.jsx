@@ -34,7 +34,7 @@ import { useLanguage } from "@/context/LanguageContext";
 function AdminDashboard({ stats, loading, t }) {
 	if (loading)
 		return (
-			<div className="flex flex-col gap-3">
+			<div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
 				{["d1", "d2", "d3"].map((k) => (
 					<SkeletonCard key={k} />
 				))}
@@ -43,73 +43,91 @@ function AdminDashboard({ stats, loading, t }) {
 	if (!stats) return null;
 	return (
 		<div className="flex flex-col gap-4">
-			<div className="grid grid-cols-2 gap-3">
-				<StatCard
-					icon={<Users size={18} />}
-					label={t("admin.dashboard_total_users")}
-					value={stats.totalUsers ?? 0}
-					color="var(--color-primary)"
-				/>
-				<StatCard
-					icon={<List size={18} />}
-					label={t("admin.dashboard_total_sessions")}
-					value={stats.totalSessions ?? 0}
-					color="var(--color-primary)"
-				/>
-				<StatCard
-					icon={<BookOpen size={18} />}
-					label={t("admin.dashboard_journal_entries")}
-					value={stats.totalJournalEntries ?? 0}
-					color="var(--color-info)"
-				/>
-				<StatCard
-					icon={<BarChart2 size={18} />}
-					label={t("admin.dashboard_active_users")}
-					value={stats.activeUsers ?? 0}
-					color="var(--color-warning)"
-				/>
-			</div>
+			<ul className="grid grid-cols-2 gap-3 list-none m-0 p-0">
+				<li>
+					<StatCard
+						icon={<Users size={18} aria-hidden="true" />}
+						label={t("admin.dashboard_total_users")}
+						value={stats.totalUsers ?? 0}
+						color="var(--color-primary)"
+					/>
+				</li>
+				<li>
+					<StatCard
+						icon={<List size={18} aria-hidden="true" />}
+						label={t("admin.dashboard_total_sessions")}
+						value={stats.totalSessions ?? 0}
+						color="var(--color-primary)"
+					/>
+				</li>
+				<li>
+					<StatCard
+						icon={<BookOpen size={18} aria-hidden="true" />}
+						label={t("admin.dashboard_journal_entries")}
+						value={stats.totalJournalEntries ?? 0}
+						color="var(--color-info)"
+					/>
+				</li>
+				<li>
+					<StatCard
+						icon={<BarChart2 size={18} aria-hidden="true" />}
+						label={t("admin.dashboard_active_users")}
+						value={stats.activeUsers ?? 0}
+						color="var(--color-warning)"
+					/>
+				</li>
+			</ul>
 
 			{stats.popularSequences?.length > 0 && (
-				<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
-					<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+				<section
+					aria-labelledby="admin-popular-sequences-heading"
+					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+				>
+					<h2 id="admin-popular-sequences-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
 						{t("admin.dashboard_popular_sequences")}
-					</p>
-					{stats.popularSequences.map((s, i) => (
-						<div
-							key={s._id ?? `seq-${i}`}
-							className="flex items-center justify-between py-2 border-b border-[var(--color-border-soft)] last:border-0"
-						>
-							<p className="text-sm text-[var(--color-text-secondary)] truncate flex-1">
-								{s.name ?? s.englishName}
-							</p>
-							<span className="text-xs font-bold text-[var(--color-primary)] ml-2">
-								{s.count ?? 0} sesiones
-							</span>
-						</div>
-					))}
-				</div>
+					</h2>
+					<ul className="list-none m-0 p-0">
+						{stats.popularSequences.map((s, i) => (
+							<li
+								key={s._id ?? `seq-${i}`}
+								className="flex items-center justify-between py-2 border-b border-[var(--color-border-soft)] last:border-0"
+							>
+								<p className="text-sm text-[var(--color-text-secondary)] truncate flex-1">
+									{s.name ?? s.englishName}
+								</p>
+								<span className="text-xs font-bold text-[var(--color-primary)] ml-2">
+									{s.count ?? 0} sesiones
+								</span>
+							</li>
+						))}
+					</ul>
+				</section>
 			)}
 
 			{stats.sessionsByType && (
-				<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
-					<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+				<section
+					aria-labelledby="admin-sessions-by-type-heading"
+					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+				>
+					<h2 id="admin-sessions-by-type-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
 						{t("admin.dashboard_sessions_by_type")}
-					</p>
-					{Object.entries(stats.sessionsByType).map(([type, count]) => (
-						<div
-							key={type}
-							className="flex items-center justify-between py-2 border-b border-[var(--color-border-soft)] last:border-0"
-						>
-							<p className="text-sm text-[var(--color-text-secondary)] capitalize">
-								{type.replace(/_/g, " ")}
-							</p>
-							<span className="text-xs font-bold text-[var(--color-text-primary)]">
-								{count}
-							</span>
-						</div>
-					))}
-				</div>
+					</h2>
+					<dl className="m-0">
+						{Object.entries(stats.sessionsByType).map(([type, count]) => (
+							<div
+								key={type}
+								className="flex items-center justify-between py-2 border-b border-[var(--color-border-soft)] last:border-0"
+							>
+								<dt className="text-sm text-[var(--color-text-secondary)] capitalize">
+									{type.replace(/_/g, " ")}
+								</dt>
+								<dd className="text-xs font-bold text-[var(--color-text-primary)]">
+									{count}
+								</dd>
+							</div>
+						))}
+					</dl>
+				</section>
 			)}
 		</div>
 	);
@@ -117,19 +135,20 @@ function AdminDashboard({ stats, loading, t }) {
 
 function UserRow({ user, onChangeRole, onDelete, t }) {
 	const [nextRole, setNextRole] = useState(user.role);
+	const selectId = `role-select-${user._id}`;
 
 	useEffect(() => {
 		setNextRole(user.role);
 	}, [user.role]);
 
 	return (
-		<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
-			<div className="flex items-center gap-3 mb-3">
-				<div className="w-10 h-10 rounded-full bg-[color:var(--color-primary)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0">
+		<article aria-label={user.name} className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
+			<header className="flex items-center gap-3 mb-3">
+				<div aria-hidden="true" className="w-10 h-10 rounded-full bg-[color:var(--color-primary)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0">
 					{user.avatar ? (
 						<img
 							src={user.avatar}
-							alt={user.name}
+							alt=""
 							className="w-full h-full object-cover"
 						/>
 					) : (
@@ -155,9 +174,13 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 				>
 					{user.role}
 				</Badge>
-			</div>
+			</header>
 			<div className="flex gap-2 items-center">
+				<label htmlFor={selectId} className="sr-only">
+					{t("admin.users_save_role")}
+				</label>
 				<select
+					id={selectId}
 					value={nextRole}
 					onChange={(e) => setNextRole(e.target.value)}
 					className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text-primary)]"
@@ -182,27 +205,32 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 					{t("admin.users_delete")}
 				</button>
 			</div>
-		</div>
+		</article>
 	);
 }
 
 function ContentSection({ title, items, loading, color }) {
 	if (loading) return <SkeletonCard lines={3} />;
+	const headingId = `content-section-${title.replace(/\s+/g, "-").toLowerCase()}-heading`;
 	return (
-		<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
-			<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
+		<section
+			aria-labelledby={headingId}
+			className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+		>
+			<h2 id={headingId} className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
 				{title}{" "}
 				<span className="text-[var(--color-text-muted)] font-normal">
 					({items.length})
 				</span>
-			</p>
-			<div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto">
+			</h2>
+			<ul className="flex flex-col gap-1.5 max-h-48 overflow-y-auto list-none m-0 p-0">
 				{items.slice(0, 20).map((item) => (
-					<div
+					<li
 						key={item._id}
 						className="flex items-center gap-2 py-1.5 border-b border-[var(--color-surface)] last:border-0"
 					>
-						<div
+						<span
+							aria-hidden="true"
 							className="w-1.5 h-1.5 rounded-full flex-shrink-0"
 							style={{ backgroundColor: color }}
 						/>
@@ -214,10 +242,10 @@ function ContentSection({ title, items, loading, color }) {
 								{item.difficulty}
 							</span>
 						)}
-					</div>
+					</li>
 				))}
-			</div>
-		</div>
+			</ul>
+		</section>
 	);
 }
 
@@ -324,25 +352,27 @@ export default function Admin() {
 	if (!user || user.role !== "admin") return null;
 
 	return (
-		<div className="flex flex-col pt-4 pb-6">
-			<div className="flex items-center gap-3 px-4 mb-5">
+		<main className="flex flex-col pt-4 pb-6">
+			<header className="flex items-center gap-3 px-4 mb-5">
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
+					aria-label={t("admin.title")}
 					className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-[var(--shadow-card)]"
 				>
 					<ChevronLeft
 						size={20}
+						aria-hidden="true"
 						className="text-[var(--color-text-secondary)]"
 					/>
 				</button>
 				<div className="flex items-center gap-2">
-					<Shield size={20} className="text-[var(--color-primary)]" />
+					<Shield size={20} aria-hidden="true" className="text-[var(--color-primary)]" />
 					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
 						{t("admin.title")}
 					</h1>
 				</div>
-			</div>
+			</header>
 
 			<TabBar
 				tabs={[
@@ -358,7 +388,7 @@ export default function Admin() {
 				className="px-4 mb-5"
 			/>
 
-			<div className="px-4">
+			<section aria-label={t("admin.title")} className="px-4">
 				{tab === "poses" && <PoseManager />}
 
 				{tab === "sequences" && <SequenceManager />}
@@ -370,19 +400,24 @@ export default function Admin() {
 				)}
 
 				{tab === "users" && (
-					<div className="flex flex-col gap-3">
+					<ul className="flex flex-col gap-3 list-none m-0 p-0" aria-busy={usersLoading || undefined}>
 						{usersLoading
-							? ["u1", "u2", "u3"].map((k) => <SkeletonCard key={k} />)
+							? ["u1", "u2", "u3"].map((k) => (
+									<li key={k}>
+										<SkeletonCard />
+									</li>
+								))
 							: users.map((u) => (
-									<UserRow
-										key={u._id}
-										user={u}
-										onChangeRole={handleChangeRole}
-										onDelete={setDeleteTarget}
-										t={t}
-									/>
+									<li key={u._id}>
+										<UserRow
+											user={u}
+											onChangeRole={handleChangeRole}
+											onDelete={setDeleteTarget}
+											t={t}
+										/>
+									</li>
 								))}
-					</div>
+					</ul>
 				)}
 
 				{tab === "content" && (
@@ -405,14 +440,14 @@ export default function Admin() {
 							loading={contentLoading}
 							color="var(--color-info)"
 						/>
-						<div className="bg-[var(--color-surface-card)] rounded-2xl p-4">
+						<aside className="bg-[var(--color-surface-card)] rounded-2xl p-4">
 							<p className="text-xs text-[var(--color-text-muted)] text-center">
 								{t("admin.content_help")}
 							</p>
-						</div>
+						</aside>
 					</div>
 				)}
-			</div>
+			</section>
 
 			<ConfirmModal
 				open={Boolean(deleteTarget)}
@@ -426,6 +461,6 @@ export default function Admin() {
 				danger
 				loading={deleteLoading}
 			/>
-		</div>
+		</main>
 	);
 }

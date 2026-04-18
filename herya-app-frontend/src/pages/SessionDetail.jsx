@@ -83,18 +83,19 @@ export default function SessionDetail() {
 
 	if (loading) {
 		return (
-			<div className="px-4 pt-4 flex flex-col gap-4">
+			<main className="px-4 pt-4 flex flex-col gap-4" aria-busy="true" aria-live="polite">
 				<SkeletonCard lines={5} />
 				<SkeletonCard lines={3} />
-			</div>
+			</main>
 		);
 	}
 
 	if (!session) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+			<main className="flex flex-col items-center justify-center py-20 px-4 text-center">
 				<Frown
 					size={52}
+					aria-hidden="true"
 					className="mb-3"
 					style={{ color: "var(--color-text-muted)" }}
 				/>
@@ -108,7 +109,7 @@ export default function SessionDetail() {
 				>
 					{t("session_detail.back")}
 				</button>
-			</div>
+			</main>
 		);
 	}
 
@@ -138,16 +139,18 @@ export default function SessionDetail() {
 		: null;
 
 	return (
-		<div className="flex flex-col pt-4 pb-6">
-			<div className="flex items-center justify-between px-4 mb-5">
+		<main className="flex flex-col pt-4 pb-6">
+			<header className="flex items-center justify-between px-4 mb-5">
 				<div className="flex items-center gap-3">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
+						aria-label={t("session_detail.back")}
 						className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-sm"
 					>
 						<ChevronLeft
 							size={20}
+							aria-hidden="true"
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
@@ -158,15 +161,17 @@ export default function SessionDetail() {
 				<button
 					type="button"
 					onClick={() => setShowDelete(true)}
+					aria-label={t("session_detail.delete_title")}
 					className="w-9 h-9 rounded-full bg-[var(--color-tone-danger-bg)] flex items-center justify-center"
 				>
-					<Trash2 size={16} className="text-[var(--color-danger)]" />
+					<Trash2 size={16} aria-hidden="true" className="text-[var(--color-danger)]" />
 				</button>
-			</div>
+			</header>
 
 			<div className="px-4 flex flex-col gap-4">
 				{/* Type card */}
-				<div
+				<section
+					aria-label={sessionTitle}
 					className="rounded-3xl p-5 flex items-center gap-4"
 					style={{
 						backgroundColor: `color-mix(in srgb, ${cfg.color} 16%, var(--color-surface-card))`,
@@ -174,71 +179,79 @@ export default function SessionDetail() {
 					}}
 				>
 					{family?.emoji ? (
-						<span className="text-4xl">{family.emoji}</span>
+						<span className="text-4xl" aria-hidden="true">{family.emoji}</span>
 					) : (
 						<TypeIcon
 							size={34}
 							strokeWidth={2.2}
+							aria-hidden="true"
 							style={{ color: cfg.color }}
 						/>
 					)}
 					<div>
-						<p className="font-display text-xl font-bold text-[var(--color-text-primary)]">
+						<h2 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
 							{sessionTitle}
-						</p>
+						</h2>
 						{family && (
 							<p className="text-sm text-[var(--color-text-secondary)]">
 								{family.labelKey ? t(family.labelKey) : family.label}
 							</p>
 						)}
 						<p className="text-xs mt-1 text-[var(--color-text-muted)]">
-							{format.date(session.date || session.createdAt, lang)}
+							<time dateTime={session.date || session.createdAt}>
+								{format.date(session.date || session.createdAt, lang)}
+							</time>
 						</p>
 					</div>
-				</div>
+				</section>
 
 				{/* Stats */}
-				<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
-					<div className="grid grid-cols-2 gap-4">
+				<section aria-label={t("session_detail.title")} className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
+					<dl className="grid grid-cols-2 gap-4">
 						<div className="text-center">
-							<p className="font-bold text-2xl text-[var(--color-text-primary)]">
-								{session.duration ?? "—"}
-							</p>
-							<p className="text-[var(--color-text-muted)] text-xs">
+							<dt className="text-[var(--color-text-muted)] text-xs order-2">
 								{t("session_detail.minutes")}
-							</p>
+							</dt>
+							<dd className="font-bold text-2xl text-[var(--color-text-primary)]">
+								{session.duration ?? "—"}
+							</dd>
 						</div>
 						<div className="text-center">
-							<p className="font-bold text-2xl text-[var(--color-text-primary)]">
-								{session.completed ? "✓" : "—"}
-							</p>
-							<p className="text-[var(--color-text-muted)] text-xs">
+							<dt className="text-[var(--color-text-muted)] text-xs order-2">
 								{session.completed
 									? t("session_detail.completed")
 									: t("session_detail.in_progress")}
-							</p>
+							</dt>
+							<dd className="font-bold text-2xl text-[var(--color-text-primary)]" aria-hidden={!session.completed}>
+								{session.completed ? "✓" : "—"}
+							</dd>
 						</div>
-					</div>
-				</div>
+					</dl>
+				</section>
 
 				{/* Moods */}
 				{(session.moodBefore?.length > 0 || session.moodAfter?.length > 0) && (
-					<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
-						<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+					<section
+						aria-labelledby="session-mood-heading"
+						className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]"
+					>
+						<h2 id="session-mood-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
 							{t("session_detail.mood")}
-						</p>
+						</h2>
 						{session.moodBefore?.length > 0 && (
 							<div className="mb-2">
 								<p className="text-xs text-[var(--color-text-muted)] mb-1">
 									{t("session_detail.before")}
 								</p>
-								<div className="flex gap-1.5 flex-wrap">
+								<ul className="flex gap-1.5 flex-wrap list-none m-0 p-0">
 									{moodBeforeTokens.map(({ mood, key }) => (
-										<Badge key={key} color="var(--color-primary)">
-											{t(`session.moods.${mood}`)}
-										</Badge>
+										<li key={key}>
+											<Badge color="var(--color-primary)">
+												{t(`session.moods.${mood}`)}
+											</Badge>
+										</li>
 									))}
-								</div>
+								</ul>
 							</div>
 						)}
 						{session.moodAfter?.length > 0 && (
@@ -246,49 +259,53 @@ export default function SessionDetail() {
 								<p className="text-xs text-[var(--color-text-muted)] mb-1">
 									{t("session_detail.after")}
 								</p>
-								<div className="flex gap-1.5 flex-wrap">
+								<ul className="flex gap-1.5 flex-wrap list-none m-0 p-0">
 									{moodAfterTokens.map(({ mood, key }) => (
-										<Badge key={key} color="var(--color-primary)">
-											{t(`session.moods.${mood}`)}
-										</Badge>
+										<li key={key}>
+											<Badge color="var(--color-primary)">
+												{t(`session.moods.${mood}`)}
+											</Badge>
+										</li>
 									))}
-								</div>
+								</ul>
 							</div>
 						)}
-					</div>
+					</section>
 				)}
 
 				{/* Notes */}
 				{session.notes && (
-					<div className="bg-[var(--color-surface-card)] rounded-2xl p-4">
-						<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
+					<section aria-labelledby="session-notes-heading" className="bg-[var(--color-surface-card)] rounded-2xl p-4">
+						<h2 id="session-notes-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
 							{t("session_detail.notes")}
-						</p>
+						</h2>
 						<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
 							{session.notes}
 						</p>
-					</div>
+					</section>
 				)}
 
 				{/* VK Feedback */}
 				{session.vkFeedback && (
-					<div className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
-						<p className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+					<section aria-labelledby="session-feedback-heading" className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
+						<h2 id="session-feedback-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
 							{t("session_detail.vk_feedback")}
-						</p>
-						<div className="flex flex-col gap-2">
+						</h2>
+						<dl className="flex flex-col gap-2">
 							{Object.entries(session.vkFeedback).map(([k, v]) => (
 								<div key={k} className="flex items-center justify-between">
-									<p className="text-xs text-[var(--color-text-secondary)]">
+									<dt className="text-xs text-[var(--color-text-secondary)]">
 										{t(`session_detail.feedback_${k}`)}
-									</p>
-									<Badge color="var(--color-primary)">
-										{t(`session_detail.feedback_val_${v}`)}
-									</Badge>
+									</dt>
+									<dd>
+										<Badge color="var(--color-primary)">
+											{t(`session_detail.feedback_val_${v}`)}
+										</Badge>
+									</dd>
 								</div>
 							))}
-						</div>
-					</div>
+						</dl>
+					</section>
 				)}
 			</div>
 
@@ -302,6 +319,6 @@ export default function SessionDetail() {
 				danger
 				loading={deleting}
 			/>
-		</div>
+		</main>
 	);
 }

@@ -18,9 +18,8 @@ export default function NostrilIndicator({
 	const isLeft = activeNostril === "left";
 
 	return (
-		<div
-			className="flex flex-col items-center gap-1"
-			role="img"
+		<figure
+			className="flex flex-col items-center gap-1 m-0"
 			aria-label={t(
 				isLeft ? "pranayama.nostril_left" : "pranayama.nostril_right",
 			)}
@@ -120,14 +119,14 @@ export default function NostrilIndicator({
 				)}
 			</svg>
 
-			<span
+			<figcaption
 				className="text-[10px] font-semibold uppercase"
 				style={{ color }}
 			>
 				{t(
 					isLeft ? "pranayama.nostril_left" : "pranayama.nostril_right",
 				)}
-			</span>
-		</div>
+			</figcaption>
+		</figure>
 	);
 }

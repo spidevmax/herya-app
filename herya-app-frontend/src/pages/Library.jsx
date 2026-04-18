@@ -326,8 +326,8 @@ const Library = () => {
 				);
 
 	return (
-		<div className="flex flex-col gap-4 pt-4 pb-6">
-			<div className="px-4">
+		<main className="flex flex-col gap-4 pt-4 pb-6">
+			<header className="px-4">
 				<h1 className="font-display mb-1 text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">
 					{t("library.title", "Library")}
 				</h1>
@@ -337,7 +337,7 @@ const Library = () => {
 						"Explore and study sequences, poses, and pranayama.",
 					)}
 				</p>
-			</div>
+			</header>
 
 			<div
 				className="flex gap-2 overflow-x-auto px-4 pb-1"
@@ -554,7 +554,7 @@ const Library = () => {
 				</div>
 			)}
 
-			<div
+			<section
 				className="flex-1 px-4"
 				role="tabpanel"
 				id={`${tabsId}-${tab}-panel`}
@@ -562,7 +562,7 @@ const Library = () => {
 			>
 				<AnimatePresence mode="wait">
 					{loading ? (
-						<div key="loading" className="flex flex-col gap-4">
+						<div key="loading" className="flex flex-col gap-4" aria-live="polite" aria-busy="true">
 							{["s1", "s2", "s3"].map((key) => (
 								<SkeletonCard key={key} />
 							))}
@@ -607,9 +607,14 @@ const Library = () => {
 							{tab === "all" ? (
 								groupedItems.map((group) =>
 									group.count > 0 ? (
-										<div key={group.type} className="flex flex-col gap-3">
-											<div className="flex items-center justify-between px-1">
+										<section
+											key={group.type}
+											aria-labelledby={`${tabsId}-${group.type}-heading`}
+											className="flex flex-col gap-3"
+										>
+											<header className="flex items-center justify-between px-1">
 												<h2
+													id={`${tabsId}-${group.type}-heading`}
 													className="font-display text-sm font-bold uppercase tracking-widest"
 													style={{ color: "var(--color-text-secondary)" }}
 												>
@@ -633,51 +638,53 @@ const Library = () => {
 														</button>
 													)}
 												</div>
-											</div>
-											<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+											</header>
+											<ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 list-none m-0 p-0">
 												{group.items.map((item) => (
-													<RetroCard
-														key={getItemId(item)}
-														item={item}
-														type={getCardType(item, tab)}
-														typeLabel={cardTypeLabel(getCardType(item, tab))}
-														fallbackItemLabel={tr(
-															"library.card_default_item",
-															"Item",
-														)}
-														onClick={() =>
-															handleCardClick(item, getCardType(item, tab))
-														}
-													/>
+													<li key={getItemId(item)}>
+														<RetroCard
+															item={item}
+															type={getCardType(item, tab)}
+															typeLabel={cardTypeLabel(getCardType(item, tab))}
+															fallbackItemLabel={tr(
+																"library.card_default_item",
+																"Item",
+															)}
+															onClick={() =>
+																handleCardClick(item, getCardType(item, tab))
+															}
+														/>
+													</li>
 												))}
-											</div>
-										</div>
+											</ul>
+										</section>
 									) : null,
 								)
 							) : (
-								<div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+								<ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 list-none m-0 p-0">
 									{prioritizedItems.map((item) => (
-										<RetroCard
-											key={getItemId(item)}
-											item={item}
-											type={getCardType(item, tab)}
-											typeLabel={cardTypeLabel(getCardType(item, tab))}
-											fallbackItemLabel={tr(
-												"library.card_default_item",
-												"Item",
-											)}
-											onClick={() =>
-												handleCardClick(item, getCardType(item, tab))
-											}
-										/>
+										<li key={getItemId(item)}>
+											<RetroCard
+												item={item}
+												type={getCardType(item, tab)}
+												typeLabel={cardTypeLabel(getCardType(item, tab))}
+												fallbackItemLabel={tr(
+													"library.card_default_item",
+													"Item",
+												)}
+												onClick={() =>
+													handleCardClick(item, getCardType(item, tab))
+												}
+											/>
+										</li>
 									))}
-								</div>
+								</ul>
 							)}
 						</motion.div>
 					)}
 				</AnimatePresence>
-			</div>
-		</div>
+			</section>
+		</main>
 	);
 };
 

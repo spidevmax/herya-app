@@ -28,7 +28,8 @@ const ProfileHeroCard = ({
 	const totalSessions = user?.totalSessions ?? 0;
 
 	return (
-		<motion.div
+		<motion.section
+			aria-label={user?.name || t("profile.title")}
 			initial={{ opacity: 0, y: 16 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="rounded-[32px] p-6 sm:p-8 text-white overflow-hidden relative"
@@ -140,7 +141,7 @@ const ProfileHeroCard = ({
 					))}
 				</div>
 			</div>
-		</motion.div>
+		</motion.section>
 	);
 };
 

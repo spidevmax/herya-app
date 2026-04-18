@@ -185,26 +185,26 @@ export const StatCard = ({
 	color = "var(--color-primary)",
 }) => {
 	return (
-		<div
+		<article
 			className="rounded-xl p-3 flex flex-col gap-2"
 			style={{
 				backgroundColor: `color-mix(in srgb, ${color} 8%, transparent)`,
 				borderLeft: `3px solid ${color}`,
 			}}
 		>
-			<div className="flex items-center gap-2" style={{ color }}>
-				{icon}
+			<header className="flex items-center gap-2" style={{ color }}>
+				<span aria-hidden="true">{icon}</span>
 				<p className="text-xs font-medium text-[var(--color-text-secondary)]">
 					{label}
 				</p>
-			</div>
+			</header>
 			<p
 				className="text-xl font-bold"
 				style={{ color: "var(--color-text-primary)" }}
 			>
 				{value}
 			</p>
-		</div>
+		</article>
 	);
 };
 
@@ -301,74 +301,78 @@ export const MoodSelector = ({ value, onChange, label, options, maxSelection = 5
 	};
 
 	return (
-		<div className="flex flex-col gap-3">
+		<fieldset className="flex flex-col gap-3 m-0 p-0 border-0">
 			{label && (
-				<div className="flex items-center justify-between">
-					<p className="text-sm font-medium text-[var(--color-text-primary)]">
+				<header className="flex items-center justify-between">
+					<legend className="text-sm font-medium text-[var(--color-text-primary)] p-0">
 						{label}
-					</p>
-					<p className="text-xs text-[var(--color-text-muted)]">
+					</legend>
+					<p className="text-xs text-[var(--color-text-muted)]" aria-live="polite">
 						{selected.length}/{maxSelection}
 					</p>
-				</div>
+				</header>
 			)}
-			<div className="grid grid-cols-4 gap-2">
+			<ul className="grid grid-cols-4 gap-2 list-none m-0 p-0">
 				{moods.map((mood) => {
 					const MoodIcon = MOOD_ICONS[mood] || Circle;
 					const isSelected = selected.includes(mood);
 					const isDisabled = atLimit && !isSelected;
 					return (
-						<motion.button
-							key={mood}
-							type="button"
-							onClick={() => toggle(mood)}
-							disabled={isDisabled}
-							whileHover={isDisabled ? {} : { scale: 1.05 }}
-							whileTap={isDisabled ? {} : { scale: 0.95 }}
-							className={`flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
-								isSelected
-									? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
-									: isDisabled
-										? "bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border border-[var(--color-border-soft)] opacity-40 cursor-not-allowed"
-										: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
-							}`}
-						>
-							<span className="mb-1">
-								<MoodIcon size={20} strokeWidth={2.2} />
-							</span>
-							<span>{t(`session.moods.${mood}`)}</span>
-						</motion.button>
+						<li key={mood}>
+							<motion.button
+								type="button"
+								onClick={() => toggle(mood)}
+								disabled={isDisabled}
+								aria-pressed={isSelected}
+								whileHover={isDisabled ? {} : { scale: 1.05 }}
+								whileTap={isDisabled ? {} : { scale: 0.95 }}
+								className={`w-full flex flex-col items-center justify-center py-3 px-2 rounded-xl transition-all text-xs font-medium ${
+									isSelected
+										? "bg-[var(--color-primary)] text-white shadow-[var(--shadow-card)]"
+										: isDisabled
+											? "bg-[var(--color-surface-card)] text-[var(--color-text-muted)] border border-[var(--color-border-soft)] opacity-40 cursor-not-allowed"
+											: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+								}`}
+							>
+								<span aria-hidden="true" className="mb-1">
+									<MoodIcon size={20} strokeWidth={2.2} />
+								</span>
+								<span>{t(`session.moods.${mood}`)}</span>
+							</motion.button>
+						</li>
 					);
 				})}
-			</div>
-		</div>
+			</ul>
+		</fieldset>
 	);
 };
 
 // ── FilterChips ───────────────────────────────────────────────────────────────
 export const FilterChips = ({ options, selected, onSelect }) => {
 	return (
-		<div className="flex gap-2 flex-wrap">
+		<ul className="flex gap-2 flex-wrap list-none m-0 p-0">
 			{options.map((option) => (
-				<motion.button
-					key={option.key}
-					type="button"
-					onClick={() => onSelect(option.key)}
-					whileHover={{ scale: 1.05 }}
-					whileTap={{ scale: 0.95 }}
-					className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-						selected === option.key
-							? "text-white shadow-[var(--shadow-card)]"
-							: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
-					}`}
-					style={
-						selected === option.key ? { backgroundColor: option.color } : {}
-					}
-				>
-					{option.label}
-				</motion.button>
+				<li key={option.key}>
+					<motion.button
+						type="button"
+						onClick={() => onSelect(option.key)}
+						aria-pressed={selected === option.key}
+						whileHover={{ scale: 1.05 }}
+						whileTap={{ scale: 0.95 }}
+						className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+							selected === option.key
+								? "text-white shadow-[var(--shadow-card)]"
+								: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+						}`}
+						style={
+							selected === option.key ? { backgroundColor: option.color } : {}
+						}
+					>
+						{option.label}
+					</motion.button>
+				</li>
 			))}
-		</div>
+		</ul>
 	);
 };
 
@@ -388,14 +392,15 @@ export const Badge = ({ children, color = "var(--color-secondary)", className = 
 export const SkeletonCard = ({ lines = 3, className = "" }) => {
 	return (
 		<div
+			aria-hidden="true"
 			className={`rounded-2xl p-4 space-y-3 shadow-[var(--shadow-card)] ${className}`}
 			style={{ backgroundColor: "var(--color-surface-card)" }}
 		>
-			<div className="skeleton h-5 w-3/4 rounded-lg" />
+			<span className="skeleton h-5 w-3/4 rounded-lg block" />
 			{Array.from({ length: lines - 1 }, (_, idx) => idx + 1).map((lineNo) => (
-				<div
+				<span
 					key={`skeleton-line-${lineNo}`}
-					className={`skeleton h-4 rounded-lg ${lineNo === lines - 1 ? "w-1/2" : "w-full"}`}
+					className={`skeleton h-4 rounded-lg block ${lineNo === lines - 1 ? "w-1/2" : "w-full"}`}
 				/>
 			))}
 		</div>
@@ -438,19 +443,20 @@ export const EmptyState = ({
 	className = "",
 }) => {
 	return (
-		<motion.div
+		<motion.section
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
+			aria-label={title}
 			className={`flex flex-col items-center justify-center text-center py-16 px-6 ${className}`}
 		>
 			{icon ? (
-				<motion.div className="mb-4 float" animate={{}} style={{}}>
+				<motion.span aria-hidden="true" className="mb-4 float inline-block" animate={{}} style={{}}>
 					{icon}
-				</motion.div>
+				</motion.span>
 			) : illustration ? (
-				<motion.div className="text-6xl mb-4 float" animate={{}} style={{}}>
+				<motion.span aria-hidden="true" className="text-6xl mb-4 float inline-block" animate={{}} style={{}}>
 					{illustration}
-				</motion.div>
+				</motion.span>
 			) : null}
 			<h3 className="font-display text-xl font-semibold mb-2 text-[var(--color-text-primary)]">
 				{title}
@@ -461,7 +467,7 @@ export const EmptyState = ({
 				</p>
 			)}
 			{action}
-		</motion.div>
+		</motion.section>
 	);
 };
 
@@ -470,14 +476,19 @@ export const ProgressBar = ({ value, max, color = "var(--color-secondary)", clas
 	const pct = Math.min(100, Math.round((value / max) * 100));
 	return (
 		<div
+			role="progressbar"
+			aria-valuenow={pct}
+			aria-valuemin={0}
+			aria-valuemax={100}
 			className={`w-full h-2 rounded-full overflow-hidden ${className}`}
 			style={{ backgroundColor: "var(--color-border-soft)" }}
 		>
-			<motion.div
+			<motion.span
+				aria-hidden="true"
 				initial={{ width: 0 }}
 				animate={{ width: `${pct}%` }}
 				transition={{ duration: 0.8, ease: "easeOut" }}
-				className="h-full rounded-full"
+				className="h-full rounded-full block"
 				style={{ backgroundColor: color }}
 			/>
 		</div>
@@ -688,19 +699,19 @@ export const SurfaceCard = ({ children, className = "", ...props }) => (
 );
 
 export const PageHeader = ({ title, description, className = "", titleClassName = "" }) => (
-	<div className={`page-header ${className}`}>
+	<header className={`page-header ${className}`}>
 		<h1 className={`text-display-md text-[var(--color-text-primary)] ${titleClassName}`}>
 			{title}
 		</h1>
 		{description ? (
 			<p className="text-body-sm text-[var(--color-text-secondary)]">{description}</p>
 		) : null}
-	</div>
+	</header>
 );
 
 export const StickyHeader = ({ onBack, title, children }) => {
 	return (
-		<div className="sticky-header">
+		<header className="sticky-header">
 			{onBack && (
 				<button
 					type="button"
@@ -709,7 +720,7 @@ export const StickyHeader = ({ onBack, title, children }) => {
 					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
 					style={{ backgroundColor: "var(--color-surface-card)" }}
 				>
-					<ArrowLeft size={20} style={{ color: "var(--color-text-primary)" }} />
+					<ArrowLeft size={20} aria-hidden="true" style={{ color: "var(--color-text-primary)" }} />
 				</button>
 			)}
 			{title && (
@@ -718,6 +729,6 @@ export const StickyHeader = ({ onBack, title, children }) => {
 				</h1>
 			)}
 			{children}
-		</div>
+		</header>
 	);
 };

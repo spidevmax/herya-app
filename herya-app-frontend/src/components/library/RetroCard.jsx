@@ -102,8 +102,8 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 				style={{ backgroundColor: palette.bg, borderColor }}
 			>
 				<div className="flex items-stretch">
-					<div
-						className="flex shrink-0 items-center justify-center"
+					<figure
+						className="flex shrink-0 items-center justify-center m-0"
 						style={{
 							width: 88,
 							minHeight: 88,
@@ -121,23 +121,24 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 							<div
 								className="font-display flex h-full w-full items-center justify-center text-2xl font-black"
 								style={{ color: borderColor }}
+								aria-hidden="true"
 							>
 								{monogram || (
 									<PersonStanding size={28} style={{ color: borderColor }} />
 								)}
 							</div>
 						)}
-					</div>
+					</figure>
 
 					<div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-3 py-2.5">
-						<div className="flex items-start justify-between gap-2">
+						<header className="flex items-start justify-between gap-2">
 							<div className="min-w-0">
-								<p
+								<span
 									className="text-[10px] font-black uppercase tracking-[0.12em]"
 									style={{ color: borderColor }}
 								>
 									{typeLabel}
-								</p>
+								</span>
 								<h3
 									className="truncate text-base font-black leading-tight"
 									style={{ color: borderColor }}
@@ -145,7 +146,7 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 									{title}
 								</h3>
 							</div>
-						</div>
+						</header>
 						{subtitle && subtitle !== title && (
 							<p
 								className="truncate text-xs font-medium italic"
@@ -165,25 +166,26 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 					</div>
 				</div>
 
-				<div
+				<footer
 					className="flex items-center justify-between gap-2 px-3 py-2"
 					style={{
 						borderTop: `3px solid ${borderColor}`,
 						backgroundColor: colorMix(borderColor, 7),
 					}}
 				>
-					<div className="flex flex-wrap gap-1.5">
+					<ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
 						{stats.map((stat) => (
-							<StatBox
-								key={stat.label}
-								value={stat.value}
-								label={stat.label}
-								bg={palette.statBg}
-								color={borderColor}
-							/>
+							<li key={stat.label}>
+								<StatBox
+									value={stat.value}
+									label={stat.label}
+									bg={palette.statBg}
+									color={borderColor}
+								/>
+							</li>
 						))}
-					</div>
-				</div>
+					</ul>
+				</footer>
 			</div>
 		</motion.button>
 	);

@@ -53,7 +53,7 @@ const Journal = () => {
 	}, [loading, selected, selectedEntryId, setSelectedEntryId]);
 
 	return (
-		<div className="flex flex-col gap-6 pt-4 pb-6">
+		<main className="flex flex-col gap-6 pt-4 pb-6">
 			<JournalHeader entryCount={entries.length} />
 
 			{loading ? (
@@ -124,7 +124,7 @@ const Journal = () => {
 				isOpen={!!selectedEntryId}
 				onClose={() => setSelectedEntryId(null)}
 			/>
-		</div>
+		</main>
 	);
 };
 

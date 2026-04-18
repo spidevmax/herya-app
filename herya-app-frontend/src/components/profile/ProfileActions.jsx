@@ -20,7 +20,8 @@ export default function ProfileActions({
 	const { t } = useLanguage();
 
 	return (
-		<div
+		<section
+			aria-label={t("profile.actions_title")}
 			className="rounded-3xl p-5 space-y-3 shadow-[var(--shadow-card)]"
 			style={cardStyle}
 		>
@@ -102,6 +103,6 @@ export default function ProfileActions({
 					{t("profile.delete_account")}
 				</button>
 			</div>
-		</div>
+		</section>
 	);
 }

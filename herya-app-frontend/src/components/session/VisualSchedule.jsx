@@ -35,23 +35,22 @@ export default function VisualSchedule({
 	if (blocks.length === 0) return null;
 
 	return (
-		<div
+		<section
 			className={`rounded-2xl ${compact ? "p-3" : "p-4"}`}
 			style={{
 				backgroundColor: "var(--color-surface-card)",
 				border: "1px solid var(--color-border-soft)",
 			}}
-			role="list"
 			aria-label={t("practice.visual_schedule_label")}
 		>
-			<p
+			<h3
 				className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3"
 				style={{ color: "var(--color-text-muted)" }}
 			>
 				{t("practice.visual_schedule_title")}
-			</p>
+			</h3>
 
-			<div className="flex flex-col gap-2">
+			<ol className="flex flex-col gap-2 list-none m-0 p-0">
 				{blocks.map((block, idx) => {
 					const Icon = BLOCK_ICONS[block.blockType] || Leaf;
 					const color = BLOCK_COLORS[block.blockType] || "var(--color-primary)";
@@ -60,7 +59,7 @@ export default function VisualSchedule({
 					const isFuture = idx > currentBlockIndex;
 
 					return (
-						<motion.div
+						<motion.li
 							key={block._id || block.id || `schedule-${idx}`}
 							initial={{ opacity: 0, x: -12 }}
 							animate={{ opacity: 1, x: 0 }}
@@ -75,7 +74,6 @@ export default function VisualSchedule({
 									: "2px solid transparent",
 								opacity: isFuture ? 0.55 : 1,
 							}}
-							role="listitem"
 							aria-current={isCurrent ? "step" : undefined}
 							aria-label={`${t("practice.visual_schedule_step", { n: idx + 1 })}: ${block.label}`}
 						>
@@ -133,10 +131,10 @@ export default function VisualSchedule({
 									style={{ backgroundColor: color }}
 								/>
 							)}
-						</motion.div>
+						</motion.li>
 					);
 				})}
-			</div>
-		</div>
+			</ol>
+		</section>
 	);
 }

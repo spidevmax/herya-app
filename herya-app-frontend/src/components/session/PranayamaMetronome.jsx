@@ -64,39 +64,42 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 		window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 	return (
-		<div className="flex flex-col items-center gap-6 py-6">
+		<section aria-label="Pranayama Metronome" className="flex flex-col items-center gap-6 py-6">
 			{/* Pattern selector */}
-			<div className="flex gap-2 flex-wrap justify-center">
+			<ul className="flex gap-2 flex-wrap justify-center list-none m-0 p-0" aria-label="Patterns">
 				{Object.entries(PRANAYAMA_PATTERNS).map(([key, p]) => (
-					<button
-						type="button"
-						key={key}
-						onClick={() => handleSelectPattern(key)}
-						className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
-						style={
-							selectedKey === key
-								? {
-										backgroundColor: "var(--color-primary)",
-										color: "white",
-										boxShadow: "var(--shadow-button)",
-									}
-								: {
-										backgroundColor:
-											"var(--color-surface-card)",
-										color: "var(--color-text-secondary)",
-										border: "1px solid var(--color-border-soft)",
-									}
-						}
-					>
-						{p.nameKey ? t(p.nameKey) : p.name}
-					</button>
+					<li key={key}>
+						<button
+							type="button"
+							aria-pressed={selectedKey === key}
+							onClick={() => handleSelectPattern(key)}
+							className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
+							style={
+								selectedKey === key
+									? {
+											backgroundColor: "var(--color-primary)",
+											color: "white",
+											boxShadow: "var(--shadow-button)",
+										}
+									: {
+											backgroundColor:
+												"var(--color-surface-card)",
+											color: "var(--color-text-secondary)",
+											border: "1px solid var(--color-border-soft)",
+										}
+							}
+						>
+							{p.nameKey ? t(p.nameKey) : p.name}
+						</button>
+					</li>
 				))}
-			</div>
+			</ul>
 
 			{/* Main circle */}
 			<div className="relative flex items-center justify-center">
 				{engine.isRunning && !reducedMotion && (
-					<motion.div
+					<motion.span
+						aria-hidden="true"
 						className="absolute rounded-full border-4 opacity-20"
 						style={{
 							borderColor: color,
@@ -112,6 +115,8 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					/>
 				)}
 				<motion.div
+					role="status"
+					aria-live="polite"
 					className="w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-lg"
 					animate={{
 						scale:
@@ -188,13 +193,15 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					}}
 					aria-label={t("guided.reset")}
 				>
-					<RotateCcw size={18} />
+					<RotateCcw size={18} aria-hidden="true" />
 				</button>
 				<motion.button
+					type="button"
 					whileTap={{ scale: 0.92 }}
 					onClick={engine.toggle}
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 					style={{ backgroundColor: color }}
+					aria-pressed={engine.isRunning}
 					aria-label={
 						engine.isRunning
 							? t("guided.pause")
@@ -202,15 +209,15 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					}
 				>
 					{engine.isRunning ? (
-						<Pause size={24} />
+						<Pause size={24} aria-hidden="true" />
 					) : (
-						<Play size={24} className="ml-0.5" />
+						<Play size={24} aria-hidden="true" className="ml-0.5" />
 					)}
 				</motion.button>
 			</div>
 
 			{/* Phase labels */}
-			<div className="flex gap-3 flex-wrap justify-center">
+			<dl className="flex gap-3 flex-wrap justify-center">
 				{activePhases.map((phase) => (
 					<div
 						key={phase}
@@ -222,23 +229,23 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 									: "transparent",
 						}}
 					>
-						<span
+						<dt
 							className="text-[10px] font-semibold uppercase"
 							style={{ color: "var(--color-text-muted)" }}
 						>
 							{t(
 								PHASE_LABEL_KEYS[phase] || "pranayama.inhale",
 							)}
-						</span>
-						<span
-							className="text-lg font-bold tabular-nums"
+						</dt>
+						<dd
+							className="text-lg font-bold tabular-nums m-0"
 							style={{ color: PHASE_COLORS[phase] }}
 						>
 							{phaseDurations[phase]}s
-						</span>
+						</dd>
 					</div>
 				))}
-			</div>
-		</div>
+			</dl>
+		</section>
 	);
 }

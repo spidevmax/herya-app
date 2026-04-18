@@ -64,22 +64,24 @@ export default function BreathingDetail() {
 
 	if (loading) {
 		return (
-			<div className="px-4 pt-4 flex flex-col gap-4">
+			<main className="px-4 pt-4 flex flex-col gap-4" aria-busy="true" aria-live="polite">
 				<div
+					aria-hidden="true"
 					className="h-48 rounded-3xl animate-pulse"
 					style={{ backgroundColor: "var(--color-surface-card)" }}
 				/>
 				<SkeletonCard />
 				<SkeletonCard />
-			</div>
+			</main>
 		);
 	}
 
 	if (!pattern) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+			<main className="flex flex-col items-center justify-center py-20 px-4 text-center">
 				<Frown
 					size={52}
+					aria-hidden="true"
 					className="mb-3"
 					style={{ color: "var(--color-text-muted)" }}
 				/>
@@ -92,9 +94,9 @@ export default function BreathingDetail() {
 					className="mt-4 text-sm font-semibold"
 					style={{ color: "var(--color-primary)" }}
 				>
-					← {t("breathing_detail.back")}
+					<span aria-hidden="true">← </span>{t("breathing_detail.back")}
 				</button>
-			</div>
+			</main>
 		);
 	}
 
@@ -108,9 +110,9 @@ export default function BreathingDetail() {
 		: null;
 
 	return (
-		<div className="flex flex-col pb-10">
+		<main className="flex flex-col pb-10">
 			{/* Hero banner */}
-			<div
+			<header
 				className="relative px-4 pt-12 pb-8 flex flex-col items-center gap-3"
 				style={{
 					background: `linear-gradient(135deg, ${colorMix(diffColor, 13)}, ${colorMix(diffColor, 3)})`,
@@ -126,10 +128,11 @@ export default function BreathingDetail() {
 						color: "var(--color-text-primary)",
 					}}
 				>
-					<ChevronLeft size={20} />
+					<ChevronLeft size={20} aria-hidden="true" />
 				</button>
 
 				<div
+					aria-hidden="true"
 					className="w-24 h-24 rounded-3xl flex items-center justify-center text-5xl border-4 shadow-lg"
 					style={{
 						backgroundColor: "var(--color-surface-card)",
@@ -162,29 +165,31 @@ export default function BreathingDetail() {
 					)}
 				</div>
 
-				<div className="flex gap-2 flex-wrap justify-center">
-					<span
-						className="px-3 py-1 rounded-full text-xs font-bold text-white"
-						style={{ backgroundColor: diffColor }}
-					>
-						{translateWithFallback(t, `library.${pattern.difficulty}`, pattern.difficulty)}
-					</span>
-					{pattern.energyEffect && (
+				<ul className="flex gap-2 flex-wrap justify-center list-none m-0 p-0">
+					<li>
 						<span
-							className="px-3 py-1 rounded-full text-xs font-semibold border"
-							style={{
-								borderColor: "var(--color-border)",
-								color: "var(--color-text-secondary)",
-							}}
+							className="px-3 py-1 rounded-full text-xs font-bold text-white"
+							style={{ backgroundColor: diffColor }}
 						>
-							<span className="inline-flex items-center gap-1">
-								<EnergyIcon size={13} />
+							{translateWithFallback(t, `library.${pattern.difficulty}`, pattern.difficulty)}
+						</span>
+					</li>
+					{pattern.energyEffect && (
+						<li>
+							<span
+								className="px-3 py-1 rounded-full text-xs font-semibold border inline-flex items-center gap-1"
+								style={{
+									borderColor: "var(--color-border)",
+									color: "var(--color-text-secondary)",
+								}}
+							>
+								<EnergyIcon size={13} aria-hidden="true" />
 								{translateWithFallback(t, `library.effects.${pattern.energyEffect}`, pattern.energyEffect)}
 							</span>
-						</span>
+						</li>
 					)}
-				</div>
-			</div>
+				</ul>
+			</header>
 
 			<div className="px-4 pt-5 flex flex-col gap-5">
 				{/* Description */}
@@ -199,17 +204,19 @@ export default function BreathingDetail() {
 
 				{/* Ratio visual */}
 				{ratioStr && (
-					<div
+					<section
+						aria-labelledby="breathing-ratio-heading"
 						className="rounded-3xl p-5"
 						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
-						<p
+						<h2
+							id="breathing-ratio-heading"
 							className="text-xs font-bold uppercase tracking-widest mb-4"
 							style={{ color: "var(--color-text-muted)" }}
 						>
 							{t("pranayama.inhale")} · {t("pranayama.hold")} ·{" "}
 							{t("pranayama.exhale")} · {t("pranayama.hold")}
-						</p>
+						</h2>
 						<div className="flex justify-around">
 							<RatioBox
 								label={t("pranayama.inhale")}
@@ -235,46 +242,48 @@ export default function BreathingDetail() {
 						<p className="text-center mt-4 text-lg font-bold font-display text-[var(--color-text-primary)]">
 							{ratioStr}
 						</p>
-					</div>
+					</section>
 				)}
 
 				{/* Benefits */}
 				{benefits.length > 0 && (
-					<div
+					<section
+						aria-labelledby="breathing-benefits-heading"
 						className="rounded-2xl p-4"
 						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
-						<h3 className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
+						<h2 id="breathing-benefits-heading" className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
 							{t("breathing_detail.benefits")}
-						</h3>
-						<ul className="flex flex-col gap-2">
+						</h2>
+						<ul className="flex flex-col gap-2 list-none m-0 p-0">
 							{benefits.map((b) => (
 								<li
 									key={b}
 									className="flex items-start gap-2 text-sm"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
-									<span style={{ color: "var(--color-primary)" }}>✓</span>
+									<span aria-hidden="true" style={{ color: "var(--color-primary)" }}>✓</span>
 									{b}
 								</li>
 							))}
 						</ul>
-					</div>
+					</section>
 				)}
 
 				{/* Step-by-step instructions */}
 				{instructions.length > 0 && (
-					<div>
-						<h3 className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
+					<section aria-labelledby="breathing-instructions-heading">
+						<h2 id="breathing-instructions-heading" className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
 							{t("breathing_detail.instructions")}
-						</h3>
-						<ol className="flex flex-col gap-3">
+						</h2>
+						<ol className="flex flex-col gap-3 list-none m-0 p-0">
 							{instructions.map((step, i) => (
 								<li
 									key={`step-${String(step).slice(0, 40)}-${String(step).length}`}
 									className="flex items-start gap-3"
 								>
 									<span
+										aria-hidden="true"
 										className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
 										style={{ backgroundColor: "var(--color-primary)" }}
 									>
@@ -289,9 +298,9 @@ export default function BreathingDetail() {
 								</li>
 							))}
 						</ol>
-					</div>
+					</section>
 				)}
 			</div>
-		</div>
+		</main>
 	);
 }

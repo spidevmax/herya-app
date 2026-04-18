@@ -187,15 +187,15 @@ export default function CycleBreathingPlayer({
 	const showCompletionState = engine.finished;
 
 	return (
-		<div className="flex flex-col items-center gap-4 py-2">
+		<section aria-label={pattern.romanizationName} className="flex flex-col items-center gap-4 py-2">
 			{/* Header */}
-			<div className="text-center">
-				<p
-					className="text-xs font-semibold uppercase tracking-widest"
+			<header className="text-center">
+				<h3
+					className="text-xs font-semibold uppercase tracking-widest m-0"
 					style={{ color: paletteTint.accent }}
 				>
 					{pattern.romanizationName}
-				</p>
+				</h3>
 				{pattern.sanskritName && (
 					<p
 						className="text-xs mt-0.5"
@@ -207,7 +207,7 @@ export default function CycleBreathingPlayer({
 						{pattern.sanskritName}
 					</p>
 				)}
-			</div>
+			</header>
 
 			{/* Cycle counter — always visible */}
 			<div
@@ -406,7 +406,7 @@ export default function CycleBreathingPlayer({
 			</div>
 
 			{/* Phase labels with durations */}
-			<div className="flex gap-2 justify-center flex-wrap">
+			<dl className="flex gap-2 justify-center flex-wrap">
 				{activePhases.map((phase) => (
 					<div
 						key={phase}
@@ -418,21 +418,21 @@ export default function CycleBreathingPlayer({
 									: "transparent",
 						}}
 					>
-						<span
+						<dt
 							className="text-[10px] font-semibold uppercase"
 							style={{ color: "var(--color-text-muted)" }}
 						>
 							{t(PHASE_LABEL_KEYS[phase] || "pranayama.inhale")}
-						</span>
-						<span
-							className="text-sm font-bold tabular-nums"
+						</dt>
+						<dd
+							className="text-sm font-bold tabular-nums m-0"
 							style={{ color: PHASE_COLORS[phase] }}
 						>
 							{phaseDurations[phase]}s
-						</span>
+						</dd>
 					</div>
 				))}
-			</div>
+			</dl>
 
 			{/* Cycle dots */}
 			{targetCycles <= 20 && (
@@ -518,22 +518,24 @@ export default function CycleBreathingPlayer({
 					}}
 					aria-label={t("guided.reset")}
 				>
-					<RotateCcw size={16} />
+					<RotateCcw size={16} aria-hidden="true" />
 				</button>
 
 				{/* Play / Pause */}
 				<motion.button
+					type="button"
 					whileTap={{ scale: 0.92 }}
 					onClick={engine.toggle}
 					disabled={showCompletionState}
+					aria-pressed={engine.isRunning}
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg disabled:opacity-50"
 					style={{ backgroundColor: color }}
 					aria-label={engine.isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{engine.isRunning ? (
-						<Pause size={24} />
+						<Pause size={24} aria-hidden="true" />
 					) : (
-						<Play size={24} className="ml-0.5" />
+						<Play size={24} aria-hidden="true" className="ml-0.5" />
 					)}
 				</motion.button>
 
@@ -558,7 +560,7 @@ export default function CycleBreathingPlayer({
 					)}
 					aria-pressed={audioEnabled}
 				>
-					{audioEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+					{audioEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
 				</button>
 			</div>
 
@@ -588,7 +590,7 @@ export default function CycleBreathingPlayer({
 						)}
 						aria-pressed={hapticEnabled}
 					>
-						<Vibrate size={12} />
+						<Vibrate size={12} aria-hidden="true" />
 						{t(
 							hapticEnabled
 								? "pranayama.vibration_on"
@@ -614,7 +616,7 @@ export default function CycleBreathingPlayer({
 					aria-label={t("pranayama.low_stimulation")}
 					aria-pressed={lowStim}
 				>
-					<Accessibility size={12} />
+					<Accessibility size={12} aria-hidden="true" />
 					{t("pranayama.low_stimulation")}
 				</button>
 			</div>
@@ -629,6 +631,6 @@ export default function CycleBreathingPlayer({
 						/>
 					</div>
 				)}
-		</div>
+		</section>
 	);
 }

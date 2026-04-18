@@ -246,10 +246,10 @@ export default function GuidedPracticePlayer({
 	const isWaitingToStart = !timer.isRunning && timer.globalElapsedSec === 0;
 
 	return (
-		<div className="flex flex-col gap-5 pt-2 pb-4">
+		<section aria-label={t("practice.session_progress")} className="flex flex-col gap-5 pt-2 pb-4">
 			{/* Global progress bar */}
-			<div>
-				<div className="flex justify-between items-center mb-1.5">
+			<section aria-label={t("practice.session_progress")}>
+				<header className="flex justify-between items-center mb-1.5">
 					<span
 						className="text-xs font-medium"
 						style={{ color: "var(--color-text-secondary)" }}
@@ -263,54 +263,75 @@ export default function GuidedPracticePlayer({
 						{formatTime(timer.globalElapsedSec)} /{" "}
 						{formatTime(timer.totalPlannedSec)}
 					</span>
-				</div>
+				</header>
 				<ProgressBar
 					value={timer.globalElapsedSec}
 					max={timer.totalPlannedSec}
 					color="var(--color-primary)"
 				/>
-				<div className="flex justify-between mt-1">
-					<span
-						className="text-[10px]"
-						style={{ color: "var(--color-text-muted)" }}
-					>
-						{t("practice.time_elapsed")}: {formatTime(timer.globalElapsedSec)}
-					</span>
-					<span
-						className="text-[10px]"
-						style={{ color: "var(--color-text-muted)" }}
-					>
-						{t("practice.time_remaining")}: {formatTime(timer.globalRemainingSec)}
-					</span>
-				</div>
-			</div>
+				<dl className="flex justify-between mt-1 m-0">
+					<div className="flex gap-1">
+						<dt
+							className="text-[10px]"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{t("practice.time_elapsed")}:
+						</dt>
+						<dd
+							className="text-[10px] m-0"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{formatTime(timer.globalElapsedSec)}
+						</dd>
+					</div>
+					<div className="flex gap-1">
+						<dt
+							className="text-[10px]"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{t("practice.time_remaining")}:
+						</dt>
+						<dd
+							className="text-[10px] m-0"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{formatTime(timer.globalRemainingSec)}
+						</dd>
+					</div>
+				</dl>
+			</section>
 
 			{/* Block indicator dots */}
-			<div className="flex justify-center gap-1.5">
-				{blocks.map((block, idx) => (
-					<button
-						key={
+			<nav aria-label={t("practice.next_block")} className="flex justify-center">
+				<ol className="flex justify-center gap-1.5 list-none m-0 p-0">
+					{blocks.map((block, idx) => (
+						<li key={
 							block.id ??
 							block._id ??
 							`block-${block.order ?? block.label ?? block.blockType}`
-						}
-						type="button"
-						onClick={() => timer.goToBlock(idx)}
-						className="transition-all rounded-full"
-						style={{
-							width: idx === timer.currentBlockIndex ? 24 : 8,
-							height: 8,
-							backgroundColor:
-								idx < timer.currentBlockIndex
-									? BLOCK_TYPE_COLORS[block.blockType]
-									: idx === timer.currentBlockIndex
-										? BLOCK_TYPE_COLORS[block.blockType]
-										: "var(--color-border-soft)",
-							opacity: idx <= timer.currentBlockIndex ? 1 : 0.4,
-						}}
-					/>
-				))}
-			</div>
+						}>
+							<button
+								type="button"
+								onClick={() => timer.goToBlock(idx)}
+								aria-current={idx === timer.currentBlockIndex ? "step" : undefined}
+								aria-label={block.label || `Block ${idx + 1}`}
+								className="transition-all rounded-full block"
+								style={{
+									width: idx === timer.currentBlockIndex ? 24 : 8,
+									height: 8,
+									backgroundColor:
+										idx < timer.currentBlockIndex
+											? BLOCK_TYPE_COLORS[block.blockType]
+											: idx === timer.currentBlockIndex
+												? BLOCK_TYPE_COLORS[block.blockType]
+												: "var(--color-border-soft)",
+									opacity: idx <= timer.currentBlockIndex ? 1 : 0.4,
+								}}
+							/>
+						</li>
+					))}
+				</ol>
+			</nav>
 
 			{/* Visual schedule — predictability board for tutor mode */}
 			{isTutorMode && (
@@ -381,7 +402,8 @@ export default function GuidedPracticePlayer({
 
 						{/* Start overlay — shown before user presses play (all block types) */}
 						{isWaitingToStart && hasGuidedPlayer && (
-							<div
+							<section
+								aria-labelledby={`block-start-heading-${timer.currentBlockIndex}`}
 								className="rounded-2xl p-6 text-center"
 								style={{
 									backgroundColor: "var(--color-surface-card)",
@@ -397,14 +419,14 @@ export default function GuidedPracticePlayer({
 										total: blocks.length,
 									})}
 								</p>
-								<div className="mb-3 flex justify-center">
+								<span aria-hidden="true" className="mb-3 flex justify-center">
 									<BlockIcon
 										size={44}
 										strokeWidth={2.2}
 										style={{ color: blockColor }}
 									/>
-								</div>
-								<h3 className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+								</span>
+								<h3 id={`block-start-heading-${timer.currentBlockIndex}`} className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
 									{currentBlock.label}
 								</h3>
 								<p
@@ -414,13 +436,14 @@ export default function GuidedPracticePlayer({
 									{t(`practice.type_${currentBlock.blockType}`)} · {currentBlock.durationMinutes}m
 								</p>
 								<motion.button
+									type="button"
 									whileTap={{ scale: 0.92 }}
 									onClick={startTimerWithBackend}
 									aria-label={t("practice.aria_play")}
 									className="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg"
 									style={{ backgroundColor: blockColor }}
 								>
-									<Play size={32} className="ml-1" />
+									<Play size={32} aria-hidden="true" className="ml-1" />
 								</motion.button>
 								<p
 									className="text-xs mt-3"
@@ -428,12 +451,13 @@ export default function GuidedPracticePlayer({
 								>
 									{t("practice.tap_to_start")}
 								</p>
-							</div>
+							</section>
 						)}
 
 						{/* Fallback: Timer-only card (non-guided or missing data) */}
 						{!hasGuidedPlayer && (
-							<div
+							<section
+								aria-labelledby={`block-timer-heading-${timer.currentBlockIndex}`}
 								className="rounded-2xl p-6 text-center"
 								style={{
 									backgroundColor: "var(--color-surface-card)",
@@ -450,15 +474,15 @@ export default function GuidedPracticePlayer({
 									})}
 								</p>
 
-								<div className="mb-3 flex justify-center">
+								<span aria-hidden="true" className="mb-3 flex justify-center">
 									<BlockIcon
 										size={44}
 										strokeWidth={2.2}
 										style={{ color: blockColor }}
 									/>
-								</div>
+								</span>
 
-								<h3 className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+								<h3 id={`block-timer-heading-${timer.currentBlockIndex}`} className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
 									{currentBlock.label}
 								</h3>
 
@@ -472,13 +496,14 @@ export default function GuidedPracticePlayer({
 								{isWaitingToStart ? (
 									<>
 										<motion.button
+											type="button"
 											whileTap={{ scale: 0.92 }}
 											onClick={startTimerWithBackend}
 											aria-label={t("practice.aria_play")}
 											className="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg"
 											style={{ backgroundColor: blockColor }}
 										>
-											<Play size={32} className="ml-1" />
+											<Play size={32} aria-hidden="true" className="ml-1" />
 										</motion.button>
 										<p
 											className="text-xs mt-3"
@@ -489,7 +514,7 @@ export default function GuidedPracticePlayer({
 									</>
 								) : (
 									/* Block timer circle — only shown after user presses play */
-									<div className="flex justify-center mb-4">
+									<div className="flex justify-center mb-4" role="timer" aria-live="off" aria-label={t("practice.block_remaining")}>
 										<CircleProgress
 											value={timer.blockElapsedSec}
 											max={(currentBlock.durationMinutes || 1) * 60}
@@ -514,7 +539,7 @@ export default function GuidedPracticePlayer({
 										</CircleProgress>
 									</div>
 								)}
-							</div>
+							</section>
 						)}
 					</motion.div>
 				)}
@@ -522,7 +547,8 @@ export default function GuidedPracticePlayer({
 
 			{/* Next block preview */}
 			{nextBlock && (
-				<div
+				<aside
+					aria-label={t("practice.next_block")}
 					className="flex items-center gap-3 px-4 py-3 rounded-xl"
 					style={{
 						backgroundColor: `color-mix(in srgb, ${BLOCK_TYPE_COLORS[nextBlock.blockType]} 8%, transparent)`,
@@ -531,6 +557,7 @@ export default function GuidedPracticePlayer({
 				>
 					<ChevronRight
 						size={14}
+						aria-hidden="true"
 						style={{
 							color: BLOCK_TYPE_COLORS[nextBlock.blockType],
 						}}
@@ -549,7 +576,7 @@ export default function GuidedPracticePlayer({
 							{nextBlock.label} · {nextBlock.durationMinutes}m
 						</p>
 					</div>
-				</div>
+				</aside>
 			)}
 
 			{/* Controls — hidden during "waiting to start" overlay for guided blocks */}
@@ -567,10 +594,11 @@ export default function GuidedPracticePlayer({
 							color: "var(--color-text-secondary)",
 						}}
 					>
-						<SkipBack size={18} />
+						<SkipBack size={18} aria-hidden="true" />
 					</button>
 
 					<motion.button
+						type="button"
 						whileTap={{ scale: 0.92 }}
 						onClick={
 							timer.isRunning
@@ -579,14 +607,15 @@ export default function GuidedPracticePlayer({
 									? timer.resume
 									: startTimerWithBackend
 						}
+						aria-pressed={timer.isRunning}
 						aria-label={timer.isRunning ? t("practice.aria_pause") : t("practice.aria_play")}
 						className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 						style={{ backgroundColor: blockColor }}
 					>
 						{timer.isRunning ? (
-							<Pause size={24} />
+							<Pause size={24} aria-hidden="true" />
 						) : (
-							<Play size={24} className="ml-0.5" />
+							<Play size={24} aria-hidden="true" className="ml-0.5" />
 						)}
 					</motion.button>
 
@@ -602,7 +631,7 @@ export default function GuidedPracticePlayer({
 							color: "var(--color-text-secondary)",
 						}}
 					>
-						<SkipForward size={18} />
+						<SkipForward size={18} aria-hidden="true" />
 					</button>
 				</div>
 			)}
@@ -619,22 +648,25 @@ export default function GuidedPracticePlayer({
 						{t("practice.safe_pause")}
 					</Button>
 					{safePauseOpen && (
-						<div
+						<section
 							className="rounded-2xl p-4 border flex flex-col gap-3"
 							style={{
 								backgroundColor: "var(--color-surface-card)",
 								borderColor: "var(--color-border-soft)",
 							}}
 							role="dialog"
-							aria-label={t("practice.safe_pause_title")}
+							aria-labelledby="safe-pause-title"
+							aria-describedby="safe-pause-subtitle"
 						>
-							<p
-								className="text-sm font-semibold"
+							<h3
+								id="safe-pause-title"
+								className="text-sm font-semibold m-0"
 								style={{ color: "var(--color-text-primary)" }}
 							>
 								{t("practice.safe_pause_title")}
-							</p>
+							</h3>
 							<p
+								id="safe-pause-subtitle"
 								className="text-xs"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
@@ -642,8 +674,8 @@ export default function GuidedPracticePlayer({
 							</p>
 
 							{/* Co-regulation breathing circle */}
-							<div className="flex flex-col items-center py-3">
-								<motion.div
+							<figure className="flex flex-col items-center py-3 m-0">
+								<motion.span
 									animate={{ scale: [1, 1.3, 1] }}
 									transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
 									className="w-16 h-16 rounded-full flex items-center justify-center"
@@ -653,48 +685,40 @@ export default function GuidedPracticePlayer({
 									}}
 									aria-hidden="true"
 								>
-									<Leaf size={24} style={{ color: "var(--color-primary)" }} />
-								</motion.div>
-								<p
+									<Leaf size={24} aria-hidden="true" style={{ color: "var(--color-primary)" }} />
+								</motion.span>
+								<figcaption
 									className="text-[11px] mt-2"
 									style={{ color: "var(--color-text-muted)" }}
 								>
 									{t("practice.safe_pause_breathe")}
-								</p>
-							</div>
+								</figcaption>
+							</figure>
 
-							<div
-								className="text-xs"
+							<ol
+								className="flex flex-col gap-1 list-decimal list-inside text-xs m-0 p-0"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
-								1. {t("practice.safe_pause_step_1")}
-							</div>
-							<div
-								className="text-xs"
-								style={{ color: "var(--color-text-secondary)" }}
-							>
-								2. {t("practice.safe_pause_step_2")}
-							</div>
-							<div
-								className="text-xs"
-								style={{ color: "var(--color-text-secondary)" }}
-							>
-								3. {t("practice.safe_pause_step_3")}
-							</div>
+								<li>{t("practice.safe_pause_step_1")}</li>
+								<li>{t("practice.safe_pause_step_2")}</li>
+								<li>{t("practice.safe_pause_step_3")}</li>
+							</ol>
 							{(anchorPhrase || anchorBodyCue) && (
-								<div
+								<section
+									aria-labelledby="safe-pause-anchor-title"
 									className="rounded-xl p-3 border"
 									style={{
 										backgroundColor: "var(--color-surface)",
 										borderColor: "var(--color-border-soft)",
 									}}
 								>
-									<p
-										className="text-[11px] font-semibold mb-1"
+									<h4
+										id="safe-pause-anchor-title"
+										className="text-[11px] font-semibold mb-1 m-0"
 										style={{ color: "var(--color-text-primary)" }}
 									>
 										{t("practice.safe_pause_anchor_title")}
-									</p>
+									</h4>
 									{anchorPhrase && (
 										<p
 											className="text-xs"
@@ -718,6 +742,7 @@ export default function GuidedPracticePlayer({
 										size="sm"
 										onClick={() => setAnchorUsed(true)}
 										className="mt-2 min-h-[48px]"
+										aria-pressed={anchorUsed}
 										aria-label={
 											anchorUsed
 												? t("practice.safe_pause_anchor_used")
@@ -728,7 +753,7 @@ export default function GuidedPracticePlayer({
 											? t("practice.safe_pause_anchor_used")
 											: t("practice.safe_pause_anchor_mark_used")}
 									</Button>
-								</div>
+								</section>
 							)}
 							{safePauseRemaining > 0 ? (
 								<p
@@ -769,7 +794,7 @@ export default function GuidedPracticePlayer({
 										}}
 										aria-label={t("practice.safe_pause_try_different")}
 									>
-										<Shuffle size={16} />
+										<Shuffle size={16} aria-hidden="true" />
 										{t("practice.safe_pause_try_different")}
 									</Button>
 								)}
@@ -781,7 +806,7 @@ export default function GuidedPracticePlayer({
 									{t("practice.safe_pause_end")}
 								</Button>
 							</div>
-						</div>
+						</section>
 					)}
 				</>
 			)}
@@ -790,7 +815,7 @@ export default function GuidedPracticePlayer({
 					timer.pause();
 					setAbandonModalOpen(true);
 				}}>
-					<Square size={14} />
+					<Square size={14} aria-hidden="true" />
 					{t("practice.end_session")}
 				</Button>
 				<Button className="flex-1" onClick={handleFinish}>
@@ -822,6 +847,6 @@ export default function GuidedPracticePlayer({
 				visible={transitionVisible}
 				onCountdownEnd={handleTransitionEnd}
 			/>
-		</div>
+		</section>
 	);
 }

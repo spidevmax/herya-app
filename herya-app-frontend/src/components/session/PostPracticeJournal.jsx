@@ -164,7 +164,12 @@ export default function PostPracticeJournal({
 	})();
 
 	return (
-		<motion.div
+		<motion.form
+			aria-labelledby="post-practice-heading"
+			onSubmit={(e) => {
+				e.preventDefault();
+				handleSave();
+			}}
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="flex flex-col gap-5 pt-2"
@@ -177,11 +182,14 @@ export default function PostPracticeJournal({
 			/>
 
 			{/* Session summary */}
-			<div
+			<section
+				aria-labelledby="post-practice-heading"
 				className="rounded-2xl p-5 text-center"
 				style={{ backgroundColor: "var(--color-surface-card)" }}
 			>
-				<motion.div
+				<motion.span
+					aria-hidden="true"
+					className="inline-block"
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}
 					transition={{ type: "spring", stiffness: 260, damping: 20 }}
@@ -191,41 +199,41 @@ export default function PostPracticeJournal({
 						style={{ color: "var(--color-primary)" }}
 						className="mx-auto mb-3"
 					/>
-				</motion.div>
-				<h2 className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+				</motion.span>
+				<h2 id="post-practice-heading" className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
 					{t("practice.journal_title")}
 				</h2>
 				{sessionSummary && (
-					<div className="flex justify-center gap-4 mt-3">
+					<dl className="flex justify-center gap-4 mt-3">
 						<div className="text-center">
-							<p
+							<dd
 								className="text-lg font-bold"
 								style={{ color: "var(--color-primary)" }}
 							>
 								{formatTime(sessionSummary.globalElapsedSec || 0)}
-							</p>
-							<p
+							</dd>
+							<dt
 								className="text-[10px] uppercase tracking-wider"
 								style={{ color: "var(--color-text-muted)" }}
 							>
 								{t("practice.duration")}
-							</p>
+							</dt>
 						</div>
 						<div className="text-center">
-							<p
+							<dd
 								className="text-lg font-bold"
 								style={{ color: "var(--color-secondary)" }}
 							>
 								{sessionSummary.blocksCompleted || 0}
-							</p>
-							<p
+							</dd>
+							<dt
 								className="text-[10px] uppercase tracking-wider"
 								style={{ color: "var(--color-text-muted)" }}
 							>
 								{t("practice.blocks_completed")}
-							</p>
+							</dt>
 						</div>
-					</div>
+					</dl>
 				)}
 				{isTutorMode && tutorSummaryKey && (
 					<p
@@ -236,44 +244,47 @@ export default function PostPracticeJournal({
 					</p>
 				)}
 				{isTutorMode && tutorMicroAchievements.length > 0 && (
-					<div
+					<section
+						aria-labelledby="post-practice-micro-heading"
 						className="mt-4 rounded-xl px-3 py-2 text-left"
 						style={{ backgroundColor: "var(--color-surface)" }}
 					>
-						<p
+						<h3
+							id="post-practice-micro-heading"
 							className="text-[11px] font-semibold mb-1"
 							style={{ color: "var(--color-text-primary)" }}
 						>
 							{t("practice.micro_title")}
-						</p>
-						<div className="flex flex-col gap-1">
+						</h3>
+						<ul className="flex flex-col gap-1 list-none m-0 p-0">
 							{tutorMicroAchievements.map((item) => (
-								<p
+								<li
 									key={item}
 									className="text-[11px]"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
-									• {item}
-								</p>
+									<span aria-hidden="true">• </span>
+									{item}
+								</li>
 							))}
-						</div>
-					</div>
+						</ul>
+					</section>
 				)}
-			</div>
+			</section>
 
 			{/* Mood after */}
-			<div
-				className="rounded-2xl p-5"
+			<fieldset
+				className="rounded-2xl p-5 border-0"
 				style={{ backgroundColor: "var(--color-surface-card)" }}
 			>
-				<p
+				<legend
 					className="text-sm font-medium mb-3"
 					style={{ color: "var(--color-text-primary)" }}
 				>
 					{isTutorMode
 						? t("practice.checkout_signal")
 						: t("practice.journal_mood_after")}
-				</p>
+				</legend>
 				{isTutorMode ? (
 					<div className="grid grid-cols-3 gap-2">
 						{["green", "yellow", "red"].map((signal) => {
@@ -334,22 +345,25 @@ export default function PostPracticeJournal({
 						})}
 					</div>
 				)}
-			</div>
+			</fieldset>
 
 			{/* Energy & Stress */}
 			{!isTutorMode && (
-				<div
+				<section
+					aria-label={t("practice.journal_energy_after", { n: energyAfter })}
 					className="rounded-2xl p-5 flex flex-col gap-4"
 					style={{ backgroundColor: "var(--color-surface-card)" }}
 				>
 					<div>
-						<p
-							className="text-sm font-medium mb-2"
+						<label
+							htmlFor="post-practice-energy"
+							className="text-sm font-medium mb-2 block"
 							style={{ color: "var(--color-text-primary)" }}
 						>
 							{t("practice.journal_energy_after", { n: energyAfter })}
-						</p>
+						</label>
 						<input
+							id="post-practice-energy"
 							type="range"
 							min={1}
 							max={10}
@@ -360,13 +374,15 @@ export default function PostPracticeJournal({
 						/>
 					</div>
 					<div>
-						<p
-							className="text-sm font-medium mb-2"
+						<label
+							htmlFor="post-practice-stress"
+							className="text-sm font-medium mb-2 block"
 							style={{ color: "var(--color-text-primary)" }}
 						>
 							{t("practice.journal_stress_after", { n: stressAfter })}
-						</p>
+						</label>
 						<input
+							id="post-practice-stress"
 							type="range"
 							min={1}
 							max={10}
@@ -376,26 +392,27 @@ export default function PostPracticeJournal({
 							style={{ accentColor: "var(--color-accent)" }}
 						/>
 					</div>
-				</div>
+				</section>
 			)}
 
 			{/* Physical sensations */}
 			{!isTutorMode && (
-				<div
-					className="rounded-2xl p-5"
+				<fieldset
+					className="rounded-2xl p-5 border-0"
 					style={{ backgroundColor: "var(--color-surface-card)" }}
 				>
-					<p
+					<legend
 						className="text-sm font-medium mb-3"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{t("practice.journal_sensations")}
-					</p>
+					</legend>
 					<div className="flex flex-wrap gap-2">
 						{SENSATION_OPTIONS.map((s) => (
 							<button
 								type="button"
 								key={s}
+								aria-pressed={physicalSensations.includes(s)}
 								onClick={() => toggleSensation(s)}
 								className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
 								style={{
@@ -411,24 +428,27 @@ export default function PostPracticeJournal({
 							</button>
 						))}
 					</div>
-				</div>
+				</fieldset>
 			)}
 
 			{/* Free-form notes */}
-			<div
+			<section
+				aria-label={t("practice.journal_emotional_notes")}
 				className="rounded-2xl p-5 flex flex-col gap-4"
 				style={{ backgroundColor: "var(--color-surface-card)" }}
 			>
 				<div>
-					<p
-						className="text-sm font-medium mb-2"
+					<label
+						htmlFor="post-practice-notes"
+						className="text-sm font-medium mb-2 block"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{isTutorMode
 							? t("practice.tutor_notes")
 							: t("practice.journal_emotional_notes")}
-					</p>
+					</label>
 					<textarea
+						id="post-practice-notes"
 						value={emotionalNotes}
 						onChange={(e) => setEmotionalNotes(e.target.value)}
 						rows={2}
@@ -442,13 +462,15 @@ export default function PostPracticeJournal({
 					/>
 				</div>
 				<div>
-					<p
-						className="text-sm font-medium mb-2"
+					<label
+						htmlFor="post-practice-gratitude"
+						className="text-sm font-medium mb-2 block"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{t("practice.journal_gratitude")}
-					</p>
+					</label>
 					<textarea
+						id="post-practice-gratitude"
 						value={gratitude}
 						onChange={(e) => setGratitude(e.target.value)}
 						rows={2}
@@ -462,13 +484,15 @@ export default function PostPracticeJournal({
 					/>
 				</div>
 				<div>
-					<p
-						className="text-sm font-medium mb-2"
+					<label
+						htmlFor="post-practice-learnings"
+						className="text-sm font-medium mb-2 block"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{t("practice.journal_learnings")}
-					</p>
+					</label>
 					<textarea
+						id="post-practice-learnings"
 						value={learnings}
 						onChange={(e) => setLearnings(e.target.value)}
 						rows={2}
@@ -481,11 +505,12 @@ export default function PostPracticeJournal({
 						}}
 					/>
 				</div>
-			</div>
+			</section>
 
 			{/* Error banner */}
 			{error && (
 				<motion.div
+					role="alert"
 					initial={{ opacity: 0, y: 8 }}
 					animate={{ opacity: 1, y: 0 }}
 					className="rounded-xl p-3 flex items-center justify-between"
@@ -504,10 +529,11 @@ export default function PostPracticeJournal({
 						<button
 							type="button"
 							onClick={onDismissError}
+							aria-label={t("ui.close_modal")}
 							className="ml-2 text-xs font-bold"
 							style={{ color: "var(--color-text-muted)" }}
 						>
-							✕
+							<span aria-hidden="true">✕</span>
 						</button>
 					)}
 				</motion.div>
@@ -515,7 +541,7 @@ export default function PostPracticeJournal({
 
 			{/* Save */}
 			<Button
-				onClick={handleSave}
+				type="submit"
 				disabled={saving}
 				loading={saving}
 				size="lg"
@@ -523,6 +549,6 @@ export default function PostPracticeJournal({
 			>
 				{error ? t("practice.retry_save") : t("practice.save_journal")}
 			</Button>
-		</motion.div>
+		</motion.form>
 	);
 }

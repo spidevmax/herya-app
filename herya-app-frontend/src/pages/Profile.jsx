@@ -231,7 +231,7 @@ export default function Profile() {
 	};
 
 	return (
-		<div className="flex flex-col gap-6 pt-4 pb-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+		<main className="flex flex-col gap-6 pt-4 pb-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
 			<input
 				ref={fileInputRef}
 				type="file"
@@ -309,6 +309,6 @@ export default function Profile() {
 				loading={deletingAccount}
 				confirmPhrase={t("profile.delete_confirm_phrase")}
 			/>
-		</div>
+		</main>
 	);
 }

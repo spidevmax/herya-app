@@ -12,19 +12,19 @@ import { Card, LoadingSpinner, SurfaceCard } from "@/components/ui";
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
 export const EntryCardSkeleton = () => (
-	<SurfaceCard className="animate-pulse p-3.5 shadow-none">
+	<SurfaceCard aria-hidden="true" className="animate-pulse p-3.5 shadow-none">
 		<div className="flex items-start justify-between gap-2 mb-2.5">
 			<div className="min-w-0 flex-1">
-				<div className="skeleton h-5 w-28 rounded-lg mb-1.5" />
-				<div className="skeleton h-3 w-20 rounded-lg" />
+				<span className="skeleton h-5 w-28 rounded-lg mb-1.5 block" />
+				<span className="skeleton h-3 w-20 rounded-lg block" />
 			</div>
 			<div className="flex gap-1">
-				<div className="skeleton h-6 w-14 rounded-full" />
-				<div className="skeleton h-6 w-14 rounded-full" />
+				<span className="skeleton h-6 w-14 rounded-full block" />
+				<span className="skeleton h-6 w-14 rounded-full block" />
 			</div>
 		</div>
-		<div className="skeleton h-3 w-full rounded-lg mb-1" />
-		<div className="skeleton h-3 w-3/4 rounded-lg" />
+		<span className="skeleton h-3 w-full rounded-lg mb-1 block" />
+		<span className="skeleton h-3 w-3/4 rounded-lg block" />
 	</SurfaceCard>
 );
 
@@ -128,19 +128,17 @@ export const EntryList = ({
 
 	return (
 		<div className="flex flex-col gap-2.5">
-			<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+			<ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 list-none m-0 p-0">
 				{entries.map((entry) => (
-					<EntryCard
-						key={resolveEntryId(entry)}
-						entry={entry}
-						onSelect={onSelectEntry}
-					/>
+					<li key={resolveEntryId(entry)}>
+						<EntryCard entry={entry} onSelect={onSelectEntry} />
+					</li>
 				))}
-			</div>
+			</ul>
 
 			{/* Load more sentinel / spinner */}
 			{hasMore && (
-				<div ref={sentinelRef} className="flex justify-center py-4">
+				<div ref={sentinelRef} className="flex justify-center py-4" aria-live="polite">
 					{loadingMore && <LoadingSpinner size={24} />}
 				</div>
 			)}

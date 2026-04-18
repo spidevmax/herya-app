@@ -129,16 +129,18 @@ export default function SessionHistory() {
 	}, [fetchSessions]);
 
 	return (
-		<div className="flex flex-col pt-4 pb-6 min-h-0">
-			<div className="px-4 mb-4">
+		<main className="flex flex-col pt-4 pb-6 min-h-0">
+			<header className="px-4 mb-4">
 				<div className="flex items-center gap-3 mb-4">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
+						aria-label={t("session.back_home")}
 						className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-sm"
 					>
 						<ChevronLeft
 							size={20}
+							aria-hidden="true"
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
@@ -158,12 +160,14 @@ export default function SessionHistory() {
 						setPage(1);
 					}}
 				/>
-			</div>
+			</header>
 
-			<div className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-				{loading ? (
-					["s1", "s2", "s3", "s4"].map((k) => <SkeletonCard key={k} />)
-				) : sessions.length === 0 ? (
+			{loading ? (
+				<div className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" aria-busy="true" aria-live="polite">
+					{["s1", "s2", "s3", "s4"].map((k) => <SkeletonCard key={k} />)}
+				</div>
+			) : sessions.length === 0 ? (
+				<div className="px-4">
 					<EmptyState
 						icon={
 							<ClipboardList
@@ -174,29 +178,34 @@ export default function SessionHistory() {
 						title={t("session_history.empty_title")}
 						description={t("session_history.empty_hint")}
 					/>
-				) : (
-					sessions.map((s, i) => (
-						<SessionCard
-							key={s._id}
-							session={s}
-							index={i}
-							onClick={() => navigate(`/sessions/${s._id}`)}
-							t={t}
-							lang={lang}
-						/>
-					))
-				)}
+				</div>
+			) : (
+				<ul className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 list-none m-0 p-0">
+					{sessions.map((s, i) => (
+						<li key={s._id}>
+							<SessionCard
+								session={s}
+								index={i}
+								onClick={() => navigate(`/sessions/${s._id}`)}
+								t={t}
+								lang={lang}
+							/>
+						</li>
+					))}
+				</ul>
+			)}
 
-				{!loading && hasMore && (
+			{!loading && hasMore && (
+				<div className="px-4 mt-3">
 					<button
 						type="button"
 						onClick={() => setPage((p) => p + 1)}
-						className="w-full py-3 rounded-2xl border border-[var(--color-border-soft)] text-[var(--color-primary)] text-sm font-semibold mt-2"
+						className="w-full py-3 rounded-2xl border border-[var(--color-border-soft)] text-[var(--color-primary)] text-sm font-semibold"
 					>
 						{t("session_history.load_more")}
 					</button>
-				)}
-			</div>
-		</div>
+				</div>
+			)}
+		</main>
 	);
 }

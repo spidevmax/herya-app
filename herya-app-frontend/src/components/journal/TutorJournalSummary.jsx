@@ -82,15 +82,16 @@ export const TutorJournalSummary = ({ entries }) => {
 		: t("journal.tutor_summary_no_data");
 
 	return (
-		<SurfaceCard className="p-4 shadow-none">
-			<div className="flex items-center justify-between gap-3 mb-3">
+		<SurfaceCard role="region" aria-labelledby="tutor-summary-heading" className="p-4 shadow-none">
+			<header className="flex items-center justify-between gap-3 mb-3">
 				<div>
-					<p
+					<h2
+						id="tutor-summary-heading"
 						className="text-[11px] font-bold uppercase tracking-[0.1em]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
 						{t("journal.tutor_summary_title")}
-					</p>
+					</h2>
 					<p
 						className="text-sm"
 						style={{ color: "var(--color-text-secondary)" }}
@@ -99,75 +100,76 @@ export const TutorJournalSummary = ({ entries }) => {
 					</p>
 				</div>
 				<div
+					aria-hidden="true"
 					className="w-8 h-8 rounded-xl flex items-center justify-center"
 					style={{ backgroundColor: "var(--color-surface)" }}
 				>
 					<ShieldCheck size={16} style={{ color: "var(--color-info)" }} />
 				</div>
-			</div>
+			</header>
 
-			<div className="grid grid-cols-2 gap-2 mb-3">
+			<dl className="grid grid-cols-2 gap-2 mb-3">
 				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
-					<p
+					<dt
 						className="text-[10px]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
 						{t("journal.tutor_summary_current_signal")}
-					</p>
-					<p
+					</dt>
+					<dd
 						className="text-xs font-semibold mt-0.5"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{latestSignalLabel}
-					</p>
+					</dd>
 				</div>
 				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
-					<p
+					<dt
 						className="text-[10px]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
 						{t("journal.tutor_summary_safe_pauses")}
-					</p>
-					<p
+					</dt>
+					<dd
 						className="text-xs font-semibold mt-0.5"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{summary.safePauseCount}
-					</p>
+					</dd>
 				</div>
 				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
-					<p
+					<dt
 						className="text-[10px]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
 						{t("journal.tutor_summary_improved")}
-					</p>
-					<p
+					</dt>
+					<dd
 						className="text-xs font-semibold mt-0.5"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{summary.improvedRate === null
 							? t("journal.tutor_summary_no_data")
 							: formatPercent(summary.improvedRate)}
-					</p>
+					</dd>
 				</div>
 				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
-					<p
+					<dt
 						className="text-[10px]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
 						{t("journal.tutor_summary_anchor_usage")}
-					</p>
-					<p
+					</dt>
+					<dd
 						className="text-xs font-semibold mt-0.5"
 						style={{ color: "var(--color-text-primary)" }}
 					>
 						{summary.anchorUseRate === null
 							? t("journal.tutor_summary_no_data")
 							: formatPercent(summary.anchorUseRate)}
-					</p>
+					</dd>
 				</div>
-			</div>
+			</dl>
 
 			<p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
 				{t("journal.tutor_summary_signal_transitions", {

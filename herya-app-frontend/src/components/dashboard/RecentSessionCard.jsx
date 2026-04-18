@@ -30,11 +30,14 @@ export default function RecentSessionCard({ session, index = 0 }) {
 	const color = family?.color || "var(--color-primary)";
 
 	return (
-		<motion.div
+		<motion.article
 			initial={{ opacity: 0, x: -16 }}
 			animate={{ opacity: 1, x: 0 }}
 			transition={{ delay: index * 0.08 }}
 			onClick={() => navigate(`/sessions/${session._id}`)}
+			onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate(`/sessions/${session._id}`); } }}
+			role="button"
+			tabIndex={0}
 			className="flex items-center gap-3 rounded-2xl p-4 shadow-[var(--shadow-card)] cursor-pointer active:scale-[0.98] transition-transform"
 			style={{ backgroundColor: "var(--color-surface-card)" }}
 		>
@@ -77,6 +80,6 @@ export default function RecentSessionCard({ session, index = 0 }) {
 					<XCircle size={14} style={{ color: "var(--color-text-muted)" }} />
 				)}
 			</div>
-		</motion.div>
+		</motion.article>
 	);
 }

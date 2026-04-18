@@ -54,11 +54,15 @@ export default function AuthCallback() {
 	}, [authError, loginWithToken, navigate, t, token]);
 
 	return (
-		<div className="min-h-dvh flex items-center justify-center px-6">
-			<div className="w-full max-w-md rounded-3xl bg-[var(--color-surface-card)] p-6 text-center shadow-[var(--shadow-card)]">
+		<main className="min-h-dvh flex items-center justify-center px-6">
+			<section
+				aria-live="polite"
+				aria-busy={!error}
+				className="w-full max-w-md rounded-3xl bg-[var(--color-surface-card)] p-6 text-center shadow-[var(--shadow-card)]"
+			>
 				{error ? (
 					<>
-						<p className="text-[var(--color-error-text)] text-sm font-semibold mb-4">
+						<p role="alert" className="text-[var(--color-error-text)] text-sm font-semibold mb-4">
 							{error}
 						</p>
 						<button
@@ -71,13 +75,13 @@ export default function AuthCallback() {
 					</>
 				) : (
 					<>
-						<div className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin" />
+						<div aria-hidden="true" className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin" />
 						<p className="text-[var(--color-text-primary)] text-sm font-semibold">
 							{t("auth_callback.completing")}
 						</p>
 					</>
 				)}
-			</div>
-		</div>
+			</section>
+		</main>
 	);
 }

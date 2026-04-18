@@ -3,7 +3,7 @@ import { useAuth } from "@/context/AuthContext";
 import { LoadingSpinner } from "@/components/ui";
 
 const FullPageSpinner = () => (
-	<div className="min-h-dvh flex items-center justify-center">
+	<div role="status" aria-live="polite" className="min-h-dvh flex items-center justify-center">
 		<LoadingSpinner size={40} color="var(--color-primary)" />
 	</div>
 );

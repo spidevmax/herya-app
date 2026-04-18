@@ -12,8 +12,9 @@ export default function Toggle({ id, label, checked, onChange }) {
 				className="sr-only"
 				aria-label={label}
 			/>
-			<div
-				className="w-11 h-6 rounded-full transition-colors duration-200 relative"
+			<span
+				aria-hidden="true"
+				className="w-11 h-6 rounded-full transition-colors duration-200 relative inline-block"
 				style={{
 					backgroundColor: checked
 						? "var(--color-primary)"
@@ -26,7 +27,7 @@ export default function Toggle({ id, label, checked, onChange }) {
 						transform: checked ? "translateX(20px)" : "translateX(0px)",
 					}}
 				/>
-			</div>
+			</span>
 		</label>
 	);
 }

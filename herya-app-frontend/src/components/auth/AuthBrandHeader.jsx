@@ -9,7 +9,7 @@ export default function AuthBrandHeader({
 	const { t } = useLanguage();
 
 	return (
-		<motion.div
+		<motion.header
 			initial={{ opacity: 0, y: 10 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.35 }}
@@ -45,6 +45,6 @@ export default function AuthBrandHeader({
 					{t(subtitleKey)}
 				</p>
 			)}
-		</motion.div>
+		</motion.header>
 	);
 }

@@ -11,7 +11,7 @@ export default function SafetyBanner({ contraindications = [], warnings = "" }) 
 	if (items.length === 0 && !warnings) return null;
 
 	return (
-		<motion.div
+		<motion.aside
 			initial={{ opacity: 0, y: -4 }}
 			animate={{ opacity: 1, y: 0 }}
 			className="rounded-xl p-3 border"
@@ -24,10 +24,13 @@ export default function SafetyBanner({ contraindications = [], warnings = "" }) 
 			<button
 				type="button"
 				onClick={() => setExpanded((e) => !e)}
+				aria-expanded={expanded}
+				aria-controls="safety-banner-details"
 				className="flex items-center gap-2 w-full text-left"
 			>
 				<AlertTriangle
 					size={16}
+					aria-hidden="true"
 					className="shrink-0"
 					style={{ color: "var(--color-warning-text, #92400E)" }}
 				/>
@@ -38,7 +41,7 @@ export default function SafetyBanner({ contraindications = [], warnings = "" }) 
 					{t("guided.safety_warning")} ({items.length})
 				</span>
 				{items.length > 0 && (
-					<span style={{ color: "var(--color-warning-text, #92400E)" }}>
+					<span aria-hidden="true" style={{ color: "var(--color-warning-text, #92400E)" }}>
 						{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
 					</span>
 				)}
@@ -47,18 +50,20 @@ export default function SafetyBanner({ contraindications = [], warnings = "" }) 
 			<AnimatePresence>
 				{expanded && items.length > 0 && (
 					<motion.ul
+						id="safety-banner-details"
 						initial={{ height: 0, opacity: 0 }}
 						animate={{ height: "auto", opacity: 1 }}
 						exit={{ height: 0, opacity: 0 }}
-						className="overflow-hidden mt-2 flex flex-col gap-1"
+						className="overflow-hidden mt-2 flex flex-col gap-1 list-none m-0 p-0"
 					>
-						{items.map((item, i) => (
+						{items.map((item) => (
 							<li
-								key={i}
+								key={item}
 								className="text-xs pl-6"
 								style={{ color: "var(--color-warning-text, #92400E)" }}
 							>
-								• {item}
+								<span aria-hidden="true">• </span>
+								{item}
 							</li>
 						))}
 						{warnings && (
@@ -72,6 +77,6 @@ export default function SafetyBanner({ contraindications = [], warnings = "" }) 
 					</motion.ul>
 				)}
 			</AnimatePresence>
-		</motion.div>
+		</motion.aside>
 	);
 }

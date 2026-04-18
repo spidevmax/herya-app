@@ -148,20 +148,22 @@ export default function ChildProfileManager({
 	};
 
 	return (
-		<div
+		<section
+			aria-labelledby="child-profiles-heading"
 			className={`rounded-2xl ${compact ? "p-3" : "p-4"}`}
 			style={{
 				backgroundColor: "var(--color-surface-card)",
 				border: "1px solid var(--color-border-soft)",
 			}}
 		>
-			<div className="flex items-center justify-between mb-3">
-				<p
+			<header className="flex items-center justify-between mb-3">
+				<h2
+					id="child-profiles-heading"
 					className="text-[10px] font-bold uppercase tracking-[0.1em]"
 					style={{ color: "var(--color-text-muted)" }}
 				>
 					{t("tutor.child_profiles_title")}
-				</p>
+				</h2>
 				<button
 					type="button"
 					onClick={() => {
@@ -176,14 +178,14 @@ export default function ChildProfileManager({
 					}}
 					aria-label={t("tutor.add_child")}
 				>
-					<UserPlus size={14} />
+					<UserPlus size={14} aria-hidden="true" />
 					{t("tutor.add_child")}
 				</button>
-			</div>
+			</header>
 
 			{/* Profile list */}
 			{loading ? (
-				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+				<p className="text-xs" role="status" aria-live="polite" style={{ color: "var(--color-text-muted)" }}>
 					{t("ui.loading")}...
 				</p>
 			) : profiles.length === 0 && !showForm ? (
@@ -191,15 +193,13 @@ export default function ChildProfileManager({
 					{t("tutor.no_children")}
 				</p>
 			) : (
-				<div className="flex flex-col gap-2">
+				<ul className="flex flex-col gap-2 list-none m-0 p-0">
 					{profiles.map((profile) => {
 						const isSelected = selectedChildId === profile._id;
 						return (
-							<button
+							<li
 								key={profile._id}
-								type="button"
-								onClick={() => onSelectChild?.(profile)}
-								className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all min-h-[48px]"
+								className="flex items-center gap-2 rounded-xl transition-all"
 								style={{
 									backgroundColor: isSelected
 										? `color-mix(in srgb, ${profile.avatarColor} 12%, transparent)`
@@ -208,53 +208,56 @@ export default function ChildProfileManager({
 										? `2px solid ${profile.avatarColor}`
 										: "2px solid var(--color-border-soft)",
 								}}
-								aria-pressed={isSelected}
-								aria-label={profile.name}
 							>
-								<div
-									className="w-9 h-9 min-w-[2.25rem] rounded-full flex items-center justify-center text-white text-sm font-bold"
-									style={{ backgroundColor: profile.avatarColor }}
+								<button
+									type="button"
+									onClick={() => onSelectChild?.(profile)}
+									className="flex flex-1 items-center gap-3 px-3 py-2.5 rounded-xl text-left min-h-[48px]"
+									aria-pressed={isSelected}
+									aria-label={profile.name}
 								>
-									{profile.name.charAt(0).toUpperCase()}
-								</div>
-								<div className="flex-1 min-w-0">
-									<p
-										className="text-sm font-semibold truncate"
-										style={{ color: "var(--color-text-primary)" }}
+									<span
+										aria-hidden="true"
+										className="w-9 h-9 min-w-[2.25rem] rounded-full flex items-center justify-center text-white text-sm font-bold"
+										style={{ backgroundColor: profile.avatarColor }}
 									>
-										{profile.name}
-									</p>
-									{profile.age && (
-										<p
-											className="text-[10px]"
-											style={{ color: "var(--color-text-muted)" }}
+										{profile.name.charAt(0).toUpperCase()}
+									</span>
+									<span className="flex-1 min-w-0">
+										<span
+											className="block text-sm font-semibold truncate"
+											style={{ color: "var(--color-text-primary)" }}
 										>
-											{t("tutor.child_age", { n: profile.age })}
-										</p>
-									)}
-								</div>
-								<div className="flex gap-1">
-									<button
-										type="button"
-										onClick={(e) => {
-											e.stopPropagation();
-											openEdit(profile);
-										}}
-										className="w-8 h-8 rounded-lg flex items-center justify-center"
-										style={{ color: "var(--color-text-muted)" }}
-										aria-label={t("tutor.edit_child")}
-									>
-										<Pencil size={14} />
-									</button>
+											{profile.name}
+										</span>
+										{profile.age && (
+											<span
+												className="block text-[10px]"
+												style={{ color: "var(--color-text-muted)" }}
+											>
+												{t("tutor.child_age", { n: profile.age })}
+											</span>
+										)}
+									</span>
 									<ChevronRight
 										size={16}
+										aria-hidden="true"
 										style={{ color: "var(--color-text-muted)" }}
 									/>
-								</div>
-							</button>
+								</button>
+								<button
+									type="button"
+									onClick={() => openEdit(profile)}
+									className="w-8 h-8 mr-2 rounded-lg flex items-center justify-center"
+									style={{ color: "var(--color-text-muted)" }}
+									aria-label={t("tutor.edit_child")}
+								>
+									<Pencil size={14} aria-hidden="true" />
+								</button>
+							</li>
 						);
 					})}
-				</div>
+				</ul>
 			)}
 
 			{/* Create/Edit Form */}
@@ -266,22 +269,28 @@ export default function ChildProfileManager({
 						exit={{ height: 0, opacity: 0 }}
 						className="overflow-hidden mt-3"
 					>
-						<div
+						<form
+							aria-labelledby="child-profile-form-heading"
+							onSubmit={(e) => {
+								e.preventDefault();
+								handleSave();
+							}}
 							className="rounded-xl p-4 flex flex-col gap-3"
 							style={{
 								backgroundColor: "var(--color-surface)",
 								border: "1px solid var(--color-border-soft)",
 							}}
 						>
-							<div className="flex justify-between items-center">
-								<p
+							<header className="flex justify-between items-center">
+								<h3
+									id="child-profile-form-heading"
 									className="text-sm font-semibold"
 									style={{ color: "var(--color-text-primary)" }}
 								>
 									{editingProfile
 										? t("tutor.edit_child_title")
 										: t("tutor.new_child_title")}
-								</p>
+								</h3>
 								<button
 									type="button"
 									onClick={() => {
@@ -290,12 +299,16 @@ export default function ChildProfileManager({
 									}}
 									aria-label={t("ui.close_modal")}
 								>
-									<X size={16} style={{ color: "var(--color-text-muted)" }} />
+									<X size={16} aria-hidden="true" style={{ color: "var(--color-text-muted)" }} />
 								</button>
-							</div>
+							</header>
 
 							{/* Name */}
+							<label htmlFor="child-profile-name" className="sr-only">
+								{t("tutor.child_name")}
+							</label>
 							<input
+								id="child-profile-name"
 								type="text"
 								value={form.name}
 								onChange={(e) => updateField("name", e.target.value)}
@@ -310,7 +323,11 @@ export default function ChildProfileManager({
 							/>
 
 							{/* Age */}
+							<label htmlFor="child-profile-age" className="sr-only">
+								{t("tutor.child_age_placeholder")}
+							</label>
 							<input
+								id="child-profile-age"
 								type="number"
 								value={form.age}
 								onChange={(e) => updateField("age", e.target.value)}
@@ -326,18 +343,19 @@ export default function ChildProfileManager({
 							/>
 
 							{/* Avatar color */}
-							<div>
-								<p
+							<fieldset className="border-0 p-0 m-0">
+								<legend
 									className="text-xs font-medium mb-1"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
 									{t("tutor.avatar_color")}
-								</p>
+								</legend>
 								<div className="flex gap-2 flex-wrap">
 									{AVATAR_COLORS.map((c) => (
 										<button
 											key={c}
 											type="button"
+											aria-pressed={form.avatarColor === c}
 											onClick={() => updateField("avatarColor", c)}
 											className="w-8 h-8 rounded-full transition-all min-w-[2rem]"
 											style={{
@@ -351,18 +369,22 @@ export default function ChildProfileManager({
 										/>
 									))}
 								</div>
-							</div>
+							</fieldset>
 
 							{/* Sensory preferences */}
-							<div>
-								<p
+							<fieldset className="border-0 p-0 m-0">
+								<legend
 									className="text-xs font-medium mb-2"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
 									{t("tutor.sensory_prefs")}
-								</p>
+								</legend>
 								<div className="grid grid-cols-1 gap-2">
+									<label htmlFor="child-pref-theme" className="sr-only">
+										{t("tutor.sensory_prefs")}
+									</label>
 									<select
+										id="child-pref-theme"
 										value={form.sensoryPreferences.preferredTheme}
 										onChange={(e) =>
 											updateField(
@@ -382,7 +404,11 @@ export default function ChildProfileManager({
 											</option>
 										))}
 									</select>
+									<label htmlFor="child-pref-sound" className="sr-only">
+										{t("tutor.sensory_prefs")}
+									</label>
 									<select
+										id="child-pref-sound"
 										value={form.sensoryPreferences.soundPalette}
 										onChange={(e) =>
 											updateField(
@@ -402,7 +428,11 @@ export default function ChildProfileManager({
 											</option>
 										))}
 									</select>
+									<label htmlFor="child-pref-animation" className="sr-only">
+										{t("tutor.sensory_prefs")}
+									</label>
 									<select
+										id="child-pref-animation"
 										value={form.sensoryPreferences.animationSpeed}
 										onChange={(e) =>
 											updateField(
@@ -423,17 +453,21 @@ export default function ChildProfileManager({
 										))}
 									</select>
 								</div>
-							</div>
+							</fieldset>
 
 							{/* Safety anchors */}
-							<div>
-								<p
+							<fieldset className="border-0 p-0 m-0">
+								<legend
 									className="text-xs font-medium mb-1"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
 									{t("tutor.safety_anchors")}
-								</p>
+								</legend>
+								<label htmlFor="child-anchor-phrase" className="sr-only">
+									{t("tutor.anchor_phrase_placeholder")}
+								</label>
 								<input
+									id="child-anchor-phrase"
 									type="text"
 									value={form.safetyAnchors.phrase}
 									onChange={(e) =>
@@ -448,7 +482,11 @@ export default function ChildProfileManager({
 										"--tw-ring-color": "var(--color-secondary)",
 									}}
 								/>
+								<label htmlFor="child-anchor-bodycue" className="sr-only">
+									{t("tutor.anchor_body_cue_placeholder")}
+								</label>
 								<input
+									id="child-anchor-bodycue"
 									type="text"
 									value={form.safetyAnchors.bodyCue}
 									onChange={(e) =>
@@ -463,10 +501,14 @@ export default function ChildProfileManager({
 										"--tw-ring-color": "var(--color-secondary)",
 									}}
 								/>
-							</div>
+							</fieldset>
 
 							{/* Notes */}
+							<label htmlFor="child-profile-notes" className="sr-only">
+								{t("tutor.child_notes_placeholder")}
+							</label>
 							<textarea
+								id="child-profile-notes"
 								value={form.notes}
 								onChange={(e) => updateField("notes", e.target.value)}
 								placeholder={t("tutor.child_notes_placeholder")}
@@ -481,17 +523,17 @@ export default function ChildProfileManager({
 							/>
 
 							<Button
-								onClick={handleSave}
+								type="submit"
 								disabled={!form.name.trim()}
 								size="md"
 								className="w-full"
 							>
 								{editingProfile ? t("tutor.save_changes") : t("tutor.create_child")}
 							</Button>
-						</div>
+						</form>
 					</motion.div>
 				)}
 			</AnimatePresence>
-		</div>
+		</section>
 	);
 }

@@ -119,11 +119,11 @@ export default function BreathingPatternPicker({
 						}}
 					>
 						{/* Search */}
-						<div
+						<label
 							className="flex items-center gap-2 px-3 py-2 border-b"
 							style={{ borderColor: "var(--color-border-soft)" }}
 						>
-							<Search size={14} style={{ color: "var(--color-text-muted)" }} />
+							<Search size={14} aria-hidden="true" style={{ color: "var(--color-text-muted)" }} />
 							<input
 								type="text"
 								value={search}
@@ -137,7 +137,7 @@ export default function BreathingPatternPicker({
 									<X size={14} style={{ color: "var(--color-text-muted)" }} />
 								</button>
 							)}
-						</div>
+						</label>
 
 						{/* List */}
 						<div className="max-h-64 overflow-y-auto">

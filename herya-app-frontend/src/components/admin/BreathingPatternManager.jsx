@@ -90,29 +90,31 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 	};
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
-			<div
+		<div role="dialog" aria-modal="true" aria-labelledby="breathing-modal-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
+			<section
+				aria-labelledby="breathing-modal-title"
 				className="relative w-full max-w-2xl rounded-3xl p-5 shadow-[var(--shadow-card-hover)] sm:p-6"
 				style={{ backgroundColor: "var(--color-surface-card)" }}
 			>
 				<button
 					type="button"
 					onClick={onClose}
+					aria-label={t("admin.breathing_manager_cancel")}
 					className="absolute right-4 top-4 rounded-full p-2 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
 				>
-					<X size={18} />
+					<X size={18} aria-hidden="true" />
 				</button>
 
-				<h2 className="pr-10 font-display text-2xl font-bold text-[var(--color-text-primary)]">
+				<h2 id="breathing-modal-title" className="pr-10 font-display text-2xl font-bold text-[var(--color-text-primary)]">
 					{isEditing
 						? t("admin.breathing_manager_edit")
 						: t("admin.breathing_manager_create")}
 				</h2>
 
 				{error && (
-					<div className="mt-4 rounded-2xl border border-[var(--color-danger)] bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-danger)]">
+					<p role="alert" className="mt-4 rounded-2xl border border-[var(--color-danger)] bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-danger)]">
 						{error}
-					</div>
+					</p>
 				)}
 
 				<form onSubmit={handleSubmit} className="mt-5 space-y-4">
@@ -357,7 +359,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 						</Button>
 					</div>
 				</form>
-			</div>
+			</section>
 		</div>
 	);
 }
@@ -428,14 +430,19 @@ export default function BreathingPatternManager() {
 	};
 
 	return (
-		<div className="flex flex-col gap-4">
-			<div className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
+		<section aria-label={t("admin.tab_breathing") || "Breathing patterns"} className="flex flex-col gap-4">
+			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search
 						size={16}
+						aria-hidden="true"
 						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
 					/>
+					<label htmlFor="breathing-manager-search" className="sr-only">
+						{t("admin.breathing_manager_search")}
+					</label>
 					<input
+						id="breathing-manager-search"
 						type="search"
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
@@ -444,85 +451,87 @@ export default function BreathingPatternManager() {
 					/>
 				</div>
 				<Button onClick={() => setShowModal(true)} className="shrink-0">
-					<Plus size={16} />
+					<Plus size={16} aria-hidden="true" />
 					{t("admin.breathing_manager_create")}
 				</Button>
-			</div>
+			</search>
 
 			{error && (
-				<div className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
-					<AlertTriangle size={16} />
+				<p role="alert" className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
+					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.breathing_manager_load_error")}</span>
-				</div>
+				</p>
 			)}
 
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-				{loading ? (
-					<>
-						{["b1", "b2", "b3", "b4", "b5", "b6"].map((key) => (
-							<SkeletonCard key={key} />
-						))}
-					</>
-				) : filteredItems.length > 0 ? (
-					filteredItems.map((item) => (
-						<div
-							key={item._id}
-							className="rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]"
-						>
-							<h3 className="text-base font-semibold text-[var(--color-text-primary)]">
-								{item.romanizationName}
-							</h3>
-							<p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-								{item.iastName}
-							</p>
-							<div className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)]">
-								<span className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-									{humanize(item.difficulty || "beginner")}
-								</span>
-								<span className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-									{humanize(item.energyEffect || "calming")}
-								</span>
-								<span className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-									{item.patternRatio?.inhale ?? 1}:
-									{item.patternRatio?.hold ?? 0}:
-									{item.patternRatio?.exhale ?? 1}:
-									{item.patternRatio?.holdAfterExhale ?? 0}
-								</span>
-							</div>
-							<p className="mt-3 line-clamp-2 text-xs text-[var(--color-text-muted)]">
-								{item.description}
-							</p>
-							<div className="mt-4 flex gap-2">
-								<Button
-									variant="outline"
-									size="sm"
-									className="flex-1"
-									onClick={() => {
-										setEditingItem(item);
-										setShowModal(true);
-									}}
-								>
-									<Edit2 size={14} />
-									{t("admin.breathing_manager_edit")}
-								</Button>
-								<Button
-									variant="ghost"
-									size="sm"
-									className="flex-1 text-[var(--color-danger)]"
-									onClick={() => setDeleteTarget(item)}
-								>
-									<Trash2 size={14} />
-									{t("admin.breathing_manager_delete")}
-								</Button>
-							</div>
-						</div>
-					))
-				) : (
-					<div className="col-span-full rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)]">
-						{t("admin.breathing_manager_empty")}
-					</div>
-				)}
-			</div>
+			{loading ? (
+				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+					{["b1", "b2", "b3", "b4", "b5", "b6"].map((key) => (
+						<SkeletonCard key={key} />
+					))}
+				</div>
+			) : filteredItems.length > 0 ? (
+				<ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 list-none m-0 p-0">
+					{filteredItems.map((item) => (
+						<li key={item._id}>
+							<article
+								aria-labelledby={`breathing-card-${item._id}-title`}
+								className="rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]"
+							>
+								<h3 id={`breathing-card-${item._id}-title`} className="text-base font-semibold text-[var(--color-text-primary)]">
+									{item.romanizationName}
+								</h3>
+								<p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+									{item.iastName}
+								</p>
+								<ul className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
+									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										{humanize(item.difficulty || "beginner")}
+									</li>
+									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										{humanize(item.energyEffect || "calming")}
+									</li>
+									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										{item.patternRatio?.inhale ?? 1}:
+										{item.patternRatio?.hold ?? 0}:
+										{item.patternRatio?.exhale ?? 1}:
+										{item.patternRatio?.holdAfterExhale ?? 0}
+									</li>
+								</ul>
+								<p className="mt-3 line-clamp-2 text-xs text-[var(--color-text-muted)]">
+									{item.description}
+								</p>
+								<div className="mt-4 flex gap-2">
+									<Button
+										variant="outline"
+										size="sm"
+										className="flex-1"
+										onClick={() => {
+											setEditingItem(item);
+											setShowModal(true);
+										}}
+									>
+										<Edit2 size={14} aria-hidden="true" />
+										{t("admin.breathing_manager_edit")}
+									</Button>
+									<Button
+										variant="ghost"
+										size="sm"
+										className="flex-1 text-[var(--color-danger)]"
+										onClick={() => setDeleteTarget(item)}
+									>
+										<Trash2 size={14} aria-hidden="true" />
+										{t("admin.breathing_manager_delete")}
+									</Button>
+								</div>
+							</article>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p className="rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)] m-0">
+					{t("admin.breathing_manager_empty")}
+				</p>
+			)}
 
 			<ConfirmModal
 				open={Boolean(deleteTarget)}
@@ -547,6 +556,6 @@ export default function BreathingPatternManager() {
 					onSaved={handleSaved}
 				/>
 			)}
-		</div>
+		</section>
 	);
 }

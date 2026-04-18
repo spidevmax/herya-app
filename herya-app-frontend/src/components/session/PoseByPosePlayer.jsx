@@ -139,16 +139,17 @@ export default function PoseByPosePlayer({
 
 	if (!sequence || corePoses.length === 0) {
 		return (
-			<div className="text-center py-8">
+			<section className="text-center py-8" aria-live="polite">
 				<PersonStanding
 					size={32}
+					aria-hidden="true"
 					style={{ color: "var(--color-text-muted)" }}
 					className="mx-auto mb-2"
 				/>
 				<p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
 					{t("guided.no_poses_data")}
 				</p>
-			</div>
+			</section>
 		);
 	}
 
@@ -162,15 +163,14 @@ export default function PoseByPosePlayer({
 	const remainingSec = Math.max(0, Math.ceil(targetSec - elapsedSec));
 
 	return (
-		<div className="flex flex-col gap-4">
+		<section aria-label={t("guided.pose")} className="flex flex-col gap-4">
 			{/* Pose dots */}
-			<div className="flex justify-center gap-1.5 flex-wrap" role="tablist">
+			<nav aria-label={t("guided.pose")} className="flex justify-center gap-1.5 flex-wrap">
 				{corePoses.map((cp, idx) => (
 					<button
 						key={cp._id || idx}
 						type="button"
-						role="tab"
-						aria-selected={idx === poseIndex}
+						aria-current={idx === poseIndex ? "step" : undefined}
 						aria-label={`${t("guided.pose")} ${idx + 1}`}
 						onClick={() => goToPose(idx)}
 						className="rounded-full transition-all"
@@ -187,12 +187,13 @@ export default function PoseByPosePlayer({
 						}}
 					/>
 				))}
-			</div>
+			</nav>
 
 			{/* Pose card */}
 			<AnimatePresence mode="wait">
-				<motion.div
+				<motion.article
 					key={`${poseIndex}-${side}`}
+					aria-label={pose?.romanizationName || pose?.name || t("guided.pose")}
 					initial={{ opacity: 0, x: lowStimMode ? 0 : 40 }}
 					animate={{ opacity: 1, x: 0 }}
 					exit={{ opacity: 0, x: lowStimMode ? 0 : -40 }}
@@ -204,8 +205,8 @@ export default function PoseByPosePlayer({
 					}}
 				>
 					{/* Media */}
-					<div
-						className="relative aspect-square max-h-56 w-full flex items-center justify-center"
+					<figure
+						className="relative aspect-square max-h-56 w-full flex items-center justify-center m-0"
 						style={{ backgroundColor: "var(--color-primary-light, #EEF2FF)" }}
 					>
 						{pose.media?.thumbnail?.url ? (
@@ -248,7 +249,7 @@ export default function PoseByPosePlayer({
 						>
 							{poseIndex + 1}/{corePoses.length}
 						</span>
-					</div>
+					</figure>
 
 					{/* Names */}
 					<div className="px-4 pt-3 pb-2 text-center">
@@ -383,7 +384,7 @@ export default function PoseByPosePlayer({
 							</motion.div>
 						)}
 					</AnimatePresence>
-				</motion.div>
+				</motion.article>
 			</AnimatePresence>
 
 			{/* Controls */}
@@ -400,20 +401,22 @@ export default function PoseByPosePlayer({
 					}}
 					aria-label={t("guided.prev_pose")}
 				>
-					<ChevronLeft size={18} />
+					<ChevronLeft size={18} aria-hidden="true" />
 				</button>
 
 				<motion.button
+					type="button"
 					whileTap={{ scale: 0.92 }}
 					onClick={isRunning ? () => setIsRunning(false) : handleStart}
+					aria-pressed={isRunning}
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 					style={{ backgroundColor: "var(--color-primary)" }}
 					aria-label={isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{isRunning ? (
-						<Pause size={24} />
+						<Pause size={24} aria-hidden="true" />
 					) : (
-						<Play size={24} className="ml-0.5" />
+						<Play size={24} aria-hidden="true" className="ml-0.5" />
 					)}
 				</motion.button>
 
@@ -436,7 +439,7 @@ export default function PoseByPosePlayer({
 					}}
 					aria-label={t("guided.next_pose")}
 				>
-					<ChevronRight size={18} />
+					<ChevronRight size={18} aria-hidden="true" />
 				</button>
 			</div>
 
@@ -451,11 +454,11 @@ export default function PoseByPosePlayer({
 						backgroundColor: "var(--color-surface)",
 					}}
 				>
-					<RotateCcw size={12} />
+					<RotateCcw size={12} aria-hidden="true" />
 					{t("guided.repeat_pose")}
 				</button>
 			</div>
-		</div>
+		</section>
 	);
 }
 
@@ -468,7 +471,8 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 	const instructions = pose.instructions || {};
 
 	return (
-		<div
+		<section
+			aria-label={t("guided.tab_alignment")}
 			className="border-t"
 			style={{ borderColor: "var(--color-border-soft)" }}
 		>
@@ -479,6 +483,8 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 						key={tab}
 						type="button"
 						role="tab"
+						id={`pose-tab-${tab}`}
+						aria-controls={`pose-tabpanel-${tab}`}
 						aria-selected={activeTab === tab}
 						onClick={() => setActiveTab(tab)}
 						className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap transition"
@@ -494,7 +500,12 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 			</div>
 
 			{/* Tab content */}
-			<div className="px-4 py-3 min-h-[80px]">
+			<div
+				role="tabpanel"
+				id={`pose-tabpanel-${activeTab}`}
+				aria-labelledby={`pose-tab-${activeTab}`}
+				className="px-4 py-3 min-h-[80px]"
+			>
 				{activeTab === "alignment" && (
 					<div className="flex flex-col gap-2">
 						{alignmentPoints.length > 0 ? (
@@ -705,6 +716,6 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 					</div>
 				)}
 			</div>
-		</div>
+		</section>
 	);
 }

@@ -122,11 +122,11 @@ export default function SequencePicker({
 						}}
 					>
 						{/* Search */}
-						<div
+						<label
 							className="flex items-center gap-2 px-3 py-2 border-b"
 							style={{ borderColor: "var(--color-border-soft)" }}
 						>
-							<Search size={14} style={{ color: "var(--color-text-muted)" }} />
+							<Search size={14} aria-hidden="true" style={{ color: "var(--color-text-muted)" }} />
 							<input
 								type="text"
 								value={search}
@@ -141,7 +141,7 @@ export default function SequencePicker({
 									<X size={14} style={{ color: "var(--color-text-muted)" }} />
 								</button>
 							)}
-						</div>
+						</label>
 
 						{/* List */}
 						<div className="max-h-64 overflow-y-auto">
@@ -301,7 +301,7 @@ function SequencePreview({ sequence }) {
 
 			{/* Pose list */}
 			{poses.length > 0 ? (
-				<div className="flex flex-col gap-1">
+				<ol className="flex flex-col gap-1 list-none m-0 p-0">
 					{poses.map((cp, i) => {
 						const pose = cp.pose;
 						if (!pose) return null;
@@ -364,7 +364,7 @@ function SequencePreview({ sequence }) {
 							</div>
 						);
 					})}
-				</div>
+				</ol>
 			) : (
 				<p
 					className="text-xs text-center py-3"

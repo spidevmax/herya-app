@@ -163,25 +163,26 @@ export default function SequenceDetail() {
 	const viewPoseLabel = tr("sequence_detail.view_pose", "View pose");
 
 	return (
-		<div className="pb-6">
+		<main className="pb-6">
 			<StickyHeader
 				onBack={() => navigate(-1)}
 				title={loading ? t("sequence_detail.loading") : localizedName(seq, lang)}
 			/>
 
 			{loading ? (
-				<div className="px-4 flex flex-col gap-4 mt-2">
+				<div className="px-4 flex flex-col gap-4 mt-2" aria-busy="true" aria-live="polite">
 					<SkeletonCard />
 					<SkeletonCard />
 					<SkeletonCard />
 				</div>
 			) : !seq ? (
-				<div className="px-4 mt-8 text-center text-[#9CA3AF]">
+				<p className="px-4 mt-8 text-center text-[#9CA3AF]" role="alert">
 					{t("sequence_detail.not_found")}
-				</div>
+				</p>
 			) : (
 				<div className="px-4 flex flex-col gap-5 mt-2">
-					<motion.div
+					<motion.section
+						aria-labelledby="sequence-title"
 						initial={{ opacity: 0, scale: 0.96 }}
 						animate={{ opacity: 1, scale: 1 }}
 						className="rounded-3xl p-6 relative overflow-hidden"
@@ -189,7 +190,7 @@ export default function SequenceDetail() {
 							background: `linear-gradient(135deg, ${family.color}, ${colorMix(family.color, 67)})`,
 						}}
 					>
-						<div className="absolute right-4 bottom-4 opacity-20 float select-none">
+						<div aria-hidden="true" className="absolute right-4 bottom-4 opacity-20 float select-none">
 							{family.emoji ? (
 								<span className="text-8xl">{family.emoji}</span>
 							) : (
@@ -200,55 +201,63 @@ export default function SequenceDetail() {
 								/>
 							)}
 						</div>
-						<span className="text-white/80 text-xs font-bold uppercase tracking-widest">
+						<p className="text-white/80 text-xs font-bold uppercase tracking-widest">
 							{family.labelKey ? t(family.labelKey) : family.label}
-						</span>
-						<h2 className="font-display text-2xl font-bold text-white mt-1 mb-1">
+						</p>
+						<h1 id="sequence-title" className="font-display text-2xl font-bold text-white mt-1 mb-1">
 							{localizedName(seq, lang)}
-						</h2>
+						</h1>
 						<p className="text-white/70 text-sm italic mb-4">
 							{seq.sanskritName}
 						</p>
-						<div className="flex flex-wrap gap-2">
+						<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
 							{seq.estimatedDuration?.recommended && (
-								<Badge className="text-white bg-white/20 border-0">
-									<Clock size={12} />
-									{seq.estimatedDuration.recommended}{" "}
-									{t("sequence_detail.minutes")}
-								</Badge>
+								<li>
+									<Badge className="text-white bg-white/20 border-0">
+										<Clock size={12} aria-hidden="true" />
+										{seq.estimatedDuration.recommended}{" "}
+										{t("sequence_detail.minutes")}
+									</Badge>
+								</li>
 							)}
 							{seq.level && (
-								<Badge className="text-white bg-white/20 border-0">
-									<Dumbbell size={12} />
-									{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
-								</Badge>
+								<li>
+									<Badge className="text-white bg-white/20 border-0">
+										<Dumbbell size={12} aria-hidden="true" />
+										{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
+									</Badge>
+								</li>
 							)}
 							{seq.difficulty && (
-								<Badge className="text-white bg-white/20 border-0 capitalize">
-									{tr(`library.${seq.difficulty}`, seq.difficulty)}
-								</Badge>
+								<li>
+									<Badge className="text-white bg-white/20 border-0 capitalize">
+										{tr(`library.${seq.difficulty}`, seq.difficulty)}
+									</Badge>
+								</li>
 							)}
-						</div>
-					</motion.div>
+						</ul>
+					</motion.section>
 
 					{(localized(seq, "description", lang) || seq.description) && (
-						<div
+						<section
+							aria-labelledby="sequence-about-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="sequence-about-heading"
 								className="font-semibold mb-2"
 								style={{ color: "var(--color-text-primary)" }}
 							>
 								{t("sequence_detail.about")}
-							</h3>
+							</h2>
 							<p
 								className="text-sm leading-relaxed"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
 								{localized(seq, "description", lang)}
 							</p>
-						</div>
+						</section>
 					)}
 
 					{(estimatedDuration.recommended ||
@@ -256,34 +265,36 @@ export default function SequenceDetail() {
 						estimatedDuration.max ||
 						seq.level ||
 						seq.difficulty) && (
-						<div
+						<section
+							aria-labelledby="sequence-details-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="sequence-details-heading"
 								className="font-semibold mb-3"
 								style={{ color: "var(--color-text-primary)" }}
 							>
 								{tr("sequence_detail.details", "Details")}
-							</h3>
-							<div className="grid grid-cols-2 gap-2">
+							</h2>
+							<dl className="grid grid-cols-2 gap-2">
 								{seq.level ? (
 									<div
 										className="rounded-xl px-3 py-2"
 										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
-										<p
+										<dt
 											className="text-[10px] font-bold uppercase tracking-widest"
 											style={{ color: family.color }}
 										>
 											{tr("library.filter_level", "Level")}
-										</p>
-										<p
+										</dt>
+										<dd
 											className="text-sm font-semibold mt-0.5"
 											style={{ color: "var(--color-text-primary)" }}
 										>
 											{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
-										</p>
+										</dd>
 									</div>
 								) : null}
 								{seq.difficulty ? (
@@ -291,18 +302,18 @@ export default function SequenceDetail() {
 										className="rounded-xl px-3 py-2"
 										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
-										<p
+										<dt
 											className="text-[10px] font-bold uppercase tracking-widest"
 											style={{ color: family.color }}
 										>
 											{tr("library.filter_difficulty", "Difficulty")}
-										</p>
-										<p
+										</dt>
+										<dd
 											className="text-sm font-semibold mt-0.5 capitalize"
 											style={{ color: "var(--color-text-primary)" }}
 										>
 											{tr(`library.${seq.difficulty}`, seq.difficulty)}
-										</p>
+										</dd>
 									</div>
 								) : null}
 								{estimatedDuration.recommended ||
@@ -312,7 +323,7 @@ export default function SequenceDetail() {
 										className="rounded-xl px-3 py-2"
 										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
-										<p
+										<dt
 											className="text-[10px] font-bold uppercase tracking-widest"
 											style={{ color: family.color }}
 										>
@@ -320,8 +331,8 @@ export default function SequenceDetail() {
 												"sequence_detail.estimated_duration",
 												"Estimated duration",
 											)}
-										</p>
-										<p
+										</dt>
+										<dd
 											className="text-sm font-semibold mt-0.5"
 											style={{ color: "var(--color-text-primary)" }}
 										>
@@ -330,7 +341,7 @@ export default function SequenceDetail() {
 												"—"}
 											{estimatedDuration.max ? `-${estimatedDuration.max}` : ""}{" "}
 											{t("sequence_detail.minutes")}
-										</p>
+										</dd>
 									</div>
 								) : null}
 								{seq.family ? (
@@ -338,35 +349,37 @@ export default function SequenceDetail() {
 										className="rounded-xl px-3 py-2"
 										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
 									>
-										<p
+										<dt
 											className="text-[10px] font-bold uppercase tracking-widest"
 											style={{ color: family.color }}
 										>
 											{tr("library.filter_family", "Family")}
-										</p>
-										<p
+										</dt>
+										<dd
 											className="text-sm font-semibold mt-0.5 capitalize"
 											style={{ color: "var(--color-text-primary)" }}
 										>
 											{seq.family.replace(/_/g, " ")}
-										</p>
+										</dd>
 									</div>
 								) : null}
-							</div>
-						</div>
+							</dl>
+						</section>
 					)}
 
 					{therapeuticFocus && (
-						<div
+						<section
+							aria-labelledby="therapeutic-focus-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="therapeutic-focus-heading"
 								className="font-semibold mb-3"
 								style={{ color: "var(--color-text-primary)" }}
 							>
 								{tr("sequence_detail.therapeutic_focus", "Therapeutic focus")}
-							</h3>
+							</h2>
 							{(localized(therapeuticFocus, "primaryBenefit", lang) || therapeuticFocus.primaryBenefit) ? (
 								<p
 									className="text-sm leading-relaxed"
@@ -383,8 +396,9 @@ export default function SequenceDetail() {
 							) : null}
 							{Array.isArray(therapeuticFocus.targetConditions) &&
 							therapeuticFocus.targetConditions.length > 0 ? (
-								<div className="mt-3">
-									<p
+								<section aria-labelledby="target-conditions-heading" className="mt-3">
+									<h3
+										id="target-conditions-heading"
 										className="text-xs font-bold uppercase tracking-widest mb-2"
 										style={{ color: "var(--color-text-secondary)" }}
 									>
@@ -392,24 +406,23 @@ export default function SequenceDetail() {
 											"sequence_detail.target_conditions",
 											"Target conditions",
 										)}
-									</p>
-									<div className="flex flex-wrap gap-2">
+									</h3>
+									<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
 										{therapeuticFocus.targetConditions.map((condition) => (
-											<Badge
-												key={condition}
-												className="text-xs"
-												color={family.color}
-											>
-												{condition}
-											</Badge>
+											<li key={condition}>
+												<Badge className="text-xs" color={family.color}>
+													{condition}
+												</Badge>
+											</li>
 										))}
-									</div>
-								</div>
+									</ul>
+								</section>
 							) : null}
 							{Array.isArray(therapeuticFocus.contraindications) &&
 							therapeuticFocus.contraindications.length > 0 ? (
-								<div className="mt-3">
-									<p
+								<section aria-labelledby="contraindications-heading" className="mt-3">
+									<h3
+										id="contraindications-heading"
 										className="text-xs font-bold uppercase tracking-widest mb-2"
 										style={{ color: "var(--color-text-secondary)" }}
 									>
@@ -417,29 +430,31 @@ export default function SequenceDetail() {
 											"sequence_detail.contraindications",
 											"Contraindications",
 										)}
-									</p>
-									<ul className="flex flex-col gap-1.5">
+									</h3>
+									<ul className="flex flex-col gap-1.5 list-none m-0 p-0">
 										{therapeuticFocus.contraindications.map((item) => (
 											<li
 												key={item}
 												className="text-sm"
 												style={{ color: "var(--color-text-secondary)" }}
 											>
-												• {item}
+												<span aria-hidden="true">• </span>{item}
 											</li>
 										))}
 									</ul>
-								</div>
+								</section>
 							) : null}
-						</div>
+						</section>
 					)}
 
 					{recommendedPranayama && (
-						<div
+						<section
+							aria-labelledby="recommended-pranayama-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="recommended-pranayama-heading"
 								className="font-semibold mb-3"
 								style={{ color: "var(--color-text-primary)" }}
 							>
@@ -447,7 +462,7 @@ export default function SequenceDetail() {
 									"sequence_detail.recommended_pranayama",
 									"Recommended pranayama",
 								)}
-							</h3>
+							</h2>
 							<p
 								className="text-sm leading-relaxed"
 								style={{ color: "var(--color-text-secondary)" }}
@@ -457,49 +472,52 @@ export default function SequenceDetail() {
 									recommendedPranayama.englishName || recommendedPranayama.name,
 								)}
 							</p>
-						</div>
+						</section>
 					)}
 
 					{prerequisites.length > 0 && (
-						<div
+						<section
+							aria-labelledby="prerequisites-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="prerequisites-heading"
 								className="font-semibold mb-3"
 								style={{ color: "var(--color-text-primary)" }}
 							>
 								{tr("sequence_detail.prerequisites", "Prerequisites")}
-							</h3>
-							<div className="flex flex-wrap gap-2">
+							</h2>
+							<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
 								{prerequisites.map((item) => (
-									<Badge
-										key={item._id || item.englishName || item.name}
-										color={family.color}
-									>
-										{getItemName(item, t("library.card_default_item"))}
-									</Badge>
+									<li key={item._id || item.englishName || item.name}>
+										<Badge color={family.color}>
+											{getItemName(item, t("library.card_default_item"))}
+										</Badge>
+									</li>
 								))}
-							</div>
-						</div>
+							</ul>
+						</section>
 					)}
 
 					{nextSteps.length > 0 && (
-						<div
+						<section
+							aria-labelledby="next-steps-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="next-steps-heading"
 								className="font-semibold mb-3"
 								style={{ color: "var(--color-text-primary)" }}
 							>
 								{tr("sequence_detail.next_steps", "Next steps")}
-							</h3>
-							<div className="flex flex-col gap-2">
+							</h2>
+							<ul className="flex flex-col gap-2 list-none m-0 p-0">
 								{nextSteps.map((step) => {
 									const nextSequence = step?.sequence || step;
 									return (
-										<div
+										<li
 											key={
 												nextSequence._id ||
 												nextSequence.englishName ||
@@ -525,24 +543,26 @@ export default function SequenceDetail() {
 													{step.whenToUse}
 												</p>
 											) : null}
-										</div>
+										</li>
 									);
 								})}
-							</div>
-						</div>
+							</ul>
+						</section>
 					)}
 
 					{hasAssignedPoses ? (
-						<div
+						<section
+							aria-labelledby="full-sequence-heading"
 							className="rounded-2xl p-5"
 							style={{ backgroundColor: "var(--color-surface-card)" }}
 						>
-							<h3
+							<h2
+								id="full-sequence-heading"
 								className="font-semibold mb-3 flex items-center gap-2"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								<BookOpen size={16} /> {t("sequence_detail.full_sequence")}
-							</h3>
+								<BookOpen size={16} aria-hidden="true" /> {t("sequence_detail.full_sequence")}
+							</h2>
 							<p
 								className="text-xs font-medium mb-4"
 								style={{ color: "var(--color-text-muted)" }}
@@ -556,14 +576,15 @@ export default function SequenceDetail() {
 							</p>
 							<div className="flex flex-col gap-4">
 								{sequenceSections.map((section) => (
-									<div key={section.key} className="flex flex-col gap-2">
-										<h4
+									<section key={section.key} aria-labelledby={`sequence-section-${section.key}`} className="flex flex-col gap-2">
+										<h3
+											id={`sequence-section-${section.key}`}
 											className="text-xs font-bold uppercase tracking-widest"
 											style={{ color: "var(--color-text-secondary)" }}
 										>
 											{section.label}
-										</h4>
-										<ol className="flex flex-col gap-2">
+										</h3>
+										<ol className="flex flex-col gap-2 list-none m-0 p-0">
 											{section.items.map((pose) => (
 												<li
 													key={pose.id}
@@ -683,25 +704,27 @@ export default function SequenceDetail() {
 												</li>
 											))}
 										</ol>
-									</div>
+									</section>
 								))}
 							</div>
-						</div>
+						</section>
 					) : (
-						<div
+						<section
+							aria-labelledby="full-sequence-empty-heading"
 							className="rounded-2xl p-5 border"
 							style={{
 								backgroundColor: "var(--color-surface-card)",
 								borderColor: `${colorMix(family.color, 20)}`,
 							}}
 						>
-							<h3
+							<h2
+								id="full-sequence-empty-heading"
 								className="font-semibold mb-2 flex items-center gap-2"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								<BookOpen size={16} />
+								<BookOpen size={16} aria-hidden="true" />
 								{t("sequence_detail.full_sequence")}
-							</h3>
+							</h2>
 							<p
 								className="text-sm leading-relaxed"
 								style={{ color: "var(--color-text-secondary)" }}
@@ -711,10 +734,10 @@ export default function SequenceDetail() {
 									"This sequence has no poses assigned yet in the backend data.",
 								)}
 							</p>
-						</div>
+						</section>
 					)}
 				</div>
 			)}
-		</div>
+		</main>
 	);
 }

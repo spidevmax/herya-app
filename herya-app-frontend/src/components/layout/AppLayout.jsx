@@ -102,9 +102,9 @@ const AppLayout = () => {
 					</AnimatePresence>
 
 					{/* Bottom nav — hidden on desktop */}
-					<div className="lg:hidden">
+					<footer className="lg:hidden">
 						<BottomNav />
-					</div>
+					</footer>
 				</div>
 			</div>
 		</div>

@@ -15,7 +15,8 @@ const HeroCard = ({ sequence, reason, loading }) => {
 
 	if (!sequence) {
 		return (
-			<div
+			<section
+				aria-label={t("dashboard.welcome_title")}
 				className="rounded-3xl p-6 text-white"
 				style={{
 					background:
@@ -37,7 +38,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 				>
 					{t("hero.explore")} <ArrowRight size={16} />
 				</Button>
-			</div>
+			</section>
 		);
 	}
 
@@ -58,7 +59,8 @@ const HeroCard = ({ sequence, reason, loading }) => {
 	};
 
 	return (
-		<motion.div
+		<motion.article
+			aria-label={`${t("dashboard.recommended")}: ${localizedName(sequence, lang)}`}
 			className="rounded-3xl overflow-hidden cursor-pointer"
 			onClick={handleCardClick}
 			onKeyDown={handleCardKeyDown}
@@ -139,7 +141,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					{t("hero.start")} <ArrowRight size={16} />
 				</button>
 			</div>
-		</motion.div>
+		</motion.article>
 	);
 };
 

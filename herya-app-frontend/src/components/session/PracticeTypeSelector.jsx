@@ -33,8 +33,8 @@ export default function PracticeTypeSelector({ onSelect }) {
 	const { t } = useLanguage();
 
 	return (
-		<div className="flex flex-col gap-6 pt-4">
-			<div className="text-center">
+		<section aria-label={t("practice.select_type_title")} className="flex flex-col gap-6 pt-4">
+			<header className="text-center">
 				<h2 className="text-2xl font-semibold mb-2 text-[var(--color-text-primary)]">
 					{t("practice.select_type_title")}
 				</h2>
@@ -44,7 +44,7 @@ export default function PracticeTypeSelector({ onSelect }) {
 				>
 					{t("practice.select_type_subtitle")}
 				</p>
-			</div>
+			</header>
 
 			<div className="grid grid-cols-2 gap-3">
 				{PRACTICE_TYPES.map((type, i) => {
@@ -92,6 +92,6 @@ export default function PracticeTypeSelector({ onSelect }) {
 					);
 				})}
 			</div>
-		</div>
+		</section>
 	);
 }

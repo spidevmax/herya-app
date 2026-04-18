@@ -67,7 +67,8 @@ export default function PracticeSnapshotCard({
 	};
 
 	return (
-		<motion.div
+		<motion.section
+			aria-label={t("dashboard.quick_snapshot_title")}
 			className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
 			style={{
 				backgroundColor: "var(--color-surface-card)",
@@ -150,6 +151,6 @@ export default function PracticeSnapshotCard({
 					{t("dashboard.quick_garden")}
 				</button>
 			</div>
-		</motion.div>
+		</motion.section>
 	);
 }

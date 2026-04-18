@@ -118,13 +118,13 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 							{/* Header */}
 							<div className="flex items-start justify-between mb-4 gap-3">
 								<div className="flex-1">
-									<p
+									<h2
 										id={titleId}
 										className="font-display text-lg font-semibold leading-tight"
 										style={{ color: "var(--color-text-primary)" }}
 									>
 										{created}
-									</p>
+									</h2>
 									{entryId ? (
 										<button
 											type="button"

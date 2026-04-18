@@ -38,7 +38,8 @@ const formatValue = (value) => {
 };
 
 const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
-	<motion.div
+	<motion.section
+		aria-label={title}
 		initial={reduceMotion ? false : { opacity: 0, y: 16 }}
 		whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
 		viewport={{ once: true, amount: 0.18 }}
@@ -55,11 +56,11 @@ const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
 		className="rounded-2xl p-4 shadow-[var(--shadow-card)]"
 		style={{ backgroundColor: "var(--color-surface-card)" }}
 	>
-		<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
+		<h2 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
 			{title}
-		</h3>
+		</h2>
 		{children}
-	</motion.div>
+	</motion.section>
 );
 
 function RelatedPoseChip({ pose, onClick, lang }) {
@@ -123,19 +124,20 @@ export default function PoseDetail() {
 
 	if (loading) {
 		return (
-			<div className="px-4 pt-4 flex flex-col gap-4">
-				<div className="h-56 rounded-3xl bg-[var(--color-surface-card)] animate-pulse" />
+			<main className="px-4 pt-4 flex flex-col gap-4" aria-busy="true" aria-live="polite">
+				<div className="h-56 rounded-3xl bg-[var(--color-surface-card)] animate-pulse" aria-hidden="true" />
 				<SkeletonCard lines={4} />
 				<SkeletonCard lines={3} />
-			</div>
+			</main>
 		);
 	}
 
 	if (!pose) {
 		return (
-			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+			<main className="flex flex-col items-center justify-center py-20 px-4 text-center">
 				<Frown
 					size={52}
+					aria-hidden="true"
 					className="mb-3"
 					style={{ color: "var(--color-text-muted)" }}
 				/>
@@ -149,7 +151,7 @@ export default function PoseDetail() {
 				>
 					{t("pose_detail.back")}
 				</button>
-			</div>
+			</main>
 		);
 	}
 
@@ -193,21 +195,22 @@ export default function PoseDetail() {
 	const counterposes = related?.counterposes ?? [];
 
 	return (
-		<div className="flex flex-col pb-10">
+		<main className="flex flex-col pb-10">
 			{/* Hero image */}
-			<div
+			<figure
 				ref={heroRef}
-				className="relative h-64 bg-[var(--color-tone-info-bg)] overflow-hidden"
+				className="relative h-64 bg-[var(--color-tone-info-bg)] overflow-hidden m-0"
 			>
 				{poseImage ? (
 					<motion.img
 						src={poseImage}
-						alt={pose.englishName}
+						alt={poseDisplayName}
 						className="w-full h-full object-cover"
 						style={{ y: heroY, scale: heroScale }}
 					/>
 				) : (
 					<motion.div
+						aria-hidden="true"
 						className="w-full h-full flex items-center justify-center text-8xl"
 						style={{ y: heroY, scale: heroScale }}
 					>
@@ -217,20 +220,21 @@ export default function PoseDetail() {
 						/>
 					</motion.div>
 				)}
-				<div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/18 via-transparent to-transparent" />
+				<div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/18 via-transparent to-transparent" />
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
 					aria-label={t("pose_detail.back")}
 					className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm"
 				>
-					<ChevronLeft size={20} className="text-[var(--color-text-primary)]" />
+					<ChevronLeft size={20} aria-hidden="true" className="text-[var(--color-text-primary)]" />
 				</button>
-			</div>
+			</figure>
 
 			<div className="px-4 pt-5 flex flex-col gap-5">
 				{/* Name & badges */}
-				<motion.div
+				<motion.section
+					aria-labelledby="pose-title"
 					initial={{ opacity: 0, y: 16, scale: 0.985 }}
 					animate={{ opacity: 1, y: 0, scale: 1 }}
 					transition={{ type: "spring", stiffness: 230, damping: 22 }}
@@ -245,17 +249,19 @@ export default function PoseDetail() {
 						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
 						<div
+							aria-hidden="true"
 							className="absolute -right-8 -top-8 w-28 h-28 rounded-full blur-2xl opacity-35"
 							style={{ backgroundColor: "var(--color-primary-light)" }}
 						/>
 						<div
+							aria-hidden="true"
 							className="absolute -left-10 -bottom-10 w-28 h-28 rounded-full blur-2xl opacity-25"
 							style={{ backgroundColor: "var(--color-info)" }}
 						/>
 
 						<div className="relative flex items-start justify-between gap-3">
 							<div className="min-w-0">
-								<h1 className="font-display text-2xl font-bold leading-tight text-[var(--color-text-primary)]">
+								<h1 id="pose-title" className="font-display text-2xl font-bold leading-tight text-[var(--color-text-primary)]">
 									{poseDisplayName}
 								</h1>
 								{poseDisplayRomanized && (
@@ -277,7 +283,7 @@ export default function PoseDetail() {
 									color: "var(--color-primary)",
 								}}
 							>
-								<Sparkles size={12} />
+								<Sparkles size={12} aria-hidden="true" />
 								{translateWithFallback(t, "pose_detail.profile_label", "Pose Profile")}
 							</div>
 						</div>
@@ -384,7 +390,7 @@ export default function PoseDetail() {
 							</p>
 						)}
 					</div>
-				</motion.div>
+				</motion.section>
 
 				<DetailBlock
 					title={t("pose_detail.details")}
@@ -513,17 +519,17 @@ export default function PoseDetail() {
 					>
 						<div className="flex flex-col gap-4">
 							{setupSteps.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="instructions-setup-heading">
+									<h3 id="instructions-setup-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.setup")}
-									</p>
-									<ol className="flex flex-col gap-3">
+									</h3>
+									<ol className="flex flex-col gap-3 list-none m-0 p-0">
 										{setupSteps.map((step, i) => (
 											<li
 												key={`setup-${step}`}
 												className="flex items-start gap-3"
 											>
-												<span className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+												<span aria-hidden="true" className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
 													{i + 1}
 												</span>
 												<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed flex-1">
@@ -532,74 +538,74 @@ export default function PoseDetail() {
 											</li>
 										))}
 									</ol>
-								</div>
+								</section>
 							)}
 							{alignmentSteps.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="instructions-alignment-heading">
+									<h3 id="instructions-alignment-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.alignment")}
-									</p>
-									<ul className="flex flex-col gap-2">
+									</h3>
+									<ul className="flex flex-col gap-2 list-none m-0 p-0">
 										{alignmentSteps.map((step) => (
 											<li
 												key={`alignment-${step}`}
 												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
 											>
-												<span className="text-[var(--color-success)] mt-0.5 flex-shrink-0">
+												<span aria-hidden="true" className="text-[var(--color-success)] mt-0.5 flex-shrink-0">
 													•
 												</span>
 												<span>{step}</span>
 											</li>
 										))}
 									</ul>
-								</div>
+								</section>
 							)}
 							{modificationSteps.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="instructions-modifications-heading">
+									<h3 id="instructions-modifications-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.modifications")}
-									</p>
-									<ul className="flex flex-col gap-2">
+									</h3>
+									<ul className="flex flex-col gap-2 list-none m-0 p-0">
 										{modificationSteps.map((step) => (
 											<li
 												key={`mod-${step}`}
 												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
 											>
-												<span className="text-[var(--color-warning)] mt-0.5 flex-shrink-0">
+												<span aria-hidden="true" className="text-[var(--color-warning)] mt-0.5 flex-shrink-0">
 													•
 												</span>
 												<span>{step}</span>
 											</li>
 										))}
 									</ul>
-								</div>
+								</section>
 							)}
 							{exitSteps.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="instructions-exit-heading">
+									<h3 id="instructions-exit-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.exit")}
-									</p>
-									<ul className="flex flex-col gap-2">
+									</h3>
+									<ul className="flex flex-col gap-2 list-none m-0 p-0">
 										{exitSteps.map((step) => (
 											<li
 												key={`exit-${step}`}
 												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
 											>
-												<span className="text-[var(--color-danger)] mt-0.5 flex-shrink-0">
+												<span aria-hidden="true" className="text-[var(--color-danger)] mt-0.5 flex-shrink-0">
 													•
 												</span>
 												<span>{step}</span>
 											</li>
 										))}
 									</ul>
-								</div>
+								</section>
 							)}
 							{keyPoints.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="instructions-keypoints-heading">
+									<h3 id="instructions-keypoints-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.alignment_details")}
-									</p>
-									<ul className="flex flex-col gap-2">
+									</h3>
+									<ul className="flex flex-col gap-2 list-none m-0 p-0">
 										{keyPoints.map((point) => (
 											<li
 												key={`key-point-${point?.area || point?.instruction || String(point)}`}
@@ -610,7 +616,7 @@ export default function PoseDetail() {
 											</li>
 										))}
 									</ul>
-								</div>
+								</section>
 							)}
 						</div>
 					</DetailBlock>
@@ -680,7 +686,8 @@ export default function PoseDetail() {
 				{(preparatory.length > 0 ||
 					followUp.length > 0 ||
 					counterposes.length > 0) && (
-					<motion.div
+					<motion.section
+						aria-labelledby="related-poses-heading"
 						initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }}
 						whileInView={
 							prefersReducedMotion ? undefined : { opacity: 1, y: 0 }
@@ -697,65 +704,68 @@ export default function PoseDetail() {
 									}
 						}
 					>
-						<h3 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
+						<h2 id="related-poses-heading" className="font-display font-bold text-[var(--color-text-primary)] mb-3">
 							{t("pose_detail.related_poses")}
-						</h3>
+						</h2>
 						<div className="flex flex-col gap-4">
 							{preparatory.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="related-preparation-heading">
+									<h3 id="related-preparation-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.preparation")}
-									</p>
-									<div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
+									</h3>
+									<ul className="flex gap-3 overflow-x-auto pb-1 no-scrollbar list-none m-0 p-0">
 										{preparatory.map((p) => (
-											<RelatedPoseChip
-												key={p._id}
-												pose={p}
-												lang={lang}
-												onClick={() => navigate(`/library/pose/${p._id}`)}
-											/>
+											<li key={p._id}>
+												<RelatedPoseChip
+													pose={p}
+													lang={lang}
+													onClick={() => navigate(`/library/pose/${p._id}`)}
+												/>
+											</li>
 										))}
-									</div>
-								</div>
+									</ul>
+								</section>
 							)}
 							{followUp.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="related-continuation-heading">
+									<h3 id="related-continuation-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.continuation")}
-									</p>
-									<div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
+									</h3>
+									<ul className="flex gap-3 overflow-x-auto pb-1 no-scrollbar list-none m-0 p-0">
 										{followUp.map((p) => (
-											<RelatedPoseChip
-												key={p._id}
-												pose={p}
-												lang={lang}
-												onClick={() => navigate(`/library/pose/${p._id}`)}
-											/>
+											<li key={p._id}>
+												<RelatedPoseChip
+													pose={p}
+													lang={lang}
+													onClick={() => navigate(`/library/pose/${p._id}`)}
+												/>
+											</li>
 										))}
-									</div>
-								</div>
+									</ul>
+								</section>
 							)}
 							{counterposes.length > 0 && (
-								<div>
-									<p className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+								<section aria-labelledby="related-counterposes-heading">
+									<h3 id="related-counterposes-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
 										{t("pose_detail.counterposes")}
-									</p>
-									<div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
+									</h3>
+									<ul className="flex gap-3 overflow-x-auto pb-1 no-scrollbar list-none m-0 p-0">
 										{counterposes.map((p) => (
-											<RelatedPoseChip
-												key={p._id}
-												pose={p}
-												lang={lang}
-												onClick={() => navigate(`/library/pose/${p._id}`)}
-											/>
+											<li key={p._id}>
+												<RelatedPoseChip
+													pose={p}
+													lang={lang}
+													onClick={() => navigate(`/library/pose/${p._id}`)}
+												/>
+											</li>
 										))}
-									</div>
-								</div>
+									</ul>
+								</section>
 							)}
 						</div>
-					</motion.div>
+					</motion.section>
 				)}
 			</div>
-		</div>
+		</main>
 	);
 }

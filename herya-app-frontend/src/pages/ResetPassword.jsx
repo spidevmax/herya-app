@@ -54,12 +54,12 @@ export default function ResetPassword() {
 	};
 
 	return (
-		<div
+		<main
 			className="min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden"
 			style={{ background: "var(--gradient-warm)" }}
 		>
-			<div className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-[var(--color-surface-card)]/25 blur-xl" />
-			<div className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl" />
+			<div aria-hidden="true" className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-[var(--color-surface-card)]/25 blur-xl" />
+			<div aria-hidden="true" className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl" />
 
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
@@ -77,13 +77,14 @@ export default function ResetPassword() {
 							aria-label={tr("reset_password.back", "Back")}
 							className="flex items-center gap-2 mb-6 font-bold text-lg text-[var(--color-primary)] hover:opacity-70 transition"
 						>
-							<ArrowLeft size={20} />
+							<ArrowLeft size={20} aria-hidden="true" />
 							{tr("reset_password.back", "Back")}
 						</button>
 
-						<div className="text-center mb-8">
+						<header className="text-center mb-8">
 							<Lock
 								size={54}
+								aria-hidden="true"
 								className="mb-4 inline-block text-[var(--color-primary)]"
 							/>
 							<h1 className="font-display text-4xl font-bold mb-2 text-[var(--color-primary)]">
@@ -92,9 +93,10 @@ export default function ResetPassword() {
 							<p className="text-sm text-[var(--color-text-secondary)]">
 								{tr("reset_password.subtitle", "Enter your new secure password")}
 							</p>
-						</div>
+						</header>
 
-						<motion.div
+						<motion.section
+							aria-label={tr("reset_password.title", "New password")}
 							className="rounded-3xl p-8 backdrop-blur-sm border-[3px] border-[var(--color-secondary)] bg-[var(--color-surface-card)]"
 							style={{
 								boxShadow: "var(--shadow-warm)",
@@ -106,13 +108,14 @@ export default function ResetPassword() {
 							}}
 						>
 							{error && (
-								<motion.div
+								<motion.p
+									role="alert"
 									initial={{ opacity: 0, y: -8, scale: 0.95 }}
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									className="mb-4 px-5 py-4 rounded-2xl text-sm font-semibold bg-[var(--color-error-bg)] text-[var(--color-error-text)] border-l-4 border-[var(--color-accent)]"
 								>
 									{error}
-								</motion.div>
+								</motion.p>
 							)}
 
 							<form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -200,12 +203,15 @@ export default function ResetPassword() {
 									{tr("reset_password.back_to_login", "Back to login")}
 								</Link>
 							</p>
-						</motion.div>
+						</motion.section>
 					</>
 				)}
 
 				{success && (
-					<motion.div
+					<motion.section
+						aria-labelledby="reset-success-heading"
+						role="status"
+						aria-live="polite"
 						initial={{ opacity: 0, scale: 0.95 }}
 						animate={{ opacity: 1, scale: 1 }}
 						className="rounded-3xl p-8 border-[3px] border-[var(--color-secondary)] backdrop-blur-sm bg-[var(--color-surface-card)]"
@@ -216,9 +222,10 @@ export default function ResetPassword() {
 						<div className="text-center">
 							<Lock
 								size={46}
+								aria-hidden="true"
 								className="mb-4 inline-block text-[var(--color-primary)]"
 							/>
-							<h2 className="font-display text-3xl font-bold mb-3 text-[var(--color-primary)]">
+							<h2 id="reset-success-heading" className="font-display text-3xl font-bold mb-3 text-[var(--color-primary)]">
 								{tr("reset_password.success_title", "All set")}
 							</h2>
 							<p className="text-sm mb-6 font-semibold text-[var(--color-text-secondary)]">
@@ -232,9 +239,9 @@ export default function ResetPassword() {
 								{tr("reset_password.back_to_login", "Back to login")}
 							</Link>
 						</div>
-					</motion.div>
+					</motion.section>
 				)}
 			</motion.div>
-		</div>
+		</main>
 	);
 }

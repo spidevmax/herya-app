@@ -43,7 +43,7 @@ export default function PostPracticeNudge({
 
 	return (
 		<AnimatePresence>
-			<motion.div
+			<motion.aside
 				initial={{ opacity: 0, y: -8 }}
 				animate={{ opacity: 1, y: 0 }}
 				exit={{ opacity: 0, y: -8 }}
@@ -52,6 +52,7 @@ export default function PostPracticeNudge({
 					background: nudge.bg,
 					borderColor: "var(--color-border-soft)",
 				}}
+				aria-label={t("practice.post_nudge_label")}
 			>
 				<div className="flex items-start gap-3">
 					<div
@@ -83,7 +84,7 @@ export default function PostPracticeNudge({
 						<X size={14} style={{ color: "var(--color-text-muted)" }} />
 					</button>
 				</div>
-			</motion.div>
+			</motion.aside>
 		</AnimatePresence>
 	);
 }

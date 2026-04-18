@@ -179,19 +179,19 @@ export default function PhasedMeditationPlayer({
 		phaseColors[currentPhase.phase.type] || "var(--color-accent)";
 
 	return (
-		<div className="flex flex-col items-center gap-5 py-2">
+		<section aria-label={t(`session.meditation_types.${meditationType}`)} className="flex flex-col items-center gap-5 py-2">
 			{/* Header */}
-			<div className="text-center">
+			<header className="text-center">
 				<p
 					className="text-xs font-semibold uppercase tracking-widest"
 					style={{ color: "var(--color-accent)" }}
 				>
 					{t(`session.meditation_types.${meditationType}`)}
 				</p>
-			</div>
+			</header>
 
 			{/* Phase indicators */}
-			<div className="flex gap-2 w-full max-w-xs">
+			<ol className="flex gap-2 w-full max-w-xs list-none m-0 p-0">
 				{phases.map((phase, i) => {
 					const pct = phase.pct;
 					const isActive = i === currentPhase.index;
@@ -201,19 +201,21 @@ export default function PhasedMeditationPlayer({
 						: 0;
 
 					return (
-						<div
+						<li
 							key={phase.type}
+							aria-current={isActive ? "step" : undefined}
 							className="flex flex-col items-center gap-1"
 							style={{ width: `${pct}%` }}
 						>
-							<div
-								className="w-full h-1.5 rounded-full overflow-hidden"
+							<span
+								aria-hidden="true"
+								className="w-full h-1.5 rounded-full overflow-hidden block"
 								style={{
 									backgroundColor: `${phaseColors[phase.type]}20`,
 								}}
 							>
-								<div
-									className="h-full rounded-full transition-all duration-1000"
+								<span
+									className="h-full rounded-full transition-all duration-1000 block"
 									style={{
 										backgroundColor: phaseColors[phase.type],
 										width: isComplete
@@ -223,7 +225,7 @@ export default function PhasedMeditationPlayer({
 												: "0%",
 									}}
 								/>
-							</div>
+							</span>
 							<span
 								className="text-[9px] font-semibold uppercase"
 								style={{
@@ -234,15 +236,18 @@ export default function PhasedMeditationPlayer({
 							>
 								{t(`guided.phase_${phase.type}`)}
 							</span>
-						</div>
+						</li>
 					);
 				})}
-			</div>
+			</ol>
 
 			{/* Main visual */}
 			<div className="relative flex items-center justify-center my-4">
 				{/* Breathing circle */}
 				<motion.div
+					role="timer"
+					aria-live="off"
+					aria-label={t("practice.remaining")}
 					className="w-44 h-44 rounded-full flex flex-col items-center justify-center"
 					style={{
 						backgroundColor: `${currentColor}10`,
@@ -261,6 +266,7 @@ export default function PhasedMeditationPlayer({
 				>
 					<Leaf
 						size={28}
+						aria-hidden="true"
 						style={{ color: currentColor, opacity: 0.5 }}
 						className="mb-2"
 					/>
@@ -282,8 +288,9 @@ export default function PhasedMeditationPlayer({
 			{/* Instruction text */}
 			{showGuide && guided && (
 				<AnimatePresence mode="wait">
-					<motion.div
+					<motion.aside
 						key={currentPhase.index}
+						aria-label={t(`guided.phase_${currentPhase.phase.type}`)}
 						initial={{ opacity: 0, y: 8 }}
 						animate={{ opacity: 1, y: 0 }}
 						exit={{ opacity: 0, y: -8 }}
@@ -308,7 +315,7 @@ export default function PhasedMeditationPlayer({
 								{t("guided.meditation_silence")}
 							</p>
 						)}
-					</motion.div>
+					</motion.aside>
 				</AnimatePresence>
 			)}
 
@@ -317,10 +324,11 @@ export default function PhasedMeditationPlayer({
 				<button
 					type="button"
 					onClick={() => setShowGuide((g) => !g)}
+					aria-pressed={showGuide}
 					className="flex items-center gap-1.5 text-xs font-medium"
 					style={{ color: "var(--color-accent)" }}
 				>
-					{showGuide ? <EyeOff size={12} /> : <Eye size={12} />}
+					{showGuide ? <EyeOff size={12} aria-hidden="true" /> : <Eye size={12} aria-hidden="true" />}
 					{showGuide
 						? t("guided.hide_instructions")
 						: t("guided.show_instructions")}
@@ -333,7 +341,7 @@ export default function PhasedMeditationPlayer({
 					className="text-[10px] flex items-center gap-1"
 					style={{ color: "var(--color-text-muted)" }}
 				>
-					<Bell size={10} />
+					<Bell size={10} aria-hidden="true" />
 					{t("guided.bell_every", { n: bellInterval })}
 				</p>
 			)}
@@ -341,19 +349,21 @@ export default function PhasedMeditationPlayer({
 			{/* Controls */}
 			<div className="flex items-center gap-4">
 				<motion.button
+					type="button"
 					whileTap={{ scale: 0.92 }}
 					onClick={() => setIsRunning((r) => !r)}
+					aria-pressed={isRunning}
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 					style={{ backgroundColor: currentColor }}
 					aria-label={isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{isRunning ? (
-						<Pause size={24} />
+						<Pause size={24} aria-hidden="true" />
 					) : (
-						<Play size={24} className="ml-0.5" />
+						<Play size={24} aria-hidden="true" className="ml-0.5" />
 					)}
 				</motion.button>
 			</div>
-		</div>
+		</section>
 	);
 }

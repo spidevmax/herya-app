@@ -86,9 +86,9 @@ export default function Dashboard() {
 				: "dashboard.greeting_evening";
 
 	return (
-		<div className="flex flex-col gap-6 pt-4 pb-6 max-w-7xl mx-auto px-4 lg:px-6">
+		<main className="flex flex-col gap-6 pt-4 pb-6 max-w-7xl mx-auto px-4 lg:px-6">
 			{/* ── Header ────────────────────────────────────────────────────── */}
-			<motion.div
+			<motion.header
 				initial={{ opacity: 0, y: -8 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.3 }}
@@ -105,11 +105,12 @@ export default function Dashboard() {
 						{user?.name?.split(" ")[0] ?? t("dashboard.default_name")}
 					</h1>
 				</div>
-			</motion.div>
+			</motion.header>
 
 			{error && (
 				<motion.button
 					type="button"
+					role="alert"
 					initial={{ opacity: 0, y: 8 }}
 					animate={{ opacity: 1, y: 0 }}
 					onClick={loadDashboard}
@@ -119,7 +120,7 @@ export default function Dashboard() {
 						border: "1px solid var(--color-warning-border)",
 					}}
 				>
-					<AlertTriangle size={20} style={{ color: "var(--color-warning)" }} />
+					<AlertTriangle size={20} aria-hidden="true" style={{ color: "var(--color-warning)" }} />
 					<div>
 						<p className="text-sm font-semibold text-[var(--color-text-primary)]">
 							{t("dashboard.error_title")}
@@ -221,7 +222,8 @@ export default function Dashboard() {
 					) : (
 						<>
 							{pendingSession && (
-								<div
+								<article
+									aria-label={t("dashboard.resume_practice")}
 									className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3"
 									style={{
 										backgroundColor: "var(--color-surface-card)",
@@ -274,27 +276,33 @@ export default function Dashboard() {
 										className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white shrink-0"
 										style={{ backgroundColor: "var(--color-info)" }}
 									>
-										<RotateCcw size={12} />
+										<RotateCcw size={12} aria-hidden="true" />
 										{t("practice.resume")}
 									</button>
-								</div>
+								</article>
 							)}
 
 							{completedSessions.length > 0 ? (
-								<>
+								<section aria-labelledby="recent-practice-heading" className="flex flex-col gap-3">
 									<h2
+										id="recent-practice-heading"
 										className="font-display text-[11px] font-bold uppercase tracking-[0.1em]"
 										style={{ color: "var(--color-text-muted)" }}
 									>
 										{t("dashboard.recent_practice")}
 									</h2>
-									{completedSessions.map((s, i) => (
-										<RecentSessionCard key={s._id} session={s} index={i} />
-									))}
-								</>
+									<ul className="flex flex-col gap-3 list-none m-0 p-0">
+										{completedSessions.map((s, i) => (
+											<li key={s._id}>
+												<RecentSessionCard session={s} index={i} />
+											</li>
+										))}
+									</ul>
+								</section>
 							) : (
 								!pendingSession && (
-									<div
+									<section
+										aria-label={t("dashboard.no_sessions_title")}
 										className="rounded-3xl p-6 text-center shadow-[var(--shadow-card)]"
 										style={{ backgroundColor: "var(--color-surface-card)" }}
 									>
@@ -310,13 +318,13 @@ export default function Dashboard() {
 										>
 											{t("dashboard.no_sessions_hint")}
 										</p>
-									</div>
+									</section>
 								)
 							)}
 						</>
 					)}
 				</motion.div>
 			</div>
-		</div>
+		</main>
 	);
 }

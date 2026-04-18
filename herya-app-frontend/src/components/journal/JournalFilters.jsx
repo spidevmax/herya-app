@@ -44,7 +44,7 @@ export const JournalFilters = ({
 	].filter(Boolean).length;
 
 	return (
-		<SurfaceCard className="flex flex-col gap-3 p-3 shadow-none">
+		<SurfaceCard role="search" aria-label={t("journal.filters_label")} className="flex flex-col gap-3 p-3 shadow-none">
 			{/* Search + toggle row */}
 			<div className="flex items-center gap-2">
 				<div className="relative flex-1">
@@ -58,6 +58,7 @@ export const JournalFilters = ({
 					{isSearching && (
 						<Loader2
 							size={14}
+							aria-hidden="true"
 							className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-[var(--color-text-muted)]"
 						/>
 					)}
@@ -95,6 +96,7 @@ export const JournalFilters = ({
 					)}
 					<ChevronDown
 						size={14}
+						aria-hidden="true"
 						className={`transition-transform ${filtersOpen ? "rotate-180" : ""}`}
 					/>
 				</button>

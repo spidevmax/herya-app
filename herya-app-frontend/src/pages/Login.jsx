@@ -84,7 +84,7 @@ export default function Login() {
 							</div>
 
 							{error && (
-								<div className="mb-4 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]">
+								<div role="alert" className="mb-4 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]">
 									{error}
 								</div>
 							)}

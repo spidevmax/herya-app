@@ -135,9 +135,13 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="pose-form-title"
+			aria-describedby="pose-form-subtitle"
 			className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4"
 		>
-			<motion.div
+			<motion.section
 				initial={{ opacity: 0, y: 14, scale: 0.98 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				exit={{ opacity: 0, y: 10, scale: 0.98 }}
@@ -147,27 +151,29 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 				<button
 					type="button"
 					onClick={onClose}
+					aria-label={t("admin.pose_manager_cancel")}
 					className="absolute right-4 top-4 rounded-full p-2 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
 				>
-					<X size={18} />
+					<X size={18} aria-hidden="true" />
 				</button>
 
-				<div className="pr-10">
+				<header className="pr-10">
 					<p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
 						{t("admin.tab_poses")}
 					</p>
-					<h2 className="mt-1 font-display text-2xl font-bold text-[var(--color-text-primary)]">
+					<h2 id="pose-form-title" className="mt-1 font-display text-2xl font-bold text-[var(--color-text-primary)]">
 						{isEditing
 							? t("admin.pose_manager_edit")
 							: t("admin.pose_manager_create")}
 					</h2>
-					<p className="mt-2 text-sm text-[var(--color-text-secondary)]">
+					<p id="pose-form-subtitle" className="mt-2 text-sm text-[var(--color-text-secondary)]">
 						{t("admin.pose_manager_subtitle")}
 					</p>
-				</div>
+				</header>
 
 				{error && (
-					<div
+					<p
+						role="alert"
 						className="mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm"
 						style={{
 							backgroundColor: "var(--color-error-bg)",
@@ -175,9 +181,9 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 							color: "var(--color-danger)",
 						}}
 					>
-						<AlertTriangle size={16} className="mt-0.5 shrink-0" />
+						<AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
 						<span>{error}</span>
-					</div>
+					</p>
 				)}
 
 				<form className="mt-5 space-y-5" onSubmit={handleSubmit}>
@@ -467,7 +473,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 						</Button>
 					</div>
 				</form>
-			</motion.div>
+			</motion.section>
 		</motion.div>
 	);
 }
@@ -549,14 +555,19 @@ export default function PoseManager() {
 	};
 
 	return (
-		<div className="flex flex-col gap-4">
-			<div className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
+		<section aria-label={t("admin.tab_poses")} className="flex flex-col gap-4">
+			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search
 						size={16}
+						aria-hidden="true"
 						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
 					/>
+					<label htmlFor="pose-manager-search" className="sr-only">
+						{t("admin.pose_manager_search")}
+					</label>
 					<input
+						id="pose-manager-search"
 						type="search"
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
@@ -565,7 +576,11 @@ export default function PoseManager() {
 					/>
 				</div>
 
+				<label htmlFor="pose-manager-difficulty" className="sr-only">
+					{t("admin.pose_manager_difficulty")}
+				</label>
 				<select
+					id="pose-manager-difficulty"
 					value={difficulty}
 					onChange={(event) => setDifficulty(event.target.value)}
 					className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
@@ -583,105 +598,107 @@ export default function PoseManager() {
 				</select>
 
 				<Button onClick={() => setShowForm(true)} className="shrink-0">
-					<Plus size={16} />
+					<Plus size={16} aria-hidden="true" />
 					{t("admin.pose_manager_create")}
 				</Button>
-			</div>
+			</search>
 
 			{error && (
-				<div className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
-					<AlertTriangle size={16} />
+				<p role="alert" className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
+					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.pose_manager_load_error")}</span>
-				</div>
+				</p>
 			)}
 
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-				{loading ? (
-					<>
-						{["p1", "p2", "p3", "p4", "p5", "p6"].map((key) => (
-							<SkeletonCard key={key} />
-						))}
-					</>
-				) : filteredPoses.length > 0 ? (
-					filteredPoses.map((pose) => (
-						<div
-							key={pose._id}
-							className="overflow-hidden rounded-3xl bg-[var(--color-surface-card)] shadow-[var(--shadow-card)]"
-						>
-							{pose.media?.thumbnail?.url ? (
-								<img
-									src={pose.media.thumbnail.url}
-									alt={pose.name}
-									className="h-44 w-full object-cover"
-								/>
-							) : (
-								<div className="flex h-44 items-center justify-center bg-[var(--color-surface)] text-sm text-[var(--color-text-muted)]">
-									{t("admin.pose_manager_no_thumbnail")}
-								</div>
-							)}
-							<div className="space-y-3 p-4">
-								<div className="flex items-start justify-between gap-3">
-									<div className="min-w-0">
-										<h3 className="truncate text-base font-semibold text-[var(--color-text-primary)]">
-											{pose.name}
-										</h3>
-										<p className="truncate text-sm text-[var(--color-text-secondary)]">
-											{pose.romanizationName}
-										</p>
-									</div>
-									<Badge color="var(--color-primary)">{pose.difficulty}</Badge>
-								</div>
-
-								<div className="flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)]">
-									<span className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-										{humanizeValue(pose.vkCategory?.primary ?? "")}
-									</span>
-									<span className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-										{humanizeValue(pose.sidedness?.type ?? "symmetric")}
-									</span>
-									<span className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-										{humanizeValue(pose.drishti ?? "none")}
-									</span>
-								</div>
-
-								{pose.media?.images?.length > 0 && (
-									<p className="text-xs text-[var(--color-text-muted)]">
-										{pose.media.images.length} {t("admin.pose_manager_images")}
+			{loading ? (
+				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+					{["p1", "p2", "p3", "p4", "p5", "p6"].map((key) => (
+						<SkeletonCard key={key} />
+					))}
+				</div>
+			) : filteredPoses.length > 0 ? (
+				<ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 list-none m-0 p-0">
+					{filteredPoses.map((pose) => (
+						<li key={pose._id}>
+							<article
+								aria-labelledby={`pose-card-${pose._id}-name`}
+								className="overflow-hidden rounded-3xl bg-[var(--color-surface-card)] shadow-[var(--shadow-card)]"
+							>
+								{pose.media?.thumbnail?.url ? (
+									<img
+										src={pose.media.thumbnail.url}
+										alt={pose.name}
+										className="h-44 w-full object-cover"
+									/>
+								) : (
+									<p className="flex h-44 items-center justify-center bg-[var(--color-surface)] text-sm text-[var(--color-text-muted)] m-0">
+										{t("admin.pose_manager_no_thumbnail")}
 									</p>
 								)}
+								<div className="space-y-3 p-4">
+									<header className="flex items-start justify-between gap-3">
+										<div className="min-w-0">
+											<h3 id={`pose-card-${pose._id}-name`} className="truncate text-base font-semibold text-[var(--color-text-primary)]">
+												{pose.name}
+											</h3>
+											<p className="truncate text-sm text-[var(--color-text-secondary)]">
+												{pose.romanizationName}
+											</p>
+										</div>
+										<Badge color="var(--color-primary)">{pose.difficulty}</Badge>
+									</header>
 
-								<div className="flex gap-2 pt-1">
-									<Button
-										variant="outline"
-										size="sm"
-										className="flex-1"
-										onClick={() => {
-											setEditingPose(pose);
-											setShowForm(true);
-										}}
-									>
-										<Edit2 size={14} />
-										{t("admin.pose_manager_edit")}
-									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										className="flex-1 text-[var(--color-danger)]"
-										onClick={() => setDeleteTarget(pose)}
-									>
-										<Trash2 size={14} />
-										{t("admin.pose_manager_delete")}
-									</Button>
+									<ul className="flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
+										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+											{humanizeValue(pose.vkCategory?.primary ?? "")}
+										</li>
+										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+											{humanizeValue(pose.sidedness?.type ?? "symmetric")}
+										</li>
+										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+											{humanizeValue(pose.drishti ?? "none")}
+										</li>
+									</ul>
+
+									{pose.media?.images?.length > 0 && (
+										<p className="text-xs text-[var(--color-text-muted)]">
+											{pose.media.images.length} {t("admin.pose_manager_images")}
+										</p>
+									)}
+
+									<div className="flex gap-2 pt-1">
+										<Button
+											variant="outline"
+											size="sm"
+											className="flex-1"
+											onClick={() => {
+												setEditingPose(pose);
+												setShowForm(true);
+											}}
+										>
+											<Edit2 size={14} aria-hidden="true" />
+											{t("admin.pose_manager_edit")}
+										</Button>
+										<Button
+											variant="ghost"
+											size="sm"
+											className="flex-1 text-[var(--color-danger)]"
+											onClick={() => setDeleteTarget(pose)}
+										>
+											<Trash2 size={14} aria-hidden="true" />
+											{t("admin.pose_manager_delete")}
+										</Button>
+									</div>
 								</div>
-							</div>
-						</div>
-					))
-				) : (
-					<div className="col-span-full rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)]">
-						{t("admin.pose_manager_empty")}
-					</div>
-				)}
-			</div>
+							</article>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p className="rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)] m-0">
+					{t("admin.pose_manager_empty")}
+				</p>
+			)}
 
 			<ConfirmModal
 				open={Boolean(deleteTarget)}
@@ -706,6 +723,6 @@ export default function PoseManager() {
 					onSaved={handleSavedPose}
 				/>
 			)}
-		</div>
+		</section>
 	);
 }

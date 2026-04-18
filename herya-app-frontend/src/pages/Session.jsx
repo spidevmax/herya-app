@@ -381,40 +381,42 @@ export default function Session() {
 
 	if (step === "done") {
 		return (
-			<div className="min-h-dvh flex flex-col items-center justify-center gap-6 px-6">
+			<main className="min-h-dvh flex flex-col items-center justify-center gap-6 px-6">
 				<motion.div
+					aria-hidden="true"
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}
 					transition={{ type: "spring", stiffness: 260, damping: 20 }}
 				>
 					<CheckCircle size={72} style={{ color: "var(--color-primary)" }} />
 				</motion.div>
-				<h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">
+				<h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
 					{t("session.done_title")}
-				</h2>
+				</h1>
 				<p className="text-[var(--color-text-muted)] text-center text-sm font-medium">
 					{t("session.done_subtitle")}
 				</p>
 				<Button onClick={() => navigate("/")}>{t("session.back_home")}</Button>
-			</div>
+			</main>
 		);
 	}
 
 	return (
-		<div className="flex flex-col min-h-dvh">
+		<main className="flex flex-col min-h-dvh">
 			<StickyHeader onBack={() => navigate(-1)} title={sessionTypeLabel} />
 
 			<div className="flex-1 px-4 pb-28 overflow-y-auto">
 				<AnimatePresence mode="wait">
 					{step === "pre" && (
-						<motion.div
+						<motion.section
 							key="pre"
+							aria-labelledby="session-pre-heading"
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-6 pt-4"
 						>
-							<h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+							<h2 id="session-pre-heading" className="text-xl font-semibold text-[var(--color-text-primary)]">
 								{t("session.pre_title")}
 							</h2>
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
@@ -493,12 +495,13 @@ export default function Session() {
 							>
 								{t("session.begin")}
 							</Button>
-						</motion.div>
+						</motion.section>
 					)}
 
 					{step === "active" && (
-						<motion.div
+						<motion.section
 							key="active"
+							aria-label={sessionTypeLabel}
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}
@@ -783,7 +786,7 @@ export default function Session() {
 							<Button onClick={() => setStep("post")} className="w-full">
 								{t("session.finish")}
 							</Button>
-						</motion.div>
+						</motion.section>
 					)}
 
 					{isCompletePractice && (
@@ -985,16 +988,17 @@ export default function Session() {
 						</div>
 					)}
 					{step === "post" && (
-						<motion.div
+						<motion.section
 							key="post"
+							aria-labelledby="session-post-heading"
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-6 pt-4"
 						>
 							<h2
+								id="session-post-heading"
 								className="text-xl font-semibold text-[var(--color-text-primary)]"
-		
 							>
 								{t("session.post_title")}
 							</h2>
@@ -1058,10 +1062,10 @@ export default function Session() {
 							<Button onClick={handleComplete} disabled={saving}>
 								{saving ? t("session.saving") : t("session.save")}
 							</Button>
-						</motion.div>
+						</motion.section>
 					)}
 				</AnimatePresence>
 			</div>
-		</div>
+		</main>
 	);
 }

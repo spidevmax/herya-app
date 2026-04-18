@@ -64,7 +64,8 @@ export default function TutorInsightsCard({ tutorInsights }) {
 
 	if (!hasData) {
 		return (
-			<div
+			<section
+				aria-label={t("dashboard.tutor_insights_title")}
 				className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
 				style={{
 					backgroundColor: "var(--color-surface-card)",
@@ -88,7 +89,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
 					{t("dashboard.tutor_insights_empty")}
 				</p>
-			</div>
+			</section>
 		);
 	}
 
@@ -125,14 +126,15 @@ export default function TutorInsightsCard({ tutorInsights }) {
 	};
 
 	return (
-		<div
+		<section
+			aria-label={t("dashboard.tutor_insights_title")}
 			className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
 			style={{
 				backgroundColor: "var(--color-surface-card)",
 				border: "1px solid var(--color-border-soft)",
 			}}
 		>
-			<div className="flex items-start justify-between gap-3 mb-3">
+			<header className="flex items-start justify-between gap-3 mb-3">
 				<div>
 					<p
 						className="text-[11px] font-bold uppercase tracking-[0.1em]"
@@ -153,7 +155,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 				>
 					<ShieldCheck size={16} style={{ color: "var(--color-info)" }} />
 				</div>
-			</div>
+			</header>
 
 			<div className="grid grid-cols-2 gap-2 mb-3">
 				<TutorStat
@@ -339,6 +341,6 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					</p>
 				)}
 			</div>
-		</div>
+		</section>
 	);
 }

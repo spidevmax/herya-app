@@ -284,16 +284,18 @@ export default function Poses() {
 	}, [query, difficulty, fetchPoses]);
 
 	return (
-		<div className="flex flex-col pt-4 pb-6 min-h-0">
-			<div className="px-4 mb-4">
+		<main className="flex flex-col pt-4 pb-6 min-h-0">
+			<header className="px-4 mb-4">
 				<div className="flex items-center gap-3 mb-4">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
+						aria-label={t("session.back_home")}
 						className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] flex items-center justify-center shadow-sm"
 					>
 						<ChevronLeft
 							size={20}
+							aria-hidden="true"
 							className="text-[var(--color-text-secondary)]"
 						/>
 					</button>
@@ -306,7 +308,7 @@ export default function Poses() {
 					onChange={setQuery}
 					placeholder={t("library.search")}
 				/>
-			</div>
+			</header>
 
 			<div className="px-4 mb-4">
 				<FilterChips
@@ -316,10 +318,12 @@ export default function Poses() {
 				/>
 			</div>
 
-			<div className="px-4 flex flex-col gap-3">
-				{loading ? (
-					["p1", "p2", "p3", "p4", "p5"].map((k) => <SkeletonCard key={k} />)
-				) : poses.length === 0 ? (
+			{loading ? (
+				<div className="px-4 flex flex-col gap-3" aria-busy="true" aria-live="polite">
+					{["p1", "p2", "p3", "p4", "p5"].map((k) => <SkeletonCard key={k} />)}
+				</div>
+			) : poses.length === 0 ? (
+				<div className="px-4">
 					<EmptyState
 						icon={
 							<PersonStanding
@@ -330,18 +334,21 @@ export default function Poses() {
 						title={t("library.empty_poses")}
 						description={t("library.empty_poses_hint")}
 					/>
-				) : (
-					poses.map((p, i) => (
-						<PoseCard
-							key={p._id}
-							pose={p}
-							index={i}
-							t={t}
-							onClick={() => navigate(`/poses/${p._id}`)}
-						/>
-					))
-				)}
-			</div>
-		</div>
+				</div>
+			) : (
+				<ul className="px-4 flex flex-col gap-3 list-none m-0 p-0">
+					{poses.map((p, i) => (
+						<li key={p._id}>
+							<PoseCard
+								pose={p}
+								index={i}
+								t={t}
+								onClick={() => navigate(`/poses/${p._id}`)}
+							/>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
 	);
 }

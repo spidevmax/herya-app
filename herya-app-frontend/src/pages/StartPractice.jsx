@@ -855,12 +855,13 @@ export default function StartPractice() {
 	// Done screen
 	if (phase === "done") {
 		return (
-			<div className="min-h-dvh flex flex-col items-center justify-center gap-6 px-6">
+			<main className="min-h-dvh flex flex-col items-center justify-center gap-6 px-6">
 				<motion.div
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}
 					transition={{ type: "spring", stiffness: 260, damping: 20 }}
 					className="flex justify-center"
+					aria-hidden="true"
 				>
 					<Leaf
 						size={64}
@@ -868,12 +869,12 @@ export default function StartPractice() {
 						style={{ color: "var(--color-primary)" }}
 					/>
 				</motion.div>
-				<h2
+				<h1
 					className="text-2xl font-semibold"
 					style={{ color: "var(--color-text-primary)" }}
 				>
 					{t("practice.done_title")}
-				</h2>
+				</h1>
 				<p
 					className="text-sm text-center"
 					style={{ color: "var(--color-text-secondary)" }}
@@ -881,20 +882,20 @@ export default function StartPractice() {
 					{t("practice.done_subtitle")}
 				</p>
 
-				<div className="flex gap-3">
+				<nav aria-label={t("practice.done_title")} className="flex gap-3">
 					<Button variant="outline" onClick={() => navigate("/sessions")}>
 						{t("practice.view_history")}
 					</Button>
 					<Button onClick={() => navigate("/")}>
 						{t("session.back_home")}
 					</Button>
-				</div>
-			</div>
+				</nav>
+			</main>
 		);
 	}
 
 	return (
-		<div className="flex flex-col min-h-dvh">
+		<main className="flex flex-col min-h-dvh">
 			{/* Header */}
 			<StickyHeader
 				onBack={() => {
@@ -942,16 +943,17 @@ export default function StartPractice() {
 
 			{/* Recovery banner */}
 			{showRecovery && persistence.recovered && phase === "type" && (
-				<motion.div
+				<motion.aside
 					initial={{ opacity: 0, y: -10 }}
 					animate={{ opacity: 1, y: 0 }}
+					aria-label={t("practice.recovery_title")}
 					className="mx-4 mb-3 rounded-xl p-4 flex items-center gap-3"
 					style={{
 						backgroundColor: "var(--color-warning-bg)",
 						border: "1px solid var(--color-warning-border)",
 					}}
 				>
-					<div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
+					<div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center" aria-hidden="true">
 						<RotateCcw size={16} className="text-amber-700" />
 					</div>
 					<div className="flex-1">
@@ -981,12 +983,13 @@ export default function StartPractice() {
 							{t("practice.resume")}
 						</button>
 					</div>
-				</motion.div>
+				</motion.aside>
 			)}
 
 			{/* Error banner */}
 			{error && (
 				<div
+					role="alert"
 					className="mx-4 mb-3 rounded-xl p-3 text-sm"
 					style={{
 						backgroundColor: "var(--color-error-bg)",
@@ -997,6 +1000,7 @@ export default function StartPractice() {
 					<button
 						type="button"
 						onClick={() => setError(null)}
+						aria-label={t("practice.dismiss")}
 						className="ml-2 font-semibold"
 					>
 						✕
@@ -1061,33 +1065,34 @@ export default function StartPractice() {
 					)}
 
 					{phase === "checkin" && (
-						<motion.div
+						<motion.section
 							key="checkin"
+							aria-labelledby="checkin-heading"
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-5 pt-4"
 						>
-							<h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+							<h2 id="checkin-heading" className="text-xl font-semibold text-[var(--color-text-primary)]">
 								{isTutorPractice
 									? t("practice.checkin_title_tutor")
 									: t("practice.checkin_title")}
 							</h2>
 
-							<div
-								className="rounded-2xl p-5"
+							<fieldset
+								className="rounded-2xl p-5 border-0"
 								style={{ backgroundColor: "var(--color-surface-card)" }}
 							>
-								<p
+								<legend
 									className="text-sm font-medium mb-3"
 									style={{ color: "var(--color-text-primary)" }}
 								>
 									{isTutorPractice
 										? t("practice.checkin_signal")
 										: t("practice.checkin_mood")}
-								</p>
+								</legend>
 								{isTutorPractice ? (
-									<div className="grid grid-cols-3 gap-2">
+									<div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t("practice.checkin_signal")}>
 										{["green", "yellow", "red"].map((signal) => {
 											const selected = tutorSignal === signal;
 											const signalColor =
@@ -1099,6 +1104,8 @@ export default function StartPractice() {
 											return (
 												<button
 													type="button"
+													role="radio"
+													aria-checked={selected}
 													key={signal}
 													onClick={() => handleTutorSignalChange(signal)}
 													className="rounded-xl px-3 py-2 text-xs font-semibold transition"
@@ -1118,13 +1125,14 @@ export default function StartPractice() {
 										})}
 									</div>
 								) : (
-									<div className="flex flex-wrap gap-2">
+									<div className="flex flex-wrap gap-2" role="group" aria-label={t("practice.checkin_mood")}>
 										{MOOD_OPTIONS.map((m) => {
 											const selected = checkInMood.includes(m);
 											const color = getMoodColor(m);
 											return (
 												<button
 													type="button"
+													aria-pressed={selected}
 													key={m}
 													onClick={() => toggleCheckInMood(m)}
 													className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
@@ -1143,7 +1151,7 @@ export default function StartPractice() {
 										})}
 									</div>
 								)}
-							</div>
+							</fieldset>
 
 							{!isTutorPractice && (
 								<div
@@ -1229,7 +1237,7 @@ export default function StartPractice() {
 							>
 								{t("practice.begin_practice")}
 							</Button>
-						</motion.div>
+						</motion.section>
 					)}
 
 					{phase === "practice" && (
@@ -1306,6 +1314,6 @@ export default function StartPractice() {
 				description={t("practice.confirm_back_desc")}
 				confirmLabel={t("practice.confirm_back_yes")}
 			/>
-		</div>
+		</main>
 	);
 }

@@ -8,8 +8,8 @@ export default function NotFound() {
 	const { t } = useLanguage();
 
 	return (
-		<div className="min-h-dvh flex items-center justify-center px-6 py-10">
-			<div
+		<main className="min-h-dvh flex items-center justify-center px-6 py-10">
+			<article
 				className="w-full max-w-xl rounded-3xl p-7 sm:p-9"
 				style={{
 					backgroundColor: "var(--color-surface-card)",
@@ -71,7 +71,7 @@ export default function NotFound() {
 					<Compass size={14} />
 					{t("not_found.go_back")}
 				</button>
-			</div>
-		</div>
+			</article>
+		</main>
 	);
 }

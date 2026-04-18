@@ -69,7 +69,7 @@ export default function Register() {
 					</div>
 
 					{error && (
-						<div className="mb-4 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]">
+						<div role="alert" className="mb-4 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]">
 							{error}
 						</div>
 					)}
@@ -83,6 +83,7 @@ export default function Register() {
 								<button
 									type="button"
 									onClick={() => setForm((f) => ({ ...f, role: "user" }))}
+									aria-pressed={form.role === "user"}
 									className="rounded-xl border px-3 py-2 text-sm font-semibold transition"
 									style={{
 										borderColor:
@@ -101,6 +102,7 @@ export default function Register() {
 								<button
 									type="button"
 									onClick={() => setForm((f) => ({ ...f, role: "tutor" }))}
+									aria-pressed={form.role === "tutor"}
 									className="rounded-xl border px-3 py-2 text-sm font-semibold transition"
 									style={{
 										borderColor:
