@@ -1,4 +1,8 @@
 const { query, param, body } = require("express-validator");
+const {
+	BREATHING_TECHNIQUE_KEYS,
+	BREATHING_TECHNIQUE_FAMILIES,
+} = require("../models/BreathingPattern.model");
 
 /**
  * Validations: Admin Endpoints
@@ -169,6 +173,18 @@ const createPoseValidation = [
 		.withMessage("Difficulty is required")
 		.isIn(["beginner", "intermediate", "advanced"])
 		.withMessage("Difficulty must be beginner, intermediate, or advanced"),
+
+	body("techniqueKey")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Technique key must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
+
+	body("techniqueFamily")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_FAMILIES)
+		.withMessage(
+			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
+		),
 ];
 
 /**
@@ -194,6 +210,18 @@ const updatePoseValidation = [
 		.optional()
 		.isIn(["beginner", "intermediate", "advanced"])
 		.withMessage("Difficulty must be beginner, intermediate, or advanced"),
+
+	body("techniqueKey")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Technique key must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
+
+	body("techniqueFamily")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_FAMILIES)
+		.withMessage(
+			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
+		),
 ];
 
 /**
@@ -236,6 +264,23 @@ const createBreathingPatternValidation = [
 		.withMessage("Difficulty is required")
 		.isIn(["beginner", "intermediate", "advanced"])
 		.withMessage("Difficulty must be beginner, intermediate, or advanced"),
+
+	body("techniqueKey")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Technique key must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
+
+	body("techniqueFamily")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_FAMILIES)
+		.withMessage(
+			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
+		),
+
+	body("variantOf")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Variant of must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
 ];
 
 /**
@@ -255,6 +300,23 @@ const updateBreathingPatternValidation = [
 		.optional()
 		.isIn(["beginner", "intermediate", "advanced"])
 		.withMessage("Difficulty must be beginner, intermediate, or advanced"),
+
+	body("techniqueKey")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Technique key must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
+
+	body("techniqueFamily")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_FAMILIES)
+		.withMessage(
+			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
+		),
+
+	body("variantOf")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Variant of must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
 ];
 
 /**

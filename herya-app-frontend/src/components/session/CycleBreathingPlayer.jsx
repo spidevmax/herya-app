@@ -79,34 +79,38 @@ export default function CycleBreathingPlayer({
 		if (config.customRatio) {
 			const base = pattern?.baseBreathDuration || profile.baseDuration;
 			const ratio = config.customRatio;
-			return {
+			const basePhaseDurations = {
 				inhale: (ratio.inhale || 0) * base,
 				hold: (ratio.hold || 0) * base,
 				exhale: (ratio.exhale || 0) * base,
 				holdAfterExhale: (ratio.holdAfterExhale || 0) * base,
 			};
+			return Object.fromEntries(
+				profile.phaseSequence
+					.map((step) => [
+						step.key,
+						(basePhaseDurations[step.phaseKey] || 0) *
+							(step.durationMultiplier ?? 1),
+					])
+					.filter(([, duration]) => duration > 0),
+			);
 		}
 		return profile.phaseDurations;
 	}, [config.customRatio, pattern, profile]);
 
-	// When a customRatio is provided, derive active phases from the full
-	// canonical phase order instead of profile.activePhases, which was
-	// pre-filtered against the *default* ratio and may have dropped phases
-	// (e.g. "hold") that the custom ratio now enables.
-	const activePhases = useMemo(() => {
-		const source = config.customRatio
-			? ["inhale", "hold", "exhale", "holdAfterExhale"]
-			: profile.activePhases;
-		return source.filter((k) => phaseDurations[k] > 0);
-	}, [config.customRatio, profile.activePhases, phaseDurations]);
+	const enginePhases = useMemo(
+		() => profile.enginePhases.filter((phaseKey) => phaseDurations[phaseKey] > 0),
+		[phaseDurations, profile.enginePhases],
+	);
+	const runtimePhaseSequence = useMemo(
+		() => profile.phaseSequence.filter((step) => phaseDurations[step.key] > 0),
+		[phaseDurations, profile.phaseSequence],
+	);
 
 	const targetCycles =
 		config.cycles || pattern?.recommendedPractice?.cycles?.default || 10;
 	const pauseBetween =
 		config.pauseBetweenCycles ?? profile.pauseBetweenCycles ?? 0;
-
-	// ── Nostril alternation state ────────────────────────────────────────
-	const [activeNostril, setActiveNostril] = useState("left");
 
 	// ── Breathing engine ─────────────────────────────────────────────────
 	const handlePhaseChange = useCallback(() => {
@@ -119,16 +123,12 @@ export default function CycleBreathingPlayer({
 			onCycleComplete?.(count);
 			vibrate(profile.haptic?.roundChange || 60);
 			audio.playRoundChange(profile.audio);
-			// Alternate nostrils per cycle
-			if (profile.nostrilAlternation) {
-				setActiveNostril((prev) => (prev === "left" ? "right" : "left"));
-			}
 		},
 		[onCycleComplete, vibrate, audio, profile],
 	);
 
 	const engine = useBreathingEngine({
-		activePhases,
+		activePhases: enginePhases,
 		phaseDurations,
 		targetCycles,
 		pauseBetween,
@@ -139,9 +139,14 @@ export default function CycleBreathingPlayer({
 
 	// ── Play phase guide sound when phase changes ────────────────────────
 	const prevPhaseRef = useRef(null);
+	const currentStep =
+		runtimePhaseSequence[engine.phaseIdx] || runtimePhaseSequence[0];
+	const currentPhaseKey = currentStep?.phaseKey || engine.currentPhaseKey;
+	const currentNostrilFlow = currentStep?.nostrilFlow || "both";
+
 	useEffect(() => {
 		if (!engine.isRunning || engine.isPausing) return;
-		const key = engine.currentPhaseKey;
+		const key = currentPhaseKey;
 		if (key !== prevPhaseRef.current) {
 			prevPhaseRef.current = key;
 			audio.playPhaseGuide(key, profile.audio, engine.currentPhaseDuration);
@@ -153,6 +158,7 @@ export default function CycleBreathingPlayer({
 		engine.currentPhaseDuration,
 		audio,
 		profile.audio,
+		currentPhaseKey,
 	]);
 
 	// ── Reduced motion ───────────────────────────────────────────────────
@@ -161,16 +167,30 @@ export default function CycleBreathingPlayer({
 		window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 	// ── Derived UI values ────────────────────────────────────────────────
-	const color = PHASE_COLORS[engine.currentPhaseKey] || PHASE_COLORS.inhale;
-	const anim = profile.animation[engine.currentPhaseKey] || {
+	const color = PHASE_COLORS[currentPhaseKey] || PHASE_COLORS.inhale;
+	const anim = profile.animation[currentPhaseKey] || {
 		scale: 1,
 		ease: "linear",
 	};
 	const paletteTint =
 		PALETTE_TINTS[profile.visual?.palette] || PALETTE_TINTS.balanced;
-	const totalCycleDuration = activePhases.reduce(
+	const totalCycleDuration = enginePhases.reduce(
 		(sum, k) => sum + (phaseDurations[k] || 0),
 		0,
+	);
+	const displayPhaseDurations = useMemo(
+		() =>
+			profile.activePhases.reduce((acc, phase) => {
+				acc[phase] = runtimePhaseSequence
+					.filter((step) => step.phaseKey === phase)
+					.reduce((sum, step) => sum + (phaseDurations[step.key] || 0), 0);
+				return acc;
+			}, {}),
+		[phaseDurations, profile.activePhases, runtimePhaseSequence],
+	);
+	const displayActivePhases = useMemo(
+		() => profile.activePhases.filter((phase) => (displayPhaseDurations[phase] || 0) > 0),
+		[displayPhaseDurations, profile.activePhases],
 	);
 
 	const ratioStr = pattern
@@ -241,10 +261,11 @@ export default function CycleBreathingPlayer({
 			</div>
 
 			{/* Nostril indicator for alternate-nostril techniques */}
-			{profile.nostrilAlternation && engine.isRunning && (
+			{runtimePhaseSequence.some((step) => step.nostrilFlow !== "both") &&
+				engine.isRunning && (
 				<NostrilIndicator
-					activeNostril={activeNostril}
-					phaseKey={engine.currentPhaseKey}
+					nostrilFlow={currentNostrilFlow}
+					phaseKey={currentPhaseKey}
 					color={color}
 				/>
 			)}
@@ -291,7 +312,7 @@ export default function CycleBreathingPlayer({
 					}}
 					role="img"
 					aria-label={t(
-						PHASE_LABEL_KEYS[engine.currentPhaseKey] || "pranayama.inhale",
+						PHASE_LABEL_KEYS[currentPhaseKey] || "pranayama.inhale",
 					)}
 				>
 					<AnimatePresence mode="wait">
@@ -335,7 +356,7 @@ export default function CycleBreathingPlayer({
 								<>
 									<p className="font-semibold text-base" style={{ color }}>
 										{t(
-											PHASE_LABEL_KEYS[engine.currentPhaseKey] ||
+											PHASE_LABEL_KEYS[currentPhaseKey] ||
 												"pranayama.inhale",
 										)}
 									</p>
@@ -362,14 +383,16 @@ export default function CycleBreathingPlayer({
 				aria-valuemin={0}
 				aria-valuemax={100}
 			>
-				{activePhases.map((phase) => {
+				{enginePhases.map((phase) => {
+					const step = profile.phaseSequence.find((item) => item.key === phase);
+					const phaseKey = step?.phaseKey || phase;
 					const dur = phaseDurations[phase];
 					const pct = (dur / totalCycleDuration) * 100;
 					const isActive =
 						phase === engine.currentPhaseKey && !engine.isPausing;
 					const isCompleted =
-						activePhases.indexOf(phase) <
-						activePhases.indexOf(engine.currentPhaseKey);
+						enginePhases.indexOf(phase) <
+						enginePhases.indexOf(engine.currentPhaseKey);
 
 					return (
 						<div
@@ -377,14 +400,14 @@ export default function CycleBreathingPlayer({
 							className="relative h-2 rounded-full overflow-hidden"
 							style={{
 								width: `${pct}%`,
-								backgroundColor: `${PHASE_COLORS[phase]}25`,
+								backgroundColor: `${PHASE_COLORS[phaseKey]}25`,
 							}}
 						>
 							{isActive && (
 								<motion.div
 									className="absolute inset-y-0 left-0 rounded-full"
 									style={{
-										backgroundColor: PHASE_COLORS[phase],
+										backgroundColor: PHASE_COLORS[phaseKey],
 									}}
 									animate={{
 										width: `${engine.phaseProgress * 100}%`,
@@ -396,7 +419,7 @@ export default function CycleBreathingPlayer({
 								<div
 									className="absolute inset-0 rounded-full"
 									style={{
-										backgroundColor: PHASE_COLORS[phase],
+										backgroundColor: PHASE_COLORS[phaseKey],
 									}}
 								/>
 							)}
@@ -407,13 +430,13 @@ export default function CycleBreathingPlayer({
 
 			{/* Phase labels with durations */}
 			<dl className="flex gap-2 justify-center flex-wrap">
-				{activePhases.map((phase) => (
+				{displayActivePhases.map((phase) => (
 					<div
 						key={phase}
 						className="flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-lg transition-all"
 						style={{
 							backgroundColor:
-								phase === engine.currentPhaseKey && !engine.isPausing
+								phase === currentPhaseKey && !engine.isPausing
 									? `${PHASE_COLORS[phase]}15`
 									: "transparent",
 						}}
@@ -428,7 +451,7 @@ export default function CycleBreathingPlayer({
 							className="text-sm font-bold tabular-nums m-0"
 							style={{ color: PHASE_COLORS[phase] }}
 						>
-							{phaseDurations[phase]}s
+							{displayPhaseDurations[phase]}s
 						</dd>
 					</div>
 				))}

@@ -5,8 +5,9 @@
  * technique: phase order, animation curves, visual style, audio design,
  * haptic intensity, stimulation level, and safety rules.
  *
- * The engine reads the profile by matching `pattern.romanizationName` (case-
- * insensitive, trimmed). If no match is found, `_default` is used.
+ * The engine reads the profile by matching `pattern.techniqueKey` first and
+ * falling back to normalized names/aliases. If no match is found, `_default`
+ * is used.
  *
  * Fields
  * ──────
@@ -21,7 +22,9 @@
  *  safety            – beginner limits, max cycles, warnings
  *  pauseBetweenCycles – default pause seconds (0 = no pause)
  *  countBased        – true for techniques measured in rapid exhalations
- *  nostrilAlternation – true for Nadi Shodhana / Surya Bhedana style
+ *  phaseSequence      – optional expanded sequence with repeated phases and
+ *                       nostril flow metadata for techniques such as Nadi
+ *                       Shodhana and Anuloma / Pratiloma Ujjayi
  *  roundBased        – true for Kapalabhati / Bhastrika (rounds of pumps)
  */
 
@@ -90,7 +93,7 @@ const PROFILES = {
 		pauseBetweenCycles: 0,
 	},
 
-	"nadi shodhana": {
+	nadi_shodhana: {
 		phaseOrder: ["inhale", "hold", "exhale"],
 		defaultRatio: { inhale: 1, hold: 1, exhale: 2, holdAfterExhale: 0 },
 		baseDuration: 4,
@@ -112,7 +115,14 @@ const PROFILES = {
 		},
 		haptic: { inhale: 15, hold: 0, exhale: 15, phaseChange: 25 },
 		stimulation: "low",
-		nostrilAlternation: true,
+		phaseSequence: [
+			{ key: "inhale_left", phaseKey: "inhale", nostrilFlow: "left" },
+			{ key: "hold_left", phaseKey: "hold", nostrilFlow: "none" },
+			{ key: "exhale_right", phaseKey: "exhale", nostrilFlow: "right" },
+			{ key: "inhale_right", phaseKey: "inhale", nostrilFlow: "right" },
+			{ key: "hold_right", phaseKey: "hold", nostrilFlow: "none" },
+			{ key: "exhale_left", phaseKey: "exhale", nostrilFlow: "left" },
+		],
 		safety: { maxCyclesBeginner: 12 },
 		pauseBetweenCycles: 2,
 	},
@@ -229,7 +239,7 @@ const PROFILES = {
 	},
 
 	// ── Additional seeded techniques ────────────────────────────────────────
-	"surya bhedana": {
+	surya_bhedana: {
 		phaseOrder: ["inhale", "exhale"],
 		defaultRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
 		baseDuration: 5,
@@ -249,12 +259,43 @@ const PROFILES = {
 		},
 		haptic: { inhale: 15, exhale: 15, phaseChange: 25 },
 		stimulation: "medium",
-		nostrilAlternation: true,
+		phaseSequence: [
+			{ key: "inhale_right", phaseKey: "inhale", nostrilFlow: "right" },
+			{ key: "exhale_left", phaseKey: "exhale", nostrilFlow: "left" },
+		],
 		safety: { maxCyclesBeginner: 10 },
 		pauseBetweenCycles: 2,
 	},
 
-	"sama vritti": {
+	candra_bhedana: {
+		phaseOrder: ["inhale", "exhale"],
+		defaultRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
+		baseDuration: 5,
+		animation: {
+			inhale: { scale: 1.2, ease: [0.33, 0, 0.67, 1] },
+			exhale: { scale: 0.85, ease: [0.33, 0, 0.67, 1] },
+		},
+		visual: {
+			circleStyle: "nostril",
+			palette: "cooling",
+			phaseEmphasis: "inhale",
+		},
+		audio: {
+			inhale: AUDIO.tone,
+			exhale: AUDIO.none,
+			phaseChange: AUDIO.click,
+		},
+		haptic: { inhale: 12, exhale: 0, phaseChange: 20 },
+		stimulation: "low",
+		phaseSequence: [
+			{ key: "inhale_left", phaseKey: "inhale", nostrilFlow: "left" },
+			{ key: "exhale_right", phaseKey: "exhale", nostrilFlow: "right" },
+		],
+		safety: { maxCyclesBeginner: 10 },
+		pauseBetweenCycles: 2,
+	},
+
+	sama_vritti: {
 		phaseOrder: ["inhale", "exhale"],
 		defaultRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
 		baseDuration: 4,
@@ -278,7 +319,7 @@ const PROFILES = {
 		pauseBetweenCycles: 0,
 	},
 
-	"agni prasana": {
+	agni: {
 		phaseOrder: ["inhale", "hold", "exhale", "holdAfterExhale"],
 		defaultRatio: { inhale: 1, hold: 1, exhale: 2, holdAfterExhale: 1 },
 		baseDuration: 4,
@@ -305,6 +346,123 @@ const PROFILES = {
 		safety: { maxCyclesBeginner: 8 },
 		pauseBetweenCycles: 3,
 	},
+
+	anuloma_ujjayi: {
+		phaseOrder: ["inhale", "exhale"],
+		defaultRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
+		baseDuration: 5,
+		animation: {
+			inhale: { scale: 1.22, ease: [0.25, 0.1, 0.25, 1] },
+			exhale: { scale: 0.82, ease: [0.42, 0, 0.58, 1] },
+		},
+		visual: { circleStyle: "wave", palette: "balanced", phaseEmphasis: "exhale" },
+		audio: { inhale: AUDIO.ocean, exhale: AUDIO.ocean, phaseChange: AUDIO.bell },
+		haptic: { inhale: 15, exhale: 0, phaseChange: 20 },
+		stimulation: "low",
+		phaseSequence: [
+			{ key: "inhale_both_1", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 0.5 },
+			{ key: "exhale_left", phaseKey: "exhale", nostrilFlow: "left", durationMultiplier: 0.5 },
+			{ key: "inhale_both_2", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 0.5 },
+			{ key: "exhale_right", phaseKey: "exhale", nostrilFlow: "right", durationMultiplier: 0.5 },
+		],
+		safety: { maxCyclesBeginner: 12 },
+		pauseBetweenCycles: 1,
+	},
+
+	pratiloma_ujjayi: {
+		phaseOrder: ["inhale", "hold", "exhale"],
+		defaultRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
+		baseDuration: 5,
+		animation: {
+			inhale: { scale: 1.22, ease: [0.25, 0.1, 0.25, 1] },
+			exhale: { scale: 0.82, ease: [0.42, 0, 0.58, 1] },
+		},
+		visual: { circleStyle: "wave", palette: "balanced", phaseEmphasis: "inhale" },
+		audio: { inhale: AUDIO.ocean, exhale: AUDIO.ocean, phaseChange: AUDIO.click },
+		haptic: { inhale: 15, exhale: 0, phaseChange: 20 },
+		stimulation: "medium",
+		phaseSequence: [
+			{ key: "inhale_left", phaseKey: "inhale", nostrilFlow: "left", durationMultiplier: 0.5 },
+			{ key: "exhale_both_1", phaseKey: "exhale", nostrilFlow: "both", durationMultiplier: 0.5 },
+			{ key: "inhale_right", phaseKey: "inhale", nostrilFlow: "right", durationMultiplier: 0.5 },
+			{ key: "exhale_both_2", phaseKey: "exhale", nostrilFlow: "both", durationMultiplier: 0.5 },
+		],
+		safety: { maxCyclesBeginner: 8 },
+		pauseBetweenCycles: 2,
+	},
+
+	viloma_ujjayi: {
+		phaseOrder: ["inhale", "hold", "exhale"],
+		defaultRatio: { inhale: 1, hold: 1, exhale: 1, holdAfterExhale: 0 },
+		baseDuration: 4,
+		animation: {
+			inhale: { scale: 1.18, ease: [0.25, 0.1, 0.25, 1] },
+			hold: { scale: 1.18, ease: "linear" },
+			exhale: { scale: 0.86, ease: [0.42, 0, 0.58, 1] },
+		},
+		visual: { circleStyle: "wave", palette: "balanced", phaseEmphasis: null },
+		audio: { inhale: AUDIO.ocean, hold: AUDIO.none, exhale: AUDIO.tone, phaseChange: AUDIO.click },
+		haptic: { inhale: 10, hold: 8, exhale: 10, phaseChange: 18 },
+		stimulation: "low",
+		phaseSequence: [
+			{ key: "inhale_part_1", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 1 / 3 },
+			{ key: "pause_after_inhale_1", phaseKey: "hold", nostrilFlow: "none", durationMultiplier: 0.5 },
+			{ key: "inhale_part_2", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 1 / 3 },
+			{ key: "pause_after_inhale_2", phaseKey: "hold", nostrilFlow: "none", durationMultiplier: 0.5 },
+			{ key: "inhale_part_3", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 1 / 3 },
+			{ key: "exhale_continuous", phaseKey: "exhale", nostrilFlow: "both" },
+		],
+		safety: { maxCyclesBeginner: 10 },
+		pauseBetweenCycles: 1,
+	},
+
+	murccha: {
+		phaseOrder: ["inhale", "hold", "exhale"],
+		defaultRatio: { inhale: 1, hold: 2, exhale: 2, holdAfterExhale: 0 },
+		baseDuration: 5,
+		animation: {
+			inhale: { scale: 1.18, ease: [0.33, 0, 0.67, 1] },
+			hold: { scale: 1.22, ease: "linear" },
+			exhale: { scale: 0.88, ease: [0.33, 0, 0.67, 1] },
+		},
+		visual: { circleStyle: "pulse", palette: "calming", phaseEmphasis: "hold" },
+		audio: { inhale: AUDIO.none, hold: AUDIO.hum, exhale: AUDIO.none, phaseChange: AUDIO.none },
+		haptic: { inhale: 0, hold: 0, exhale: 0, phaseChange: 0 },
+		stimulation: "low",
+		safety: { maxCyclesBeginner: 4 },
+		pauseBetweenCycles: 3,
+	},
+
+	plavini: {
+		phaseOrder: ["inhale", "hold", "exhale"],
+		defaultRatio: { inhale: 2, hold: 1, exhale: 2, holdAfterExhale: 0 },
+		baseDuration: 5,
+		animation: {
+			inhale: { scale: 1.28, ease: [0.33, 0, 0.67, 1] },
+			hold: { scale: 1.28, ease: "linear" },
+			exhale: { scale: 0.9, ease: [0.42, 0, 0.58, 1] },
+		},
+		visual: { circleStyle: "circle", palette: "balanced", phaseEmphasis: "inhale" },
+		audio: { inhale: AUDIO.tone, hold: AUDIO.none, exhale: AUDIO.tone, phaseChange: AUDIO.bell },
+		haptic: { inhale: 12, hold: 0, exhale: 12, phaseChange: 20 },
+		stimulation: "low",
+		safety: { maxCyclesBeginner: 6 },
+		pauseBetweenCycles: 2,
+	},
+};
+
+const PROFILE_ALIASES = {
+	"nadi shodhana": "nadi_shodhana",
+	nadishodhana: "nadi_shodhana",
+	"surya bhedana": "surya_bhedana",
+	"candra bhedana": "candra_bhedana",
+	"chandra bhedana": "candra_bhedana",
+	"candra bedhana": "candra_bhedana",
+	"sama vritti": "sama_vritti",
+	"agni prasana": "agni",
+	"anuloma ujjayi": "anuloma_ujjayi",
+	"pratiloma ujjayi": "pratiloma_ujjayi",
+	"viloma ujjayi": "viloma_ujjayi",
 };
 
 // ── Default profile (for unknown techniques) ────────────────────────────────
@@ -358,26 +516,54 @@ export const LOW_STIM_OVERRIDES = {
  * @returns {object} Merged profile with backend data taking precedence
  */
 function resolveProfile(base, ratio, baseDur) {
-	const phaseDurations = {
+	const basePhaseDurations = {
 		inhale: (ratio.inhale || 0) * baseDur,
 		hold: (ratio.hold || 0) * baseDur,
 		exhale: (ratio.exhale || 0) * baseDur,
 		holdAfterExhale: (ratio.holdAfterExhale || 0) * baseDur,
 	};
-	// Build activePhases from the canonical order, including any phase whose
-	// ratio produces a non-zero duration — even if the profile's phaseOrder
-	// omits it. This ensures that a backend ratio like 1:1:1 correctly
-	// activates the hold phase even for techniques that default to 0 hold.
-	const activePhases = PHASE_KEYS.filter((k) => phaseDurations[k] > 0);
+
+	const rawSequence =
+		base.phaseSequence?.length > 0
+			? base.phaseSequence
+			: base.phaseOrder.map((phaseKey) => ({
+					key: phaseKey,
+					phaseKey,
+					nostrilFlow: "both",
+				}));
+
+	const phaseSequence = rawSequence
+		.map((step, index) => {
+			const durationBase = basePhaseDurations[step.phaseKey] || 0;
+			const duration = durationBase * (step.durationMultiplier ?? 1);
+			return {
+				key: step.key || `${step.phaseKey}_${index}`,
+				phaseKey: step.phaseKey,
+				nostrilFlow: step.nostrilFlow || "both",
+				duration,
+			};
+		})
+		.filter((step) => step.duration > 0);
+
+	const enginePhases = phaseSequence.map((step) => step.key);
+	const phaseDurations = Object.fromEntries(
+		phaseSequence.map((step) => [step.key, step.duration]),
+	);
+	const displayPhases = [
+		...new Set(phaseSequence.map((step) => step.phaseKey)),
+	];
 
 	return {
 		...base,
 		ratio,
 		baseDuration: baseDur,
+		basePhaseDurations,
 		phaseDurations,
-		activePhases,
-		totalCycleDuration: activePhases.reduce(
-			(sum, k) => sum + phaseDurations[k],
+		phaseSequence,
+		enginePhases,
+		activePhases: displayPhases,
+		totalCycleDuration: enginePhases.reduce(
+			(sum, key) => sum + phaseDurations[key],
 			0,
 		),
 	};
@@ -385,7 +571,8 @@ function resolveProfile(base, ratio, baseDur) {
 
 export function getProfile(pattern) {
 	if (!pattern) return resolveProfile(DEFAULT_PROFILE, DEFAULT_PROFILE.defaultRatio, DEFAULT_PROFILE.baseDuration);
-	const key = (pattern.romanizationName || "").trim().toLowerCase();
+	const rawKey = (pattern.techniqueKey || pattern.romanizationName || "").trim().toLowerCase();
+	const key = PROFILE_ALIASES[rawKey] || rawKey;
 	const base = PROFILES[key] || DEFAULT_PROFILE;
 
 	const ratio = hasUsableRatio(pattern.patternRatio)

@@ -1,4 +1,8 @@
 const BreathingPattern = require("../models/BreathingPattern.model");
+const {
+	BREATHING_TECHNIQUE_KEYS,
+	BREATHING_TECHNIQUE_FAMILIES,
+} = require("../models/BreathingPattern.model");
 const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
 
@@ -41,6 +45,8 @@ const getBreathingPatterns = async (req, res, next) => {
 			energyEffect,
 			practicePhase,
 			recommendedBefore,
+			techniqueKey,
+			techniqueFamily,
 			page = 1,
 			limit = 20,
 		} = req.query;
@@ -52,6 +58,8 @@ const getBreathingPatterns = async (req, res, next) => {
 		if (energyEffect) filter.energyEffect = energyEffect;
 		if (practicePhase) filter["vkContext.practicePhase"] = practicePhase;
 		if (recommendedBefore) filter["vkContext.recommendedBefore"] = recommendedBefore;
+		if (techniqueKey) filter.techniqueKey = techniqueKey;
+		if (techniqueFamily) filter.techniqueFamily = techniqueFamily;
 
 		// Pagination
 		const skip = (parseInt(page, 10) - 1) * parseInt(limit, 10);
@@ -265,21 +273,15 @@ const getBreathingPatternsByTechnique = async (req, res, next) => {
 	try {
 		const { technique } = req.params;
 
-		const validTechniques = [
-			"nadishodhana",
-			"kapalabhati",
-			"bhastrika",
-			"ujjayi",
-			"bhramari",
-			"cooling",
-		];
+		const validTechniques = [...BREATHING_TECHNIQUE_KEYS, ...BREATHING_TECHNIQUE_FAMILIES];
 
 		if (!validTechniques.includes(technique)) {
 			throw createError(400, "Invalid breathing technique");
 		}
 
-		const filter = {};
-		filter[`vkTechniques.${technique}.enabled`] = true;
+		const filter = BREATHING_TECHNIQUE_FAMILIES.includes(technique)
+			? { techniqueFamily: technique }
+			: { techniqueKey: technique };
 
 		const patterns = await BreathingPattern.find(filter).sort({
 			difficulty: 1,

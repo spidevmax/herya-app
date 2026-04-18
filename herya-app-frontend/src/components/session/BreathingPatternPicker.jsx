@@ -43,6 +43,9 @@ export default function BreathingPatternPicker({
 		return patterns.filter(
 			(p) =>
 				p.romanizationName?.toLowerCase().includes(q) ||
+				p.techniqueKey?.toLowerCase().includes(q) ||
+				p.techniqueFamily?.toLowerCase().includes(q) ||
+				p.alias?.some((alias) => alias?.toLowerCase().includes(q)) ||
 				p.sanskritName?.toLowerCase().includes(q) ||
 				p.energyEffect?.toLowerCase().includes(q) ||
 				p.difficulty?.toLowerCase().includes(q),
@@ -88,6 +91,7 @@ export default function BreathingPatternPicker({
 						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
 							{getRatioDisplay(selected)} · {formatHuman(selected.energyEffect)}{" "}
 							· {t(`library.${selected.difficulty}`)}
+							{selected.techniqueFamily ? ` · ${formatHuman(selected.techniqueFamily)}` : ""}
 						</p>
 					</div>
 				) : (
@@ -207,6 +211,16 @@ export default function BreathingPatternPicker({
 												>
 													{t(`library.${pat.difficulty}`)}
 												</span>
+												{pat.techniqueFamily && (
+													<span
+														className="text-[10px]"
+														style={{
+															color: "var(--color-text-muted)",
+														}}
+													>
+														{formatHuman(pat.techniqueFamily)}
+													</span>
+												)}
 												{pat.recommendedPractice?.cycles?.default && (
 													<span
 														className="text-[10px]"

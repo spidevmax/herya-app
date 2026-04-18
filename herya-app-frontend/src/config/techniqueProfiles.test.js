@@ -10,42 +10,68 @@ import {
 // ── Mock patterns matching backend seed data ────────────────────────────────
 const MOCK_PATTERNS = {
 	ujjayi: {
+		techniqueKey: "ujjayi",
 		romanizationName: "Ujjayi",
 		patternRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
 		baseBreathDuration: 5,
 	},
 	nadiShodhana: {
+		techniqueKey: "nadi_shodhana",
 		romanizationName: "Nadi Shodhana",
 		patternRatio: { inhale: 1, hold: 1, exhale: 2, holdAfterExhale: 0 },
 		baseBreathDuration: 4,
 	},
 	kapalabhati: {
+		techniqueKey: "kapalabhati",
 		romanizationName: "Kapalabhati",
 		patternRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
 		baseBreathDuration: 3,
 		patternType: "count_based",
 	},
 	bhastrika: {
+		techniqueKey: "bhastrika",
 		romanizationName: "Bhastrika",
 		patternRatio: { inhale: 1, hold: 1, exhale: 1, holdAfterExhale: 0 },
 		baseBreathDuration: 3,
 	},
 	bhramari: {
+		techniqueKey: "bhramari",
 		romanizationName: "Bhramari",
 		patternRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
 		baseBreathDuration: 5,
 	},
 	sitali: {
+		techniqueKey: "sitali",
 		romanizationName: "Sitali",
 		patternRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
 		baseBreathDuration: 5,
 	},
 	samaVritti: {
+		techniqueKey: "sama_vritti",
 		romanizationName: "Sama Vritti",
 		patternRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
 		baseBreathDuration: 4,
 	},
+	anulomaUjjayi: {
+		techniqueKey: "anuloma_ujjayi",
+		romanizationName: "Anuloma Ujjayi",
+		patternRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
+		baseBreathDuration: 5,
+	},
+	pratilomaUjjayi: {
+		techniqueKey: "pratiloma_ujjayi",
+		romanizationName: "Pratiloma Ujjayi",
+		patternRatio: { inhale: 1, hold: 0, exhale: 2, holdAfterExhale: 0 },
+		baseBreathDuration: 5,
+	},
+	vilomaUjjayi: {
+		techniqueKey: "viloma_ujjayi",
+		romanizationName: "Viloma Ujjayi",
+		patternRatio: { inhale: 1, hold: 1, exhale: 1, holdAfterExhale: 0 },
+		baseBreathDuration: 4,
+	},
 	agniPrasana: {
+		techniqueKey: "agni",
 		romanizationName: "Agni Prasana",
 		patternRatio: { inhale: 1, hold: 1, exhale: 2, holdAfterExhale: 1 },
 		baseBreathDuration: 4,
@@ -87,6 +113,7 @@ describe("techniqueProfiles", () => {
 
 		it("returns default profile for unknown technique", () => {
 			const profile = getProfile({
+				techniqueKey: "unknown_technique",
 				romanizationName: "Unknown Technique",
 				patternRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
 				baseBreathDuration: 4,
@@ -110,9 +137,53 @@ describe("techniqueProfiles", () => {
 				]);
 			});
 
+			it("Nadi Shodhana expands a full left-right round", () => {
+				const profile = getProfile(MOCK_PATTERNS.nadiShodhana);
+				expect(profile.enginePhases).toEqual([
+					"inhale_left",
+					"hold_left",
+					"exhale_right",
+					"inhale_right",
+					"hold_right",
+					"exhale_left",
+				]);
+			});
+
 			it("Kapalabhati has exhale → inhale order", () => {
 				const profile = getProfile(MOCK_PATTERNS.kapalabhati);
 				expect(profile.activePhases).toEqual(["exhale", "inhale"]);
+			});
+
+			it("Anuloma Ujjayi alternates unilateral exhalations", () => {
+				const profile = getProfile(MOCK_PATTERNS.anulomaUjjayi);
+				expect(profile.enginePhases).toEqual([
+					"inhale_both_1",
+					"exhale_left",
+					"inhale_both_2",
+					"exhale_right",
+				]);
+			});
+
+			it("Pratiloma Ujjayi alternates unilateral inhalations", () => {
+				const profile = getProfile(MOCK_PATTERNS.pratilomaUjjayi);
+				expect(profile.enginePhases).toEqual([
+					"inhale_left",
+					"exhale_both_1",
+					"inhale_right",
+					"exhale_both_2",
+				]);
+			});
+
+			it("Viloma Ujjayi expands interrupted inhalation steps", () => {
+				const profile = getProfile(MOCK_PATTERNS.vilomaUjjayi);
+				expect(profile.enginePhases).toEqual([
+					"inhale_part_1",
+					"pause_after_inhale_1",
+					"inhale_part_2",
+					"pause_after_inhale_2",
+					"inhale_part_3",
+					"exhale_continuous",
+				]);
 			});
 
 			it("Agni Prasana has all four phases", () => {
@@ -156,7 +227,27 @@ describe("techniqueProfiles", () => {
 		describe("technique-specific flags", () => {
 			it("Nadi Shodhana has nostrilAlternation", () => {
 				const profile = getProfile(MOCK_PATTERNS.nadiShodhana);
-				expect(profile.nostrilAlternation).toBe(true);
+				expect(profile.phaseSequence.map((step) => step.nostrilFlow)).toEqual([
+					"left",
+					"none",
+					"right",
+					"right",
+					"none",
+					"left",
+				]);
+			});
+
+			it("supports single-nostril techniques with explicit phase routing", () => {
+				const profile = getProfile({
+					techniqueKey: "surya_bhedana",
+					romanizationName: "Surya Bhedana",
+					patternRatio: { inhale: 1, hold: 0, exhale: 1, holdAfterExhale: 0 },
+					baseBreathDuration: 5,
+				});
+				expect(profile.phaseSequence.map((step) => step.nostrilFlow)).toEqual([
+					"right",
+					"left",
+				]);
 			});
 
 			it("Kapalabhati has roundBased and countBased", () => {
@@ -172,7 +263,9 @@ describe("techniqueProfiles", () => {
 
 			it("Ujjayi does not have nostrilAlternation", () => {
 				const profile = getProfile(MOCK_PATTERNS.ujjayi);
-				expect(profile.nostrilAlternation).toBeUndefined();
+				expect(profile.phaseSequence.every((step) => step.nostrilFlow === "both")).toBe(
+					true,
+				);
 			});
 		});
 

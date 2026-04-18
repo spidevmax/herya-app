@@ -44,6 +44,94 @@
  */
 const mongoose = require("mongoose");
 
+const BREATHING_TECHNIQUE_KEYS = [
+	"ujjayi",
+	"anuloma_ujjayi",
+	"pratiloma_ujjayi",
+	"viloma_ujjayi",
+	"nadi_shodhana",
+	"surya_bhedana",
+	"candra_bhedana",
+	"murccha",
+	"plavini",
+	"sitali",
+	"kapalabhati",
+	"sama_vritti",
+	"bhramari",
+	"agni",
+	"bhastrika",
+];
+
+const BREATHING_TECHNIQUE_FAMILIES = [
+	"ujjayi_family",
+	"alternate_nostril",
+	"heating",
+	"cooling",
+	"balancing",
+	"humming",
+	"cleansing",
+	"retention",
+	"expansion",
+];
+
+const inferTechniqueMeta = (docLike = {}) => {
+	const name = String(docLike.romanizationName || "")
+		.trim()
+		.toLowerCase();
+	const coolingType = docLike?.vkTechniques?.cooling?.type;
+
+	if (name === "ujjayi") return { techniqueKey: "ujjayi", techniqueFamily: "ujjayi_family" };
+	if (name === "anuloma ujjayi")
+		return { techniqueKey: "anuloma_ujjayi", techniqueFamily: "ujjayi_family" };
+	if (name === "pratiloma ujjayi")
+		return { techniqueKey: "pratiloma_ujjayi", techniqueFamily: "ujjayi_family" };
+	if (name === "viloma ujjayi")
+		return { techniqueKey: "viloma_ujjayi", techniqueFamily: "ujjayi_family" };
+	if (name === "nadi shodhana")
+		return { techniqueKey: "nadi_shodhana", techniqueFamily: "alternate_nostril" };
+	if (name === "surya bhedana")
+		return { techniqueKey: "surya_bhedana", techniqueFamily: "alternate_nostril" };
+	if (
+		name === "candra bhedana" ||
+		name === "chandra bhedana" ||
+		name === "candra bedhana"
+	)
+		return { techniqueKey: "candra_bhedana", techniqueFamily: "alternate_nostril" };
+	if (name === "murccha") return { techniqueKey: "murccha", techniqueFamily: "retention" };
+	if (name === "plavini") return { techniqueKey: "plavini", techniqueFamily: "expansion" };
+	if (name === "sama vritti")
+		return { techniqueKey: "sama_vritti", techniqueFamily: "balancing" };
+	if (name === "bhramari") return { techniqueKey: "bhramari", techniqueFamily: "humming" };
+	if (name === "agni" || name === "agni prasana")
+		return { techniqueKey: "agni", techniqueFamily: "heating" };
+	if (name === "bhastrika") return { techniqueKey: "bhastrika", techniqueFamily: "heating" };
+	if (name === "kapalabhati")
+		return { techniqueKey: "kapalabhati", techniqueFamily: "cleansing" };
+	if (name === "sitali" || coolingType === "sitali")
+		return { techniqueKey: "sitali", techniqueFamily: "cooling" };
+
+	if (docLike?.vkTechniques?.nadishodhana?.enabled) {
+		return { techniqueKey: "nadi_shodhana", techniqueFamily: "alternate_nostril" };
+	}
+	if (docLike?.vkTechniques?.kapalabhati?.enabled) {
+		return { techniqueKey: "kapalabhati", techniqueFamily: "cleansing" };
+	}
+	if (docLike?.vkTechniques?.bhastrika?.enabled) {
+		return { techniqueKey: "bhastrika", techniqueFamily: "heating" };
+	}
+	if (docLike?.vkTechniques?.ujjayi?.enabled) {
+		return { techniqueKey: "ujjayi", techniqueFamily: "ujjayi_family" };
+	}
+	if (docLike?.vkTechniques?.bhramari?.enabled) {
+		return { techniqueKey: "bhramari", techniqueFamily: "humming" };
+	}
+	if (docLike?.vkTechniques?.cooling?.enabled) {
+		return { techniqueKey: "sitali", techniqueFamily: "cooling" };
+	}
+
+	return {};
+};
+
 const breathingPatternSchema = new mongoose.Schema(
 	{
 		// IDENTIFICATION
@@ -82,6 +170,20 @@ const breathingPatternSchema = new mongoose.Schema(
 			enum: ["beginner", "intermediate", "advanced"],
 			default: "beginner",
 			required: true,
+		},
+		techniqueKey: {
+			type: String,
+			enum: BREATHING_TECHNIQUE_KEYS,
+			index: true,
+		},
+		techniqueFamily: {
+			type: String,
+			enum: BREATHING_TECHNIQUE_FAMILIES,
+			index: true,
+		},
+		variantOf: {
+			type: String,
+			enum: BREATHING_TECHNIQUE_KEYS,
 		},
 
 		// BREATHING PATTERN
@@ -401,6 +503,8 @@ breathingPatternSchema.methods.isSafeForLevel = function (userLevel) {
 
 // INDEXES
 breathingPatternSchema.index({ difficulty: 1, energyEffect: 1 });
+breathingPatternSchema.index({ techniqueKey: 1, difficulty: 1 });
+breathingPatternSchema.index({ techniqueFamily: 1, difficulty: 1 });
 breathingPatternSchema.index({
 	energyEffect: 1,
 	bestTimeOfDay: 1,
@@ -425,11 +529,42 @@ breathingPatternSchema.index({
 
 // VALIDATION: Ensure that ratio-based patterns have at least inhale or exhale > 0
 breathingPatternSchema.pre("validate", async function () {
+	const inferred = inferTechniqueMeta(this);
+	if (!this.techniqueKey && inferred.techniqueKey) {
+		this.techniqueKey = inferred.techniqueKey;
+	}
+	if (!this.techniqueFamily && inferred.techniqueFamily) {
+		this.techniqueFamily = inferred.techniqueFamily;
+	}
+	if (!this.variantOf) {
+		if (["anuloma_ujjayi", "pratiloma_ujjayi", "viloma_ujjayi"].includes(this.techniqueKey)) {
+			this.variantOf = "ujjayi";
+		} else if (["surya_bhedana", "candra_bhedana"].includes(this.techniqueKey)) {
+			this.variantOf = "nadi_shodhana";
+		}
+	}
+
 	if (this.patternType === "ratio_based") {
 		const { inhale, exhale } = this.patternRatio;
 
 		if (inhale === 0 && exhale === 0) {
 			throw new Error("Breathing pattern must have at least inhale or exhale > 0");
+		}
+	}
+
+	if (this.patternType === "time_based") {
+		const { inhale, hold, exhale, holdAfterExhale } = this.patternTime;
+		if ((inhale || 0) + (hold || 0) + (exhale || 0) + (holdAfterExhale || 0) <= 0) {
+			throw new Error("Time-based breathing pattern must define positive phase durations");
+		}
+	}
+
+	if (this.patternType === "count_based") {
+		const pumpingRate = this?.vkTechniques?.kapalabhati?.pumpingRate;
+		const rounds = this?.vkTechniques?.kapalabhati?.rounds || this?.vkTechniques?.bhastrika?.rounds;
+		const hasCountConfig = Number.isFinite(pumpingRate) || Number.isFinite(rounds);
+		if (!hasCountConfig) {
+			throw new Error("Count-based breathing pattern must define count-oriented technique settings");
 		}
 	}
 });
@@ -463,3 +598,6 @@ breathingPatternSchema.pre("validate", async function () {
 const BreathingPattern = mongoose.model("BreathingPattern", breathingPatternSchema);
 
 module.exports = BreathingPattern;
+module.exports.BREATHING_TECHNIQUE_KEYS = BREATHING_TECHNIQUE_KEYS;
+module.exports.BREATHING_TECHNIQUE_FAMILIES = BREATHING_TECHNIQUE_FAMILIES;
+module.exports.inferTechniqueMeta = inferTechniqueMeta;

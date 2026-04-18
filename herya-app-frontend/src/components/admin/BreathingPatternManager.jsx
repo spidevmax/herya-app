@@ -12,6 +12,34 @@ import { useLanguage } from "@/context/LanguageContext";
 const DIFFICULTIES = ["beginner", "intermediate", "advanced"];
 const EFFECTS = ["calming", "energizing", "balancing", "cooling", "heating"];
 const PATTERN_TYPES = ["ratio_based", "time_based", "count_based"];
+const TECHNIQUE_KEYS = [
+	"ujjayi",
+	"anuloma_ujjayi",
+	"pratiloma_ujjayi",
+	"viloma_ujjayi",
+	"nadi_shodhana",
+	"surya_bhedana",
+	"candra_bhedana",
+	"murccha",
+	"plavini",
+	"sitali",
+	"kapalabhati",
+	"sama_vritti",
+	"bhramari",
+	"agni",
+	"bhastrika",
+];
+const TECHNIQUE_FAMILIES = [
+	"ujjayi_family",
+	"alternate_nostril",
+	"heating",
+	"cooling",
+	"balancing",
+	"humming",
+	"cleansing",
+	"retention",
+	"expansion",
+];
 
 const humanize = (value) =>
 	String(value)
@@ -31,6 +59,9 @@ const toForm = (item) => ({
 	sanskritName: item?.sanskritName ?? "",
 	description: item?.description ?? "",
 	difficulty: item?.difficulty ?? "beginner",
+	techniqueKey: item?.techniqueKey ?? "",
+	techniqueFamily: item?.techniqueFamily ?? "",
+	variantOf: item?.variantOf ?? "",
 	energyEffect: item?.energyEffect ?? "calming",
 	patternType: item?.patternType ?? "ratio_based",
 	inhale: String(item?.patternRatio?.inhale ?? 1),
@@ -64,6 +95,9 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 				sanskritName: form.sanskritName.trim(),
 				description: form.description.trim(),
 				difficulty: form.difficulty,
+				techniqueKey: form.techniqueKey || undefined,
+				techniqueFamily: form.techniqueFamily || undefined,
+				variantOf: form.variantOf || undefined,
 				energyEffect: form.energyEffect,
 				patternType: form.patternType,
 				baseBreathDuration: Number(form.baseBreathDuration || 5),
@@ -209,7 +243,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 						/>
 					</label>
 
-					<div className="grid gap-4 sm:grid-cols-3">
+					<div className="grid gap-4 sm:grid-cols-2">
 						<label className="space-y-1.5 text-sm">
 							<span className="font-semibold text-[var(--color-text-primary)]">
 								{t("admin.breathing_manager_difficulty")}
@@ -249,6 +283,77 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 								{EFFECTS.map((effect) => (
 									<option key={effect} value={effect}>
 										{humanize(effect)}
+									</option>
+								))}
+							</select>
+						</label>
+					</div>
+
+					<div className="grid gap-4 sm:grid-cols-3">
+						<label className="space-y-1.5 text-sm">
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Technique Key
+							</span>
+							<select
+								value={form.techniqueKey}
+								onChange={(event) =>
+									setForm((prev) => ({
+										...prev,
+										techniqueKey: event.target.value,
+									}))
+								}
+								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+							>
+								<option value="">Auto infer</option>
+								{TECHNIQUE_KEYS.map((value) => (
+									<option key={value} value={value}>
+										{humanize(value)}
+									</option>
+								))}
+							</select>
+						</label>
+
+						<label className="space-y-1.5 text-sm">
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Variant Of
+							</span>
+							<select
+								value={form.variantOf}
+								onChange={(event) =>
+									setForm((prev) => ({
+										...prev,
+										variantOf: event.target.value,
+									}))
+								}
+								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+							>
+								<option value="">None</option>
+								{TECHNIQUE_KEYS.map((value) => (
+									<option key={value} value={value}>
+										{humanize(value)}
+									</option>
+								))}
+							</select>
+						</label>
+
+						<label className="space-y-1.5 text-sm">
+							<span className="font-semibold text-[var(--color-text-primary)]">
+								Technique Family
+							</span>
+							<select
+								value={form.techniqueFamily}
+								onChange={(event) =>
+									setForm((prev) => ({
+										...prev,
+										techniqueFamily: event.target.value,
+									}))
+								}
+								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+							>
+								<option value="">Auto infer</option>
+								{TECHNIQUE_FAMILIES.map((value) => (
+									<option key={value} value={value}>
+										{humanize(value)}
 									</option>
 								))}
 							</select>
@@ -397,7 +502,14 @@ export default function BreathingPatternManager() {
 		const normalized = query.trim().toLowerCase();
 		if (!normalized) return items;
 		return items.filter((item) =>
-			[item.romanizationName, item.iastName, item.sanskritName]
+			[
+				item.romanizationName,
+				item.iastName,
+				item.sanskritName,
+				item.techniqueKey,
+				item.techniqueFamily,
+				item.variantOf,
+			]
 				.filter(Boolean)
 				.some((field) => field.toLowerCase().includes(normalized)),
 		);
@@ -490,6 +602,21 @@ export default function BreathingPatternManager() {
 									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
 										{humanize(item.energyEffect || "calming")}
 									</li>
+									{item.techniqueKey && (
+										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+											{humanize(item.techniqueKey)}
+										</li>
+									)}
+									{item.techniqueFamily && (
+										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+											{humanize(item.techniqueFamily)}
+										</li>
+									)}
+									{item.variantOf && (
+										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+											Variant of {humanize(item.variantOf)}
+										</li>
+									)}
 									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
 										{item.patternRatio?.inhale ?? 1}:
 										{item.patternRatio?.hold ?? 0}:

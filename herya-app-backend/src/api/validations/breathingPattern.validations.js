@@ -1,4 +1,8 @@
 const { query, param } = require("express-validator");
+const {
+	BREATHING_TECHNIQUE_KEYS,
+	BREATHING_TECHNIQUE_FAMILIES,
+} = require("../models/BreathingPattern.model");
 
 /**
  * Validation Rules: getBreathingPatternsValidation
@@ -31,6 +35,18 @@ const getBreathingPatternsValidation = [
 		.optional()
 		.isIn(["opening", "mid_practice", "closing", "anytime"])
 		.withMessage("Practice phase must be one of: opening, mid_practice, closing, anytime"),
+
+	query("techniqueKey")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_KEYS)
+		.withMessage(`Technique key must be one of: ${BREATHING_TECHNIQUE_KEYS.join(", ")}`),
+
+	query("techniqueFamily")
+		.optional()
+		.isIn(BREATHING_TECHNIQUE_FAMILIES)
+		.withMessage(
+			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
+		),
 
 	query("recommendedBefore")
 		.optional()
@@ -91,9 +107,12 @@ const breathingPatternTechniqueValidation = [
 	param("technique")
 		.notEmpty()
 		.withMessage("Technique is required")
-		.isIn(["nadishodhana", "kapalabhati", "bhastrika", "ujjayi", "bhramari", "cooling"])
+		.isIn([...BREATHING_TECHNIQUE_KEYS, ...BREATHING_TECHNIQUE_FAMILIES])
 		.withMessage(
-			"Invalid breathing technique. Must be one of: nadishodhana, kapalabhati, bhastrika, ujjayi, bhramari, cooling",
+			`Invalid breathing technique. Must be one of: ${[
+				...BREATHING_TECHNIQUE_KEYS,
+				...BREATHING_TECHNIQUE_FAMILIES,
+			].join(", ")}`,
 		),
 ];
 
