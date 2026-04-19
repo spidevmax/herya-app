@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, ChevronRight, Pencil, X } from "lucide-react";
+import { UserPlus, Check, Pencil, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
 import {
@@ -171,7 +171,7 @@ export default function ChildProfileManager({
 						setForm(defaultForm());
 						setShowForm(true);
 					}}
-					className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold"
+					className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
 					style={{
 						backgroundColor: "var(--color-surface)",
 						color: "var(--color-primary)",
@@ -212,7 +212,7 @@ export default function ChildProfileManager({
 								<button
 									type="button"
 									onClick={() => onSelectChild?.(profile)}
-									className="flex flex-1 items-center gap-3 px-3 py-2.5 rounded-xl text-left min-h-[48px]"
+									className="flex flex-1 items-center gap-3 px-3 py-2.5 rounded-xl text-left min-h-[48px] cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_6%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
 									aria-pressed={isSelected}
 									aria-label={profile.name}
 								>
@@ -239,16 +239,18 @@ export default function ChildProfileManager({
 											</span>
 										)}
 									</span>
-									<ChevronRight
-										size={16}
-										aria-hidden="true"
-										style={{ color: "var(--color-text-muted)" }}
-									/>
+									{isSelected ? (
+										<Check
+											size={16}
+											aria-hidden="true"
+											style={{ color: profile.avatarColor }}
+										/>
+									) : null}
 								</button>
 								<button
 									type="button"
 									onClick={() => openEdit(profile)}
-									className="w-8 h-8 mr-2 rounded-lg flex items-center justify-center"
+									className="w-8 h-8 mr-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors hover:bg-[var(--color-surface-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
 									style={{ color: "var(--color-text-muted)" }}
 									aria-label={t("tutor.edit_child")}
 								>

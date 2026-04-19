@@ -235,6 +235,8 @@ const getRecommendedSequence = async (req, res, next) => {
 
 		let recommendedSequence = null;
 		let reason = "";
+		let reasonKey = null;
+		let reasonVars = null;
 
 		if (problematicAreas.length > 0) {
 			// Find sequence targeting problematic areas
@@ -262,14 +264,12 @@ const getRecommendedSequence = async (req, res, next) => {
 				family: { $nin: recentFamilies }, // Avoid recent families
 			}).populate("structure.corePoses.pose");
 
-			// i18n: Reason for anatomical recommendation
+			reasonKey = "recommendation.reason_problem_area";
+			reasonVars = { area: mostProblematicArea };
 			reason = req.t
-				? req.t("recommendation.reason_problem_area", {
-						area: mostProblematicArea,
-					})
+				? req.t(reasonKey, reasonVars)
 				: `Recommended to address ${mostProblematicArea} (showing no improvement in recent practices)`;
 		} else {
-			// No issues found, suggest next progression step
 			if (req.user.vkProgression?.currentMainSequence?.sequenceId) {
 				const currentSequence = await VKSequence.findById(
 					req.user.vkProgression.currentMainSequence.sequenceId,
@@ -277,19 +277,21 @@ const getRecommendedSequence = async (req, res, next) => {
 
 				if (currentSequence?.nextSteps?.length > 0) {
 					recommendedSequence = currentSequence.nextSteps[0].sequence;
-					reason = "Suggested next step in your progression path";
+					reasonKey = "recommendation.reason_next_step";
+					reason = req.t
+						? req.t(reasonKey)
+						: "Suggested next step in your progression path";
 				}
 			}
 
-			// Fallback to beginner tadasana sequence
 			if (!recommendedSequence) {
 				recommendedSequence = await VKSequence.findOne({
 					family: "tadasana",
 					level: 1,
 				}).populate("structure.corePoses.pose");
-				// i18n: Reason for foundational fallback
+				reasonKey = "recommendation.reason_foundational";
 				reason = req.t
-					? req.t("recommendation.reason_foundational")
+					? req.t(reasonKey)
 					: "Great foundational sequence to continue your practice";
 			}
 		}
@@ -302,6 +304,8 @@ const getRecommendedSequence = async (req, res, next) => {
 			{
 				sequence: recommendedSequence,
 				reason,
+				reasonKey,
+				reasonVars,
 			},
 		);
 	} catch (error) {

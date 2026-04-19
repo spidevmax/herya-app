@@ -104,6 +104,7 @@ export default function BreathingDetail() {
 	const diffColor = DIFF_COLORS[pattern.difficulty] ?? "var(--color-primary)";
 	const EnergyIcon = ENERGY_ICONS[pattern.energyEffect] ?? Wind;
 	const benefits = localizedArray(pattern, "benefits", lang).length > 0 ? localizedArray(pattern, "benefits", lang) : (pattern.benefits ?? []);
+	const contraindications = localizedArray(pattern, "contraindications", lang).length > 0 ? localizedArray(pattern, "contraindications", lang) : (pattern.contraindications ?? []);
 	const instructions = pattern.instructions ?? [];
 	const ratioStr = pattern.patternRatio
 		? `${ratio.inhale ?? 1}:${ratio.hold ?? 0}:${ratio.exhale ?? 1}:${ratio.holdAfterExhale ?? 0}`
@@ -264,6 +265,38 @@ export default function BreathingDetail() {
 								>
 									<span aria-hidden="true" style={{ color: "var(--color-primary)" }}>✓</span>
 									{b}
+								</li>
+							))}
+						</ul>
+					</section>
+				)}
+
+				{/* Contraindications */}
+				{contraindications.length > 0 && (
+					<section
+						aria-labelledby="breathing-contraindications-heading"
+						className="rounded-2xl p-4"
+						style={{
+							backgroundColor: "color-mix(in srgb, var(--color-warning) 6%, var(--color-surface-card))",
+							border: "1px solid color-mix(in srgb, var(--color-warning) 30%, transparent)",
+						}}
+					>
+						<h2
+							id="breathing-contraindications-heading"
+							className="font-display font-bold mb-3"
+							style={{ color: "var(--color-warning-text, var(--color-text-primary))" }}
+						>
+							{t("breathing_detail.contraindications")}
+						</h2>
+						<ul className="flex flex-col gap-2 list-none m-0 p-0">
+							{contraindications.map((c) => (
+								<li
+									key={c}
+									className="flex items-start gap-2 text-sm"
+									style={{ color: "var(--color-text-secondary)" }}
+								>
+									<span aria-hidden="true" style={{ color: "var(--color-warning)" }}>⚠</span>
+									{c}
 								</li>
 							))}
 						</ul>

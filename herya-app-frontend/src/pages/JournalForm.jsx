@@ -8,7 +8,7 @@ import {
 	getJournalEntryById,
 	updateJournalEntry,
 } from "@/api/journalEntries.api";
-import { MOOD_OPTIONS, MOOD_AFTER_OPTIONS } from "@/utils/constants";
+import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
 import { Button, MoodSelector } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -397,7 +397,7 @@ const JournalForm = () => {
 								: t("journal_form.new_title")}
 						</h1>
 						<p className="m-0 text-sm text-[var(--color-text-muted)]">
-							Review your state before and after practice in one place.
+							{t("journal_form.header_subtitle")}
 						</p>
 					</div>
 				</div>
@@ -406,7 +406,7 @@ const JournalForm = () => {
 					{/* Before section */}
 					<JournalCard
 						title={t("journal_form.before")}
-						subtitle="Capture how you arrived to the practice."
+						subtitle={t("journal_form.before_subtitle")}
 					>
 						<MoodSelector
 							value={form.moodBefore}
@@ -425,8 +425,8 @@ const JournalForm = () => {
 									}))
 								}
 								accent="var(--color-primary)"
-								lowLabel="Low"
-								highLabel="High"
+								lowLabel={t("journal_form.slider_low_energy")}
+								highLabel={t("journal_form.slider_high_energy")}
 							/>
 							<SliderPanel
 								id="stress-before"
@@ -439,8 +439,8 @@ const JournalForm = () => {
 									}))
 								}
 								accent="var(--color-danger)"
-								lowLabel="Soft"
-								highLabel="Intense"
+								lowLabel={t("journal_form.slider_low_stress")}
+								highLabel={t("journal_form.slider_high_stress")}
 							/>
 						</div>
 					</JournalCard>
@@ -448,7 +448,7 @@ const JournalForm = () => {
 					{/* Sensations */}
 					<JournalCard
 						title={t("journal_form.sensations")}
-						subtitle="Mark the sensations that stood out most in your body."
+						subtitle={t("journal_form.sensations_subtitle")}
 					>
 						<div className="flex flex-wrap gap-2.5">
 							{SENSATIONS.map((s) => (
@@ -465,7 +465,7 @@ const JournalForm = () => {
 					{/* Reflection */}
 					<JournalCard
 						title={t("journal_form.reflection")}
-						subtitle="Write down what feels emotionally present."
+						subtitle={t("journal_form.reflection_subtitle")}
 					>
 						<label
 							htmlFor="reflection"
@@ -489,7 +489,7 @@ const JournalForm = () => {
 					{/* Insights */}
 					<JournalCard
 						title={t("journal_form.insights")}
-						subtitle="Keep one or two key learnings from the practice."
+						subtitle={t("journal_form.insights_subtitle")}
 					>
 						<label
 							htmlFor="insights"
@@ -513,7 +513,7 @@ const JournalForm = () => {
 					{/* After section */}
 					<JournalCard
 						title={t("journal_form.after")}
-						subtitle="Notice what shifted once the practice ended."
+						subtitle={t("journal_form.after_subtitle")}
 					>
 						<MoodSelector
 							value={form.moodAfter}
@@ -533,8 +533,8 @@ const JournalForm = () => {
 									}))
 								}
 								accent="var(--color-primary)"
-								lowLabel="Low"
-								highLabel="High"
+								lowLabel={t("journal_form.slider_low_energy")}
+								highLabel={t("journal_form.slider_high_energy")}
 							/>
 							<SliderPanel
 								id="stress-after"
@@ -547,8 +547,8 @@ const JournalForm = () => {
 									}))
 								}
 								accent="var(--color-danger)"
-								lowLabel="Soft"
-								highLabel="Intense"
+								lowLabel={t("journal_form.slider_low_stress")}
+								highLabel={t("journal_form.slider_high_stress")}
 							/>
 						</div>
 					</JournalCard>
@@ -556,7 +556,7 @@ const JournalForm = () => {
 					{/* Photos */}
 					<JournalCard
 						title={t("journal_form.photos")}
-						subtitle="Optional snapshots that help you remember the context."
+						subtitle={t("journal_form.photos_subtitle")}
 					>
 						<label
 							className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[24px] p-6 transition hover:border-[var(--color-primary)]"

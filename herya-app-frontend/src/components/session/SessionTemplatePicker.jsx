@@ -128,21 +128,20 @@ export default function SessionTemplatePicker({
 					{t("practice.templates_title")}
 				</p>
 
-				{blocks.length > 0 && (
-					<button
-						type="button"
-						onClick={() => setShowNameInput(!showNameInput)}
-						className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold"
-						style={{
-							backgroundColor: "var(--color-surface)",
-							color: "var(--color-primary)",
-						}}
-						aria-label={t("practice.save_template")}
-					>
-						<BookmarkPlus size={14} />
-						{t("practice.save_template")}
-					</button>
-				)}
+				<button
+					type="button"
+					onClick={() => setShowNameInput(!showNameInput)}
+					disabled={blocks.length === 0}
+					className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-50"
+					style={{
+						backgroundColor: "var(--color-surface)",
+						color: "var(--color-primary)",
+					}}
+					aria-label={t("practice.save_template")}
+				>
+					<BookmarkPlus size={14} aria-hidden="true" />
+					{t("practice.save_template")}
+				</button>
 			</header>
 
 			{/* Save form */}
@@ -187,9 +186,14 @@ export default function SessionTemplatePicker({
 					{t("ui.loading")}...
 				</p>
 			) : templates.length === 0 ? (
-				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
-					{t("practice.templates_empty")}
-				</p>
+				<div className="flex flex-col gap-1">
+					<p className="text-xs font-semibold" style={{ color: "var(--color-text-secondary)" }}>
+						{t("practice.templates_empty")}
+					</p>
+					<p className="text-[11px] leading-relaxed" style={{ color: "var(--color-text-muted)" }}>
+						{t("practice.templates_empty_hint")}
+					</p>
+				</div>
 			) : (
 				<div className="flex flex-col gap-2">
 					{templates.slice(0, 6).map((tpl) => (
@@ -221,26 +225,26 @@ export default function SessionTemplatePicker({
 								<button
 									type="button"
 									onClick={() => handleLoad(tpl)}
-									className="w-8 h-8 rounded-lg flex items-center justify-center"
+									className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-colors hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
 									style={{
 										backgroundColor: "var(--color-primary)",
 										color: "white",
 									}}
 									aria-label={t("practice.load_template")}
 								>
-									<RotateCcw size={14} />
+									<RotateCcw size={14} aria-hidden="true" />
 								</button>
 								<button
 									type="button"
 									onClick={() => handleDelete(tpl._id)}
-									className="w-8 h-8 rounded-lg flex items-center justify-center"
+									className="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_10%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)]"
 									style={{
 										backgroundColor: "var(--color-surface-card)",
 										color: "var(--color-text-muted)",
 									}}
 									aria-label={t("practice.delete_template")}
 								>
-									<Trash2 size={14} />
+									<Trash2 size={14} aria-hidden="true" />
 								</button>
 							</div>
 						</div>

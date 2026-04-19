@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { BookOpen, PlayCircle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui";
 import { format } from "@/utils/helpers";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -161,28 +162,24 @@ export default function PracticeSnapshotCard({
 			</div>
 
 			<div className="flex flex-col sm:flex-row gap-2">
-				<button
-					type="button"
+				<Button
 					onClick={handlePrimaryAction}
-					className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white"
-					style={{ backgroundColor: "var(--color-primary)" }}
+					variant="primary"
+					size="md"
+					className="flex-1"
 				>
-					<PlayCircle size={16} />
+					<PlayCircle size={16} aria-hidden="true" />
 					{nextActionLabel}
-				</button>
-				<button
-					type="button"
+				</Button>
+				<Button
 					onClick={() => navigate("/journal")}
-					className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold"
-					style={{
-						backgroundColor: "var(--color-surface)",
-						color: "var(--color-text-primary)",
-						border: "1px solid var(--color-border-soft)",
-					}}
+					variant="outline"
+					size="md"
+					className="flex-1"
 				>
-					<BookOpen size={16} />
+					<BookOpen size={16} aria-hidden="true" />
 					{t("dashboard.quick_garden")}
-				</button>
+				</Button>
 			</div>
 		</motion.section>
 	);

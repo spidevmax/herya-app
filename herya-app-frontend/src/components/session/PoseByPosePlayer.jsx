@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { distributePoseTime, formatPoseDuration } from "@/utils/distributePoseTime";
+import { localized, localizedName, localizedArray } from "@/utils/libraryHelpers";
 
 const TABS = ["alignment", "breathing", "mistakes", "benefits"];
 
@@ -29,7 +30,7 @@ export default function PoseByPosePlayer({
 	onComplete,
 	onPoseChange,
 }) {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const [poseIndex, setPoseIndex] = useState(0);
 	const [side, setSide] = useState(null); // null | "left" | "right"
 	const [elapsedSec, setElapsedSec] = useState(0);
@@ -158,7 +159,8 @@ export default function PoseByPosePlayer({
 		return null;
 	}
 
-	const poseName = pose.romanizationName || pose.name || "—";
+	const poseName =
+		localizedName(pose, lang) || pose.romanizationName || pose.name || "—";
 	const timeProgress = Math.min(elapsedSec / targetSec, 1);
 	const remainingSec = Math.max(0, Math.ceil(targetSec - elapsedSec));
 
@@ -294,7 +296,7 @@ export default function PoseByPosePlayer({
 								className="text-xs font-medium"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
-								{pose.breathingCue || t("guided.breathe_steadily")}
+								{localized(pose, "breathingCue", lang) || t("guided.breathe_steadily")}
 							</span>
 							<div className="flex items-center gap-2">
 								{currentPoseAlloc?.bilateral && side && (
@@ -380,6 +382,7 @@ export default function PoseByPosePlayer({
 									activeTab={activeTab}
 									setActiveTab={setActiveTab}
 									t={t}
+									lang={lang}
 								/>
 							</motion.div>
 						)}
@@ -462,11 +465,17 @@ export default function PoseByPosePlayer({
 	);
 }
 
-function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
+function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 	const alignmentPoints = pose.alignmentDetails?.keyPoints || [];
-	const mistakes = pose.commonMistakes || [];
-	const benefits = pose.benefits || [];
-	const contraindications = pose.contraindications || [];
+	const mistakes = localizedArray(pose, "commonMistakes", lang).length > 0
+		? localizedArray(pose, "commonMistakes", lang)
+		: (pose.commonMistakes || []);
+	const benefits = localizedArray(pose, "benefits", lang).length > 0
+		? localizedArray(pose, "benefits", lang)
+		: (pose.benefits || []);
+	const contraindications = localizedArray(pose, "contraindications", lang).length > 0
+		? localizedArray(pose, "contraindications", lang)
+		: (pose.contraindications || []);
 	const cues = corePose?.contextualCues || [];
 	const instructions = pose.instructions || {};
 
@@ -591,7 +600,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t }) {
 							className="text-sm font-medium"
 							style={{ color: "var(--color-text-primary)" }}
 						>
-							{pose.breathingCue || t("guided.breathe_steadily")}
+							{localized(pose, "breathingCue", lang) || t("guided.breathe_steadily")}
 						</p>
 						{instructions.setup?.length > 0 && (
 							<div>

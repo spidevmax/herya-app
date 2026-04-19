@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronUp, Search, Wind, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { localizedArray } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
 const formatHuman = (v) =>
@@ -33,7 +34,7 @@ export default function BreathingPatternPicker({
 	selectedId,
 	onSelect,
 }) {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
 
@@ -252,7 +253,11 @@ export default function BreathingPatternPicker({
 			{/* Safety banner */}
 			{selected?.contraindications?.length > 0 && (
 				<SafetyBanner
-					contraindications={selected.contraindications}
+					contraindications={
+						localizedArray(selected, "contraindications", lang).length > 0
+							? localizedArray(selected, "contraindications", lang)
+							: selected.contraindications
+					}
 					warnings={selected.warnings}
 				/>
 			)}

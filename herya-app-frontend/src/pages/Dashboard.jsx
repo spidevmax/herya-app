@@ -61,7 +61,11 @@ export default function Dashboard() {
 				if (rec.status === "fulfilled") {
 					const payload = rec.value.data?.data || rec.value.data;
 					setRecommended(payload?.sequence ?? payload);
-					setRecommendReason(payload?.reason ?? null);
+					if (payload?.reasonKey) {
+						setRecommendReason(t(payload.reasonKey, payload.reasonVars || {}));
+					} else {
+						setRecommendReason(payload?.reason ?? null);
+					}
 				}
 				if (sess.status === "fulfilled") {
 					const payload = sess.value.data?.data || sess.value.data || {};
@@ -73,7 +77,7 @@ export default function Dashboard() {
 					setStats(st.value.data?.data || st.value.data);
 			})
 			.finally(() => setLoading(false));
-	}, []);
+	}, [t]);
 
 	useEffect(() => {
 		loadDashboard();
@@ -148,7 +152,7 @@ export default function Dashboard() {
 									}}
 								>
 									<roleTone.icon size={11} aria-hidden="true" />
-									{t(`dashboard.role_${user.role}`, roleTone.label)}
+									{t(`dashboard.role_${user.role}`)}
 								</span>
 							)}
 						</div>

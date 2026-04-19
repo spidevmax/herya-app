@@ -18,6 +18,7 @@ import {
 } from "@/config/techniqueProfiles";
 import useBreathingEngine from "@/hooks/useBreathingEngine";
 import usePranayamaAudio from "@/hooks/usePranayamaAudio";
+import { localizedArray } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 import NostrilIndicator from "./NostrilIndicator";
 
@@ -42,7 +43,7 @@ export default function CycleBreathingPlayer({
 	onComplete,
 	onCycleComplete,
 }) {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 
 	// ── Resolve profile ──────────────────────────────────────────────────
 	const baseProfile = useMemo(() => getProfile(pattern), [pattern]);
@@ -517,7 +518,11 @@ export default function CycleBreathingPlayer({
 			{profile.safety?.showWarning && (
 				<div className="w-full max-w-xs">
 					<SafetyBanner
-						contraindications={pattern.contraindications || []}
+						contraindications={
+							localizedArray(pattern, "contraindications", lang).length > 0
+								? localizedArray(pattern, "contraindications", lang)
+								: (pattern.contraindications || [])
+						}
 						warnings={
 							profile.safety.warningKey
 								? t(profile.safety.warningKey)
@@ -649,7 +654,11 @@ export default function CycleBreathingPlayer({
 				pattern.contraindications?.length > 0 && (
 					<div className="w-full max-w-xs">
 						<SafetyBanner
-							contraindications={pattern.contraindications}
+							contraindications={
+								localizedArray(pattern, "contraindications", lang).length > 0
+									? localizedArray(pattern, "contraindications", lang)
+									: pattern.contraindications
+							}
 							warnings={pattern.warnings}
 						/>
 					</div>

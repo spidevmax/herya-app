@@ -1096,10 +1096,18 @@ export default function StartPractice() {
 									{isTutorPractice
 										? t("practice.checkin_signal")
 										: t("practice.checkin_mood")}
+									{isTutorPractice && selectedChild?.name ? (
+										<span
+											className="block mt-1 text-xs font-normal"
+											style={{ color: "var(--color-text-muted)" }}
+										>
+											{selectedChild.name}
+										</span>
+									) : null}
 								</legend>
 								{isTutorPractice ? (
 									<div
-										className="grid grid-cols-3 gap-2"
+										className="grid grid-cols-1 sm:grid-cols-3 gap-2"
 										role="radiogroup"
 										aria-label={t("practice.checkin_signal")}
 									>
@@ -1118,7 +1126,7 @@ export default function StartPractice() {
 													aria-checked={selected}
 													key={signal}
 													onClick={() => handleTutorSignalChange(signal)}
-													className="rounded-xl px-3 py-2 text-xs font-semibold transition"
+													className="rounded-xl px-4 py-3 text-sm font-semibold transition-all cursor-pointer min-h-[56px] flex items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 hover:brightness-95"
 													style={{
 														backgroundColor: selected
 															? signalColor
@@ -1126,10 +1134,20 @@ export default function StartPractice() {
 														color: selected
 															? "white"
 															: "var(--color-text-secondary)",
-														border: `1px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
+														border: `2px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
+														"--tw-ring-color": signalColor,
 													}}
 												>
-													{t(`practice.signal_${signal}`)}
+													<span
+														aria-hidden="true"
+														className="w-3 h-3 rounded-full shrink-0"
+														style={{
+															backgroundColor: selected ? "white" : signalColor,
+														}}
+													/>
+													<span className="flex-1 leading-snug break-words">
+														{t(`practice.signal_${signal}`)}
+													</span>
 												</button>
 											);
 										})}

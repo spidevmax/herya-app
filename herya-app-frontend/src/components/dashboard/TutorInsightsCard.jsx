@@ -199,7 +199,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					className="text-[10px] font-bold uppercase tracking-[0.1em]"
 					style={{ color: "var(--color-text-muted)" }}
 				>
-					{t("dashboard.tutor_insights_summary_title", "Summary")}
+					{t("dashboard.tutor_insights_summary_title")}
 				</h3>
 				<dl className="grid grid-cols-2 gap-2 m-0">
 					<TutorStat
@@ -269,15 +269,15 @@ export default function TutorInsightsCard({ tutorInsights }) {
 				<ul className="flex flex-col gap-1 list-none m-0 p-0">
 					<DeltaRow
 						value={delta.signalImprovementRate || 0}
-						label={t("dashboard.tutor_insights_weekly_delta_signal_label", "Signal")}
+						label={t("dashboard.tutor_insights_weekly_delta_signal_label")}
 					/>
 					<DeltaRow
 						value={delta.anchorUseRate || 0}
-						label={t("dashboard.tutor_insights_weekly_delta_anchor_label", "Anchor use")}
+						label={t("dashboard.tutor_insights_weekly_delta_anchor_label")}
 					/>
 					<DeltaRow
 						value={delta.totalSafePauses || 0}
-						label={t("dashboard.tutor_insights_weekly_delta_pauses_label", "Safe pauses")}
+						label={t("dashboard.tutor_insights_weekly_delta_pauses_label")}
 						invert
 					/>
 				</ul>
