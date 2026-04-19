@@ -321,6 +321,103 @@ describe("distributePoseTime", () => {
 		});
 	});
 
+	describe("recommendedHoldSeconds (auto mode)", () => {
+		const holdPose = (name, holdSec, type = "symmetric", breaths = 5) => ({
+			pose: {
+				romanizationName: name,
+				sidedness: { type },
+				recommendedHoldSeconds: holdSec,
+				recommendedBreaths: {
+					beginner: { min: breaths - 1, max: breaths + 1 },
+					intermediate: { min: breaths + 1, max: breaths + 3 },
+					advanced: { min: breaths + 3, max: breaths + 5 },
+				},
+			},
+			breaths,
+		});
+
+		it("uses recommendedHoldSeconds as weight when present", () => {
+			// Savasana 300s + Setu Bandhasana 60s, 15 min = 900s
+			// Expected ratio 5:1 → Savasana 750s, Setu 150s
+			const poses = [holdPose("Savasana", 300), holdPose("Setu", 60)];
+			const result = distributePoseTime({
+				corePoses: poses,
+				blockTotalSec: 900,
+				level: "beginner",
+				mode: "auto",
+			});
+			expect(result.poses[0].totalSec).toBe(750);
+			expect(result.poses[1].totalSec).toBe(150);
+		});
+
+		it("falls back to breaths when recommendedHoldSeconds is missing", () => {
+			// No hold → uses breaths × 4. 5 vs 10 → 1:2 → 40s/80s in 120s block
+			const poses = [symmetricPose(5), symmetricPose(10)];
+			const result = distributePoseTime({
+				corePoses: poses,
+				blockTotalSec: 120,
+				level: "beginner",
+				mode: "auto",
+			});
+			expect(result.poses[0].totalSec).toBe(40);
+			expect(result.poses[1].totalSec).toBe(80);
+		});
+
+		it("caps a dominant pose at MAX_POSE_RATIO when 3+ poses", () => {
+			// 3 poses: Savasana 300, two short 30s → would give Savasana 83% without cap
+			const poses = [
+				holdPose("Savasana", 300),
+				holdPose("Tadasana", 30),
+				holdPose("Mountain", 30),
+			];
+			const result = distributePoseTime({
+				corePoses: poses,
+				blockTotalSec: 600,
+				level: "beginner",
+				mode: "auto",
+			});
+			// Cap is 45% × 600 = 270s
+			expect(result.poses[0].totalSec).toBeLessThanOrEqual(270);
+			// Sum still equals block
+			const sum = result.poses.reduce((s, p) => s + p.totalSec, 0);
+			expect(sum).toBe(600);
+			// The two short ones absorbed the excess
+			expect(result.poses[1].totalSec).toBeGreaterThan(30);
+		});
+
+		it("does NOT cap with only 2 poses (preserves natural ratio)", () => {
+			// 2 poses: Savasana 300 + Setu 60 → ratio 5:1 stays
+			const poses = [holdPose("Savasana", 300), holdPose("Setu", 60)];
+			const result = distributePoseTime({
+				corePoses: poses,
+				blockTotalSec: 900,
+				level: "beginner",
+				mode: "auto",
+			});
+			// 750/900 = 83% — well over the 45% cap, intentionally allowed
+			expect(result.poses[0].totalSec).toBeGreaterThan(900 * 0.45);
+		});
+
+		it("recommended mode now produces different result than equal mode", () => {
+			// Regression: was the original bug — both modes returned 50/50
+			const poses = [holdPose("Savasana", 300), holdPose("Setu", 60)];
+			const auto = distributePoseTime({
+				corePoses: poses,
+				blockTotalSec: 600,
+				level: "beginner",
+				mode: "auto",
+			});
+			const equal = distributePoseTime({
+				corePoses: poses,
+				blockTotalSec: 600,
+				level: "beginner",
+				mode: "equal",
+			});
+			expect(auto.poses[0].totalSec).not.toBe(equal.poses[0].totalSec);
+			expect(equal.poses[0].totalSec).toBe(equal.poses[1].totalSec);
+		});
+	});
+
 	describe("formatPoseDuration", () => {
 		it("formats seconds only", () => {
 			expect(formatPoseDuration(45)).toBe("45s");

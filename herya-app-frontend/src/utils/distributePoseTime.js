@@ -31,6 +31,9 @@
 const MIN_POSE_SEC = 12; // minimum seconds per pose (per side)
 const SECS_PER_BREATH = 4; // VK standard: ~4 seconds per breath cycle
 const DEFAULT_BREATHS = 5;
+// Maximum share of the block any single pose can take in "auto" mode.
+// Prevents a long-hold pose (e.g. Savasana 300s) from devouring short blocks.
+const MAX_POSE_RATIO = 0.45;
 
 /**
  * Get recommended breaths for a pose at a given level.
@@ -45,6 +48,22 @@ function getBreathsForPose(corePose, level = "beginner") {
 		return Math.round((levelBreaths.min + levelBreaths.max) / 2);
 	}
 	return corePose.breaths || DEFAULT_BREATHS;
+}
+
+/**
+ * Get the recommended weight (in seconds) for a pose.
+ *
+ * Order of precedence (per side):
+ *   1. pose.recommendedHoldSeconds  ← curated, intentional per-pose hold
+ *   2. breaths × SECS_PER_BREATH    ← derived from level breath ranges
+ *
+ * The bilateral multiplier is applied by the caller, not here.
+ */
+function getWeightSecPerSide(corePose, level = "beginner") {
+	const pose = corePose?.pose;
+	const hold = pose?.recommendedHoldSeconds;
+	if (Number.isFinite(hold) && hold > 0) return hold;
+	return getBreathsForPose(corePose, level) * SECS_PER_BREATH;
 }
 
 /**
@@ -131,9 +150,9 @@ export function distributePoseTime({
 // ── Auto distribution ────────────────────────────────────────────────────
 function distributeAuto(corePoses, blockTotalSec, level, naturalSec) {
 	const weights = corePoses.map((cp) => {
-		const breaths = getBreathsForPose(cp, level);
+		const perSide = getWeightSecPerSide(cp, level);
 		const sides = isBilateral(cp) ? 2 : 1;
-		return breaths * sides;
+		return perSide * sides;
 	});
 	const totalWeight = weights.reduce((a, b) => a + b, 0);
 
@@ -144,16 +163,18 @@ function distributeAuto(corePoses, blockTotalSec, level, naturalSec) {
 	}, 0);
 
 	let warning = null;
-	let effectiveTotal = blockTotalSec;
+	const effectiveTotal = blockTotalSec;
 
 	if (minRequired > blockTotalSec) {
 		warning = "insufficient_time";
-		// Scale down proportionally but still allocate
-		effectiveTotal = blockTotalSec;
 	}
 
-	// Proportional allocation
-	const rawAllocations = weights.map((w) => (w / totalWeight) * effectiveTotal);
+	// Proportional allocation, capped so no single pose dominates a short block.
+	const rawAllocations = capDominantAllocations(
+		weights.map((w) => (w / totalWeight) * effectiveTotal),
+		effectiveTotal,
+		MAX_POSE_RATIO,
+	);
 
 	// Apply minimums
 	const poses = applyMinimumsAndRound(
@@ -171,6 +192,44 @@ function distributeAuto(corePoses, blockTotalSec, level, naturalSec) {
 		totalSec: poses.reduce((s, p) => s + p.totalSec, 0),
 		naturalSec,
 	};
+}
+
+// Iteratively cap any allocation that exceeds maxRatio of total, redistributing
+// the excess proportionally to the remaining (non-capped) poses. The cap only
+// engages when there are enough other poses to absorb the excess without
+// violating their own minimums — with 1 or 2 poses, the cap is a no-op so the
+// natural ratio (e.g. 2:1) is preserved.
+function capDominantAllocations(allocations, total, maxRatio) {
+	if (allocations.length < 3 || total <= 0) return allocations.slice();
+	const cap = total * maxRatio;
+	const result = allocations.slice();
+	const capped = new Array(result.length).fill(false);
+
+	for (let pass = 0; pass < result.length; pass += 1) {
+		let excess = 0;
+		for (let i = 0; i < result.length; i += 1) {
+			if (!capped[i] && result[i] > cap) {
+				excess += result[i] - cap;
+				result[i] = cap;
+				capped[i] = true;
+			}
+		}
+		if (excess <= 0) break;
+		const openIdx = result
+			.map((_, i) => i)
+			.filter((i) => !capped[i]);
+		if (openIdx.length === 0) break;
+		const openSum = openIdx.reduce((s, i) => s + result[i], 0);
+		if (openSum <= 0) {
+			const share = excess / openIdx.length;
+			for (const i of openIdx) result[i] += share;
+		} else {
+			for (const i of openIdx) {
+				result[i] += (result[i] / openSum) * excess;
+			}
+		}
+	}
+	return result;
 }
 
 // ── Equal distribution ───────────────────────────────────────────────────
