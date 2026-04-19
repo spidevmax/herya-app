@@ -1,11 +1,11 @@
+import { motion } from "framer-motion";
+import { ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Eye, EyeOff, Lock, ArrowLeft } from "lucide-react";
 import { resetPassword } from "@/api/auth.api";
-import { useLanguage } from "@/context/LanguageContext";
 import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
 import { Button } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function ResetPassword() {
 	const navigate = useNavigate();
@@ -16,8 +16,13 @@ export default function ResetPassword() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 	const [error, setError] = useState("");
+	const [errorList, setErrorList] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [success, setSuccess] = useState(false);
+	const [touched, setTouched] = useState({
+		newPassword: false,
+		confirmPassword: false,
+	});
 
 	const tr = (key, fallback) => {
 		const value = t(key);
@@ -26,17 +31,27 @@ export default function ResetPassword() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setError("");
+		setErrorList([]);
 		if (!token) {
-			setError(tr("reset_password.invalid_token", "Invalid or missing reset token"));
+			setError(
+				tr("reset_password.invalid_token", "Invalid or missing reset token"),
+			);
 			return;
 		}
-
+		if (form.newPassword.length < 8) {
+			setError(
+				tr(
+					"reset_password.too_short",
+					"Password must be at least 8 characters",
+				),
+			);
+			return;
+		}
 		if (form.newPassword !== form.confirmPassword) {
 			setError(tr("reset_password.mismatch", "Passwords don't match"));
 			return;
 		}
-
-		setError("");
 		setLoading(true);
 		try {
 			await resetPassword({
@@ -47,7 +62,16 @@ export default function ResetPassword() {
 			setSuccess(true);
 			setTimeout(() => navigate("/login"), 2000);
 		} catch (err) {
-			setError(err?.response?.data?.message || tr("reset_password.error", "Password reset failed"));
+			const apiErrors = err?.response?.data?.errors;
+			if (Array.isArray(apiErrors) && apiErrors.length > 0) {
+				setErrorList(apiErrors.map((e) => e.msg || e.message || e));
+				setError("");
+			} else {
+				setError(
+					err?.response?.data?.message ||
+						tr("reset_password.error", "Password reset failed"),
+				);
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -58,8 +82,14 @@ export default function ResetPassword() {
 			className="min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden"
 			style={{ background: "var(--gradient-warm)" }}
 		>
-			<div aria-hidden="true" className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-[var(--color-surface-card)]/25 blur-xl" />
-			<div aria-hidden="true" className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl" />
+			<div
+				aria-hidden="true"
+				className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-[var(--color-surface-card)]/25 blur-xl"
+			/>
+			<div
+				aria-hidden="true"
+				className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl"
+			/>
 
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
@@ -73,7 +103,7 @@ export default function ResetPassword() {
 					<>
 						<button
 							type="button"
-							onClick={() => navigate("/login")}
+							onClick={() => navigate(-1)}
 							aria-label={tr("reset_password.back", "Back")}
 							className="flex items-center gap-2 mb-6 font-bold text-lg text-[var(--color-primary)] hover:opacity-70 transition"
 						>
@@ -88,10 +118,13 @@ export default function ResetPassword() {
 								className="mb-4 inline-block text-[var(--color-primary)]"
 							/>
 							<h1 className="font-display text-4xl font-bold mb-2 text-[var(--color-primary)]">
-								{tr("reset_password.title", "New password")}
+								{tr("reset_password.title", "Create a new password")}
 							</h1>
 							<p className="text-sm text-[var(--color-text-secondary)]">
-								{tr("reset_password.subtitle", "Enter your new secure password")}
+								{tr(
+									"reset_password.subtitle",
+									"Choose a secure password to access your account.",
+								)}
 							</p>
 						</header>
 
@@ -107,42 +140,69 @@ export default function ResetPassword() {
 								boxShadow: "var(--shadow-warm-hover)",
 							}}
 						>
-							{error && (
-								<motion.p
+							{(error || (errorList && errorList.length > 0)) && (
+								<motion.div
+									id="reset-error"
 									role="alert"
 									initial={{ opacity: 0, y: -8, scale: 0.95 }}
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									className="mb-4 px-5 py-4 rounded-2xl text-sm font-semibold bg-[var(--color-error-bg)] text-[var(--color-error-text)] border-l-4 border-[var(--color-accent)]"
 								>
-									{error}
-								</motion.p>
+									{error && <div>{error}</div>}
+									{errorList && errorList.length > 0 && (
+										<ul className="list-disc pl-5">
+											{errorList.map((msg) => (
+												<li
+													key={
+														typeof msg === "string" ? msg : JSON.stringify(msg)
+													}
+												>
+													{msg}
+												</li>
+											))}
+										</ul>
+									)}
+								</motion.div>
 							)}
 
-							<form onSubmit={handleSubmit} className="flex flex-col gap-5">
+							<form
+								onSubmit={handleSubmit}
+								className="flex flex-col gap-5"
+								autoComplete="off"
+							>
 								<div className="relative">
+									<label htmlFor="new-password" className="sr-only">
+										{tr("reset_password.new_password_label", "New password")}
+									</label>
 									<Lock
 										size={20}
 										className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]"
 									/>
 									<input
+										id="new-password"
+										name="new-password"
 										type={showPassword ? "text" : "password"}
 										autoComplete="new-password"
 										required
-										aria-label={tr("reset_password.new_password_label", "New password")}
+										aria-describedby={error ? "reset-error" : undefined}
+										aria-invalid={!!error}
 										placeholder="••••••••"
 										value={form.newPassword}
-										onChange={(e) =>
-											setForm((f) => ({
-												...f,
-												newPassword: e.target.value,
-											}))
-										}
-										className="input-base input-base-lg pl-12 pr-12"
+										onChange={(e) => {
+											setForm((f) => ({ ...f, newPassword: e.target.value }));
+											setTouched((t) => ({ ...t, newPassword: true }));
+										}}
+										className={`input-base input-base-lg pl-12 pr-12 ${error && touched.newPassword ? "border-[var(--color-error-text)]" : ""}`}
 									/>
 									<button
 										type="button"
+										tabIndex={0}
 										onClick={() => setShowPassword((v) => !v)}
-										aria-label={showPassword ? tr("login.hide_password", "Hide password") : tr("login.show_password", "Show password")}
+										aria-label={
+											showPassword
+												? tr("login.hide_password", "Hide password")
+												: tr("login.show_password", "Show password")
+										}
 										className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] hover:opacity-70 transition"
 									>
 										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -150,29 +210,44 @@ export default function ResetPassword() {
 								</div>
 
 								<div className="relative">
+									<label htmlFor="confirm-password" className="sr-only">
+										{tr(
+											"reset_password.confirm_password_label",
+											"Confirm password",
+										)}
+									</label>
 									<Lock
 										size={20}
 										className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]"
 									/>
 									<input
+										id="confirm-password"
+										name="confirm-password"
 										type={showConfirmPassword ? "text" : "password"}
 										autoComplete="new-password"
 										required
-										aria-label={tr("reset_password.confirm_password_label", "Confirm password")}
+										aria-describedby={error ? "reset-error" : undefined}
+										aria-invalid={!!error}
 										placeholder="••••••••"
 										value={form.confirmPassword}
-										onChange={(e) =>
+										onChange={(e) => {
 											setForm((f) => ({
 												...f,
 												confirmPassword: e.target.value,
-											}))
-										}
-										className="input-base input-base-lg pl-12 pr-12"
+											}));
+											setTouched((t) => ({ ...t, confirmPassword: true }));
+										}}
+										className={`input-base input-base-lg pl-12 pr-12 ${error && touched.confirmPassword ? "border-[var(--color-error-text)]" : ""}`}
 									/>
 									<button
 										type="button"
+										tabIndex={0}
 										onClick={() => setShowConfirmPassword((v) => !v)}
-										aria-label={showConfirmPassword ? tr("login.hide_password", "Hide password") : tr("login.show_password", "Show password")}
+										aria-label={
+											showConfirmPassword
+												? tr("login.hide_password", "Hide password")
+												: tr("login.show_password", "Show password")
+										}
 										className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] hover:opacity-70 transition"
 									>
 										{showConfirmPassword ? (
@@ -188,10 +263,11 @@ export default function ResetPassword() {
 									disabled={loading}
 									size="lg"
 									className="mt-4 w-full"
+									aria-busy={loading}
 								>
 									{loading
-										? tr("reset_password.submitting", "Resetting...")
-										: tr("reset_password.submit", "Reset Password")}
+										? tr("reset_password.submitting", "Updating...")
+										: tr("reset_password.submit", "Update password")}
 								</Button>
 							</form>
 
@@ -225,11 +301,17 @@ export default function ResetPassword() {
 								aria-hidden="true"
 								className="mb-4 inline-block text-[var(--color-primary)]"
 							/>
-							<h2 id="reset-success-heading" className="font-display text-3xl font-bold mb-3 text-[var(--color-primary)]">
+							<h2
+								id="reset-success-heading"
+								className="font-display text-3xl font-bold mb-3 text-[var(--color-primary)]"
+							>
 								{tr("reset_password.success_title", "All set")}
 							</h2>
 							<p className="text-sm mb-6 font-semibold text-[var(--color-text-secondary)]">
-								{tr("reset_password.success_message", "Your password has been successfully reset. Redirecting to login...")}
+								{tr(
+									"reset_password.success_message",
+									"Your password has been successfully reset. Redirecting to login...",
+								)}
 							</p>
 							<Link
 								to="/login"

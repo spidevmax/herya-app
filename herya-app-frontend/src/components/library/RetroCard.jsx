@@ -52,20 +52,36 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 		return cat ? tr(`library.categories.${cat}`, String(cat).replace(/_/g, " ")) : "—";
 	};
 	const translateEffect = (e) => e ? tr(`library.effects.${e}`, e) : "—";
+	const translateDrishti = (d) => d ? tr(`library.drishti.${d}`, String(d).replace(/_/g, " ")) : "—";
+
+	const formatRatio = (ratio) => {
+		if (!ratio || typeof ratio !== "object") return "—";
+		const { inhale = 0, hold = 0, exhale = 0, holdAfterExhale = 0 } = ratio;
+		if (!inhale && !hold && !exhale && !holdAfterExhale) return "—";
+		return `${inhale}:${hold}:${exhale}:${holdAfterExhale}`;
+	};
+
+	const formatDuration = (minutes) => {
+		const n = Number(minutes);
+		if (!Number.isFinite(n) || n <= 0) return null;
+		return `${n}m`;
+	};
+
+	const buildSequenceStats = () => {
+		const base = [
+			{ value: tr(`library.level_${item.level}`, item.level ?? "—"), label: tr("library.stat_level", "LEVEL") },
+			{ value: translateFamily(item.family), label: tr("library.stat_family", "FAMILY") },
+			{ value: getSequencePoseCount(item) ?? "—", label: tr("library.stat_poses", "POSES") },
+			{ value: translateDifficulty(item.difficulty), label: tr("library.stat_difficulty", "DIFF") },
+		];
+		const duration = formatDuration(item.duration ?? item.estimatedDuration);
+		if (duration) base.push({ value: duration, label: tr("library.stat_duration", "TIME") });
+		return base;
+	};
 
 	const stats =
 		type === "sequences"
-			? [
-					{ value: tr(`library.level_${item.level}`, item.level ?? "—"), label: tr("library.stat_level", "LEVEL") },
-					{
-						value: translateFamily(item.family),
-						label: tr("library.stat_family", "FAMILY"),
-					},
-					{
-						value: getSequencePoseCount(item) ?? "—",
-						label: tr("library.stat_poses", "POSES"),
-					},
-				]
+			? buildSequenceStats()
 			: type === "poses"
 				? [
 						{
@@ -76,6 +92,10 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 							value: translateCategory(item.poseType ?? item.category),
 							label: tr("library.stat_type", "TYPE"),
 						},
+						{
+							value: translateDrishti(item.drishti),
+							label: tr("library.stat_drishti", "GAZE"),
+						},
 					]
 				: [
 						{
@@ -85,6 +105,14 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						{
 							value: translateCategory(item.breathType ?? item.category),
 							label: tr("library.stat_type", "TYPE"),
+						},
+						{
+							value: formatRatio(item.patternRatio),
+							label: tr("library.stat_ratio", "RATIO"),
+						},
+						{
+							value: translateDifficulty(item.difficulty),
+							label: tr("library.stat_difficulty", "DIFF"),
 						},
 					];
 

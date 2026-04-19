@@ -715,7 +715,7 @@ export default function StartPractice() {
 			const backendMsg = firstValidationMsg || data?.message || null;
 			setError(
 				backendMsg && backendMsg !== "Validation error"
-					? `${t("practice.error_create_session")} (${backendMsg})`
+					? `${t("practice.error_create_session")} (Password must be at least 8 characters)`
 					: t("practice.error_create_session"),
 			);
 		}
@@ -953,7 +953,10 @@ export default function StartPractice() {
 						border: "1px solid var(--color-warning-border)",
 					}}
 				>
-					<div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center" aria-hidden="true">
+					<div
+						className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center"
+						aria-hidden="true"
+					>
 						<RotateCcw size={16} className="text-amber-700" />
 					</div>
 					<div className="flex-1">
@@ -1073,7 +1076,10 @@ export default function StartPractice() {
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-5 pt-4"
 						>
-							<h2 id="checkin-heading" className="text-xl font-semibold text-[var(--color-text-primary)]">
+							<h2
+								id="checkin-heading"
+								className="text-xl font-semibold text-[var(--color-text-primary)]"
+							>
 								{isTutorPractice
 									? t("practice.checkin_title_tutor")
 									: t("practice.checkin_title")}
@@ -1092,7 +1098,11 @@ export default function StartPractice() {
 										: t("practice.checkin_mood")}
 								</legend>
 								{isTutorPractice ? (
-									<div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t("practice.checkin_signal")}>
+									<div
+										className="grid grid-cols-3 gap-2"
+										role="radiogroup"
+										aria-label={t("practice.checkin_signal")}
+									>
 										{["green", "yellow", "red"].map((signal) => {
 											const selected = tutorSignal === signal;
 											const signalColor =
@@ -1125,7 +1135,11 @@ export default function StartPractice() {
 										})}
 									</div>
 								) : (
-									<div className="flex flex-wrap gap-2" role="group" aria-label={t("practice.checkin_mood")}>
+									<div
+										className="flex flex-wrap gap-2"
+										role="group"
+										aria-label={t("practice.checkin_mood")}
+									>
 										{MOOD_OPTIONS.map((m) => {
 											const selected = checkInMood.includes(m);
 											const color = getMoodColor(m);

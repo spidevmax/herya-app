@@ -29,20 +29,43 @@ function getCalendarDays(sessionDates = []) {
 	});
 }
 
+const SKELETON_DAYS = Array.from({ length: 14 }, (_, i) => `d-${i}`);
+
 export default function CalendarStrip({
 	sessionDates = [],
 	streak = 0,
 	weekSessions = null,
+	loading = false,
 }) {
 	const { t } = useLanguage();
 	const stripRef = useRef(null);
 	const days = useMemo(() => getCalendarDays(sessionDates), [sessionDates]);
 
 	useEffect(() => {
+		if (loading) return;
 		const strip = stripRef.current;
 		if (!strip) return;
 		strip.scrollLeft = strip.scrollWidth;
-	}, []);
+	}, [loading]);
+
+	if (loading) {
+		return (
+			<section aria-busy="true" aria-label={t("dashboard.practice_label")}>
+				<div className="flex items-center justify-between mb-3">
+					<span className="skeleton h-3 w-28 rounded-lg" aria-hidden="true" />
+					<span className="skeleton h-4 w-20 rounded-full" aria-hidden="true" />
+				</div>
+				<div className="flex gap-2 pb-1" aria-hidden="true">
+					{SKELETON_DAYS.map((key) => (
+						<div key={key} className="flex-shrink-0 flex flex-col items-center gap-1 w-10">
+							<span className="skeleton h-2.5 w-6 rounded" />
+							<span className="skeleton w-9 h-9 rounded-full" />
+						</div>
+					))}
+				</div>
+			</section>
+		);
+	}
 
 	return (
 		<section aria-label={t("dashboard.practice_label")}>

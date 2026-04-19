@@ -1,4 +1,4 @@
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -26,6 +26,12 @@ const RECOMMENDATION_COLOR = {
 	info: "var(--color-text-secondary)",
 };
 
+const CONFIDENCE_COLOR = {
+	high: "var(--color-success)",
+	medium: "var(--color-warning)",
+	low: "var(--color-text-muted)",
+};
+
 const formatPercent = (value = 0) => `${Math.max(0, value)}%`;
 const formatDelta = (value = 0) => {
 	if (value > 0) return `+${value}`;
@@ -33,28 +39,49 @@ const formatDelta = (value = 0) => {
 	return "0";
 };
 
+const TrendIcon = ({ value, size = 12 }) => {
+	if (value > 0) return <TrendingUp size={size} aria-hidden="true" />;
+	if (value < 0) return <TrendingDown size={size} aria-hidden="true" />;
+	return <Minus size={size} aria-hidden="true" />;
+};
+
 const TutorStat = ({ label, value }) => (
 	<div
-		className="rounded-2xl p-3"
+		className="rounded-2xl p-3 m-0"
 		style={{
 			backgroundColor: "var(--color-surface)",
 			border: "1px solid var(--color-border-soft)",
 		}}
 	>
-		<p
+		<dt
 			className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1"
 			style={{ color: "var(--color-text-muted)" }}
 		>
 			{label}
-		</p>
-		<p
-			className="text-lg font-bold"
+		</dt>
+		<dd
+			className="text-lg font-bold m-0"
 			style={{ color: "var(--color-text-primary)" }}
 		>
 			{value}
-		</p>
+		</dd>
 	</div>
 );
+
+const DeltaRow = ({ value, label, invert = false }) => {
+	const tone = getDeltaTone(invert ? -value : value);
+	return (
+		<li
+			className="flex items-center gap-1.5 text-xs m-0"
+			style={{ color: tone }}
+		>
+			<TrendIcon value={invert ? -value : value} />
+			<span>
+				{label}: <strong>{formatDelta(value)}</strong>
+			</span>
+		</li>
+	);
+};
 
 export default function TutorInsightsCard({ tutorInsights }) {
 	const navigate = useNavigate();
@@ -65,27 +92,29 @@ export default function TutorInsightsCard({ tutorInsights }) {
 	if (!hasData) {
 		return (
 			<section
-				aria-label={t("dashboard.tutor_insights_title")}
+				aria-labelledby="tutor-insights-title"
 				className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
 				style={{
 					backgroundColor: "var(--color-surface-card)",
 					border: "1px solid var(--color-border-soft)",
 				}}
 			>
-				<div className="flex items-center gap-2 mb-2">
-					<div
+				<header className="flex items-center gap-2 mb-2">
+					<span
+						aria-hidden="true"
 						className="w-8 h-8 rounded-xl flex items-center justify-center"
 						style={{ backgroundColor: "var(--color-surface)" }}
 					>
 						<ShieldCheck size={16} style={{ color: "var(--color-info)" }} />
-					</div>
-					<p
+					</span>
+					<h2
+						id="tutor-insights-title"
 						className="text-[11px] font-bold uppercase tracking-[0.1em]"
 						style={{ color: "var(--color-text-muted)" }}
 					>
 						{t("dashboard.tutor_insights_title")}
-					</p>
-				</div>
+					</h2>
+				</header>
 				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
 					{t("dashboard.tutor_insights_empty")}
 				</p>
@@ -107,12 +136,11 @@ export default function TutorInsightsCard({ tutorInsights }) {
 	};
 	const recommendationPreset =
 		recommendation.preset === "adult" ? "adult" : "tutor";
-	const recommendationConfidence =
-		recommendation.confidence === "high" ||
-		recommendation.confidence === "medium" ||
-		recommendation.confidence === "low"
-			? recommendation.confidence
-			: "medium";
+	const recommendationConfidence = ["high", "medium", "low"].includes(
+		recommendation.confidence,
+	)
+		? recommendation.confidence
+		: "medium";
 	const recommendationActionLabel =
 		recommendationPreset === "adult"
 			? "dashboard.tutor_insights_reco_apply_adult"
@@ -125,16 +153,19 @@ export default function TutorInsightsCard({ tutorInsights }) {
 		byPreset: { adult: 0, tutor: 0 },
 	};
 
+	const confidenceColor = CONFIDENCE_COLOR[recommendationConfidence];
+
 	return (
 		<section
-			aria-label={t("dashboard.tutor_insights_title")}
-			className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
+			aria-labelledby="tutor-insights-title"
+			className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex flex-col gap-4"
 			style={{
 				backgroundColor: "var(--color-surface-card)",
 				border: "1px solid var(--color-border-soft)",
 			}}
 		>
-			<header className="flex items-start justify-between gap-3 mb-3">
+			{/* ── Header ────────────────────────────────────────────────────── */}
+			<header className="flex items-start justify-between gap-3">
 				<div>
 					<p
 						className="text-[11px] font-bold uppercase tracking-[0.1em]"
@@ -142,102 +173,120 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					>
 						{t("dashboard.tutor_insights_title")}
 					</p>
-					<p
-						className="text-sm"
-						style={{ color: "var(--color-text-secondary)" }}
+					<h2
+						id="tutor-insights-title"
+						className="font-display text-base font-bold"
+						style={{ color: "var(--color-text-primary)" }}
 					>
 						{t("dashboard.tutor_insights_subtitle")}
-					</p>
+					</h2>
 				</div>
-				<div
-					className="w-8 h-8 rounded-xl flex items-center justify-center"
-					style={{ backgroundColor: "var(--color-surface)" }}
+				<span
+					aria-hidden="true"
+					className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+					style={{
+						backgroundColor: "color-mix(in srgb, var(--color-info) 14%, transparent)",
+					}}
 				>
-					<ShieldCheck size={16} style={{ color: "var(--color-info)" }} />
-				</div>
+					<ShieldCheck size={18} style={{ color: "var(--color-info)" }} />
+				</span>
 			</header>
 
-			<div className="grid grid-cols-2 gap-2 mb-3">
-				<TutorStat
-					label={t("dashboard.tutor_insights_sessions")}
-					value={data.sessionCount || 0}
-				/>
-				<TutorStat
-					label={t("dashboard.tutor_insights_pauses")}
-					value={data.totalSafePauses || 0}
-				/>
-				<TutorStat
-					label={t("dashboard.tutor_insights_anchor_use")}
-					value={formatPercent(anchorUseRate)}
-				/>
-				<TutorStat
-					label={t("dashboard.tutor_insights_signal_improved")}
-					value={formatPercent(signalImprovementRate)}
-				/>
-			</div>
-
-			<div className="flex items-center justify-between text-xs">
-				<span style={{ color: "var(--color-text-secondary)" }}>
-					{t("dashboard.tutor_insights_signal_samples", {
-						n: data.signalTransitionsCount || 0,
-					})}
-				</span>
-				<span
-					className="font-semibold"
-					style={{ color: getTrendTone(signalImprovementRate) }}
+			{/* ── Resumen ────────────────────────────────────────────────────── */}
+			<section aria-labelledby="tutor-summary-heading" className="flex flex-col gap-2">
+				<h3
+					id="tutor-summary-heading"
+					className="text-[10px] font-bold uppercase tracking-[0.1em]"
+					style={{ color: "var(--color-text-muted)" }}
 				>
-					{t("dashboard.tutor_insights_trend", {
-						n: formatPercent(signalImprovementRate),
-					})}
-				</span>
-			</div>
+					{t("dashboard.tutor_insights_summary_title", "Summary")}
+				</h3>
+				<dl className="grid grid-cols-2 gap-2 m-0">
+					<TutorStat
+						label={t("dashboard.tutor_insights_sessions")}
+						value={data.sessionCount || 0}
+					/>
+					<TutorStat
+						label={t("dashboard.tutor_insights_pauses")}
+						value={data.totalSafePauses || 0}
+					/>
+					<TutorStat
+						label={t("dashboard.tutor_insights_anchor_use")}
+						value={formatPercent(anchorUseRate)}
+					/>
+					<TutorStat
+						label={t("dashboard.tutor_insights_signal_improved")}
+						value={formatPercent(signalImprovementRate)}
+					/>
+				</dl>
 
-			<div
-				className="mt-3 rounded-2xl p-3"
+				<div className="flex items-center justify-between text-xs">
+					<span style={{ color: "var(--color-text-secondary)" }}>
+						{t("dashboard.tutor_insights_signal_samples", {
+							n: data.signalTransitionsCount || 0,
+						})}
+					</span>
+					<span
+						className="inline-flex items-center gap-1 font-semibold"
+						style={{ color: getTrendTone(signalImprovementRate) }}
+					>
+						<TrendIcon value={signalImprovementRate > 50 ? 1 : signalImprovementRate < 40 ? -1 : 0} />
+						{t("dashboard.tutor_insights_trend", {
+							n: formatPercent(signalImprovementRate),
+						})}
+					</span>
+				</div>
+			</section>
+
+			{/* ── Tendencia semanal ─────────────────────────────────────────── */}
+			<section
+				aria-labelledby="tutor-weekly-heading"
+				className="rounded-2xl p-3"
 				style={{
 					backgroundColor: "var(--color-surface)",
 					border: "1px solid var(--color-border-soft)",
 				}}
 			>
-				<p
+				<h3
+					id="tutor-weekly-heading"
 					className="text-[10px] font-bold uppercase tracking-[0.1em] mb-2"
 					style={{ color: "var(--color-text-muted)" }}
 				>
 					{t("dashboard.tutor_insights_weekly_title")}
-				</p>
+				</h3>
 				<div className="grid grid-cols-2 gap-2 text-xs mb-2">
-					<p style={{ color: "var(--color-text-secondary)" }}>
+					<p className="m-0" style={{ color: "var(--color-text-secondary)" }}>
 						{t("dashboard.tutor_insights_weekly_current", {
 							n: currentWeek.sessionCount || 0,
 						})}
 					</p>
-					<p style={{ color: "var(--color-text-secondary)" }}>
+					<p className="m-0" style={{ color: "var(--color-text-secondary)" }}>
 						{t("dashboard.tutor_insights_weekly_previous", {
 							n: previousWeek.sessionCount || 0,
 						})}
 					</p>
 				</div>
-				<div className="flex flex-col gap-1 text-xs">
-					<p style={{ color: getDeltaTone(delta.signalImprovementRate || 0) }}>
-						{t("dashboard.tutor_insights_weekly_delta_signal", {
-							n: formatDelta(delta.signalImprovementRate || 0),
-						})}
-					</p>
-					<p style={{ color: getDeltaTone(delta.anchorUseRate || 0) }}>
-						{t("dashboard.tutor_insights_weekly_delta_anchor", {
-							n: formatDelta(delta.anchorUseRate || 0),
-						})}
-					</p>
-					<p style={{ color: getDeltaTone(-1 * (delta.totalSafePauses || 0)) }}>
-						{t("dashboard.tutor_insights_weekly_delta_pauses", {
-							n: formatDelta(delta.totalSafePauses || 0),
-						})}
-					</p>
-				</div>
-			</div>
+				<ul className="flex flex-col gap-1 list-none m-0 p-0">
+					<DeltaRow
+						value={delta.signalImprovementRate || 0}
+						label={t("dashboard.tutor_insights_weekly_delta_signal_label", "Signal")}
+					/>
+					<DeltaRow
+						value={delta.anchorUseRate || 0}
+						label={t("dashboard.tutor_insights_weekly_delta_anchor_label", "Anchor use")}
+					/>
+					<DeltaRow
+						value={delta.totalSafePauses || 0}
+						label={t("dashboard.tutor_insights_weekly_delta_pauses_label", "Safe pauses")}
+						invert
+					/>
+				</ul>
+			</section>
 
-			<div
-				className="mt-3 rounded-2xl p-3"
+			{/* ── Recomendación ─────────────────────────────────────────────── */}
+			<section
+				aria-labelledby="tutor-reco-heading"
+				className="rounded-2xl p-3 flex flex-col gap-2"
 				style={{
 					backgroundColor:
 						RECOMMENDATION_BG[recommendation.severity] ||
@@ -245,14 +294,27 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					border: "1px solid var(--color-border-soft)",
 				}}
 			>
+				<div className="flex items-start justify-between gap-2">
+					<h3
+						id="tutor-reco-heading"
+						className="text-[10px] font-bold uppercase tracking-[0.1em]"
+						style={{ color: "var(--color-text-muted)" }}
+					>
+						{t("dashboard.tutor_insights_reco_title")}
+					</h3>
+					<span
+						className="text-[10px] font-bold uppercase tracking-[0.1em] px-2 py-0.5 rounded-full shrink-0"
+						style={{
+							backgroundColor: `color-mix(in srgb, ${confidenceColor} 14%, transparent)`,
+							color: confidenceColor,
+							border: `1px solid color-mix(in srgb, ${confidenceColor} 28%, transparent)`,
+						}}
+					>
+						{t(`dashboard.tutor_insights_confidence_${recommendationConfidence}`)}
+					</span>
+				</div>
 				<p
-					className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1"
-					style={{ color: "var(--color-text-muted)" }}
-				>
-					{t("dashboard.tutor_insights_reco_title")}
-				</p>
-				<p
-					className="text-xs font-medium"
+					className="text-sm font-semibold m-0"
 					style={{
 						color:
 							RECOMMENDATION_COLOR[recommendation.severity] ||
@@ -260,16 +322,6 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					}}
 				>
 					{t(`dashboard.tutor_insights_reco_${recommendation.key}`)}
-				</p>
-				<p
-					className="text-[11px] mt-1"
-					style={{ color: "var(--color-text-muted)" }}
-				>
-					{t("dashboard.tutor_insights_reco_confidence", {
-						n: t(
-							`dashboard.tutor_insights_confidence_${recommendationConfidence}`,
-						),
-					})}
 				</p>
 				<button
 					type="button"
@@ -286,7 +338,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 							},
 						})
 					}
-					className="mt-2 px-3 py-1.5 rounded-xl text-xs font-semibold"
+					className="self-start inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold"
 					style={{
 						backgroundColor: "var(--color-primary)",
 						color: "white",
@@ -294,32 +346,35 @@ export default function TutorInsightsCard({ tutorInsights }) {
 				>
 					{t(recommendationActionLabel)}
 				</button>
-			</div>
+			</section>
 
-			<div
-				className="mt-3 rounded-2xl p-3"
+			{/* ── Outcome ──────────────────────────────────────────────────── */}
+			<section
+				aria-labelledby="tutor-outcome-heading"
+				className="rounded-2xl p-3"
 				style={{
 					backgroundColor: "var(--color-surface)",
 					border: "1px solid var(--color-border-soft)",
 				}}
 			>
-				<p
+				<h3
+					id="tutor-outcome-heading"
 					className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1"
 					style={{ color: "var(--color-text-muted)" }}
 				>
 					{t("dashboard.tutor_insights_outcome_title")}
-				</p>
+				</h3>
 				{recommendationOutcome.appliedCount > 0 ? (
 					<div className="flex flex-col gap-1">
 						<p
-							className="text-xs"
+							className="text-xs m-0"
 							style={{ color: "var(--color-text-secondary)" }}
 						>
 							{t("dashboard.tutor_insights_outcome_improved", {
 								n: recommendationOutcome.improvedRate || 0,
 							})}
 						</p>
-						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+						<p className="text-xs m-0" style={{ color: "var(--color-text-muted)" }}>
 							{t("dashboard.tutor_insights_outcome_applied", {
 								n: recommendationOutcome.appliedCount || 0,
 							})}
@@ -328,7 +383,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 								n: recommendationOutcome.withSignalOutcome || 0,
 							})}
 						</p>
-						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+						<p className="text-xs m-0" style={{ color: "var(--color-text-muted)" }}>
 							{t("dashboard.tutor_insights_outcome_by_preset", {
 								tutor: recommendationOutcome.byPreset?.tutor || 0,
 								adult: recommendationOutcome.byPreset?.adult || 0,
@@ -336,11 +391,11 @@ export default function TutorInsightsCard({ tutorInsights }) {
 						</p>
 					</div>
 				) : (
-					<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+					<p className="text-xs m-0" style={{ color: "var(--color-text-muted)" }}>
 						{t("dashboard.tutor_insights_outcome_empty")}
 					</p>
 				)}
-			</div>
+			</section>
 		</section>
 	);
 }

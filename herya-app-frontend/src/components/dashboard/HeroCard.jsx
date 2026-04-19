@@ -36,7 +36,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					className="text-white border border-white/40 hover:bg-white/20"
 					onClick={() => navigate("/library")}
 				>
-					{t("hero.explore")} <ArrowRight size={16} />
+					{t("hero.explore")} <ArrowRight size={16} aria-hidden="true" />
 				</Button>
 			</section>
 		);
@@ -50,96 +50,99 @@ const HeroCard = ({ sequence, reason, loading }) => {
 	const heroColorStart = `color-mix(in srgb, ${family.color} 58%, var(--color-primary-dark))`;
 	const heroColorEnd = `color-mix(in srgb, ${family.color} 42%, var(--color-primary))`;
 	const recommendedMinutes = Number(sequence.estimatedDuration?.recommended);
-	const handleCardClick = () => navigate(`/library/sequence/${sequence._id}`);
-	const handleCardKeyDown = (event) => {
-		if (event.key === "Enter" || event.key === " ") {
-			event.preventDefault();
-			handleCardClick();
+	const sequenceName = localizedName(sequence, lang);
+
+	const startPractice = () => {
+		const params = new URLSearchParams({
+			type: "vk_sequence",
+			seq: sequence._id,
+		});
+		if (Number.isFinite(recommendedMinutes) && recommendedMinutes > 0) {
+			params.set("minutes", String(Math.round(recommendedMinutes)));
 		}
+		navigate(`/start-practice?${params.toString()}`);
 	};
 
 	return (
 		<motion.article
-			aria-label={`${t("dashboard.recommended")}: ${localizedName(sequence, lang)}`}
-			className="rounded-3xl overflow-hidden cursor-pointer"
-			onClick={handleCardClick}
-			onKeyDown={handleCardKeyDown}
-			role="button"
-			tabIndex={0}
-			whileHover={{ scale: 1.02 }}
-			whileTap={{ scale: 0.98 }}
+			aria-labelledby="hero-recommended-title"
+			className="rounded-3xl overflow-hidden relative"
+			whileHover={{ scale: 1.01 }}
 			transition={{ duration: 0.25 }}
+			style={{
+				background: `linear-gradient(135deg, ${heroColorStart}, ${heroColorEnd})`,
+			}}
 		>
-			<div
-				className="p-6 relative overflow-hidden"
-				style={{
-					background: `linear-gradient(135deg, ${heroColorStart}, ${heroColorEnd})`,
-				}}
-			>
-				<div className="absolute inset-0 pointer-events-none bg-black/10" />
-				<div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 float select-none pointer-events-none">
+			<div className="p-6 relative">
+				<div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-black/10" />
+				<div
+					aria-hidden="true"
+					className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 float select-none pointer-events-none"
+				>
 					{family.emoji ? (
 						<span className="text-8xl">{family.emoji}</span>
 					) : (
-						<PersonStanding
-							size={88}
-							strokeWidth={1.8}
-							className="text-white"
-						/>
+						<PersonStanding size={88} strokeWidth={1.8} className="text-white" />
 					)}
 				</div>
-				<span className="relative inline-flex items-center gap-1 text-xs font-medium text-white/85 uppercase tracking-widest mb-1">
+				<span className="relative inline-flex items-center gap-1 text-xs font-semibold text-white uppercase tracking-widest mb-1">
 					{t("dashboard.recommended")}
 				</span>
 				{reason ? (
-					<p className="relative text-white/70 text-[11px] mb-2 italic">
+					<p className="relative text-white/85 text-[11px] mb-2 italic">
 						{reason}
 					</p>
 				) : (
 					<div className="mb-2" />
 				)}
 				<h2
+					id="hero-recommended-title"
 					className="relative font-display text-2xl font-bold tracking-tight text-white leading-tight mb-1"
 				>
-					{localizedName(sequence, lang)}
+					{sequenceName}
 				</h2>
-				<p className="relative text-white/80 text-xs font-medium italic mb-4">
+				<p className="relative text-white/90 text-xs font-medium italic mb-4">
 					{sequence.sanskritName}
 				</p>
-				<div className="relative flex items-center gap-3 mb-5">
+				<dl className="relative flex items-center gap-3 mb-5 m-0">
 					{sequence.estimatedDuration?.recommended && (
 						<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
-							<Clock size={13} className="text-white/80" />
-							<span className="text-white text-xs font-semibold">
+							<Clock size={13} aria-hidden="true" className="text-white" />
+							<dt className="sr-only">{t("library.stat_duration", "Duration")}</dt>
+							<dd className="text-white text-xs font-semibold m-0">
 								{sequence.estimatedDuration.recommended} min
-							</span>
+							</dd>
 						</div>
 					)}
 					<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
-						<Dumbbell size={13} className="text-white/80" />
-						<span className="text-white text-xs font-semibold">
-							{LEVEL_LABEL_KEYS[sequence.level] ? t(LEVEL_LABEL_KEYS[sequence.level]) : (LEVEL_LABELS[sequence.level] ?? sequence.difficulty)}
-						</span>
+						<Dumbbell size={13} aria-hidden="true" className="text-white" />
+						<dt className="sr-only">{t("library.stat_level", "Level")}</dt>
+						<dd className="text-white text-xs font-semibold m-0">
+							{LEVEL_LABEL_KEYS[sequence.level]
+								? t(LEVEL_LABEL_KEYS[sequence.level])
+								: (LEVEL_LABELS[sequence.level] ?? sequence.difficulty)}
+						</dd>
 					</div>
+				</dl>
+				<div className="relative flex flex-wrap items-center gap-2">
+					<motion.button
+						type="button"
+						whileTap={{ scale: 0.97 }}
+						className="inline-flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg"
+						style={{ color: "var(--color-text-primary)" }}
+						onClick={startPractice}
+					>
+						{t("hero.start")} <ArrowRight size={16} aria-hidden="true" />
+					</motion.button>
+					<button
+						type="button"
+						className="inline-flex items-center gap-1 text-xs font-semibold text-white/90 hover:text-white underline underline-offset-2 px-2 py-1"
+						onClick={() => navigate(`/library/sequence/${sequence._id}`)}
+						aria-label={`${t("hero.view_details", "View details")}: ${sequenceName}`}
+					>
+						{t("hero.view_details", "View details")}
+					</button>
 				</div>
-				<button
-					type="button"
-					className="relative flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg"
-					style={{ color: "var(--color-text-primary)" }}
-					onClick={(e) => {
-						e.stopPropagation();
-						const params = new URLSearchParams({
-							type: "vk_sequence",
-							seq: sequence._id,
-						});
-						if (Number.isFinite(recommendedMinutes) && recommendedMinutes > 0) {
-							params.set("minutes", String(Math.round(recommendedMinutes)));
-						}
-						navigate(`/start-practice?${params.toString()}`);
-					}}
-				>
-					{t("hero.start")} <ArrowRight size={16} />
-				</button>
 			</div>
 		</motion.article>
 	);

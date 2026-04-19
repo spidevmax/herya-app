@@ -32,10 +32,43 @@ export default function PracticeSnapshotCard({
 	weekSessions = 0,
 	totalPracticeMinutes = 0,
 	pendingSession = null,
+	loading = false,
 }) {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const hasPendingSession = Boolean(pendingSession);
+
+	if (loading) {
+		return (
+			<section
+				aria-busy="true"
+				aria-label={t("dashboard.quick_snapshot_title")}
+				className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex flex-col gap-3"
+				style={{
+					backgroundColor: "var(--color-surface-card)",
+					border: "1px solid var(--color-border-soft)",
+				}}
+			>
+				<div className="flex items-start justify-between gap-3">
+					<div className="flex-1">
+						<span className="skeleton h-3 w-32 rounded-lg block mb-1" aria-hidden="true" />
+						<span className="skeleton h-3 w-48 rounded-lg block" aria-hidden="true" />
+					</div>
+					<span className="skeleton w-8 h-8 rounded-xl" aria-hidden="true" />
+				</div>
+				<div className="grid grid-cols-3 gap-2" aria-hidden="true">
+					{["a", "b", "c"].map((k) => (
+						<span key={k} className="skeleton h-16 rounded-2xl block" />
+					))}
+				</div>
+				<span className="skeleton h-14 rounded-2xl block" aria-hidden="true" />
+				<div className="flex gap-2" aria-hidden="true">
+					<span className="skeleton h-10 flex-1 rounded-xl block" />
+					<span className="skeleton h-10 flex-1 rounded-xl block" />
+				</div>
+			</section>
+		);
+	}
 	const nextActionLabel = hasPendingSession
 		? t("dashboard.resume_practice")
 		: t("dashboard.quick_start");

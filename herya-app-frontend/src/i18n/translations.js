@@ -329,6 +329,7 @@ export const translations = {
 			explore: "Explore Library",
 			recommended: "Recommended for you",
 			start: "Start Practice",
+			view_details: "View details",
 		},
 		session: {
 			done_title: "Practice Complete!",
@@ -1601,6 +1602,7 @@ export const translations = {
 			explore: "Explorar biblioteca",
 			recommended: "Recomendado para ti",
 			start: "Empezar práctica",
+			view_details: "Ver detalles",
 		},
 		session: {
 			done_title: "¡Práctica completada!",

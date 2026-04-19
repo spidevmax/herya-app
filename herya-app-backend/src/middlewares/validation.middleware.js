@@ -153,9 +153,11 @@ const handleValidationErrors = async (req, res, next) => {
 			}
 		}
 
+		// Buscar si hay un error de contraseña
+		const passwordError = errors.array().find((e) => e.path === "password");
 		return res.status(400).json({
 			success: false,
-			message: "Validation error",
+			message: passwordError ? passwordError.msg : "Validation error",
 			errors: errors.array().map((error) => ({
 				field: error.path || error.type,
 				message: error.msg,

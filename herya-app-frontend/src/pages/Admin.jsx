@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
 	ChevronLeft,
 	Users,
@@ -145,9 +145,9 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 		<article aria-label={user.name} className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
 			<header className="flex items-center gap-3 mb-3">
 				<div aria-hidden="true" className="w-10 h-10 rounded-full bg-[color:var(--color-primary)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0">
-					{user.avatar ? (
+					{user.profileImageUrl || user.avatar ? (
 						<img
-							src={user.avatar}
+							src={user.profileImageUrl || user.avatar}
 							alt=""
 							className="w-full h-full object-cover"
 						/>
@@ -253,7 +253,21 @@ export default function Admin() {
 	const { user } = useAuth();
 	const { t } = useLanguage();
 	const navigate = useNavigate();
-	const [tab, setTab] = useState("poses");
+	const [searchParams, setSearchParams] = useSearchParams();
+	const VALID_TABS = ["poses", "sequences", "breathing", "dashboard", "users", "content"];
+	const initialTab = VALID_TABS.includes(searchParams.get("tab"))
+		? searchParams.get("tab")
+		: "poses";
+	const [tab, setTab] = useState(initialTab);
+
+	useEffect(() => {
+		const current = searchParams.get("tab");
+		if (current !== tab) {
+			const next = new URLSearchParams(searchParams);
+			next.set("tab", tab);
+			setSearchParams(next, { replace: true });
+		}
+	}, [tab, searchParams, setSearchParams]);
 
 	const [stats, setStats] = useState(null);
 	const [statsLoading, setStatsLoading] = useState(true);
