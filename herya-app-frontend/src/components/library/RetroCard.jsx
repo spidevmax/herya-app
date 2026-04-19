@@ -9,28 +9,47 @@ import {
 	colorMix,
 	translateWithFallback,
 	localized,
+	DIFF_COLORS,
 } from "@/utils/libraryHelpers";
 import { useLanguage } from "@/context/LanguageContext";
 
 const StatBox = ({ value, label, bg, color }) => (
 	<div
-		className="flex min-w-[44px] flex-col items-center justify-center rounded-xl px-2 py-1.5"
+		className="flex h-full min-w-0 flex-col items-center justify-center rounded-xl px-2 py-1.5"
 		style={{ backgroundColor: bg }}
+		title={typeof value === "string" ? value : undefined}
 	>
 		<span
-			className="font-display text-sm font-bold leading-none"
+			className="block w-full truncate text-center font-display text-sm font-bold leading-none"
 			style={{ color }}
 		>
 			{value}
 		</span>
 		<span
-			className="mt-0.5 text-[9px] font-black uppercase tracking-[0.12em]"
+			className="mt-0.5 block w-full truncate text-center text-[9px] font-black uppercase tracking-[0.12em]"
 			style={{ color }}
 		>
 			{label}
 		</span>
 	</div>
 );
+
+const DifficultyBadge = ({ difficulty, label }) => {
+	const tone = DIFF_COLORS[difficulty] || "var(--color-text-muted)";
+	return (
+		<span
+			className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.1em]"
+			style={{
+				backgroundColor: colorMix(tone, 18),
+				color: tone,
+				border: `1px solid ${colorMix(tone, 40)}`,
+			}}
+			aria-hidden="true"
+		>
+			{label}
+		</span>
+	);
+};
 
 const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 	const { t, lang } = useLanguage();
@@ -72,7 +91,6 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 			{ value: tr(`library.level_${item.level}`, item.level ?? "—"), label: tr("library.stat_level", "LEVEL") },
 			{ value: translateFamily(item.family), label: tr("library.stat_family", "FAMILY") },
 			{ value: getSequencePoseCount(item) ?? "—", label: tr("library.stat_poses", "POSES") },
-			{ value: translateDifficulty(item.difficulty), label: tr("library.stat_difficulty", "DIFF") },
 		];
 		const duration = formatDuration(item.duration ?? item.estimatedDuration);
 		if (duration) base.push({ value: duration, label: tr("library.stat_duration", "TIME") });
@@ -84,10 +102,6 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 			? buildSequenceStats()
 			: type === "poses"
 				? [
-						{
-							value: translateDifficulty(item.difficulty),
-							label: tr("library.stat_level", "LEVEL"),
-						},
 						{
 							value: translateCategory(item.poseType ?? item.category),
 							label: tr("library.stat_type", "TYPE"),
@@ -110,28 +124,40 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 							value: formatRatio(item.patternRatio),
 							label: tr("library.stat_ratio", "RATIO"),
 						},
-						{
-							value: translateDifficulty(item.difficulty),
-							label: tr("library.stat_difficulty", "DIFF"),
-						},
 					];
+
+	const difficultyLabel = item.difficulty
+		? translateDifficulty(item.difficulty)
+		: null;
+
+	const ariaLabel = [
+		typeLabel,
+		title,
+		difficultyLabel ? `${tr("library.stat_difficulty", "Difficulty")}: ${difficultyLabel}` : null,
+	]
+		.filter(Boolean)
+		.join(" — ");
 
 	return (
 		<motion.button
 			type="button"
 			onClick={onClick}
+			aria-label={ariaLabel}
 			whileHover={{ y: -3, scale: 1.01 }}
 			whileTap={{ scale: 0.985 }}
-			className="relative w-full overflow-hidden rounded-[28px] text-left transition-shadow duration-200"
-			style={{ boxShadow: "0 14px 0 rgba(0,0,0,0.08)" }}
+			className="group relative flex h-full w-full overflow-hidden rounded-[28px] text-left cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+			style={{
+				boxShadow: "0 14px 0 rgba(0,0,0,0.08)",
+				"--tw-ring-color": borderColor,
+			}}
 		>
 			<div
-				className="overflow-hidden rounded-[28px] border-4"
+				className="flex flex-1 flex-col overflow-hidden rounded-[28px] border-4 transition-shadow duration-200 group-hover:shadow-[0_16px_24px_rgba(0,0,0,0.12)]"
 				style={{ backgroundColor: palette.bg, borderColor }}
 			>
-				<div className="flex items-stretch">
+				<div className="flex flex-1 items-stretch">
 					<figure
-						className="flex shrink-0 items-center justify-center m-0"
+						className="flex shrink-0 items-center justify-center m-0 overflow-hidden"
 						style={{
 							width: 88,
 							minHeight: 88,
@@ -142,8 +168,10 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						{imageSrc ? (
 							<img
 								src={imageSrc}
-								alt={title}
-								className="h-full w-full object-cover"
+								alt=""
+								loading="lazy"
+								decoding="async"
+								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
 							/>
 						) : (
 							<div
@@ -160,13 +188,21 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 
 					<div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5 px-3 py-2.5">
 						<header className="flex items-start justify-between gap-2">
-							<div className="min-w-0">
-								<span
-									className="text-[10px] font-black uppercase tracking-[0.12em]"
-									style={{ color: borderColor }}
-								>
-									{typeLabel}
-								</span>
+							<div className="min-w-0 flex-1">
+								<div className="flex items-center justify-between gap-2 mb-0.5">
+									<span
+										className="truncate text-[10px] font-black uppercase tracking-[0.12em]"
+										style={{ color: borderColor }}
+									>
+										{typeLabel}
+									</span>
+									{difficultyLabel ? (
+										<DifficultyBadge
+											difficulty={item.difficulty}
+											label={difficultyLabel}
+										/>
+									) : null}
+								</div>
 								<h3
 									className="truncate text-base font-black leading-tight"
 									style={{ color: borderColor }}
@@ -195,15 +231,15 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 				</div>
 
 				<footer
-					className="flex items-center justify-between gap-2 px-3 py-2"
+					className="mt-auto flex items-center justify-between gap-2 px-3 py-2"
 					style={{
 						borderTop: `3px solid ${borderColor}`,
 						backgroundColor: colorMix(borderColor, 7),
 					}}
 				>
-					<ul className="flex flex-wrap gap-1.5 list-none m-0 p-0">
+					<ul className="flex flex-nowrap items-stretch gap-1.5 list-none m-0 p-0 overflow-hidden w-full">
 						{stats.map((stat) => (
-							<li key={stat.label}>
+							<li key={stat.label} className="min-w-0 flex-1">
 								<StatBox
 									value={stat.value}
 									label={stat.label}

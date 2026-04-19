@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
 	deleteMyAccount,
+	deleteProfileImage,
 	updateProfile,
 	updateProfileImage,
 } from "@/api/users.api";
@@ -75,6 +76,8 @@ export default function Profile() {
 	const [fieldErrors, setFieldErrors] = useState({});
 	const [deletingAccount, setDeletingAccount] = useState(false);
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+	const [removePhotoModalOpen, setRemovePhotoModalOpen] = useState(false);
+	const [removingPhoto, setRemovingPhoto] = useState(false);
 	const [draft, setDraft] = useState(() => createInitialDraft(user));
 	const [baseDraft, setBaseDraft] = useState(() => createInitialDraft(user));
 	const fileInputRef = useRef(null);
@@ -219,6 +222,23 @@ export default function Profile() {
 		}
 	};
 
+	const handleRemovePhoto = async () => {
+		setPhotoError("");
+		setRemovingPhoto(true);
+		try {
+			const response = await deleteProfileImage();
+			const updatedUser = response?.data?.data || response?.data;
+			if (updatedUser) updateUser(updatedUser);
+			setRemovePhotoModalOpen(false);
+		} catch {
+			setPhotoError(t("profile.remove_photo_error"));
+			setTimeout(() => setPhotoError(""), 3000);
+			setRemovePhotoModalOpen(false);
+		} finally {
+			setRemovingPhoto(false);
+		}
+	};
+
 	const handleDeleteAccount = async () => {
 		setDeletingAccount(true);
 		try {
@@ -260,7 +280,8 @@ export default function Profile() {
 				user={user}
 				displayPronouns={displayPronouns}
 				uploadingPhoto={uploadingPhoto}
-				onAvatarClick={() => fileInputRef.current?.click()}
+				onUploadClick={() => fileInputRef.current?.click()}
+				onRemoveClick={() => setRemovePhotoModalOpen(true)}
 			/>
 
 			{/* Main grid */}
@@ -308,6 +329,18 @@ export default function Profile() {
 				danger
 				loading={deletingAccount}
 				confirmPhrase={t("profile.delete_confirm_phrase")}
+			/>
+
+			<ConfirmModal
+				open={removePhotoModalOpen}
+				onClose={() => (removingPhoto ? null : setRemovePhotoModalOpen(false))}
+				onConfirm={handleRemovePhoto}
+				title={t("profile.remove_photo_modal_title")}
+				description={t("profile.remove_photo_modal_description")}
+				confirmLabel={t("profile.remove_photo_confirm")}
+				cancelLabel={t("ui.cancel")}
+				danger
+				loading={removingPhoto}
 			/>
 		</main>
 	);

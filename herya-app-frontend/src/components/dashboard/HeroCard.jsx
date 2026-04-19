@@ -33,7 +33,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 				</p>
 				<Button
 					variant="ghost"
-					className="text-white border border-white/40 hover:bg-white/20"
+					className="text-white border border-white/40 hover:bg-white/20 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
 					onClick={() => navigate("/library")}
 				>
 					{t("hero.explore")} <ArrowRight size={16} aria-hidden="true" />
@@ -128,7 +128,8 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					<motion.button
 						type="button"
 						whileTap={{ scale: 0.97 }}
-						className="inline-flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg"
+						whileHover={{ y: -1 }}
+						className="inline-flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg cursor-pointer transition-shadow hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
 						style={{ color: "var(--color-text-primary)" }}
 						onClick={startPractice}
 					>
@@ -136,7 +137,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					</motion.button>
 					<button
 						type="button"
-						className="inline-flex items-center gap-1 text-xs font-semibold text-white/90 hover:text-white underline underline-offset-2 px-2 py-1"
+						className="inline-flex items-center gap-1 text-xs font-semibold text-white/90 hover:text-white underline underline-offset-2 px-2 py-1 rounded-md cursor-pointer transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
 						onClick={() => navigate(`/library/sequence/${sequence._id}`)}
 						aria-label={`${t("hero.view_details", "View details")}: ${sequenceName}`}
 					>

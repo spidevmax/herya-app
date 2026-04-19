@@ -126,7 +126,7 @@ export const ChipButton = ({
 }) => (
 	<button
 		type="button"
-		className={`chip ${active ? "chip-active" : "chip-inactive"} border border-[var(--color-border-soft)] ${className}`}
+		className={`chip cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 ${active ? "chip-active" : "chip-inactive"} border border-[var(--color-border-soft)] ${className}`}
 		{...props}
 	>
 		{children}
@@ -169,7 +169,7 @@ export const Button = ({
 		<button
 			type={props.type || "button"}
 			disabled={disabled || loading}
-			className={`inline-flex items-center justify-center gap-2 ${weightClass} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+			className={`inline-flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${weightClass} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
 			{...props}
 		>
 			{loading ? <LoadingSpinner size={16} /> : children}

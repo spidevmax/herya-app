@@ -641,7 +641,7 @@ const Library = () => {
 											</header>
 											<ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 list-none m-0 p-0">
 												{group.items.map((item) => (
-													<li key={getItemId(item)}>
+													<li key={getItemId(item)} className="h-full">
 														<RetroCard
 															item={item}
 															type={getCardType(item, tab)}
@@ -663,7 +663,7 @@ const Library = () => {
 							) : (
 								<ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 list-none m-0 p-0">
 									{prioritizedItems.map((item) => (
-										<li key={getItemId(item)}>
+										<li key={getItemId(item)} className="h-full">
 											<RetroCard
 												item={item}
 												type={getCardType(item, tab)}

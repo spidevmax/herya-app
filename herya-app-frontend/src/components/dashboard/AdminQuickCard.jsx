@@ -50,11 +50,12 @@ const QuickAction = ({ icon, label, onClick, tone }) => {
 	<button
 		type="button"
 		onClick={onClick}
-		className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold transition hover:opacity-90"
+		className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
 		style={{
 			backgroundColor: `color-mix(in srgb, ${tone} 10%, transparent)`,
 			color: tone,
 			border: `1px solid color-mix(in srgb, ${tone} 28%, transparent)`,
+			"--tw-ring-color": tone,
 		}}
 	>
 		<Plus size={14} aria-hidden="true" />
@@ -192,7 +193,7 @@ export default function AdminQuickCard() {
 			<button
 				type="button"
 				onClick={() => navigate("/admin")}
-				className="inline-flex items-center gap-1.5 text-xs font-semibold"
+				className="inline-flex items-center gap-1.5 text-xs font-semibold cursor-pointer rounded-md px-1 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
 				style={{ color: "var(--color-primary)" }}
 			>
 				{t("dashboard.admin_open_panel", "Open admin panel")}
