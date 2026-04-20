@@ -40,16 +40,33 @@ const { deleteImgCloudinary } = require("../../utils/deleteImage");
  */
 const createSession = async (req, res, next) => {
 	try {
-		const { sessionType, vkSequence, completePractice, duration, plannedBlocks } = req.body;
-		const isBlockBased = Array.isArray(plannedBlocks) && plannedBlocks.length > 0;
+		const {
+			sessionType,
+			vkSequence,
+			completePractice,
+			duration,
+			plannedBlocks,
+		} = req.body;
+		const isBlockBased =
+			Array.isArray(plannedBlocks) && plannedBlocks.length > 0;
 
 		// Validate required fields based on sessionType (skip for block-based sessions)
 		if (!isBlockBased && sessionType === "vk_sequence" && !vkSequence) {
-			throw createError(400, "vkSequence is required for vk_sequence session type");
+			throw createError(
+				400,
+				"vkSequence is required for vk_sequence session type",
+			);
 		}
 
-		if (!isBlockBased && sessionType === "complete_practice" && !completePractice) {
-			throw createError(400, "completePractice is required for complete_practice session type");
+		if (
+			!isBlockBased &&
+			sessionType === "complete_practice" &&
+			!completePractice
+		) {
+			throw createError(
+				400,
+				"completePractice is required for complete_practice session type",
+			);
 		}
 
 		if (!duration) {
@@ -84,7 +101,13 @@ const createSession = async (req, res, next) => {
 		await savedSession.populate("completePractice.cooldown");
 		await savedSession.populate("completePractice.pranayama");
 
-		return sendResponse(res, 201, true, "Session created successfully", savedSession);
+		return sendResponse(
+			res,
+			201,
+			true,
+			"Session created successfully",
+			savedSession,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -119,7 +142,14 @@ const createSession = async (req, res, next) => {
  */
 const getSessions = async (req, res, next) => {
 	try {
-		const { page = 1, limit = 20, sessionType, completed, startDate, endDate } = req.query;
+		const {
+			page = 1,
+			limit = 20,
+			sessionType,
+			completed,
+			startDate,
+			endDate,
+		} = req.query;
 
 		// Build filter
 		const filter = { user: req.user._id };
@@ -206,7 +236,13 @@ const getSessionById = async (req, res, next) => {
 			throw createError(403, "You don't have access to this session");
 		}
 
-		return sendResponse(res, 200, true, "Session retrieved successfully", session);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Session retrieved successfully",
+			session,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -260,7 +296,13 @@ const updateSession = async (req, res, next) => {
 		const wasAlreadyCompleted = session.completed;
 
 		// Update allowed fields
-		const allowedUpdates = ["completed", "duration", "actualPractice", "vkFeedback", "notes"];
+		const allowedUpdates = [
+			"completed",
+			"duration",
+			"actualPractice",
+			"vkFeedback",
+			"notes",
+		];
 
 		allowedUpdates.forEach((field) => {
 			if (req.body[field] !== undefined) {
@@ -281,7 +323,13 @@ const updateSession = async (req, res, next) => {
 		await updatedSession.populate("completePractice.cooldown");
 		await updatedSession.populate("completePractice.pranayama");
 
-		return sendResponse(res, 200, true, "Session updated successfully", updatedSession);
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Session updated successfully",
+			updatedSession,
+		);
 	} catch (error) {
 		return next(error);
 	}
@@ -335,7 +383,8 @@ const deleteSession = async (req, res, next) => {
 			}
 			for (const voiceNote of journal.voiceNotes) {
 				try {
-					if (voiceNote.cloudinaryId) await deleteImgCloudinary(voiceNote.cloudinaryId);
+					if (voiceNote.cloudinaryId)
+						await deleteImgCloudinary(voiceNote.cloudinaryId);
 				} catch (_) {}
 			}
 			await JournalEntry.findByIdAndDelete(journal._id);
@@ -432,7 +481,9 @@ const getSessionStats = async (req, res, next) => {
 		// Calculate average duration
 		const totalMinutes = recentSessions.reduce((sum, s) => sum + s.duration, 0);
 		const avgDuration =
-			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
+			recentSessions.length > 0
+				? Math.round(totalMinutes / recentSessions.length)
+				: 0;
 
 		// Tutor support insights from the last 4 weeks.
 		const tutorSessions = await Session.find({
@@ -460,7 +511,10 @@ const getSessionStats = async (req, res, next) => {
 				: [];
 
 		const journalSignalBySession = new Map(
-			tutorJournals.map((journal) => [String(journal.session), journal.signalAfter]),
+			tutorJournals.map((journal) => [
+				String(journal.session),
+				journal.signalAfter,
+			]),
 		);
 
 		const signalRank = {
@@ -485,7 +539,8 @@ const getSessionStats = async (req, res, next) => {
 			};
 
 			sessionsSlice.forEach((session) => {
-				const safePauseCount = Math.max(0, Number(session?.tutorSupport?.safePauseCount) || 0) || 0;
+				const safePauseCount =
+					Math.max(0, Number(session?.tutorSupport?.safePauseCount) || 0) || 0;
 				const anchorAvailable = Boolean(session?.tutorSupport?.anchorAvailable);
 				const anchorUsed = Boolean(session?.tutorSupport?.anchorUsed);
 
@@ -511,12 +566,18 @@ const getSessionStats = async (req, res, next) => {
 
 			insights.anchorUseRate =
 				insights.anchorAvailableSessions > 0
-					? Math.round((insights.anchorUsedSessions / insights.anchorAvailableSessions) * 100)
+					? Math.round(
+							(insights.anchorUsedSessions / insights.anchorAvailableSessions) *
+								100,
+						)
 					: 0;
 
 			insights.signalImprovementRate =
 				insights.signalTransitionsCount > 0
-					? Math.round((insights.signalImprovedCount / insights.signalTransitionsCount) * 100)
+					? Math.round(
+							(insights.signalImprovedCount / insights.signalTransitionsCount) *
+								100,
+						)
 					: 0;
 
 			return insights;
@@ -546,11 +607,17 @@ const getSessionStats = async (req, res, next) => {
 			currentWeek: currentWeekInsights,
 			previousWeek: previousWeekInsights,
 			delta: {
-				sessionCount: currentWeekInsights.sessionCount - previousWeekInsights.sessionCount,
-				totalSafePauses: currentWeekInsights.totalSafePauses - previousWeekInsights.totalSafePauses,
-				anchorUseRate: currentWeekInsights.anchorUseRate - previousWeekInsights.anchorUseRate,
+				sessionCount:
+					currentWeekInsights.sessionCount - previousWeekInsights.sessionCount,
+				totalSafePauses:
+					currentWeekInsights.totalSafePauses -
+					previousWeekInsights.totalSafePauses,
+				anchorUseRate:
+					currentWeekInsights.anchorUseRate -
+					previousWeekInsights.anchorUseRate,
 				signalImprovementRate:
-					currentWeekInsights.signalImprovementRate - previousWeekInsights.signalImprovementRate,
+					currentWeekInsights.signalImprovementRate -
+					previousWeekInsights.signalImprovementRate,
 			},
 		};
 
@@ -567,7 +634,10 @@ const getSessionStats = async (req, res, next) => {
 				};
 			}
 
-			if ((insights.anchorAvailableSessions || 0) > 0 && (insights.anchorUseRate || 0) < 50) {
+			if (
+				(insights.anchorAvailableSessions || 0) > 0 &&
+				(insights.anchorUseRate || 0) < 50
+			) {
 				return {
 					key: "increase_anchor_prompts",
 					severity: "warning",
@@ -619,7 +689,9 @@ const getSessionStats = async (req, res, next) => {
 			.select("_id checkIn recommendationContext")
 			.lean();
 
-		const appliedSessionIds = recommendationAppliedSessions.map((session) => session._id);
+		const appliedSessionIds = recommendationAppliedSessions.map(
+			(session) => session._id,
+		);
 		const appliedSessionJournals =
 			appliedSessionIds.length > 0
 				? await JournalEntry.find({
@@ -631,7 +703,10 @@ const getSessionStats = async (req, res, next) => {
 				: [];
 
 		const appliedSignalBySession = new Map(
-			appliedSessionJournals.map((journal) => [String(journal.session), journal.signalAfter]),
+			appliedSessionJournals.map((journal) => [
+				String(journal.session),
+				journal.signalAfter,
+			]),
 		);
 
 		const recommendationOutcome = {
@@ -664,7 +739,9 @@ const getSessionStats = async (req, res, next) => {
 		recommendationOutcome.improvedRate =
 			recommendationOutcome.withSignalOutcome > 0
 				? Math.round(
-						(recommendationOutcome.improvedCount / recommendationOutcome.withSignalOutcome) * 100,
+						(recommendationOutcome.improvedCount /
+							recommendationOutcome.withSignalOutcome) *
+							100,
 					)
 				: 0;
 
@@ -711,17 +788,25 @@ async function updateUserStats(userId, session) {
 	const MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
 	const toUtcDay = (value) => {
 		const date = new Date(value);
-		return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+		return Date.UTC(
+			date.getUTCFullYear(),
+			date.getUTCMonth(),
+			date.getUTCDate(),
+		);
 	};
 
 	const sessionDay = toUtcDay(session.date);
-	const lastPracticeDay = user.lastPracticeDate ? toUtcDay(user.lastPracticeDate) : null;
+	const lastPracticeDay = user.lastPracticeDate
+		? toUtcDay(user.lastPracticeDate)
+		: null;
 
 	// Calculate streak using practice dates (not server-local "today").
 	if (!lastPracticeDay) {
 		user.currentStreak = 1;
 	} else {
-		const daysDiff = Math.floor((sessionDay - lastPracticeDay) / MILLIS_PER_DAY);
+		const daysDiff = Math.floor(
+			(sessionDay - lastPracticeDay) / MILLIS_PER_DAY,
+		);
 
 		if (daysDiff === 1) {
 			user.currentStreak += 1;
@@ -731,7 +816,15 @@ async function updateUserStats(userId, session) {
 		// daysDiff <= 0: same day or backdated session, keep streak unchanged.
 	}
 
-	if (!user.lastPracticeDate || new Date(session.date) > new Date(user.lastPracticeDate)) {
+	// Update bestStreak if currentStreak exceeds previous best
+	if (user.currentStreak > user.bestStreak) {
+		user.bestStreak = user.currentStreak;
+	}
+
+	if (
+		!user.lastPracticeDate ||
+		new Date(session.date) > new Date(user.lastPracticeDate)
+	) {
 		user.lastPracticeDate = session.date;
 	}
 
@@ -782,7 +875,8 @@ const pauseSession = async (req, res, next) => {
 		if (!session) throw createError(404, "Session not found");
 		if (session.user.toString() !== req.user._id.toString())
 			throw createError(403, "Access denied");
-		if (session.status !== "active") throw createError(400, "Only active sessions can be paused");
+		if (session.status !== "active")
+			throw createError(400, "Only active sessions can be paused");
 
 		session.status = "paused";
 		session.timerData.pausedAt = new Date();
@@ -804,7 +898,10 @@ const advanceBlock = async (req, res, next) => {
 		if (session.user.toString() !== req.user._id.toString())
 			throw createError(403, "Access denied");
 		if (session.status !== "active" && session.status !== "paused")
-			throw createError(400, "Blocks can only be advanced on active or paused sessions");
+			throw createError(
+				400,
+				"Blocks can only be advanced on active or paused sessions",
+			);
 
 		const { direction = "next" } = req.body;
 		const currentIdx = session.timerData.currentBlockIndex || 0;
@@ -853,7 +950,8 @@ const completeGuidedSession = async (req, res, next) => {
 		const elapsedMs = now - startedAt - totalPausedMs;
 		const actualMinutes = Math.max(1, Math.round(elapsedMs / 60000));
 
-		const blocksCompleted = req.body?.blocksCompleted ?? session.plannedBlocks.length;
+		const blocksCompleted =
+			req.body?.blocksCompleted ?? session.plannedBlocks.length;
 		const completionRate =
 			session.plannedBlocks.length > 0
 				? Math.round((blocksCompleted / session.plannedBlocks.length) * 100)
@@ -865,7 +963,10 @@ const completeGuidedSession = async (req, res, next) => {
 		session.completionRate = completionRate;
 		if (req.body?.tutorSupport) {
 			session.tutorSupport = {
-				safePauseCount: Math.max(0, Number(req.body?.tutorSupport?.safePauseCount) || 0),
+				safePauseCount: Math.max(
+					0,
+					Number(req.body?.tutorSupport?.safePauseCount) || 0,
+				),
 				anchorAvailable: Boolean(req.body?.tutorSupport?.anchorAvailable),
 				anchorUsed: Boolean(req.body?.tutorSupport?.anchorUsed),
 			};
@@ -916,7 +1017,10 @@ const abandonSession = async (req, res, next) => {
 
 		if (req.body?.tutorSupport) {
 			session.tutorSupport = {
-				safePauseCount: Math.max(0, Number(req.body?.tutorSupport?.safePauseCount) || 0),
+				safePauseCount: Math.max(
+					0,
+					Number(req.body?.tutorSupport?.safePauseCount) || 0,
+				),
 				anchorAvailable: Boolean(req.body?.tutorSupport?.anchorAvailable),
 				anchorUsed: Boolean(req.body?.tutorSupport?.anchorUsed),
 			};
@@ -1016,8 +1120,10 @@ const getPracticeAnalytics = async (req, res, next) => {
 		};
 
 		return sendResponse(res, 200, true, "Analytics retrieved", {
-			completionRate: stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
-			abandonmentRate: stats.total > 0 ? Math.round((stats.abandoned / stats.total) * 100) : 0,
+			completionRate:
+				stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0,
+			abandonmentRate:
+				stats.total > 0 ? Math.round((stats.abandoned / stats.total) * 100) : 0,
 			avgDuration: Math.round(stats.avgDuration || 0),
 			totalSessions: stats.total,
 			byType: byType.map((t) => ({
@@ -1061,16 +1167,22 @@ const getTutorAnalytics = async (req, res, next) => {
 		}
 
 		const sessions = await Session.find(filter)
-			.select("_id date status completed completionRate sessionType duration checkIn tutorSupport plannedBlocks childProfile")
+			.select(
+				"_id date status completed completionRate sessionType duration checkIn tutorSupport plannedBlocks childProfile",
+			)
 			.sort({ date: -1 })
 			.lean();
 
 		const sessionIds = sessions.map((s) => s._id);
-		const journals = sessionIds.length > 0
-			? await JournalEntry.find({ user: req.user._id, session: { $in: sessionIds } })
-					.select("session signalAfter stressLevel")
-					.lean()
-			: [];
+		const journals =
+			sessionIds.length > 0
+				? await JournalEntry.find({
+						user: req.user._id,
+						session: { $in: sessionIds },
+					})
+						.select("session signalAfter stressLevel")
+						.lean()
+				: [];
 
 		const journalBySession = new Map(
 			journals.map((j) => [String(j.session), j]),
@@ -1106,9 +1218,10 @@ const getTutorAnalytics = async (req, res, next) => {
 
 		// --- Completion rate ---
 		const completedSessions = sessions.filter((s) => s.completed);
-		const completionRate = sessions.length > 0
-			? Math.round((completedSessions.length / sessions.length) * 100)
-			: 0;
+		const completionRate =
+			sessions.length > 0
+				? Math.round((completedSessions.length / sessions.length) * 100)
+				: 0;
 
 		// --- Preferred techniques (block types that appear most) ---
 		const techniqueCounts = {};
@@ -1124,7 +1237,10 @@ const getTutorAnalytics = async (req, res, next) => {
 			.map(([technique, count]) => ({ technique, count }));
 
 		// --- Adaptive difficulty recommendation ---
-		const adaptiveDifficulty = computeAdaptiveDifficulty(sessions, regulationTrend);
+		const adaptiveDifficulty = computeAdaptiveDifficulty(
+			sessions,
+			regulationTrend,
+		);
 
 		sendResponse(res, 200, true, "Tutor analytics retrieved", {
 			period: { weeks, since },
@@ -1134,9 +1250,10 @@ const getTutorAnalytics = async (req, res, next) => {
 			safePauseStats: {
 				totalPauses: totalSafePauses,
 				sessionsWithPauses: safePauseSessions.length,
-				averagePerSession: sessions.length > 0
-					? Math.round((totalSafePauses / sessions.length) * 10) / 10
-					: 0,
+				averagePerSession:
+					sessions.length > 0
+						? Math.round((totalSafePauses / sessions.length) * 10) / 10
+						: 0,
 			},
 			preferredTechniques,
 			adaptiveDifficulty,
@@ -1153,17 +1270,22 @@ const getTutorAnalytics = async (req, res, next) => {
 function computeAdaptiveDifficulty(sessions, regulationTrend) {
 	const completed = sessions.filter((s) => s.completed);
 	const abandoned = sessions.filter((s) => s.status === "abandoned");
-	const completionRate = sessions.length > 0
-		? completed.length / sessions.length
-		: 1;
+	const completionRate =
+		sessions.length > 0 ? completed.length / sessions.length : 1;
 
-	const avgDuration = completed.length > 0
-		? Math.round(completed.reduce((sum, s) => sum + (s.duration || 0), 0) / completed.length)
-		: 5;
+	const avgDuration =
+		completed.length > 0
+			? Math.round(
+					completed.reduce((sum, s) => sum + (s.duration || 0), 0) /
+						completed.length,
+				)
+			: 5;
 
 	const recentRegulation = regulationTrend.slice(0, 5);
 	const improvedCount = recentRegulation.filter((r) => r.improved).length;
-	const worsenedCount = recentRegulation.filter((r) => !r.improved && !r.steady).length;
+	const worsenedCount = recentRegulation.filter(
+		(r) => !r.improved && !r.steady,
+	).length;
 
 	let suggestedDuration = avgDuration;
 	let complexity = "maintain";
@@ -1182,7 +1304,11 @@ function computeAdaptiveDifficulty(sessions, regulationTrend) {
 		reasons.push("regulation_declining");
 	}
 	// If doing well, gradually increase
-	else if (completionRate >= 0.8 && improvedCount >= 2 && sessions.length >= 4) {
+	else if (
+		completionRate >= 0.8 &&
+		improvedCount >= 2 &&
+		sessions.length >= 4
+	) {
 		suggestedDuration = Math.min(15, Math.round(avgDuration * 1.2));
 		complexity = "increase";
 		reasons.push("strong_progress");

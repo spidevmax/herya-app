@@ -68,6 +68,12 @@ export default function PhasedMeditationPlayer({
 	const intervalRef = useRef(null);
 	const bellAudioRef = useRef(null);
 	const lastBellRef = useRef(0);
+	const startTimeRef = useRef(null);
+	const offsetRef = useRef(0);
+	const onCompleteRef = useRef(onComplete);
+	useEffect(() => {
+		onCompleteRef.current = onComplete;
+	}, [onComplete]);
 
 	const bellInterval = config.bellInterval || 0;
 	const bellAtStart = config.bellAtStart !== false;
@@ -95,54 +101,49 @@ export default function PhasedMeditationPlayer({
 		}
 	}, []);
 
-	// Timer
+	// Timer — wall-clock based so it survives effect re-runs from prop changes
 	useEffect(() => {
 		if (!isRunning) {
 			clearInterval(intervalRef.current);
+			if (startTimeRef.current != null) {
+				offsetRef.current +=
+					Math.floor((Date.now() - startTimeRef.current) / 1000);
+				startTimeRef.current = null;
+			}
 			return;
 		}
 
-		// Bell at start
-		if (elapsedSec === 0 && bellAtStart) {
-			playBell(528, 1.5);
-		}
+		if (startTimeRef.current == null) startTimeRef.current = Date.now();
+		if (offsetRef.current === 0 && bellAtStart) playBell(528, 1.5);
 
-		intervalRef.current = setInterval(() => {
-			setElapsedSec((prev) => {
-				const next = prev + 1;
+		const tick = () => {
+			const current =
+				offsetRef.current +
+				Math.floor((Date.now() - startTimeRef.current) / 1000);
 
-				// Interval bells
-				if (
-					bellInterval > 0 &&
-					next - lastBellRef.current >= bellInterval * 60
-				) {
-					playBell(440, 0.8);
-					lastBellRef.current = next;
-				}
+			if (
+				bellInterval > 0 &&
+				current - lastBellRef.current >= bellInterval * 60
+			) {
+				playBell(440, 0.8);
+				lastBellRef.current = current;
+			}
 
-				// Complete
-				if (next >= totalSec) {
-					setIsRunning(false);
-					if (bellAtEnd) playBell(528, 2);
-					setTimeout(() => onComplete?.(), 1000);
-					return totalSec;
-				}
+			if (current >= totalSec) {
+				setElapsedSec(totalSec);
+				setIsRunning(false);
+				if (bellAtEnd) playBell(528, 2);
+				setTimeout(() => onCompleteRef.current?.(), 1000);
+				return;
+			}
 
-				return next;
-			});
-		}, 1000);
+			setElapsedSec(current);
+		};
 
+		tick();
+		intervalRef.current = setInterval(tick, 250);
 		return () => clearInterval(intervalRef.current);
-	}, [
-		isRunning,
-		totalSec,
-		bellInterval,
-		bellAtStart,
-		bellAtEnd,
-		playBell,
-		elapsedSec,
-		onComplete,
-	]);
+	}, [isRunning, totalSec, bellInterval, bellAtStart, bellAtEnd, playBell]);
 
 	// Current phase
 	const currentPhase = useMemo(() => {
