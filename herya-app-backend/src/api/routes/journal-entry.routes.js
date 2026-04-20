@@ -5,11 +5,16 @@ const {
 	createJournalEntry,
 	updateJournalEntry,
 	deleteJournalEntry,
-	getDigitalGarden,
 } = require("../controllers/journalEntry.controller");
-const { authenticateToken } = require("../../middlewares/authorization.middleware");
-const { handleValidationErrors } = require("../../middlewares/validation.middleware");
-const { uploadJournalMixed } = require("../../middlewares/upload/journal.upload");
+const {
+	authenticateToken,
+} = require("../../middlewares/authorization.middleware");
+const {
+	handleValidationErrors,
+} = require("../../middlewares/validation.middleware");
+const {
+	uploadJournalMixed,
+} = require("../../middlewares/upload/journal.upload");
 const {
 	journalValidations,
 	journalIdValidation,
@@ -91,7 +96,12 @@ router.use(authenticateToken());
  *       500:
  *         description: Server error
  */
-router.get("/", getJournalEntriesValidation, handleValidationErrors, getJournalEntries);
+router.get(
+	"/",
+	getJournalEntriesValidation,
+	handleValidationErrors,
+	getJournalEntries,
+);
 
 /**
  * @swagger
@@ -272,48 +282,6 @@ router.post(
 
 /**
  * @swagger
- * /api/v1/journal-entries/digital-garden:
- *   get:
- *     summary: Get Digital Garden visualization data
- *     description: Get emotional trends, mood flowers visualization, and practice progress
- *     tags:
- *       - Journal Entries
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Digital garden data with mood visualization
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 flowers:
- *                   type: array
- *                 trends:
- *                   type: object
- *                   properties:
- *                     emotional:
- *                       type: object
- *                       description: Aggregate emotional metrics (avgEnergyImprovement, avgStressReduction, mostCommonMoodBefore, mostCommonMoodAfter)
- *                     physical:
- *                       type: object
- *                       description: Body area progress keyed by area name (observations, improvements, significant, moderate, slight)
- *                 totalEntries:
- *                   type: integer
- *                 firstEntry:
- *                   type: string
- *                 latestEntry:
- *                   type: string
- *       401:
- *         description: Unauthorized - missing or invalid token
- *       500:
- *         description: Server error
- */
-router.get("/digital-garden", getDigitalGarden);
-
-/**
- * @swagger
  * /api/v1/journal-entries/{id}:
  *   get:
  *     summary: Get journal entry by ID
@@ -345,7 +313,12 @@ router.get("/digital-garden", getDigitalGarden);
  *       500:
  *         description: Server error
  */
-router.get("/:id", journalIdValidation, handleValidationErrors, getJournalEntryById);
+router.get(
+	"/:id",
+	journalIdValidation,
+	handleValidationErrors,
+	getJournalEntryById,
+);
 
 /**
  * @swagger
@@ -509,6 +482,11 @@ router.put(
  *       500:
  *         description: Server error
  */
-router.delete("/:id", journalIdValidation, handleValidationErrors, deleteJournalEntry);
+router.delete(
+	"/:id",
+	journalIdValidation,
+	handleValidationErrors,
+	deleteJournalEntry,
+);
 
 module.exports = router;

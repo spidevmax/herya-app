@@ -121,14 +121,3 @@ describe("Journal Entries — DELETE /:id", () => {
 		expect(res.status).toBe(200);
 	});
 });
-
-describe("Journal Entries — GET /digital-garden", () => {
-	it("returns the digital garden for the authenticated user", async () => {
-		const { token } = await createUser({ email: "journal-garden@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/digital-garden`)
-			.set("Authorization", `Bearer ${token}`);
-		expect(res.status).toBe(200);
-		expect(res.body.success).toBe(true);
-	});
-});
