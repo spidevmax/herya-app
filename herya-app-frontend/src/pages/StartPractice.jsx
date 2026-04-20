@@ -1,5 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Leaf, RotateCcw, Settings2 } from "lucide-react";
+import {
+	CircleAlert,
+	CircleCheck,
+	CircleHelp,
+	Leaf,
+	RotateCcw,
+	Settings2,
+} from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { getBreathingPatternById } from "@/api/breathing.api";
@@ -44,6 +51,27 @@ const SIGNAL_SCORES = {
 	green: 2,
 	yellow: 1,
 	red: 0,
+};
+
+const SIGNAL_META = {
+	green: {
+		Icon: CircleCheck,
+		colorVar: "var(--color-signal-green)",
+		titleKey: "practice.signal_green",
+		hintKey: "practice.signal_green_hint",
+	},
+	yellow: {
+		Icon: CircleHelp,
+		colorVar: "var(--color-signal-yellow)",
+		titleKey: "practice.signal_yellow",
+		hintKey: "practice.signal_yellow_hint",
+	},
+	red: {
+		Icon: CircleAlert,
+		colorVar: "var(--color-signal-red)",
+		titleKey: "practice.signal_red",
+		hintKey: "practice.signal_red_hint",
+	},
 };
 
 const inferSignalFromJournal = (journal) => {
@@ -1063,6 +1091,10 @@ export default function StartPractice() {
 									practiceType === "vk_sequence" ? initialBuilderBlocks : []
 								}
 								onStartSession={handleStartSession}
+								onBlocksChange={(nextBlocks, nextTotal) => {
+									setBlocks(nextBlocks);
+									setTotalMinutes(nextTotal);
+								}}
 							/>
 						</motion.div>
 					)}
@@ -1113,12 +1145,8 @@ export default function StartPractice() {
 									>
 										{["green", "yellow", "red"].map((signal) => {
 											const selected = tutorSignal === signal;
-											const signalColor =
-												signal === "green"
-													? "var(--color-signal-green)"
-													: signal === "yellow"
-														? "var(--color-signal-yellow)"
-														: "var(--color-signal-red)";
+											const meta = SIGNAL_META[signal];
+											const { Icon, colorVar, titleKey, hintKey } = meta;
 											return (
 												<button
 													type="button"
@@ -1126,27 +1154,37 @@ export default function StartPractice() {
 													aria-checked={selected}
 													key={signal}
 													onClick={() => handleTutorSignalChange(signal)}
-													className="rounded-xl px-4 py-3 text-sm font-semibold transition-all cursor-pointer min-h-[56px] flex items-center gap-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 hover:brightness-95"
+													className="rounded-2xl px-3 py-3 transition-all cursor-pointer min-h-[96px] flex flex-col items-start gap-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 hover:brightness-95"
 													style={{
 														backgroundColor: selected
-															? signalColor
+															? colorVar
 															: "var(--color-surface)",
 														color: selected
 															? "white"
 															: "var(--color-text-secondary)",
-														border: `2px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
-														"--tw-ring-color": signalColor,
+														border: `2px solid ${selected ? colorVar : "var(--color-border-soft)"}`,
+														"--tw-ring-color": colorVar,
 													}}
 												>
+													<div className="flex items-center gap-2 w-full">
+														<Icon
+															size={18}
+															aria-hidden="true"
+															style={{ color: selected ? "white" : colorVar }}
+														/>
+														<span className="text-sm font-semibold leading-snug">
+															{t(titleKey)}
+														</span>
+													</div>
 													<span
-														aria-hidden="true"
-														className="w-3 h-3 rounded-full shrink-0"
+														className="text-xs leading-snug"
 														style={{
-															backgroundColor: selected ? "white" : signalColor,
+															color: selected
+																? "rgba(255,255,255,0.9)"
+																: "var(--color-text-muted)",
 														}}
-													/>
-													<span className="flex-1 leading-snug break-words">
-														{t(`practice.signal_${signal}`)}
+													>
+														{t(hintKey)}
 													</span>
 												</button>
 											);

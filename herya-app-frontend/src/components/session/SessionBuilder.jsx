@@ -64,6 +64,7 @@ export default function SessionBuilder({
 	practiceType,
 	initialBlocks = [],
 	onStartSession,
+	onBlocksChange,
 }) {
 	const { t } = useLanguage();
 	const [blocks, setBlocks] = useState([]);
@@ -197,6 +198,10 @@ export default function SessionBuilder({
 			),
 		[blocks, getEffectiveBlockDurationMinutes],
 	);
+
+	useEffect(() => {
+		onBlocksChange?.(blocks, totalMinutes);
+	}, [blocks, totalMinutes, onBlocksChange]);
 
 	const addBlock = (blockType) => {
 		const newBlock = {

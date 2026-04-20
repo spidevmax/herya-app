@@ -191,6 +191,17 @@ export const Button = ({
 	);
 };
 
+// ── InlineLink ────────────────────────────────────────────────────────────────
+export const InlineLink = ({ children, className = "", ...props }) => (
+	<button
+		type="button"
+		className={`inline text-xs font-medium underline underline-offset-2 cursor-pointer text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 rounded-sm ${className}`}
+		{...props}
+	>
+		{children}
+	</button>
+);
+
 // ── StatCard ──────────────────────────────────────────────────────────────────
 export const StatCard = ({
 	icon,

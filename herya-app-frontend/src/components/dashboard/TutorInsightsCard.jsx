@@ -1,6 +1,16 @@
-import { ShieldCheck, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import {
+	ChevronDown,
+	ChevronUp,
+	Minus,
+	ShieldCheck,
+	TrendingDown,
+	TrendingUp,
+} from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
+
+const LOW_DATA_THRESHOLD = 4;
 
 const getTrendTone = (value) => {
 	if (value >= 70) return "var(--color-success)";
@@ -87,7 +97,10 @@ export default function TutorInsightsCard({ tutorInsights }) {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const data = tutorInsights || {};
-	const hasData = (data.sessionCount || 0) > 0;
+	const sessionCount = data.sessionCount || 0;
+	const hasData = sessionCount > 0;
+	const isLowData = sessionCount < LOW_DATA_THRESHOLD;
+	const [showDetails, setShowDetails] = useState(false);
 
 	if (!hasData) {
 		return (
@@ -204,20 +217,24 @@ export default function TutorInsightsCard({ tutorInsights }) {
 				<dl className="grid grid-cols-2 gap-2 m-0">
 					<TutorStat
 						label={t("dashboard.tutor_insights_sessions")}
-						value={data.sessionCount || 0}
-					/>
-					<TutorStat
-						label={t("dashboard.tutor_insights_pauses")}
-						value={data.totalSafePauses || 0}
-					/>
-					<TutorStat
-						label={t("dashboard.tutor_insights_anchor_use")}
-						value={formatPercent(anchorUseRate)}
+						value={sessionCount}
 					/>
 					<TutorStat
 						label={t("dashboard.tutor_insights_signal_improved")}
 						value={formatPercent(signalImprovementRate)}
 					/>
+					{!isLowData && (
+						<>
+							<TutorStat
+								label={t("dashboard.tutor_insights_pauses")}
+								value={data.totalSafePauses || 0}
+							/>
+							<TutorStat
+								label={t("dashboard.tutor_insights_anchor_use")}
+								value={formatPercent(anchorUseRate)}
+							/>
+						</>
+					)}
 				</dl>
 
 				<div className="flex items-center justify-between text-xs">
@@ -239,6 +256,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 			</section>
 
 			{/* ── Tendencia semanal ─────────────────────────────────────────── */}
+			{showDetails && !isLowData && (
 			<section
 				aria-labelledby="tutor-weekly-heading"
 				className="rounded-2xl p-3"
@@ -282,6 +300,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					/>
 				</ul>
 			</section>
+			)}
 
 			{/* ── Recomendación ─────────────────────────────────────────────── */}
 			<section
@@ -349,6 +368,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 			</section>
 
 			{/* ── Outcome ──────────────────────────────────────────────────── */}
+			{showDetails && !isLowData && (
 			<section
 				aria-labelledby="tutor-outcome-heading"
 				className="rounded-2xl p-3"
@@ -396,6 +416,27 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					</p>
 				)}
 			</section>
+			)}
+
+			{/* ── Toggle de detalles ───────────────────────────────────────── */}
+			{!isLowData && (
+				<button
+					type="button"
+					onClick={() => setShowDetails((v) => !v)}
+					aria-expanded={showDetails}
+					className="self-start inline-flex items-center gap-1 text-xs font-semibold cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+					style={{ color: "var(--color-text-secondary)" }}
+				>
+					{showDetails
+						? t("dashboard.tutor_insights_hide_details")
+						: t("dashboard.tutor_insights_show_details")}
+					{showDetails ? (
+						<ChevronUp size={14} aria-hidden="true" />
+					) : (
+						<ChevronDown size={14} aria-hidden="true" />
+					)}
+				</button>
+			)}
 		</section>
 	);
 }

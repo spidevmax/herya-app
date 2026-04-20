@@ -197,6 +197,8 @@ export const translations = {
 				"Tutor plan: {tutor} · Adult plan: {adult}",
 			tutor_insights_outcome_empty:
 				"No completed outcomes yet from applied suggestions.",
+			tutor_insights_show_details: "Show details",
+			tutor_insights_hide_details: "Hide details",
 			streak: "Streak",
 			hours: "Hours",
 			sessions: "Sessions",
@@ -1036,6 +1038,9 @@ export const translations = {
 			signal_green: "Green - calm and ready",
 			signal_yellow: "Yellow - unsure, need support",
 			signal_red: "Red - too much right now",
+			signal_green_hint: "Relaxed body, ready to practice.",
+			signal_yellow_hint: "A bit unsure — start gently.",
+			signal_red_hint: "Feels like too much — keep it very short.",
 			checkin_energy: "Energy: {n}/10",
 			checkin_stress: "Stress: {n}/10",
 			checkin_intention: "One intention (optional)",
@@ -1160,6 +1165,9 @@ export const translations = {
 			delete_template: "Delete template",
 			template_name_placeholder: "Name this session setup…",
 			template_used: "Used {n} time(s)",
+			template_name_required: "Please enter a name for the template.",
+			template_blocks_required: "Add at least one block before saving.",
+			template_save_error: "Couldn't save the template. Please try again.",
 
 			// Visual schedule (B1)
 			visual_schedule_label: "Session schedule",
@@ -1508,6 +1516,8 @@ export const translations = {
 				"Plan tutor: {tutor} · Plan adulto: {adult}",
 			tutor_insights_outcome_empty:
 				"Aún no hay resultados completados de sugerencias aplicadas.",
+			tutor_insights_show_details: "Ver detalles",
+			tutor_insights_hide_details: "Ocultar detalles",
 			streak: "Racha",
 			hours: "Horas",
 			sessions: "Sesiones",
@@ -2358,6 +2368,9 @@ export const translations = {
 			signal_green: "Verde - calmado y listo",
 			signal_yellow: "Amarillo - con dudas, necesito apoyo",
 			signal_red: "Rojo - es demasiado por ahora",
+			signal_green_hint: "Cuerpo relajado, listo para practicar.",
+			signal_yellow_hint: "Con algunas dudas — empieza suave.",
+			signal_red_hint: "Se siente mucho — mantén la sesión muy corta.",
 			checkin_energy: "Energía: {n}/10",
 			checkin_stress: "Estrés: {n}/10",
 			checkin_intention: "Una intención (opcional)",
@@ -2485,6 +2498,9 @@ export const translations = {
 			delete_template: "Eliminar plantilla",
 			template_name_placeholder: "Nombre para esta configuración…",
 			template_used: "Usada {n} vez/veces",
+			template_name_required: "Escribe un nombre para la plantilla.",
+			template_blocks_required: "Añade al menos un bloque antes de guardar.",
+			template_save_error: "No se pudo guardar la plantilla. Inténtalo de nuevo.",
 
 			// Horario visual (B1)
 			visual_schedule_label: "Horario de sesión",

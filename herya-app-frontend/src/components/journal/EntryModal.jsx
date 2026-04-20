@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { InlineLink } from "@/components/ui";
 import { format } from "@/utils/helpers";
 import { useLanguage } from "@/context/LanguageContext";
 import {
@@ -126,18 +127,16 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 										{created}
 									</h2>
 									{entryId ? (
-										<button
-											type="button"
+										<InlineLink
 											onClick={handleOpenEntry}
-											className="text-xs mt-1 font-medium underline underline-offset-2"
-											style={{ color: "var(--color-text-secondary)" }}
+											className="mt-1"
 										>
 											{translateWithFallback(
 												t,
 												"journal.view_entry",
 												"View full entry",
 											)}
-										</button>
+										</InlineLink>
 									) : (
 										<p
 											className="text-xs mt-1"

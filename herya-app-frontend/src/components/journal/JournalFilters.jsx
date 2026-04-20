@@ -134,8 +134,8 @@ export const JournalFilters = ({
 							</div>
 
 							{/* Mood + Type + Date selects */}
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
-								<div>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-start">
+								<div className="flex flex-col">
 									<label
 										htmlFor="journal-filter-mood"
 										className="sr-only"
@@ -147,7 +147,7 @@ export const JournalFilters = ({
 										label={t("journal.all_moods")}
 										value={selectedMood}
 										onChange={(e) => onMoodChange(e.target.value)}
-										className="[&_.select-base]:h-10 [&_.select-base]:bg-[var(--color-surface)]"
+										className="[&_.select-base]:h-10 [&_.select-base]:w-full [&_.select-base]:rounded-xl [&_.select-base]:bg-[var(--color-surface)] [&_.select-base]:px-3 [&_.select-base]:text-sm"
 									>
 										<option value="all">{t("journal.all_moods")}</option>
 										{moodOptions.map((mood) => (
@@ -158,7 +158,7 @@ export const JournalFilters = ({
 									</SelectField>
 								</div>
 
-								<div>
+								<div className="flex flex-col">
 									<label
 										htmlFor="journal-filter-type"
 										className="sr-only"
@@ -170,7 +170,7 @@ export const JournalFilters = ({
 										label={t("journal.all_types")}
 										value={selectedType}
 										onChange={(e) => onTypeChange(e.target.value)}
-										className="[&_.select-base]:h-10 [&_.select-base]:bg-[var(--color-surface)]"
+										className="[&_.select-base]:h-10 [&_.select-base]:w-full [&_.select-base]:rounded-xl [&_.select-base]:bg-[var(--color-surface)] [&_.select-base]:px-3 [&_.select-base]:text-sm"
 									>
 										<option value="all">{t("journal.all_types")}</option>
 										{typeOptions.map((type) => (
@@ -185,7 +185,7 @@ export const JournalFilters = ({
 									</SelectField>
 								</div>
 
-								<div>
+								<div className="flex flex-col">
 									<label
 										htmlFor="journal-filter-from"
 										className="sr-only"
@@ -199,14 +199,14 @@ export const JournalFilters = ({
 										onChange={(e) => onDateFromChange(e.target.value)}
 										max={dateTo || undefined}
 										aria-label={t("journal.date_from")}
-										className="select-base h-10 bg-[var(--color-surface)]"
+										className="select-base h-10 w-full rounded-xl bg-[var(--color-surface)] px-3 text-sm"
 										style={{
 											color: "var(--color-text-primary)",
 										}}
 									/>
 								</div>
 
-								<div>
+								<div className="flex flex-col">
 									<label
 										htmlFor="journal-filter-to"
 										className="sr-only"
@@ -220,7 +220,7 @@ export const JournalFilters = ({
 										onChange={(e) => onDateToChange(e.target.value)}
 										min={dateFrom || undefined}
 										aria-label={t("journal.date_to")}
-										className="select-base h-10 bg-[var(--color-surface)]"
+										className="select-base h-10 w-full rounded-xl bg-[var(--color-surface)] px-3 text-sm"
 										style={{
 											color: "var(--color-text-primary)",
 										}}

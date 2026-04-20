@@ -11,7 +11,7 @@ import SoftReminderCard from "@/components/dashboard/SoftReminderCard";
 import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
 import TutorInsightsCard from "@/components/dashboard/TutorInsightsCard";
 import AdminQuickCard from "@/components/dashboard/AdminQuickCard";
-import { SkeletonCard } from "@/components/ui";
+import { Button, SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -271,7 +271,6 @@ export default function Dashboard() {
 						<>
 							{pendingSession && (
 								<article
-									aria-label={t("dashboard.resume_practice")}
 									className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3"
 									style={{
 										backgroundColor: "var(--color-surface-card)",
@@ -299,34 +298,34 @@ export default function Dashboard() {
 											{pendingSession.duration} min
 										</p>
 									</div>
-									<button
-										type="button"
+									<Button
+										variant="primary"
+										size="sm"
+										className="shrink-0"
 										onClick={() => {
-											if (
+											const hasBlocks =
 												Array.isArray(pendingSession.plannedBlocks) &&
-												pendingSession.plannedBlocks.length > 0
-											) {
-												navigate("/start-practice", {
-													state: {
-														resumeSession: {
-															_id: pendingSession._id,
-															sessionType: pendingSession.sessionType,
-															duration: pendingSession.duration,
-															plannedBlocks: pendingSession.plannedBlocks,
-														},
-													},
-												});
-												return;
-											}
-
-											navigate("/start-practice");
+												pendingSession.plannedBlocks.length > 0;
+											navigate(
+												"/start-practice",
+												hasBlocks
+													? {
+															state: {
+																resumeSession: {
+																	_id: pendingSession._id,
+																	sessionType: pendingSession.sessionType,
+																	duration: pendingSession.duration,
+																	plannedBlocks: pendingSession.plannedBlocks,
+																},
+															},
+														}
+													: undefined,
+											);
 										}}
-										className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold text-white shrink-0"
-										style={{ backgroundColor: "var(--color-info)" }}
 									>
 										<RotateCcw size={12} aria-hidden="true" />
 										{t("practice.resume")}
-									</button>
+									</Button>
 								</article>
 							)}
 

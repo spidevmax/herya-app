@@ -38,6 +38,7 @@ export default function SessionTemplatePicker({
 	const [saving, setSaving] = useState(false);
 	const [showNameInput, setShowNameInput] = useState(false);
 	const [templateName, setTemplateName] = useState("");
+	const [saveError, setSaveError] = useState("");
 
 	useEffect(() => {
 		if (!visible) return;
@@ -55,7 +56,15 @@ export default function SessionTemplatePicker({
 	}, [visible, childProfileId]);
 
 	const handleSave = async () => {
-		if (!templateName.trim() || blocks.length === 0) return;
+		setSaveError("");
+		if (!templateName.trim()) {
+			setSaveError(t("practice.template_name_required"));
+			return;
+		}
+		if (blocks.length === 0) {
+			setSaveError(t("practice.template_blocks_required"));
+			return;
+		}
 		setSaving(true);
 		try {
 			const orderedBlocks = blocks.map((b, i) => ({
@@ -84,8 +93,10 @@ export default function SessionTemplatePicker({
 			setTemplates((prev) => [created, ...prev]);
 			setShowNameInput(false);
 			setTemplateName("");
-		} catch {
-			// silently fail
+		} catch (err) {
+			setSaveError(
+				err?.response?.data?.message ?? t("practice.template_save_error"),
+			);
 		} finally {
 			setSaving(false);
 		}
@@ -130,7 +141,10 @@ export default function SessionTemplatePicker({
 
 				<button
 					type="button"
-					onClick={() => setShowNameInput(!showNameInput)}
+					onClick={() => {
+						setShowNameInput((v) => !v);
+						setSaveError("");
+					}}
 					disabled={blocks.length === 0}
 					className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-50"
 					style={{
@@ -153,28 +167,43 @@ export default function SessionTemplatePicker({
 						exit={{ height: 0, opacity: 0 }}
 						className="overflow-hidden mb-3"
 					>
-						<div className="flex gap-2">
-							<input
-								type="text"
-								value={templateName}
-								onChange={(e) => setTemplateName(e.target.value)}
-								placeholder={t("practice.template_name_placeholder")}
-								maxLength={80}
-								className="flex-1 text-sm rounded-xl px-3 py-2 outline-none focus:ring-1"
-								style={{
-									backgroundColor: "var(--color-surface)",
-									color: "var(--color-text-primary)",
-									"--tw-ring-color": "var(--color-secondary)",
-								}}
-							/>
-							<Button
-								onClick={handleSave}
-								disabled={saving || !templateName.trim()}
-								loading={saving}
-								size="sm"
-							>
-								{t("ui.confirm")}
-							</Button>
+						<div className="flex flex-col gap-2">
+							<div className="flex gap-2">
+								<input
+									type="text"
+									value={templateName}
+									onChange={(e) => {
+										setTemplateName(e.target.value);
+										if (saveError) setSaveError("");
+									}}
+									placeholder={t("practice.template_name_placeholder")}
+									maxLength={80}
+									aria-invalid={Boolean(saveError) || undefined}
+									className="flex-1 text-sm rounded-xl px-3 py-2 outline-none focus:ring-1"
+									style={{
+										backgroundColor: "var(--color-surface)",
+										color: "var(--color-text-primary)",
+										"--tw-ring-color": "var(--color-secondary)",
+									}}
+								/>
+								<Button
+									onClick={handleSave}
+									disabled={saving || !templateName.trim()}
+									loading={saving}
+									size="sm"
+								>
+									{t("ui.confirm")}
+								</Button>
+							</div>
+							{saveError && (
+								<p
+									role="alert"
+									className="text-xs font-medium"
+									style={{ color: "var(--color-danger, #EF4444)" }}
+								>
+									{saveError}
+								</p>
+							)}
 						</div>
 					</motion.div>
 				)}
