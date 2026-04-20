@@ -1150,15 +1150,16 @@ export default function StartPractice() {
 											return (
 												<label
 													key={signal}
-													className="rounded-2xl px-3 py-3 transition-all cursor-pointer min-h-[96px] flex flex-col items-start gap-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 hover:brightness-95"
+													className={`relative rounded-2xl px-3.5 py-3.5 cursor-pointer min-h-[104px] flex flex-col items-start gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-[transform,box-shadow,background-color,border-color] duration-200 ease-out will-change-transform ${selected ? "-translate-y-0.5" : "hover:-translate-y-0.5"}`}
 													style={{
 														backgroundColor: selected
-															? colorVar
+															? `color-mix(in srgb, ${colorVar} 12%, var(--color-surface-card))`
 															: "var(--color-surface)",
-														color: selected
-															? "white"
-															: "var(--color-text-secondary)",
+														color: "var(--color-text-primary)",
 														border: `2px solid ${selected ? colorVar : "var(--color-border-soft)"}`,
+														boxShadow: selected
+															? `0 6px 16px -6px color-mix(in srgb, ${colorVar} 55%, transparent), inset 0 0 0 1px color-mix(in srgb, ${colorVar} 30%, transparent)`
+															: "var(--shadow-card)",
 														"--tw-ring-color": colorVar,
 													}}
 												>
@@ -1171,23 +1172,42 @@ export default function StartPractice() {
 														className="sr-only"
 														aria-checked={selected}
 													/>
+													<span
+														aria-hidden="true"
+														className="absolute top-3 right-3 w-2 h-2 rounded-full transition-transform duration-200"
+														style={{
+															backgroundColor: colorVar,
+															boxShadow: selected
+																? `0 0 0 4px color-mix(in srgb, ${colorVar} 22%, transparent)`
+																: "none",
+															transform: selected ? "scale(1.25)" : "scale(1)",
+														}}
+													/>
 													<div className="flex items-center gap-2 w-full">
-														<Icon
-															size={18}
+														<span
 															aria-hidden="true"
-															style={{ color: selected ? "white" : colorVar }}
-														/>
-														<span className="text-sm font-semibold leading-snug">
+															className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+															style={{
+																backgroundColor: selected
+																	? colorVar
+																	: `color-mix(in srgb, ${colorVar} 14%, transparent)`,
+															}}
+														>
+															<Icon
+																size={18}
+																style={{ color: selected ? "white" : colorVar }}
+															/>
+														</span>
+														<span
+															className="text-sm font-semibold leading-snug tracking-tight"
+															style={{ color: "var(--color-text-primary)" }}
+														>
 															{t(titleKey)}
 														</span>
 													</div>
 													<span
 														className="text-xs leading-snug"
-														style={{
-															color: selected
-																? "rgba(255,255,255,0.9)"
-																: "var(--color-text-muted)",
-														}}
+														style={{ color: "var(--color-text-muted)" }}
 													>
 														{t(hintKey)}
 													</span>
