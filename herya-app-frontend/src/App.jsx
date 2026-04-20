@@ -7,7 +7,6 @@ import {
 	PublicRoute,
 } from "@/components/routing/RouteGuards";
 import { LoadingSpinner } from "@/components/ui";
-import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 
