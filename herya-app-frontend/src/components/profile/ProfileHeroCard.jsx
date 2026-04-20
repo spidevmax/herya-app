@@ -21,6 +21,7 @@ const ProfileHeroCard = ({
 	uploadingPhoto,
 	onUploadClick,
 	onRemoveClick,
+	hideStats = false,
 }) => {
 	const { t } = useLanguage();
 	const initials = getUserInitials(user?.name);
@@ -203,47 +204,49 @@ const ProfileHeroCard = ({
 				</div>
 
 				{/* Stats grid */}
-				<div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-					{[
-						{
-							label: t("profile.current_streak"),
-							value: currentStreak,
-							unit: t("profile.days"),
-						},
-						{
-							label: t("profile.best_streak"),
-							value: bestStreak,
-							unit: t("profile.days"),
-						},
-						{
-							label: t("profile.total_hours"),
-							value: totalHours,
-							unit: "h",
-						},
-						{
-							label: t("profile.sessions"),
-							value: totalSessions,
-							unit: "",
-						},
-					].map(({ label, value, unit }) => (
-						<div
-							key={label}
-							className="rounded-2xl bg-white/14 border border-white/15 px-3 py-3 text-center"
-						>
-							<p className="text-[10px] sm:text-[11px] uppercase tracking-[0.13em] text-white/75 leading-tight">
-								{label}
-							</p>
-							<p className="text-2xl font-bold mt-1 leading-none">
-								{value}
-								{unit ? (
-									<span className="text-sm font-medium ml-0.5 opacity-80">
-										{unit}
-									</span>
-								) : null}
-							</p>
-						</div>
-					))}
-				</div>
+				{!hideStats && (
+					<div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+						{[
+							{
+								label: t("profile.current_streak"),
+								value: currentStreak,
+								unit: t("profile.days"),
+							},
+							{
+								label: t("profile.best_streak"),
+								value: bestStreak,
+								unit: t("profile.days"),
+							},
+							{
+								label: t("profile.total_hours"),
+								value: totalHours,
+								unit: "h",
+							},
+							{
+								label: t("profile.sessions"),
+								value: totalSessions,
+								unit: "",
+							},
+						].map(({ label, value, unit }) => (
+							<div
+								key={label}
+								className="rounded-2xl bg-white/14 border border-white/15 px-3 py-3 text-center"
+							>
+								<p className="text-[10px] sm:text-[11px] uppercase tracking-[0.13em] text-white/75 leading-tight">
+									{label}
+								</p>
+								<p className="text-2xl font-bold mt-1 leading-none">
+									{value}
+									{unit ? (
+										<span className="text-sm font-medium ml-0.5 opacity-80">
+											{unit}
+										</span>
+									) : null}
+								</p>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 		</motion.section>
 	);

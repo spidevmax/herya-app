@@ -254,7 +254,7 @@ export default function Admin() {
 	const { t } = useLanguage();
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const VALID_TABS = ["poses", "sequences", "breathing", "dashboard", "users", "content"];
+	const VALID_TABS = ["poses", "sequences", "breathing", "users"];
 	const initialTab = VALID_TABS.includes(searchParams.get("tab"))
 		? searchParams.get("tab")
 		: "poses";
@@ -393,9 +393,7 @@ export default function Admin() {
 					{ key: "poses", label: t("admin.tab_poses") },
 					{ key: "sequences", label: t("admin.tab_sequences") },
 					{ key: "breathing", label: t("admin.tab_breathing") },
-					{ key: "dashboard", label: t("admin.tab_dashboard") },
 					{ key: "users", label: t("admin.tab_users") },
-					{ key: "content", label: t("admin.tab_content") },
 				]}
 				active={tab}
 				onSelect={setTab}
@@ -408,10 +406,6 @@ export default function Admin() {
 				{tab === "sequences" && <SequenceManager />}
 
 				{tab === "breathing" && <BreathingPatternManager />}
-
-				{tab === "dashboard" && (
-					<AdminDashboard stats={stats} loading={statsLoading} t={t} />
-				)}
 
 				{tab === "users" && (
 					<ul className="flex flex-col gap-3 list-none m-0 p-0" aria-busy={usersLoading || undefined}>
@@ -434,33 +428,6 @@ export default function Admin() {
 					</ul>
 				)}
 
-				{tab === "content" && (
-					<div className="flex flex-col gap-4">
-						<ContentSection
-							title={t("admin.content_poses")}
-							items={poses}
-							loading={contentLoading}
-							color="var(--color-primary)"
-						/>
-						<ContentSection
-							title={t("admin.content_sequences")}
-							items={sequences}
-							loading={contentLoading}
-							color="var(--color-primary)"
-						/>
-						<ContentSection
-							title={t("admin.content_breathing")}
-							items={patterns}
-							loading={contentLoading}
-							color="var(--color-info)"
-						/>
-						<aside className="bg-[var(--color-surface-card)] rounded-2xl p-4">
-							<p className="text-xs text-[var(--color-text-muted)] text-center">
-								{t("admin.content_help")}
-							</p>
-						</aside>
-					</div>
-				)}
 			</section>
 
 			<ConfirmModal

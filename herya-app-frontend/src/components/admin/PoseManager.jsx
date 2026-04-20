@@ -483,6 +483,7 @@ export default function PoseManager() {
 	const [poses, setPoses] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
+	const [actionError, setActionError] = useState("");
 	const [search, setSearch] = useState("");
 	const [difficulty, setDifficulty] = useState("all");
 	const [showForm, setShowForm] = useState(false);
@@ -541,14 +542,18 @@ export default function PoseManager() {
 	const handleDelete = async () => {
 		if (!deleteTarget) return;
 		setDeleteLoading(true);
+		setActionError("");
 		try {
 			await deletePose(deleteTarget._id);
 			setPoses((previous) =>
 				previous.filter((pose) => pose._id !== deleteTarget._id),
 			);
 			setDeleteTarget(null);
-		} catch {
-			setError(true);
+		} catch (err) {
+			setActionError(
+				err?.response?.data?.message || t("admin.pose_manager_delete_error"),
+			);
+			setDeleteTarget(null);
 		} finally {
 			setDeleteLoading(false);
 		}
@@ -607,6 +612,13 @@ export default function PoseManager() {
 				<p role="alert" className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.pose_manager_load_error")}</span>
+				</p>
+			)}
+
+			{actionError && (
+				<p role="alert" className="flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm" style={{ backgroundColor: "var(--color-error-bg)", borderColor: "var(--color-danger)", color: "var(--color-danger)" }}>
+					<AlertTriangle size={16} aria-hidden="true" />
+					<span>{actionError}</span>
 				</p>
 			)}
 

@@ -776,6 +776,7 @@ export const translations = {
 			pose_manager_delete: "Delete pose",
 			pose_manager_empty: "No poses match the current filters.",
 			pose_manager_load_error: "Could not load poses.",
+			pose_manager_delete_error: "Couldn't delete this pose. It may be used in a sequence.",
 			pose_manager_save_error: "Could not save the pose.",
 			pose_manager_delete_title: "Delete {name}?",
 			pose_manager_delete_desc: "This pose will be permanently deleted.",
@@ -2094,6 +2095,7 @@ export const translations = {
 			pose_manager_delete: "Eliminar postura",
 			pose_manager_empty: "No hay posturas que coincidan con los filtros.",
 			pose_manager_load_error: "No se pudieron cargar las posturas.",
+			pose_manager_delete_error: "No se pudo eliminar la postura. Puede estar en uso en una secuencia.",
 			pose_manager_save_error: "No se pudo guardar la postura.",
 			pose_manager_delete_title: "¿Eliminar {name}?",
 			pose_manager_delete_desc:

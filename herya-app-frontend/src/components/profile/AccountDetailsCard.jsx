@@ -25,6 +25,7 @@ export default function AccountDetailsCard({
 	selectedGoals,
 	toggleArrayItem,
 	fieldErrors,
+	hideGoals = false,
 }) {
 	const { t } = useLanguage();
 
@@ -123,45 +124,47 @@ export default function AccountDetailsCard({
 			</div>
 
 			{/* Goals */}
-			<div>
-				<div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-3">
-					<p
-						className="text-sm font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{t("profile.goals_title")}
-					</p>
-					<span
-						className="text-xs"
-						style={{ color: "var(--color-text-muted)" }}
-					>
-						{t("profile.goals_hint")}
-					</span>
+			{!hideGoals && (
+				<div>
+					<div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-3">
+						<p
+							className="text-sm font-semibold"
+							style={{ color: "var(--color-text-primary)" }}
+						>
+							{t("profile.goals_title")}
+						</p>
+						<span
+							className="text-xs"
+							style={{ color: "var(--color-text-muted)" }}
+						>
+							{t("profile.goals_hint")}
+						</span>
+					</div>
+					<div className="flex flex-wrap gap-2" role="group" aria-label={t("profile.goals_title")}>
+						{GOAL_OPTIONS.map((goal) => {
+							const active = selectedGoals.includes(goal);
+							return (
+								<button
+									key={goal}
+									type="button"
+									onClick={() => toggleArrayItem("goals", goal)}
+									aria-pressed={active}
+									className="px-3 py-2 rounded-full text-xs font-semibold transition-colors duration-150"
+									style={{
+										backgroundColor: active
+											? "var(--color-primary)"
+											: "var(--color-surface)",
+										color: active ? "white" : "var(--color-text-secondary)",
+										border: "1px solid var(--color-border)",
+									}}
+								>
+									{getOptionLabel("goals", goal)}
+								</button>
+							);
+						})}
+					</div>
 				</div>
-				<div className="flex flex-wrap gap-2" role="group" aria-label={t("profile.goals_title")}>
-					{GOAL_OPTIONS.map((goal) => {
-						const active = selectedGoals.includes(goal);
-						return (
-							<button
-								key={goal}
-								type="button"
-								onClick={() => toggleArrayItem("goals", goal)}
-								aria-pressed={active}
-								className="px-3 py-2 rounded-full text-xs font-semibold transition-colors duration-150"
-								style={{
-									backgroundColor: active
-										? "var(--color-primary)"
-										: "var(--color-surface)",
-									color: active ? "white" : "var(--color-text-secondary)",
-									border: "1px solid var(--color-border)",
-								}}
-							>
-								{getOptionLabel("goals", goal)}
-							</button>
-						);
-					})}
-				</div>
-			</div>
+			)}
 		</section>
 	);
 }

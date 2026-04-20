@@ -68,6 +68,7 @@ export default function Profile() {
 	const { user, logout, updateUser } = useAuth();
 	const { t } = useLanguage();
 	const isTutor = user?.role === "tutor";
+	const isAdmin = user?.role === "admin";
 	const [savingProfile, setSavingProfile] = useState(false);
 	const [saveSuccess, setSaveSuccess] = useState(false);
 	const [uploadingPhoto, setUploadingPhoto] = useState(false);
@@ -282,6 +283,7 @@ export default function Profile() {
 				uploadingPhoto={uploadingPhoto}
 				onUploadClick={() => fileInputRef.current?.click()}
 				onRemoveClick={() => setRemovePhotoModalOpen(true)}
+				hideStats={isAdmin}
 			/>
 
 			{/* Main grid */}
@@ -294,13 +296,16 @@ export default function Profile() {
 						selectedGoals={selectedGoals}
 						toggleArrayItem={toggleArrayItem}
 						fieldErrors={fieldErrors}
+						hideGoals={isAdmin}
 					/>
-					<PracticePreferencesCard
-						draft={draft}
-						isTutor={isTutor}
-						setPreference={setPreference}
-						fieldErrors={fieldErrors}
-					/>
+					{!isAdmin && (
+						<PracticePreferencesCard
+							draft={draft}
+							isTutor={isTutor}
+							setPreference={setPreference}
+							fieldErrors={fieldErrors}
+						/>
+					)}
 				</div>
 
 				{/* Right column — sticky */}

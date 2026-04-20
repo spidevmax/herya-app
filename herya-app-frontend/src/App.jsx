@@ -140,7 +140,7 @@ const AppRoutes = () => {
 							</ProtectedRoute>
 						}
 					>
-						<Route path="/" element={<Dashboard />} />
+						<Route path="/" element={isAdmin ? <Admin /> : <Dashboard />} />
 
 						<Route path="/library" element={<Library />} />
 						<Route path="/library/sequence/:id" element={<SequenceDetail />} />
@@ -149,17 +149,25 @@ const AppRoutes = () => {
 							path="/library/breathing/:id"
 							element={<BreathingDetail />}
 						/>
-						<Route path="/poses" element={<Poses />} />
-						<Route path="/poses/:id" element={<LegacyPoseDetailRedirect />} />
-						<Route
-							path="/breathing/:id"
-							element={<LegacyBreathingDetailRedirect />}
-						/>
+						{!isAdmin && <Route path="/poses" element={<Poses />} />}
+						{!isAdmin && (
+							<Route path="/poses/:id" element={<LegacyPoseDetailRedirect />} />
+						)}
+						{!isAdmin && (
+							<Route
+								path="/breathing/:id"
+								element={<LegacyBreathingDetailRedirect />}
+							/>
+						)}
 
-						<Route path="/start-practice" element={<StartPractice />} />
-						<Route path="/session/:type" element={<Session />} />
-						<Route path="/sessions" element={<SessionHistory />} />
-						<Route path="/sessions/:id" element={<SessionDetail />} />
+						{!isAdmin && (
+							<Route path="/start-practice" element={<StartPractice />} />
+						)}
+						{!isAdmin && <Route path="/session/:type" element={<Session />} />}
+						{!isAdmin && <Route path="/sessions" element={<SessionHistory />} />}
+						{!isAdmin && (
+							<Route path="/sessions/:id" element={<SessionDetail />} />
+						)}
 
 						{!isAdmin && <Route path="/journal" element={<Journal />} />}
 						{!isAdmin && (
@@ -186,7 +194,7 @@ const AppRoutes = () => {
 							</AdminRoute>
 						}
 					>
-						<Route index element={<Admin />} />
+						<Route index element={<Navigate replace to="/" />} />
 					</Route>
 
 					<Route path="*" element={<NotFound />} />
