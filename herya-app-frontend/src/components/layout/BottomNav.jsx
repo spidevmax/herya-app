@@ -1,19 +1,22 @@
-import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
 const BottomNav = () => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
+	const { user } = useAuth();
+	const isAdmin = user?.role === "admin";
 
 	const NAV_ITEMS = [
 		{ to: "/", icon: Home, label: t("nav.home") },
 		{ to: "/library", icon: BookOpen, label: t("nav.library") },
 		null,
-		{ to: "/journal", icon: Leaf, label: t("nav.journal") },
+		!isAdmin && { to: "/journal", icon: Leaf, label: t("nav.journal") },
 		{ to: "/profile", icon: User, label: t("nav.profile") },
-	];
+	].filter(Boolean);
 
 	return (
 		<nav

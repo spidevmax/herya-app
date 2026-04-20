@@ -1148,12 +1148,8 @@ export default function StartPractice() {
 											const meta = SIGNAL_META[signal];
 											const { Icon, colorVar, titleKey, hintKey } = meta;
 											return (
-												<button
-													type="button"
-													role="radio"
-													aria-checked={selected}
+												<label
 													key={signal}
-													onClick={() => handleTutorSignalChange(signal)}
 													className="rounded-2xl px-3 py-3 transition-all cursor-pointer min-h-[96px] flex flex-col items-start gap-1.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 hover:brightness-95"
 													style={{
 														backgroundColor: selected
@@ -1166,6 +1162,15 @@ export default function StartPractice() {
 														"--tw-ring-color": colorVar,
 													}}
 												>
+													<input
+														type="radio"
+														name="tutor-signal"
+														value={signal}
+														checked={selected}
+														onChange={() => handleTutorSignalChange(signal)}
+														className="sr-only"
+														aria-checked={selected}
+													/>
 													<div className="flex items-center gap-2 w-full">
 														<Icon
 															size={18}
@@ -1186,7 +1191,7 @@ export default function StartPractice() {
 													>
 														{t(hintKey)}
 													</span>
-												</button>
+												</label>
 											);
 										})}
 									</div>

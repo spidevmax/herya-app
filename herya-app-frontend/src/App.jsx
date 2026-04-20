@@ -1,15 +1,15 @@
-import { Suspense, lazy, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
-import { useTheme } from "@/context/ThemeContext";
-import { LoadingSpinner } from "@/components/ui";
 import AppLayout from "@/components/layout/AppLayout";
 import {
 	AdminRoute,
 	ProtectedRoute,
 	PublicRoute,
 } from "@/components/routing/RouteGuards";
+import { LoadingSpinner } from "@/components/ui";
+import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
+import { useTheme } from "@/context/ThemeContext";
 
 const Admin = lazy(() => import("@/pages/Admin"));
 const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
@@ -97,7 +97,11 @@ function LegacyBreathingDetailRedirect() {
 	return <Navigate replace to={`/library/breathing/${id}`} />;
 }
 
+import { useAuth } from "@/context/AuthContext";
+
 const AppRoutes = () => {
+	const { user } = useAuth();
+	const isAdmin = user?.role === "admin";
 	return (
 		<>
 			<SyncUserPreferences />
@@ -158,13 +162,19 @@ const AppRoutes = () => {
 						<Route path="/sessions" element={<SessionHistory />} />
 						<Route path="/sessions/:id" element={<SessionDetail />} />
 
-						<Route path="/journal" element={<Journal />} />
-						<Route
-							path="/garden"
-							element={<Navigate replace to="/journal" />}
-						/>
-						<Route path="/journal/new" element={<JournalForm />} />
-						<Route path="/journal/:id/edit" element={<JournalForm />} />
+						{!isAdmin && <Route path="/journal" element={<Journal />} />}
+						{!isAdmin && (
+							<Route
+								path="/garden"
+								element={<Navigate replace to="/journal" />}
+							/>
+						)}
+						{!isAdmin && (
+							<Route path="/journal/new" element={<JournalForm />} />
+						)}
+						{!isAdmin && (
+							<Route path="/journal/:id/edit" element={<JournalForm />} />
+						)}
 
 						<Route path="/profile" element={<Profile />} />
 					</Route>

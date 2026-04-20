@@ -1,11 +1,12 @@
-import { useLocation, Outlet, NavLink, useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import BottomNav from "./BottomNav";
 import PageTransition from "./PageTransition";
 
-const NAV_ITEMS = [
+const NAV_ITEMS_BASE = [
 	{ to: "/", icon: Home, labelKey: "nav.home" },
 	{ to: "/library", icon: BookOpen, labelKey: "nav.library" },
 	{ to: "/journal", icon: Leaf, labelKey: "nav.journal" },
@@ -15,6 +16,11 @@ const NAV_ITEMS = [
 const DesktopSidebar = () => {
 	const { t } = useLanguage();
 	const navigate = useNavigate();
+	const { user } = useAuth();
+	const isAdmin = user?.role === "admin";
+	const NAV_ITEMS = isAdmin
+		? NAV_ITEMS_BASE.filter((item) => item.to !== "/journal")
+		: NAV_ITEMS_BASE;
 
 	return (
 		<aside
@@ -53,9 +59,7 @@ const DesktopSidebar = () => {
 							{({ isActive }) => (
 								<>
 									<Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
-									<span>
-										{t(item.labelKey)}
-									</span>
+									<span>{t(item.labelKey)}</span>
 								</>
 							)}
 						</NavLink>
@@ -63,16 +67,18 @@ const DesktopSidebar = () => {
 				})}
 			</nav>
 
-			{/* Start Practice button */}
-			<button
-				type="button"
-				onClick={() => navigate("/start-practice")}
-				className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-white font-semibold text-sm transition-all hover:brightness-95 active:scale-[0.97]"
-				style={{ backgroundColor: "var(--color-primary)" }}
-			>
-				<Plus size={18} strokeWidth={2.5} />
-				{t("practice.start_practice")}
-			</button>
+			{/* Start Practice button (no admin) */}
+			{!isAdmin && (
+				<button
+					type="button"
+					onClick={() => navigate("/start-practice")}
+					className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-white font-semibold text-sm transition-all hover:brightness-95 active:scale-[0.97]"
+					style={{ backgroundColor: "var(--color-primary)" }}
+				>
+					<Plus size={18} strokeWidth={2.5} />
+					{t("practice.start_practice")}
+				</button>
+			)}
 		</aside>
 	);
 };
