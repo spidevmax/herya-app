@@ -1200,11 +1200,7 @@ export default function StartPractice() {
 										})}
 									</div>
 								) : (
-									<div
-										className="flex flex-wrap gap-2"
-										role="group"
-										aria-label={t("practice.checkin_mood")}
-									>
+									<div className="flex flex-wrap gap-2">
 										{MOOD_OPTIONS.map((m) => {
 											const selected = checkInMood.includes(m);
 											const color = getMoodColor(m);
