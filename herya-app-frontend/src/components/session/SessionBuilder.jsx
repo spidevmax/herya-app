@@ -137,9 +137,6 @@ export default function SessionBuilder({
 					soundCue: "bell",
 					hapticFeedback: true,
 					autoAdvancePoses: true,
-					bellInterval: 0,
-					bellAtStart: true,
-					bellAtEnd: true,
 				};
 
 				return {
@@ -220,9 +217,6 @@ export default function SessionBuilder({
 				soundCue: "bell",
 				hapticFeedback: true,
 				autoAdvancePoses: true,
-				bellInterval: 0,
-				bellAtStart: true,
-				bellAtEnd: true,
 			},
 		};
 		setBlocks((prev) => [...prev, newBlock]);
@@ -797,46 +791,6 @@ function BlockCard({
 										))}
 									</select>
 
-									{/* Bell interval config (guided meditation) */}
-									{block.guided && (
-										<div className="flex items-center justify-between">
-											<span
-												className="text-xs"
-												style={{ color: "var(--color-text-secondary)" }}
-											>
-												{t("guided.bell_interval")}
-											</span>
-											<div className="flex gap-1.5">
-												{[0, 3, 5, 10].map((mins) => (
-													<button
-														key={mins}
-														type="button"
-														onClick={() =>
-															onUpdate({
-																config: {
-																	...block.config,
-																	bellInterval: mins,
-																},
-															})
-														}
-														className="px-2 py-1 rounded-lg text-[10px] font-semibold transition"
-														style={{
-															backgroundColor:
-																(block.config?.bellInterval || 0) === mins
-																	? color
-																	: "var(--color-surface)",
-															color:
-																(block.config?.bellInterval || 0) === mins
-																	? "white"
-																	: "var(--color-text-secondary)",
-														}}
-													>
-														{mins === 0 ? t("guided.bell_off") : `${mins}m`}
-													</button>
-												))}
-											</div>
-										</div>
-									)}
 								</>
 							)}
 

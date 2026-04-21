@@ -383,15 +383,6 @@ export default function GuidedPracticePlayer({
 								durationMinutes={currentBlock.durationMinutes || 10}
 								config={{
 									...(currentBlock.config || {}),
-									bellAtStart: lowStimMode
-										? false
-										: currentBlock.config?.bellAtStart,
-									bellAtEnd: lowStimMode
-										? false
-										: currentBlock.config?.bellAtEnd,
-									bellInterval: lowStimMode
-										? 0
-										: currentBlock.config?.bellInterval,
 									lowStim: lowStimMode,
 								}}
 								guided={currentBlock.guided && !lowStimMode}

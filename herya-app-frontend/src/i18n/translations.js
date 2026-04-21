@@ -1157,19 +1157,6 @@ export const translations = {
 				"Going back will discard the blocks you have configured.",
 			confirm_back_yes: "Discard",
 
-			// Session templates (B6)
-			templates_title: "Saved templates",
-			templates_empty: "No templates saved yet",
-			templates_empty_hint: "Add at least one block, then tap “Save template” to store this session for next time.",
-			save_template: "Save template",
-			load_template: "Load template",
-			delete_template: "Delete template",
-			template_name_placeholder: "Name this session setup…",
-			template_used: "Used {n} time(s)",
-			template_name_required: "Please enter a name for the template.",
-			template_blocks_required: "Add at least one block before saving.",
-			template_save_error: "Couldn't save the template. Please try again.",
-
 			// Visual schedule (B1)
 			visual_schedule_label: "Session schedule",
 			visual_schedule_title: "Schedule",
@@ -1278,9 +1265,6 @@ export const translations = {
 			phase_intro: "Intro",
 			phase_main: "Main",
 			phase_close: "Close",
-			bell_interval: "Bell",
-			bell_off: "Off",
-			bell_every: "Bell every {n} min",
 
 			// Meditation instructions
 			meditation_intro: "Introduction",
@@ -2491,19 +2475,6 @@ export const translations = {
 			confirm_back_desc: "Volver descartará los bloques que has configurado.",
 			confirm_back_yes: "Descartar",
 
-			// Plantillas de sesión (B6)
-			templates_title: "Plantillas guardadas",
-			templates_empty: "Aún no hay plantillas guardadas",
-			templates_empty_hint: "Añade al menos un bloque y pulsa “Guardar plantilla” para recuperar esta sesión la próxima vez.",
-			save_template: "Guardar plantilla",
-			load_template: "Cargar plantilla",
-			delete_template: "Eliminar plantilla",
-			template_name_placeholder: "Nombre para esta configuración…",
-			template_used: "Usada {n} vez/veces",
-			template_name_required: "Escribe un nombre para la plantilla.",
-			template_blocks_required: "Añade al menos un bloque antes de guardar.",
-			template_save_error: "No se pudo guardar la plantilla. Inténtalo de nuevo.",
-
 			// Horario visual (B1)
 			visual_schedule_label: "Horario de sesión",
 			visual_schedule_title: "Horario",
@@ -2612,9 +2583,6 @@ export const translations = {
 			phase_intro: "Intro",
 			phase_main: "Principal",
 			phase_close: "Cierre",
-			bell_interval: "Campana",
-			bell_off: "Sin",
-			bell_every: "Campana cada {n} min",
 
 			// Meditation instructions
 			meditation_intro: "Introducción",

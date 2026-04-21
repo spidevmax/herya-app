@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Leaf, Eye, EyeOff, Bell } from "lucide-react";
+import { Play, Pause, Leaf, Eye, EyeOff } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const DEFAULT_PHASES = [
@@ -46,7 +46,6 @@ const formatTime = (sec) => {
 export default function PhasedMeditationPlayer({
 	meditationType = "guided",
 	durationMinutes = 10,
-	config = {},
 	guided = true,
 	lowStimMode = false,
 	onComplete,
@@ -66,40 +65,12 @@ export default function PhasedMeditationPlayer({
 	const [elapsedSec, setElapsedSec] = useState(0);
 	const [showGuide, setShowGuide] = useState(guided && !lowStimMode);
 	const intervalRef = useRef(null);
-	const bellAudioRef = useRef(null);
-	const lastBellRef = useRef(0);
 	const startTimeRef = useRef(null);
 	const offsetRef = useRef(0);
 	const onCompleteRef = useRef(onComplete);
 	useEffect(() => {
 		onCompleteRef.current = onComplete;
 	}, [onComplete]);
-
-	const bellInterval = config.bellInterval || 0;
-	const bellAtStart = config.bellAtStart !== false;
-	const bellAtEnd = config.bellAtEnd !== false;
-
-	// Play bell sound
-	const playBell = useCallback((freq = 528, duration = 1.2) => {
-		try {
-			if (!bellAudioRef.current) {
-				bellAudioRef.current = new AudioContext();
-			}
-			const ctx = bellAudioRef.current;
-			const osc = ctx.createOscillator();
-			const gain = ctx.createGain();
-			osc.connect(gain);
-			gain.connect(ctx.destination);
-			osc.frequency.value = freq;
-			osc.type = "sine";
-			gain.gain.setValueAtTime(0.12, ctx.currentTime);
-			gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-			osc.start(ctx.currentTime);
-			osc.stop(ctx.currentTime + duration);
-		} catch {
-			// Audio not available
-		}
-	}, []);
 
 	// Timer — wall-clock based so it survives effect re-runs from prop changes
 	useEffect(() => {
@@ -114,25 +85,15 @@ export default function PhasedMeditationPlayer({
 		}
 
 		if (startTimeRef.current == null) startTimeRef.current = Date.now();
-		if (offsetRef.current === 0 && bellAtStart) playBell(528, 1.5);
 
 		const tick = () => {
 			const current =
 				offsetRef.current +
 				Math.floor((Date.now() - startTimeRef.current) / 1000);
 
-			if (
-				bellInterval > 0 &&
-				current - lastBellRef.current >= bellInterval * 60
-			) {
-				playBell(440, 0.8);
-				lastBellRef.current = current;
-			}
-
 			if (current >= totalSec) {
 				setElapsedSec(totalSec);
 				setIsRunning(false);
-				if (bellAtEnd) playBell(528, 2);
 				setTimeout(() => onCompleteRef.current?.(), 1000);
 				return;
 			}
@@ -143,7 +104,7 @@ export default function PhasedMeditationPlayer({
 		tick();
 		intervalRef.current = setInterval(tick, 250);
 		return () => clearInterval(intervalRef.current);
-	}, [isRunning, totalSec, bellInterval, bellAtStart, bellAtEnd, playBell]);
+	}, [isRunning, totalSec]);
 
 	// Current phase
 	const currentPhase = useMemo(() => {
@@ -334,17 +295,6 @@ export default function PhasedMeditationPlayer({
 						? t("guided.hide_instructions")
 						: t("guided.show_instructions")}
 				</button>
-			)}
-
-			{/* Bell indicator */}
-			{bellInterval > 0 && (
-				<p
-					className="text-[10px] flex items-center gap-1"
-					style={{ color: "var(--color-text-muted)" }}
-				>
-					<Bell size={10} aria-hidden="true" />
-					{t("guided.bell_every", { n: bellInterval })}
-				</p>
 			)}
 
 			{/* Controls */}

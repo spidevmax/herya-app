@@ -25,7 +25,6 @@ import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
 import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
 import SessionBuilder from "@/components/session/SessionBuilder";
-import SessionTemplatePicker from "@/components/session/SessionTemplatePicker";
 import ChildProfileManager from "@/components/tutor/ChildProfileManager";
 import { Button, ConfirmModal, StickyHeader } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -1069,21 +1068,6 @@ export default function StartPractice() {
 									compact
 								/>
 							)}
-
-							{/* Session templates — save/load */}
-							<SessionTemplatePicker
-								sessionType={practiceType}
-								blocks={blocks}
-								totalMinutes={totalMinutes}
-								preset={practicePreset}
-								childProfileId={selectedChild?._id}
-								onLoadTemplate={(tplBlocks, tplMinutes, tplType) => {
-									setBlocks(tplBlocks);
-									setTotalMinutes(tplMinutes);
-									if (tplType) setPracticeType(tplType);
-								}}
-								visible={phase === "build"}
-							/>
 
 							<SessionBuilder
 								practiceType={practiceType}
