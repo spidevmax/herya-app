@@ -13,7 +13,7 @@ const BottomNav = () => {
 	const NAV_ITEMS = [
 		{ to: "/", icon: Home, label: t("nav.home") },
 		{ to: "/library", icon: BookOpen, label: t("nav.library") },
-		null,
+		{ fab: true },
 		!isAdmin && { to: "/journal", icon: Leaf, label: t("nav.journal") },
 		{ to: "/profile", icon: User, label: t("nav.profile") },
 	].filter(Boolean);
@@ -30,7 +30,7 @@ const BottomNav = () => {
 		>
 			<ul className="relative flex items-center justify-around list-none m-0 px-2 pt-2 pb-3">
 				{NAV_ITEMS.map((item) => {
-					if (!item) {
+					if (item.fab) {
 						return (
 							<li key="fab" className="relative z-50">
 								<motion.button
