@@ -341,14 +341,19 @@ export default function SessionBuilder({
 	}
 
 	return (
-		<section aria-label={t("practice.build_session_title")} className="flex flex-col gap-4 pt-2">
+		<section
+			aria-label={t("practice.build_session_title")}
+			className="flex flex-col gap-4 pt-2"
+		>
 			{/* Header with total time */}
 			<header className="flex items-center justify-end">
 				<div
-					className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold"
+					className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold shadow"
 					style={{
-						backgroundColor: "var(--color-primary-light, #EEF2FF)",
-						color: "var(--color-primary)",
+						backgroundColor: "rgba(67, 56, 202, 0.85)", // fallback for var
+						background:
+							"linear-gradient(90deg, var(--color-primary) 80%, var(--color-primary-light, #818CF8) 100%)",
+						color: "#fff",
 					}}
 				>
 					<Clock size={14} />
@@ -790,7 +795,6 @@ function BlockCard({
 											</option>
 										))}
 									</select>
-
 								</>
 							)}
 

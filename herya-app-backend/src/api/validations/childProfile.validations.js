@@ -25,26 +25,6 @@ const createChildProfileValidations = [
 		.matches(/^#[0-9a-fA-F]{6}$/)
 		.withMessage("Avatar color must be a valid hex color (e.g. #7C6FD4)"),
 
-	check("sensoryPreferences.lowStimDefault")
-		.optional()
-		.isBoolean()
-		.withMessage("lowStimDefault must be a boolean"),
-
-	check("sensoryPreferences.preferredTheme")
-		.optional()
-		.isIn(["light", "dark", "nature", "ocean", "sunset"])
-		.withMessage("Invalid preferred theme"),
-
-	check("sensoryPreferences.soundPalette")
-		.optional()
-		.isIn(["nature", "simple_tones", "silence"])
-		.withMessage("Invalid sound palette"),
-
-	check("sensoryPreferences.animationSpeed")
-		.optional()
-		.isIn(["slow", "normal", "reduced"])
-		.withMessage("Invalid animation speed"),
-
 	check("safetyAnchors.phrase")
 		.optional()
 		.isLength({ max: 120 })
@@ -97,26 +77,6 @@ const updateChildProfileValidations = [
 		.optional()
 		.matches(/^#[0-9a-fA-F]{6}$/)
 		.withMessage("Avatar color must be a valid hex color"),
-
-	check("sensoryPreferences.lowStimDefault")
-		.optional()
-		.isBoolean()
-		.withMessage("lowStimDefault must be a boolean"),
-
-	check("sensoryPreferences.preferredTheme")
-		.optional()
-		.isIn(["light", "dark", "nature", "ocean", "sunset"])
-		.withMessage("Invalid preferred theme"),
-
-	check("sensoryPreferences.soundPalette")
-		.optional()
-		.isIn(["nature", "simple_tones", "silence"])
-		.withMessage("Invalid sound palette"),
-
-	check("sensoryPreferences.animationSpeed")
-		.optional()
-		.isIn(["slow", "normal", "reduced"])
-		.withMessage("Invalid animation speed"),
 
 	check("safetyAnchors.phrase")
 		.optional()

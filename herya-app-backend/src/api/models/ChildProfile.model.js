@@ -2,7 +2,7 @@
  * @schema ChildProfile
  * @description Profile for children managed by tutor users
  *
- * Stores per-child sensory preferences, safety anchors, known triggers,
+ * Stores per-child safety anchors, known triggers,
  * and session history metadata. Linked to a tutor (User with role: "tutor").
  *
  * Relationships:
@@ -35,24 +35,6 @@ const childProfileSchema = new mongoose.Schema(
 			trim: true,
 			default: "#7C6FD4",
 			match: /^#[0-9a-fA-F]{6}$/,
-		},
-		sensoryPreferences: {
-			lowStimDefault: { type: Boolean, default: true },
-			preferredTheme: {
-				type: String,
-				enum: ["light", "dark", "nature", "ocean", "sunset"],
-				default: "light",
-			},
-			soundPalette: {
-				type: String,
-				enum: ["nature", "simple_tones", "silence"],
-				default: "simple_tones",
-			},
-			animationSpeed: {
-				type: String,
-				enum: ["slow", "normal", "reduced"],
-				default: "slow",
-			},
 		},
 		safetyAnchors: {
 			phrase: { type: String, trim: true, maxlength: 120, default: "" },

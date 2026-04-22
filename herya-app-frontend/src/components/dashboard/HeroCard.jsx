@@ -3,15 +3,18 @@ import { ArrowRight, Clock, Dumbbell, PersonStanding } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { LEVEL_LABELS, LEVEL_LABEL_KEYS, VK_FAMILY_MAP } from "@/utils/constants";
+import {
+	LEVEL_LABEL_KEYS,
+	LEVEL_LABELS,
+	VK_FAMILY_MAP,
+} from "@/utils/constants";
 import { localizedName } from "@/utils/libraryHelpers";
 
 const HeroCard = ({ sequence, reason, loading }) => {
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
 
-	if (loading)
-		return <div className="rounded-3xl h-52 skeleton" />;
+	if (loading) return <div className="rounded-3xl h-52 skeleton" />;
 
 	if (!sequence) {
 		return (
@@ -23,9 +26,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 						"linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
 				}}
 			>
-				<h2
-					className="font-display text-2xl font-bold tracking-tight mb-2"
-				>
+				<h2 className="font-display text-2xl font-bold tracking-tight mb-2">
 					{t("dashboard.welcome_title")}
 				</h2>
 				<p className="text-white/80 text-sm font-medium mb-4">
@@ -74,7 +75,10 @@ const HeroCard = ({ sequence, reason, loading }) => {
 			}}
 		>
 			<div className="p-6 relative">
-				<div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-black/10" />
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 pointer-events-none bg-black/10"
+				/>
 				<div
 					aria-hidden="true"
 					className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 float select-none pointer-events-none"
@@ -82,7 +86,11 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					{family.emoji ? (
 						<span className="text-8xl">{family.emoji}</span>
 					) : (
-						<PersonStanding size={88} strokeWidth={1.8} className="text-white" />
+						<PersonStanding
+							size={88}
+							strokeWidth={1.8}
+							className="text-white"
+						/>
 					)}
 				</div>
 				<span className="relative inline-flex items-center gap-1 text-xs font-semibold text-white uppercase tracking-widest mb-1">
@@ -108,7 +116,9 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					{sequence.estimatedDuration?.recommended && (
 						<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
 							<Clock size={13} aria-hidden="true" className="text-white" />
-							<dt className="sr-only">{t("library.stat_duration", "Duration")}</dt>
+							<dt className="sr-only">
+								{t("library.stat_duration", "Duration")}
+							</dt>
 							<dd className="text-white text-xs font-semibold m-0">
 								{sequence.estimatedDuration.recommended} min
 							</dd>
@@ -129,8 +139,7 @@ const HeroCard = ({ sequence, reason, loading }) => {
 						type="button"
 						whileTap={{ scale: 0.97 }}
 						whileHover={{ y: -1 }}
-						className="inline-flex items-center gap-2 bg-white text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg cursor-pointer transition-shadow hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
-						style={{ color: "var(--color-text-primary)" }}
+						className="inline-flex items-center gap-2 bg-white/10 text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg cursor-pointer transition-shadow hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent text-white backdrop-blur-md border border-white/20"
 						onClick={startPractice}
 					>
 						{t("hero.start")} <ArrowRight size={16} aria-hidden="true" />

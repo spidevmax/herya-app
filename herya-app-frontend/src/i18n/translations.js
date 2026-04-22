@@ -236,9 +236,11 @@ export const translations = {
 			role_user: "Practitioner",
 		},
 		recommendation: {
-			reason_foundational: "Great foundational sequence to continue your practice",
+			reason_foundational:
+				"Great foundational sequence to continue your practice",
 			reason_next_step: "Suggested next step in your progression path",
-			reason_problem_area: "Recommended to address {area} (no improvement in recent practices)",
+			reason_problem_area:
+				"Recommended to address {area} (no improvement in recent practices)",
 		},
 		library: {
 			title: "Library",
@@ -665,7 +667,8 @@ export const translations = {
 			photo_actions_remove: "Remove photo",
 			photo_actions_cancel: "Cancel",
 			remove_photo_modal_title: "Remove profile photo?",
-			remove_photo_modal_description: "Your photo will be deleted and replaced by your default avatar. You can upload a new one anytime.",
+			remove_photo_modal_description:
+				"Your photo will be deleted and replaced by your default avatar. You can upload a new one anytime.",
 			remove_photo_confirm: "Remove photo",
 			remove_photo_error: "Could not remove photo. Please try again.",
 			actions_title: "Account",
@@ -776,7 +779,8 @@ export const translations = {
 			pose_manager_delete: "Delete pose",
 			pose_manager_empty: "No poses match the current filters.",
 			pose_manager_load_error: "Could not load poses.",
-			pose_manager_delete_error: "Couldn't delete this pose. It may be used in a sequence.",
+			pose_manager_delete_error:
+				"Couldn't delete this pose. It may be used in a sequence.",
 			pose_manager_save_error: "Could not save the pose.",
 			pose_manager_delete_title: "Delete {name}?",
 			pose_manager_delete_desc: "This pose will be permanently deleted.",
@@ -955,8 +959,7 @@ export const translations = {
 			insights_subtitle: "Keep one or two key learnings from the practice.",
 			insights_placeholder: "Any insights or learnings?",
 			photos: "Photos",
-			photos_subtitle:
-				"Optional snapshots that help you remember the context.",
+			photos_subtitle: "Optional snapshots that help you remember the context.",
 			photos_hint: "Add photos (optional)",
 			remove_photo: "Remove photo",
 			save: "Save Entry",
@@ -1188,18 +1191,6 @@ export const translations = {
 			child_name: "Child's name",
 			child_age_placeholder: "Age (3–18)",
 			avatar_color: "Avatar colour",
-			sensory_prefs: "Sensory preferences",
-			theme_light: "Light",
-			theme_dark: "Dark",
-			theme_nature: "Nature",
-			theme_ocean: "Ocean",
-			theme_sunset: "Sunset",
-			sound_nature: "Nature sounds",
-			sound_simple_tones: "Simple tones",
-			sound_silence: "Silence",
-			animation_slow: "Slow animations",
-			animation_normal: "Normal animations",
-			animation_reduced: "Reduced motion",
 			safety_anchors: "Safety anchors",
 			anchor_phrase_placeholder: 'Calming phrase (e.g. "You are safe")',
 			anchor_body_cue_placeholder: 'Body cue (e.g. "Hands on belly")',
@@ -1539,9 +1530,11 @@ export const translations = {
 			role_user: "Practicante",
 		},
 		recommendation: {
-			reason_foundational: "Una secuencia base excelente para continuar tu práctica",
+			reason_foundational:
+				"Una secuencia base excelente para continuar tu práctica",
 			reason_next_step: "Siguiente paso sugerido en tu camino de progresión",
-			reason_problem_area: "Recomendada para trabajar {area} (sin mejora en prácticas recientes)",
+			reason_problem_area:
+				"Recomendada para trabajar {area} (sin mejora en prácticas recientes)",
 		},
 		library: {
 			title: "Biblioteca",
@@ -1968,7 +1961,8 @@ export const translations = {
 			photo_actions_remove: "Eliminar foto",
 			photo_actions_cancel: "Cancelar",
 			remove_photo_modal_title: "¿Eliminar foto de perfil?",
-			remove_photo_modal_description: "Tu foto se eliminará y se reemplazará por tu avatar por defecto. Podrás subir una nueva cuando quieras.",
+			remove_photo_modal_description:
+				"Tu foto se eliminará y se reemplazará por tu avatar por defecto. Podrás subir una nueva cuando quieras.",
 			remove_photo_confirm: "Eliminar foto",
 			remove_photo_error: "No se pudo eliminar la foto. Inténtalo de nuevo.",
 			actions_title: "Cuenta",
@@ -2079,7 +2073,8 @@ export const translations = {
 			pose_manager_delete: "Eliminar postura",
 			pose_manager_empty: "No hay posturas que coincidan con los filtros.",
 			pose_manager_load_error: "No se pudieron cargar las posturas.",
-			pose_manager_delete_error: "No se pudo eliminar la postura. Puede estar en uso en una secuencia.",
+			pose_manager_delete_error:
+				"No se pudo eliminar la postura. Puede estar en uso en una secuencia.",
 			pose_manager_save_error: "No se pudo guardar la postura.",
 			pose_manager_delete_title: "¿Eliminar {name}?",
 			pose_manager_delete_desc:
@@ -2262,12 +2257,10 @@ export const translations = {
 			reflection_subtitle: "Escribe lo que sientes emocionalmente.",
 			reflection_placeholder: "¿Cómo fue tu práctica hoy?",
 			insights: "Aprendizajes",
-			insights_subtitle:
-				"Guarda uno o dos aprendizajes clave de la práctica.",
+			insights_subtitle: "Guarda uno o dos aprendizajes clave de la práctica.",
 			insights_placeholder: "¿Algún aprendizaje o descubrimiento?",
 			photos: "Fotos",
-			photos_subtitle:
-				"Fotos opcionales que te ayuden a recordar el contexto.",
+			photos_subtitle: "Fotos opcionales que te ayuden a recordar el contexto.",
 			photos_hint: "Añadir fotos (opcional)",
 			remove_photo: "Eliminar foto",
 			save: "Guardar entrada",
@@ -2506,18 +2499,6 @@ export const translations = {
 			child_name: "Nombre del niño",
 			child_age_placeholder: "Edad (3–18)",
 			avatar_color: "Color del avatar",
-			sensory_prefs: "Preferencias sensoriales",
-			theme_light: "Claro",
-			theme_dark: "Oscuro",
-			theme_nature: "Naturaleza",
-			theme_ocean: "Océano",
-			theme_sunset: "Atardecer",
-			sound_nature: "Sonidos de naturaleza",
-			sound_simple_tones: "Tonos simples",
-			sound_silence: "Silencio",
-			animation_slow: "Animaciones lentas",
-			animation_normal: "Animaciones normales",
-			animation_reduced: "Movimiento reducido",
 			safety_anchors: "Anclas de seguridad",
 			anchor_phrase_placeholder: 'Frase calmante (ej. "Estás a salvo")',
 			anchor_body_cue_placeholder: 'Señal corporal (ej. "Manos al abdomen")',

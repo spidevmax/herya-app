@@ -21,24 +21,24 @@ const BottomNav = () => {
 	return (
 		<nav
 			aria-label={t("nav.home")}
-			className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[540px] border-t z-40 backdrop-blur-xl"
+			className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[540px] border-t z-40 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
 			style={{
 				backgroundColor:
 					"color-mix(in srgb, var(--color-surface-card) 90%, transparent)",
 				borderColor: "var(--color-border)",
 			}}
 		>
-			<ul className="flex items-center justify-around px-2 pt-2 pb-3 list-none m-0 p-0">
+			<ul className="relative flex items-center justify-around list-none m-0 px-2 pt-2 pb-3">
 				{NAV_ITEMS.map((item) => {
 					if (!item) {
 						return (
-							<li key="fab">
+							<li key="fab" className="relative z-50">
 								<motion.button
 									type="button"
 									onClick={() => navigate("/start-practice")}
 									whileTap={{ scale: 0.9 }}
 									aria-label={t("fab.vk_sequence")}
-									className="relative flex items-center justify-center w-14 h-14 rounded-full text-white -mt-5"
+									className="relative flex items-center justify-center w-14 h-14 rounded-full text-white -mt-8"
 									style={{
 										backgroundColor: "var(--color-primary)",
 										boxShadow: "var(--shadow-fab)",

@@ -19,7 +19,9 @@ async function seedPoses() {
 		});
 
 		if (errors.length > 0) {
-			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
+			throw new Error(
+				`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`,
+			);
 		}
 
 		const parseArray = (str, separator = "|") =>
@@ -46,14 +48,19 @@ async function seedPoses() {
 				"arm_balance",
 				"restorative",
 			];
-			const categories = parseArray(row.category).filter((c) => validCategories.includes(c));
+			const categories = parseArray(row.category).filter((c) =>
+				validCategories.includes(c),
+			);
 
 			// chakraRelated is a single value - take first if pipe-separated
-			const chakra = row.chakraRelated ? row.chakraRelated.split("|")[0].trim() : undefined;
+			const chakra = row.chakraRelated
+				? row.chakraRelated.split("|")[0].trim()
+				: undefined;
 
 			// sidedness: use explicit column if present, otherwise derive from bilateral
 			const bilateral = row.bilateral === "true";
-			const sidednessType = row.sidedness?.trim() || (bilateral ? "both_sides" : "symmetric");
+			const sidednessType =
+				row.sidedness?.trim() || (bilateral ? "both_sides" : "symmetric");
 
 			return {
 				name: row.name?.trim(),
@@ -62,6 +69,7 @@ async function seedPoses() {
 				iastName: row.iastName?.trim(),
 				sanskritName: row.sanskritName?.trim(),
 				alias: parseArray(row.alias),
+				aliasEs: parseArray(row.aliasEs),
 				vkCategory: {
 					primary: row.vkCategoryPrimary?.trim(),
 				},
@@ -76,7 +84,10 @@ async function seedPoses() {
 					roleInSequence: row.roleInSequence?.trim() || "primary",
 				},
 				transitionType: row.transitionType?.trim() || "static",
-				recommendedHoldSeconds: Math.min(parseInt(row.recommendedHoldDefault, 10) || 30, 300),
+				recommendedHoldSeconds: Math.min(
+					parseInt(row.recommendedHoldDefault, 10) || 30,
+					300,
+				),
 				targetMuscles: parseArray(row.targetMuscles),
 				jointFocus: parseArray(row.jointFocus),
 				chakraRelated: chakra || undefined,

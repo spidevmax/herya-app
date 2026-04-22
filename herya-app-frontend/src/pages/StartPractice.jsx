@@ -276,12 +276,6 @@ export default function StartPractice() {
 		);
 	}, [isTutorUser]);
 
-	// B5: Apply child's sensory preferences when a child profile is selected
-	useEffect(() => {
-		if (!selectedChild?.sensoryPreferences) return;
-		setLowStimMode(Boolean(selectedChild.sensoryPreferences.lowStimDefault));
-	}, [selectedChild]);
-
 	useEffect(() => {
 		let mounted = true;
 

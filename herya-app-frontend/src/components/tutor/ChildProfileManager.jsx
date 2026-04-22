@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { UserPlus, Check, Pencil, X } from "lucide-react";
-import { useLanguage } from "@/context/LanguageContext";
-import { Button } from "@/components/ui";
+import { AnimatePresence, motion } from "framer-motion";
+import { Check, Pencil, UserPlus, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import {
-	getChildProfiles,
 	createChildProfile,
+	getChildProfiles,
 	updateChildProfile,
 } from "@/api/childProfiles.api";
+import { Button } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 
 const AVATAR_COLORS = [
 	"#7C6FD4",
@@ -50,12 +50,6 @@ export default function ChildProfileManager({
 			name: "",
 			age: "",
 			avatarColor: AVATAR_COLORS[0],
-			sensoryPreferences: {
-				lowStimDefault: true,
-				preferredTheme: "light",
-				soundPalette: "simple_tones",
-				animationSpeed: "slow",
-			},
 			safetyAnchors: { phrase: "", bodyCue: "" },
 			knownTriggers: [],
 			notes: "",
@@ -113,16 +107,6 @@ export default function ChildProfileManager({
 			name: profile.name || "",
 			age: profile.age || "",
 			avatarColor: profile.avatarColor || AVATAR_COLORS[0],
-			sensoryPreferences: {
-				lowStimDefault:
-					profile.sensoryPreferences?.lowStimDefault ?? true,
-				preferredTheme:
-					profile.sensoryPreferences?.preferredTheme || "light",
-				soundPalette:
-					profile.sensoryPreferences?.soundPalette || "simple_tones",
-				animationSpeed:
-					profile.sensoryPreferences?.animationSpeed || "slow",
-			},
 			safetyAnchors: {
 				phrase: profile.safetyAnchors?.phrase || "",
 				bodyCue: profile.safetyAnchors?.bodyCue || "",
@@ -185,7 +169,12 @@ export default function ChildProfileManager({
 
 			{/* Profile list */}
 			{loading ? (
-				<p className="text-xs" role="status" aria-live="polite" style={{ color: "var(--color-text-muted)" }}>
+				<p
+					className="text-xs"
+					role="status"
+					aria-live="polite"
+					style={{ color: "var(--color-text-muted)" }}
+				>
 					{t("ui.loading")}...
 				</p>
 			) : profiles.length === 0 && !showForm ? (
@@ -301,7 +290,11 @@ export default function ChildProfileManager({
 									}}
 									aria-label={t("ui.close_modal")}
 								>
-									<X size={16} aria-hidden="true" style={{ color: "var(--color-text-muted)" }} />
+									<X
+										size={16}
+										aria-hidden="true"
+										style={{ color: "var(--color-text-muted)" }}
+									/>
 								</button>
 							</header>
 
@@ -370,90 +363,6 @@ export default function ChildProfileManager({
 											aria-label={c}
 										/>
 									))}
-								</div>
-							</fieldset>
-
-							{/* Sensory preferences */}
-							<fieldset className="border-0 p-0 m-0">
-								<legend
-									className="text-xs font-medium mb-2"
-									style={{ color: "var(--color-text-secondary)" }}
-								>
-									{t("tutor.sensory_prefs")}
-								</legend>
-								<div className="grid grid-cols-1 gap-2">
-									<label htmlFor="child-pref-theme" className="sr-only">
-										{t("tutor.sensory_prefs")}
-									</label>
-									<select
-										id="child-pref-theme"
-										value={form.sensoryPreferences.preferredTheme}
-										onChange={(e) =>
-											updateField(
-												"sensoryPreferences.preferredTheme",
-												e.target.value,
-											)
-										}
-										className="text-sm rounded-xl px-3 py-2"
-										style={{
-											backgroundColor: "var(--color-surface-card)",
-											color: "var(--color-text-primary)",
-										}}
-									>
-										{THEME_OPTIONS.map((opt) => (
-											<option key={opt} value={opt}>
-												{t(`tutor.theme_${opt}`)}
-											</option>
-										))}
-									</select>
-									<label htmlFor="child-pref-sound" className="sr-only">
-										{t("tutor.sensory_prefs")}
-									</label>
-									<select
-										id="child-pref-sound"
-										value={form.sensoryPreferences.soundPalette}
-										onChange={(e) =>
-											updateField(
-												"sensoryPreferences.soundPalette",
-												e.target.value,
-											)
-										}
-										className="text-sm rounded-xl px-3 py-2"
-										style={{
-											backgroundColor: "var(--color-surface-card)",
-											color: "var(--color-text-primary)",
-										}}
-									>
-										{SOUND_OPTIONS.map((opt) => (
-											<option key={opt} value={opt}>
-												{t(`tutor.sound_${opt}`)}
-											</option>
-										))}
-									</select>
-									<label htmlFor="child-pref-animation" className="sr-only">
-										{t("tutor.sensory_prefs")}
-									</label>
-									<select
-										id="child-pref-animation"
-										value={form.sensoryPreferences.animationSpeed}
-										onChange={(e) =>
-											updateField(
-												"sensoryPreferences.animationSpeed",
-												e.target.value,
-											)
-										}
-										className="text-sm rounded-xl px-3 py-2"
-										style={{
-											backgroundColor: "var(--color-surface-card)",
-											color: "var(--color-text-primary)",
-										}}
-									>
-										{ANIMATION_OPTIONS.map((opt) => (
-											<option key={opt} value={opt}>
-												{t(`tutor.animation_${opt}`)}
-											</option>
-										))}
-									</select>
 								</div>
 							</fieldset>
 
@@ -530,7 +439,9 @@ export default function ChildProfileManager({
 								size="md"
 								className="w-full"
 							>
-								{editingProfile ? t("tutor.save_changes") : t("tutor.create_child")}
+								{editingProfile
+									? t("tutor.save_changes")
+									: t("tutor.create_child")}
 							</Button>
 						</form>
 					</motion.div>
