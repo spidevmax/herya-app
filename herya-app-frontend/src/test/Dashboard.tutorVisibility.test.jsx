@@ -65,6 +65,10 @@ vi.mock("@/components/dashboard/TutorInsightsCard", () => ({
 
 vi.mock("@/components/ui", () => ({
 	SkeletonCard: () => <div data-testid="skeleton-card" />,
+	Button: ({ children, ...props }) => <button type="button" {...props}>{children}</button>,
+	LoadingSpinner: () => <div data-testid="loading-spinner" />,
+	ConfirmModal: () => null,
+	StickyHeader: ({ children }) => <div>{children}</div>,
 }));
 
 describe("Dashboard tutor visibility", () => {

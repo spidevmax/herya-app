@@ -200,16 +200,16 @@ describe("techniqueProfiles", () => {
 		describe("phase durations", () => {
 			it("calculates Ujjayi durations from ratio × base", () => {
 				const profile = getProfile(MOCK_PATTERNS.ujjayi);
-				expect(profile.phaseDurations.inhale).toBe(5); // 1 × 5
-				expect(profile.phaseDurations.exhale).toBe(10); // 2 × 5
-				expect(profile.phaseDurations.hold).toBe(0);
+				expect(profile.basePhaseDurations.inhale).toBe(5); // 1 × 5
+				expect(profile.basePhaseDurations.exhale).toBe(10); // 2 × 5
+				expect(profile.basePhaseDurations.hold).toBe(0);
 			});
 
 			it("calculates Nadi Shodhana durations correctly", () => {
 				const profile = getProfile(MOCK_PATTERNS.nadiShodhana);
-				expect(profile.phaseDurations.inhale).toBe(4); // 1 × 4
-				expect(profile.phaseDurations.hold).toBe(4); // 1 × 4
-				expect(profile.phaseDurations.exhale).toBe(8); // 2 × 4
+				expect(profile.basePhaseDurations.inhale).toBe(4); // 1 × 4
+				expect(profile.basePhaseDurations.hold).toBe(4); // 1 × 4
+				expect(profile.basePhaseDurations.exhale).toBe(8); // 2 × 4
 			});
 
 			it("calculates total cycle duration", () => {

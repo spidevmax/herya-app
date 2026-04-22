@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import Library from "./Library";
+import Library from "../pages/Library";
 
 const mockNavigate = vi.fn();
 const getSequences = vi.fn();

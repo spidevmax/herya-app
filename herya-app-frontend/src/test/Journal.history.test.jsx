@@ -14,7 +14,7 @@ import {
 	useNavigate,
 } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import Journal from "./Journal";
+import Journal from "../pages/Journal";
 
 vi.mock("@/api/journalEntries.api", () => ({
 	getJournalEntries: vi.fn(),
