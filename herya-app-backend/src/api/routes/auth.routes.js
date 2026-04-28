@@ -3,8 +3,6 @@ const {
 	login,
 	me,
 	logout,
-	googleAuthStart,
-	googleAuthCallback,
 	requestPasswordReset,
 	resetPassword,
 } = require("../controllers/auth.controller");
@@ -181,9 +179,6 @@ authRouter.post(
 	requestPasswordReset,
 );
 authRouter.post("/reset-password", resetPasswordValidations, handleValidationErrors, resetPassword);
-
-authRouter.get("/google", googleAuthStart);
-authRouter.get("/google/callback", googleAuthCallback);
 
 authRouter.get("/me", authenticateToken(), me);
 authRouter.post("/logout", authenticateToken(), logout);

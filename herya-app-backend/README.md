@@ -135,10 +135,6 @@ Copy `.env.example` to `.env` and set the following:
 | `PORT` | Server port | `3000` |
 | `DB_URL` | MongoDB connection string | `mongodb+srv://user:pass@cluster.mongodb.net/herya` |
 | `FRONTEND_URL` | Frontend origin (CORS) | `http://localhost:5173` |
-| `BACKEND_URL` | Public backend URL (used for OAuth callback defaults) | `http://localhost:3000` |
-| `GOOGLE_CLIENT_ID` | Google OAuth client ID | `xxxxxxxxxxxx.apps.googleusercontent.com` |
-| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | `GOCSPX-...` |
-| `GOOGLE_REDIRECT_URI` | Google OAuth callback URL | `http://localhost:3000/api/v1/auth/google/callback` |
 | `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | `mycloud` |
 | `CLOUDINARY_API_KEY` | Cloudinary API key | `123456789` |
 | `CLOUDINARY_API_SECRET` | Cloudinary API secret | `abc123...` |
@@ -191,8 +187,6 @@ All endpoints are prefixed with `/api/v1`. Authenticated routes require a `Beare
 | POST | `/api/v1/auth/login` | — | Login and receive JWT |
 | POST | `/api/v1/auth/forgot-password` | — | Request password reset email |
 | POST | `/api/v1/auth/reset-password` | — | Reset password with token |
-| GET | `/api/v1/auth/google` | — | Start Google OAuth flow |
-| GET | `/api/v1/auth/google/callback` | — | Google OAuth callback and redirect to frontend |
 | GET | `/api/v1/auth/me` | ✅ user | Get authenticated user profile from JWT |
 | POST | `/api/v1/auth/logout` | ✅ user | Logout (client-side token invalidation helper) |
 

@@ -43,8 +43,6 @@ Base prefix: /api/v1
 - POST /auth/login
 - POST /auth/forgot-password
 - POST /auth/reset-password
-- GET /auth/google
-- GET /auth/google/callback
 - GET /auth/me
 - POST /auth/logout
 
@@ -78,7 +76,6 @@ Base prefix: /api/v1
 
 - GET /journal-entries
 - POST /journal-entries
-- GET /journal-entries/digital-garden
 - GET /journal-entries/:id
 - PUT /journal-entries/:id
 - DELETE /journal-entries/:id

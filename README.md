@@ -1,47 +1,70 @@
 # Herya
 
-Herya is a full-stack web application for personalized yoga practice with a
-Vinyasa Krama focus. It combines guided session building, reflective journaling, role-based workflows and an admin content system.
+Herya is a full-stack yoga practice platform centered on personalized Vinyasa
+Krama sessions, guided breathwork, meditation, reflective journaling, and
+role-based workflows for regular practitioners, tutors, and admins.
 
-## Overview
+## What This Repository Includes
 
-Herya includes:
+- Guided practice flows for `vk_sequence`, `pranayama`, `meditation`, and
+  `complete_practice`
+- A multi-phase Start Practice experience with a session builder, guided timer,
+  pause/resume flow, recovery, and post-practice journal
+- Tutor-specific tools such as child profiles, support signals, visual
+  schedules, and tutor analytics
+- Admin content management for users, poses, breathing patterns, and Vinyasa
+  Krama sequences
+- JWT authentication, password reset by email, language
+  preferences, and theme preferences
+- Swagger/OpenAPI docs, seed scripts, Docker setup, CI pipelines, and GHCR
+  image publishing
 
-- JWT-based authentication and role-aware access
-- Practice flows for three roles: user, tutor and admin
-- Asana, breathing pattern and Vinyasa Krama sequence exploration
-- Guided session creation and practice tracking
-- Post-practice journaling and insights
-- Admin tools for user and content management (poses, sequences, breathing)
+## Role Overview
+
+- `user`: builds and completes personal practice sessions, views history, and
+  journals reflections
+- `tutor`: gets tutor-oriented practice presets, child profile management, and
+  extra analytics/support flows
+- `admin`: manages platform content and user roles from the admin area
 
 ## Repository Structure
 
 ```text
 .
 ├── docs/
+│   ├── DOCKER.md
+│   ├── PLANNING.md
 │   ├── herya-app-memoria.docx
 │   ├── herya-insomnia.json
-│   ├── PLANNING.md
 │   └── start-practice-architecture.md
 ├── herya-app-backend/
 │   ├── src/
-│   ├── index.js
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── SWAGGER_GUIDE.md
 │   └── package.json
-└── herya-app-frontend/
-    ├── src/
-    ├── public/
-    └── package.json
+├── herya-app-frontend/
+│   ├── public/
+│   ├── src/
+│   ├── Dockerfile
+│   ├── README.md
+│   └── package.json
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── render.yaml
+└── README.md
 ```
 
 ## Tech Stack
 
 ### Backend
 
-- Node.js
+- Node.js 22
 - Express 5
-- MongoDB + Mongoose
+- MongoDB + Mongoose 9
 - JWT + bcrypt
 - Cloudinary + Multer
+- Nodemailer
 - Swagger
 - Jest + Supertest
 - Biome
@@ -50,7 +73,7 @@ Herya includes:
 
 - React 19
 - Vite 7
-- React Router
+- React Router 7
 - Tailwind CSS 4
 - Framer Motion
 - Axios
@@ -58,66 +81,90 @@ Herya includes:
 
 ## Requirements
 
-- Node.js 22 recommended (matches CI)
-- npm 9 or higher
-- MongoDB (local or Atlas)
-- Cloudinary account for uploads
+- Node.js 22.x
+- npm compatible with Node 22
+- MongoDB local or Atlas
+- Optional: Cloudinary for uploads
+- Optional: SMTP for password reset emails
+- Optional: Docker Engine + Docker Compose v2
 
-## Getting Started
+## Local Development
 
-### 1) Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/spidevmax/herya-app.git
 cd herya-app
 ```
 
-### 2) Install dependencies
+### 2. Install dependencies
 
 ```bash
-cd herya-app-backend && npm ci
-cd ../herya-app-frontend && npm ci
+cd herya-app-backend
+npm ci
+
+cd ../herya-app-frontend
+npm ci
+
 cd ..
 ```
 
-### 3) Configure environment variables
+### 3. Create environment files
 
-Create:
+Copy the included examples:
 
-- herya-app-backend/.env
-- herya-app-frontend/.env
+```bash
+cp herya-app-backend/.env.example herya-app-backend/.env
+cp herya-app-frontend/.env.example herya-app-frontend/.env
+```
 
-Minimal values:
-
-Backend:
+Backend values you should set at minimum:
 
 ```env
 NODE_ENV=development
 PORT=3000
 DB_URL=mongodb+srv://user:password@cluster.mongodb.net/herya
 FRONTEND_URL=http://localhost:5173
-
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
 JWT_SECRET=replace_with_a_long_secure_secret
 ```
 
-Frontend:
+Optional backend integrations:
+
+```env
+
+# Cloudinary uploads
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+
+# SMTP password reset emails
+SMTP_HOST=
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASS=
+SMTP_FROM=Herya <no-reply@herya.app>
+```
+
+Frontend values:
 
 ```env
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-### 4) Optional: seed the database
+### 4. Optional: seed the database
 
 ```bash
 cd herya-app-backend
 npm run seed
 ```
 
-### 5) Run backend and frontend
+This imports sample CSV data and creates a default admin account:
+
+- email: `admin@herya.local`
+- password: `AdminPassword123`
+
+### 5. Start the apps
 
 Terminal 1:
 
@@ -133,52 +180,42 @@ cd herya-app-frontend
 npm run dev
 ```
 
-Default URLs:
+Default local URLs:
 
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3000
-- Swagger: http://localhost:3000/api-docs
-
-## API Documentation
-
-The backend API contract is documented with Swagger/OpenAPI and served at:
-
-- http://localhost:3000/api-docs
-
-Authentication in Swagger:
-
-- Use the Authorize button and paste JWT as `Bearer your_jwt_token`.
-- You can obtain a token from `POST /api/v1/auth/register` or `POST /api/v1/auth/login`.
-
-Main API groups:
-
-- Auth
-- Users
-- Sessions
-- Journal Entries
-- Poses
-- Breathing Patterns
-- Sequences
-- Admin
-
-Detailed backend API guide:
-
-- herya-app-backend/SWAGGER_GUIDE.md
+- Swagger UI: http://localhost:3000/api-docs
 
 ## Docker Quick Start
 
-Development stack (hot reload for frontend and backend):
+### Development stack
+
+Runs backend and frontend with hot reload:
 
 ```bash
 docker compose up --build
 ```
 
-Production-like local stack (frontend served by Nginx):
+### Production-like local stack
+
+Create the root Docker env file first:
 
 ```bash
 cp .env.docker.example .env
 docker compose -f docker-compose.prod.yml --env-file .env up --build -d
 ```
+
+Notes:
+
+- Backend secrets still come from `herya-app-backend/.env`
+- Root `.env` is used for Docker production-style frontend/backend URL wiring
+- Frontend production build is served by Nginx on port `8080`
+
+Docker URLs:
+
+- Development frontend: http://localhost:5173
+- Production-like frontend: http://localhost:8080
+- Backend API: http://localhost:3000
 
 Stop containers:
 
@@ -187,101 +224,118 @@ docker compose down
 docker compose -f docker-compose.prod.yml --env-file .env down
 ```
 
-Detailed Docker documentation: docs/DOCKER.md
+More details: [docs/DOCKER.md](docs/DOCKER.md)
 
-## Deployment
+## API Surface
 
-Production deployment uses a split setup:
+All backend routes are served under `/api/v1`.
 
-- Backend: Railway (native GitHub autodeploy from `main`, waiting for CI)
-- Frontend: Vercel (deployed from GitHub Actions after CI + smoke checks)
+Main route groups:
 
-Container image publishing to GHCR is also available via:
+- `auth`
+- `users`
+- `sessions`
+- `journal-entries`
+- `poses`
+- `breathing-patterns`
+- `sequences`
+- `child-profiles`
+- `session-templates`
+- `admin`
 
-- .github/workflows/docker-release.yml
+Swagger/OpenAPI docs are available at:
+
+- http://localhost:3000/api-docs
+
+For authenticated Swagger requests, use the `Authorize` button and provide the
+token as `Bearer <jwt>`.
 
 ## Available Scripts
 
-### Backend (herya-app-backend)
+### Backend (`herya-app-backend`)
 
-- npm run dev: start server with nodemon
-- npm start: start server
-- npm run seed: run full seed pipeline
-- npm run seed:recalc-stats: recalculate user stats from sessions
-- npm test: run Jest tests
-- npm run lint: run Biome lint
-- npm run format: run Biome formatter
-- npm run check: run Biome checks
-- npm run check:fix: auto-fix Biome issues
+- `npm run dev`: start the backend with file watching
+- `npm start`: start the backend in production mode
+- `npm run seed`: import CSV seed data
+- `npm run seed:recalc-stats`: recompute user stats from sessions
+- `npm test`: run Jest tests
+- `npm run lint`: run Biome lint checks
+- `npm run format`: format files with Biome
+- `npm run check`: run Biome checks
+- `npm run check:fix`: apply Biome fixes
 
-### Frontend (herya-app-frontend)
+### Frontend (`herya-app-frontend`)
 
-- npm run dev: start Vite dev server
-- npm run build: build production bundle
-- npm run preview: preview production build
-- npm run lint: run ESLint
-- npm test: run Vitest once
-- npm run test:coverage: run tests with coverage
-- npm run test:watch: run Vitest in watch mode
+- `npm run dev`: start the Vite dev server
+- `npm run build`: build the production bundle
+- `npm run preview`: preview the production build
+- `npm run lint`: run ESLint
+- `npm test`: run Vitest once
+- `npm run test:coverage`: run tests with coverage
+- `npm run test:watch`: run Vitest in watch mode
 
-## Testing and CI/CD
+## Testing and Automation
 
-Local quality checks:
-
-Backend:
+Local checks:
 
 ```bash
-cd herya-app-backend
-npm test
-npm run check
-```
-
-Frontend:
-
-```bash
-cd herya-app-frontend
-npm run lint
-npm test
-npm run build
+cd herya-app-backend && npm test && npm run check
+cd herya-app-frontend && npm test && npm run build
 ```
 
 GitHub Actions workflows:
 
-- Backend CI: .github/workflows/backend-ci-cd.yml
-- Frontend CI: .github/workflows/frontend-ci-cd.yml
-- Docker image release: .github/workflows/docker-release.yml
+- `.github/workflows/backend-ci-cd.yml`: backend lint, tests, checks, and
+  backend Docker smoke test
+- `.github/workflows/frontend-ci-cd.yml`: frontend tests, build, frontend Docker
+  smoke test, and Vercel deployment on pushes to `main`
+- `.github/workflows/docker-release.yml`: publish backend and frontend images to
+  GHCR
 
-Backend workflow includes:
+## Deployment Notes
 
-- Lint + tests + checks
-- Docker smoke test
-- No direct Railway CLI deploy from Actions (Railway autodeploy handles production)
+This repo includes more than one deployment artifact:
 
-Frontend workflow includes:
+- `render.yaml` contains a Render blueprint for the backend Docker service
+- the frontend workflow deploys to Vercel from GitHub Actions
+- the Docker release workflow publishes production images to GHCR
 
-- Tests + build
-- Docker smoke test
-- Production deploy to Vercel on push to `main`
+If you deploy with Render, update the placeholder repository URL in
+`render.yaml` before using it.
 
-## Documentation and Resources
+## Additional Documentation
 
-- docs/herya-app-memoria.docx
-- docs/herya-insomnia.json
-- docs/PLANNING.md
-- docs/start-practice-architecture.md
-- herya-app-backend/SWAGGER_GUIDE.md
-- herya-app-backend/README.md
+- [docs/DOCKER.md](docs/DOCKER.md)
+- [docs/start-practice-architecture.md](docs/start-practice-architecture.md)
+- [docs/PLANNING.md](docs/PLANNING.md)
+- [docs/herya-insomnia.json](docs/herya-insomnia.json)
+- [herya-app-backend/README.md](herya-app-backend/README.md)
+- [herya-app-backend/SWAGGER_GUIDE.md](herya-app-backend/SWAGGER_GUIDE.md)
+- [herya-app-frontend/README.md](herya-app-frontend/README.md)
 
 ## Common Issues
 
 - CORS errors:
-  Ensure FRONTEND_URL in backend .env matches your frontend URL.
+  `FRONTEND_URL` in `herya-app-backend/.env` must match the actual frontend
+  origin.
 
-- Unauthorized requests (401):
-  Verify JWT is present and JWT_SECRET is stable.
+- Frontend cannot reach the API:
+  `VITE_API_URL` must point to the backend API root, usually
+  `http://localhost:3000/api/v1`.
 
 - MongoDB connection failures:
-  Check DB_URL and Atlas network/IP rules.
+  check `DB_URL` and any Atlas network/IP allowlist settings.
 
 - Upload failures:
-  Validate CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.
+  configure `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and
+  `CLOUDINARY_API_SECRET`.
+
+- Password reset email does not send:
+  configure `SMTP_HOST`, `SMTP_USER`, `SMTP_PASS`, and related SMTP values.
+
+Copyright (c) 2026 Max Primavera
+
+All rights reserved.
+
+This repository and its contents are proprietary.
+No permission is granted to use, copy, modify, or distribute the software.

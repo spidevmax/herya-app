@@ -1,7 +1,7 @@
 {
 	"_type": "export",
 	"__export_format": 4,
-	"__export_date": "2026-03-08T00:00:00.000Z",
+	"__export_date": "2026-04-27T00:00:00.000Z",
 	"__export_source": "herya-app-backend",
 	"resources": [
 		{
@@ -20,12 +20,16 @@
 				"base_url": "http://localhost:3000",
 				"token": "PASTE_JWT_TOKEN_HERE",
 				"admin_token": "PASTE_ADMIN_JWT_TOKEN_HERE",
+				"tutor_token": "PASTE_TUTOR_JWT_TOKEN_HERE",
 				"user_id": "PASTE_USER_ID_HERE",
 				"session_id": "PASTE_SESSION_ID_HERE",
 				"journal_id": "PASTE_JOURNAL_ID_HERE",
 				"pose_id": "PASTE_POSE_ID_HERE",
 				"pattern_id": "PASTE_PATTERN_ID_HERE",
-				"sequence_id": "PASTE_SEQUENCE_ID_HERE"
+				"sequence_id": "PASTE_SEQUENCE_ID_HERE",
+				"child_profile_id": "PASTE_CHILD_PROFILE_ID_HERE",
+				"template_id": "PASTE_TEMPLATE_ID_HERE",
+				"reset_token": "PASTE_RESET_TOKEN_HERE"
 			},
 			"color": null,
 			"isPrivate": false,
@@ -131,11 +135,12 @@
 					{ "name": "email", "value": "user@example.com" },
 					{ "name": "password", "value": "SecurePass123" },
 					{ "name": "name", "value": "John Doe" },
+					{ "name": "role", "value": "user" },
 					{ "name": "goals", "value": "reduce_stress" },
 					{ "name": "goals", "value": "improve_balance" }
 				]
 			},
-			"description": "goals enum: increase_flexibility | build_strength | reduce_stress | improve_balance | therapeutic_healing | deepen_practice | meditation_focus | breath_awareness\n\nReturns: { success, message, data: { token, user } }",
+			"description": "role enum: user | tutor\ngoals enum: increase_flexibility | build_strength | reduce_stress | improve_balance | therapeutic_healing | deepen_practice | meditation_focus | breath_awareness\n\nReturns: { success, message, data: { token, user } }",
 			"metaSortKey": 1
 		},
 		{
@@ -152,6 +157,58 @@
 			},
 			"description": "Copy the returned token into the {{ token }} environment variable.",
 			"metaSortKey": 2
+		},
+		{
+			"_id": "req_auth_forgot_password",
+			"_type": "request",
+			"parentId": "fld_auth",
+			"name": "Forgot password",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/auth/forgot-password",
+			"headers": [{ "name": "Content-Type", "value": "application/json" }],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"email\": \"user@example.com\",\n  \"locale\": \"es\"\n}"
+			},
+			"description": "Requests a password reset email. locale: es | en",
+			"metaSortKey": 3
+		},
+		{
+			"_id": "req_auth_reset_password",
+			"_type": "request",
+			"parentId": "fld_auth",
+			"name": "Reset password",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/auth/reset-password",
+			"headers": [{ "name": "Content-Type", "value": "application/json" }],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"token\": \"{{ reset_token }}\",\n  \"newPassword\": \"NewPassword456\",\n  \"confirmPassword\": \"NewPassword456\"\n}"
+			},
+			"description": "Requires a valid reset token from the password reset flow.",
+			"metaSortKey": 4
+		},
+		{
+			"_id": "req_auth_me",
+			"_type": "request",
+			"parentId": "fld_auth",
+			"name": "Current auth user",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/auth/me",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Returns the currently authenticated user.",
+			"metaSortKey": 5
+		},
+		{
+			"_id": "req_auth_logout",
+			"_type": "request",
+			"parentId": "fld_auth",
+			"name": "Logout",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/auth/logout",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Protected route. Useful for testing logout response semantics.",
+			"metaSortKey": 6
 		},
 
 		{
@@ -434,54 +491,15 @@
 			"name": "Update my profile",
 			"method": "PUT",
 			"url": "{{ base_url }}/api/v1/users/me",
-			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"headers": [
+				{ "name": "Authorization", "value": "Bearer {{ token }}" },
+				{ "name": "Content-Type", "value": "application/json" }
+			],
 			"body": {
-				"mimeType": "multipart/form-data",
-				"params": [
-					{ "name": "name", "value": "Marina Updated", "disabled": true },
-					{ "name": "email", "value": "new@example.com", "disabled": true },
-					{ "name": "goals", "value": "reduce_stress", "disabled": true },
-					{ "name": "goals", "value": "meditation_focus", "disabled": true },
-					{
-						"name": "preferences[practiceIntensity]",
-						"value": "moderate",
-						"disabled": true
-					},
-					{
-						"name": "preferences[sessionDuration]",
-						"value": "45",
-						"disabled": true
-					},
-					{
-						"name": "preferences[timeOfDay]",
-						"value": "morning",
-						"disabled": true
-					},
-					{ "name": "preferences[language]", "value": "es", "disabled": true },
-					{
-						"name": "preferences[meditativeEmphasis]",
-						"value": "true",
-						"disabled": true
-					},
-					{
-						"name": "preferences[uiPreferences][showSanskritNames]",
-						"value": "true",
-						"disabled": true
-					},
-					{
-						"name": "preferences[uiPreferences][audioGuidance]",
-						"value": "false",
-						"disabled": true
-					},
-					{
-						"name": "profileImage",
-						"value": "",
-						"type": "file",
-						"disabled": true
-					}
-				]
+				"mimeType": "application/json",
+				"text": "{\n  \"name\": \"Marina Updated\",\n  \"pronouns\": \"she/her\",\n  \"goals\": [\"reduce_stress\", \"meditation_focus\"],\n  \"preferences\": {\n    \"practiceIntensity\": \"moderate\",\n    \"sessionDuration\": 45,\n    \"timeOfDay\": \"morning\",\n    \"lowStimMode\": true,\n    \"language\": \"es\",\n    \"theme\": \"dark\",\n    \"notifications\": {\n      \"enabled\": true,\n      \"frequency\": \"weekly\",\n      \"reminderTime\": \"09:00\"\n    }\n  }\n}"
 			},
-			"description": "All fields optional. vkProgression is system-managed and cannot be changed here.\npracticeIntensity: gentle | moderate | vigorous\ntimeOfDay: morning | afternoon | evening | anytime\nlanguage: en | es",
+			"description": "JSON body. Profile image is handled separately at PUT /users/me/image.\npracticeIntensity: gentle | moderate | vigorous\ntimeOfDay: morning | afternoon | evening | anytime\nlanguage: en | es\ntheme: light | dark",
 			"metaSortKey": 2
 		},
 		{
@@ -513,6 +531,38 @@
 			"metaSortKey": 4
 		},
 		{
+			"_id": "req_users_me_image_put",
+			"_type": "request",
+			"parentId": "fld_users",
+			"name": "Update my profile image",
+			"method": "PUT",
+			"url": "{{ base_url }}/api/v1/users/me/image",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"body": {
+				"mimeType": "multipart/form-data",
+				"params": [
+					{
+						"name": "profileImage",
+						"value": "",
+						"type": "file"
+					}
+				]
+			},
+			"description": "Uploads and replaces the current profile image.",
+			"metaSortKey": 5
+		},
+		{
+			"_id": "req_users_me_image_delete",
+			"_type": "request",
+			"parentId": "fld_users",
+			"name": "Delete my profile image",
+			"method": "DELETE",
+			"url": "{{ base_url }}/api/v1/users/me/image",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Removes the current profile image if one exists.",
+			"metaSortKey": 6
+		},
+		{
 			"_id": "req_users_me_delete",
 			"_type": "request",
 			"parentId": "fld_users",
@@ -521,7 +571,7 @@
 			"url": "{{ base_url }}/api/v1/users/me",
 			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
 			"description": "WARNING: Permanently deletes account and all associated data.",
-			"metaSortKey": 5
+			"metaSortKey": 7
 		},
 
 		{
@@ -669,6 +719,101 @@
 			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
 			"metaSortKey": 9
 		},
+		{
+			"_id": "req_sessions_active_current",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Get active session",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/sessions/active/current",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Returns the current active guided session, if any.",
+			"metaSortKey": 10
+		},
+		{
+			"_id": "req_sessions_analytics_practice",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Practice analytics",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/sessions/analytics/practice",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Returns practice analytics for the authenticated user.",
+			"metaSortKey": 11
+		},
+		{
+			"_id": "req_sessions_analytics_tutor",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Tutor analytics",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/sessions/analytics/tutor",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ tutor_token }}" }],
+			"description": "Tutor-oriented analytics endpoint.",
+			"metaSortKey": 12
+		},
+		{
+			"_id": "req_sessions_start",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Start guided session",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/sessions/{{ session_id }}/start",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Starts a guided practice session flow.",
+			"metaSortKey": 13
+		},
+		{
+			"_id": "req_sessions_pause",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Pause guided session",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/sessions/{{ session_id }}/pause",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Pauses a guided practice session.",
+			"metaSortKey": 14
+		},
+		{
+			"_id": "req_sessions_advance_block",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Advance guided block",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/sessions/{{ session_id }}/advance-block",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Advances the current guided practice block.",
+			"metaSortKey": 15
+		},
+		{
+			"_id": "req_sessions_complete_guided",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Complete guided session",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/sessions/{{ session_id }}/complete",
+			"headers": [
+				{ "name": "Authorization", "value": "Bearer {{ token }}" },
+				{ "name": "Content-Type", "value": "application/json" }
+			],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"duration\": 42,\n  \"notes\": \"Completed through the guided flow\"\n}"
+			},
+			"description": "Marks a guided session as completed.",
+			"metaSortKey": 16
+		},
+		{
+			"_id": "req_sessions_abandon_guided",
+			"_type": "request",
+			"parentId": "fld_sessions",
+			"name": "Abandon guided session",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/sessions/{{ session_id }}/abandon",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Abandons the current guided session.",
+			"metaSortKey": 17
+		},
 
 		{
 			"_id": "fld_journal",
@@ -696,17 +841,6 @@
 			],
 			"description": "sortBy: date | mood | energy",
 			"metaSortKey": 1
-		},
-		{
-			"_id": "req_journal_garden",
-			"_type": "request",
-			"parentId": "fld_journal",
-			"name": "Get Digital Garden",
-			"method": "GET",
-			"url": "{{ base_url }}/api/v1/journal-entries/digital-garden",
-			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
-			"description": "Returns: { flowers, trends: { emotional, physical }, totalEntries, firstEntry, latestEntry }",
-			"metaSortKey": 2
 		},
 		{
 			"_id": "req_journal_create",
@@ -786,7 +920,7 @@
 				]
 			},
 			"description": "One journal per session (unique constraint).\nmoodBefore enum: calm | anxious | energized | tired | focused | stressed | happy | sad | grounded | restless | peaceful | overwhelmed | motivated | discouraged | scattered | irritated\nmoodAfter additionally: renewed | centered | light | clear\ndifficultyFeedback: too_easy | just_right | too_hard\npacingFeedback: too_slow | perfect | too_fast",
-			"metaSortKey": 3
+			"metaSortKey": 2
 		},
 		{
 			"_id": "req_journal_by_id",
@@ -796,7 +930,7 @@
 			"method": "GET",
 			"url": "{{ base_url }}/api/v1/journal-entries/{{ journal_id }}",
 			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
-			"metaSortKey": 4
+			"metaSortKey": 3
 		},
 		{
 			"_id": "req_journal_update",
@@ -825,7 +959,7 @@
 				]
 			},
 			"description": "All fields optional. Media uploads are additive (new files are appended to existing).",
-			"metaSortKey": 5
+			"metaSortKey": 4
 		},
 		{
 			"_id": "req_journal_delete",
@@ -836,6 +970,172 @@
 			"url": "{{ base_url }}/api/v1/journal-entries/{{ journal_id }}",
 			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
 			"description": "Deletes entry and all associated Cloudinary media (photos + voice notes).",
+			"metaSortKey": 5
+		},
+
+		{
+			"_id": "fld_child_profiles",
+			"_type": "request_group",
+			"parentId": "wrk_herya",
+			"name": "Child Profiles",
+			"description": "Authenticated routes. Creation is tutor-only; reads and updates are scoped to the owning tutor.",
+			"metaSortKey": 75
+		},
+		{
+			"_id": "req_child_profiles_list",
+			"_type": "request",
+			"parentId": "fld_child_profiles",
+			"name": "Get child profiles",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/child-profiles",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ tutor_token }}" }],
+			"description": "Returns active child profiles for the authenticated tutor.",
+			"metaSortKey": 1
+		},
+		{
+			"_id": "req_child_profiles_create",
+			"_type": "request",
+			"parentId": "fld_child_profiles",
+			"name": "Create child profile",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/child-profiles",
+			"headers": [
+				{ "name": "Authorization", "value": "Bearer {{ tutor_token }}" },
+				{ "name": "Content-Type", "value": "application/json" }
+			],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"name\": \"Lucia\",\n  \"age\": 9,\n  \"avatarColor\": \"#7C6FD4\",\n  \"safetyAnchors\": {\n    \"phrase\": \"Respira conmigo\",\n    \"bodyCue\": \"Pies firmes en el suelo\"\n  },\n  \"knownTriggers\": [\"loud noises\"],\n  \"contraindications\": [\"neck sensitivity\"],\n  \"notes\": \"Prefers shorter transitions\"\n}"
+			},
+			"description": "Tutor-only endpoint. age must be between 3 and 18.",
+			"metaSortKey": 2
+		},
+		{
+			"_id": "req_child_profiles_by_id",
+			"_type": "request",
+			"parentId": "fld_child_profiles",
+			"name": "Get child profile by ID",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/child-profiles/{{ child_profile_id }}",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ tutor_token }}" }],
+			"metaSortKey": 3
+		},
+		{
+			"_id": "req_child_profiles_update",
+			"_type": "request",
+			"parentId": "fld_child_profiles",
+			"name": "Update child profile",
+			"method": "PUT",
+			"url": "{{ base_url }}/api/v1/child-profiles/{{ child_profile_id }}",
+			"headers": [
+				{ "name": "Authorization", "value": "Bearer {{ tutor_token }}" },
+				{ "name": "Content-Type", "value": "application/json" }
+			],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"notes\": \"Needs more grounding cues\",\n  \"active\": true\n}"
+			},
+			"description": "Updates only allowed child profile fields for the owning tutor.",
+			"metaSortKey": 4
+		},
+		{
+			"_id": "req_child_profiles_delete",
+			"_type": "request",
+			"parentId": "fld_child_profiles",
+			"name": "Archive child profile",
+			"method": "DELETE",
+			"url": "{{ base_url }}/api/v1/child-profiles/{{ child_profile_id }}",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ tutor_token }}" }],
+			"description": "Soft-delete: sets active to false.",
+			"metaSortKey": 5
+		},
+
+		{
+			"_id": "fld_session_templates",
+			"_type": "request_group",
+			"parentId": "wrk_herya",
+			"name": "Session Templates",
+			"description": "Authenticated routes for reusable practice templates.",
+			"metaSortKey": 77
+		},
+		{
+			"_id": "req_templates_list",
+			"_type": "request",
+			"parentId": "fld_session_templates",
+			"name": "Get session templates",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/session-templates",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"parameters": [
+				{ "name": "childProfile", "value": "{{ child_profile_id }}", "disabled": true }
+			],
+			"description": "Returns the authenticated user's templates. Optional childProfile filter.",
+			"metaSortKey": 1
+		},
+		{
+			"_id": "req_templates_create",
+			"_type": "request",
+			"parentId": "fld_session_templates",
+			"name": "Create session template",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/session-templates",
+			"headers": [
+				{ "name": "Authorization", "value": "Bearer {{ token }}" },
+				{ "name": "Content-Type", "value": "application/json" }
+			],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"name\": \"Morning Reset\",\n  \"sessionType\": \"complete_practice\",\n  \"totalMinutes\": 35,\n  \"preset\": \"adult\",\n  \"blocks\": [\n    {\n      \"blockType\": \"vk_sequence\",\n      \"label\": \"Warm up flow\",\n      \"durationMinutes\": 15,\n      \"order\": 0,\n      \"sequenceId\": \"{{ sequence_id }}\"\n    },\n    {\n      \"blockType\": \"pranayama\",\n      \"label\": \"Breath work\",\n      \"durationMinutes\": 10,\n      \"order\": 1,\n      \"patternId\": \"{{ pattern_id }}\"\n    },\n    {\n      \"blockType\": \"meditation\",\n      \"label\": \"Close in stillness\",\n      \"durationMinutes\": 10,\n      \"order\": 2\n    }\n  ]\n}"
+			},
+			"description": "preset: adult | tutor. childProfile may also be included for tutor-specific templates.",
+			"metaSortKey": 2
+		},
+		{
+			"_id": "req_templates_by_id",
+			"_type": "request",
+			"parentId": "fld_session_templates",
+			"name": "Get session template by ID",
+			"method": "GET",
+			"url": "{{ base_url }}/api/v1/session-templates/{{ template_id }}",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"metaSortKey": 3
+		},
+		{
+			"_id": "req_templates_update",
+			"_type": "request",
+			"parentId": "fld_session_templates",
+			"name": "Update session template",
+			"method": "PUT",
+			"url": "{{ base_url }}/api/v1/session-templates/{{ template_id }}",
+			"headers": [
+				{ "name": "Authorization", "value": "Bearer {{ token }}" },
+				{ "name": "Content-Type", "value": "application/json" }
+			],
+			"body": {
+				"mimeType": "application/json",
+				"text": "{\n  \"name\": \"Morning Reset Updated\",\n  \"preset\": \"adult\",\n  \"totalMinutes\": 40\n}"
+			},
+			"metaSortKey": 4
+		},
+		{
+			"_id": "req_templates_use",
+			"_type": "request",
+			"parentId": "fld_session_templates",
+			"name": "Record template use",
+			"method": "POST",
+			"url": "{{ base_url }}/api/v1/session-templates/{{ template_id }}/use",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+			"description": "Increments usageCount and updates lastUsedAt.",
+			"metaSortKey": 5
+		},
+		{
+			"_id": "req_templates_delete",
+			"_type": "request",
+			"parentId": "fld_session_templates",
+			"name": "Delete session template",
+			"method": "DELETE",
+			"url": "{{ base_url }}/api/v1/session-templates/{{ template_id }}",
+			"headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
 			"metaSortKey": 6
 		},
 
@@ -871,7 +1171,7 @@
 				{ "name": "page", "value": "1", "disabled": true },
 				{ "name": "limit", "value": "20", "disabled": true }
 			],
-			"description": "role: user | admin",
+			"description": "role: user | tutor | admin",
 			"metaSortKey": 1
 		},
 		{
@@ -889,7 +1189,7 @@
 				"mimeType": "application/json",
 				"text": "{\n  \"role\": \"admin\"\n}"
 			},
-			"description": "role enum: user | admin",
+			"description": "role enum: user | tutor | admin",
 			"metaSortKey": 2
 		},
 		{
@@ -926,9 +1226,9 @@
 			],
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"name\": \"Tadasana Level 1 — Foundation\",\n  \"family\": \"tadasana\",\n  \"level\": 1,\n  \"duration\": { \"min\": 20, \"max\": 30 },\n  \"difficulty\": \"beginner\",\n  \"description\": \"Foundational standing mountain sequence\",\n  \"corePoses\": [\n    {\n      \"pose\": \"{{ pose_id }}\",\n      \"order\": 1,\n      \"repetitions\": 3,\n      \"breathsPerRepetition\": 5\n    }\n  ]\n}"
+				"text": "{\n  \"sanskritName\": \"Tadasana Krama\",\n  \"englishName\": \"Standing Mountain Foundation\",\n  \"family\": \"tadasana\",\n  \"level\": 1,\n  \"description\": \"Foundational Vinyasa Krama sequence\",\n  \"duration\": 25,\n  \"structure\": [\n    {\n      \"pose\": \"{{ pose_id }}\",\n      \"order\": 1,\n      \"breaths\": 5,\n      \"notes\": \"Establish the base\"\n    }\n  ]\n}"
 			},
-			"description": "family enum: tadasana | standing_asymmetric | standing_symmetric | one_leg_standing | seated | supine | prone | inverted | meditative | bow_sequence | triangle_sequence | sun_salutation | vajrasana_variations | lotus_variations\nlevel: 1 | 2 | 3",
+			"description": "Aligned with current admin validations: sanskritName, englishName, family and level are required.\nfamily enum: tadasana | standing_asymmetric | standing_symmetric | one_leg_standing | seated | supine | prone | inverted | meditative | bow_sequence | triangle_sequence | sun_salutation | vajrasana_variations | lotus_variations\nlevel: 1 | 2 | 3",
 			"metaSortKey": 1
 		},
 		{
@@ -944,7 +1244,7 @@
 			],
 			"body": {
 				"mimeType": "application/json",
-				"text": "{\n  \"name\": \"Updated Sequence Name\",\n  \"description\": \"Updated description\"\n}"
+				"text": "{\n  \"englishName\": \"Updated Sequence Name\",\n  \"description\": \"Updated description\",\n  \"level\": 2\n}"
 			},
 			"metaSortKey": 2
 		},

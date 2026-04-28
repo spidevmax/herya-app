@@ -9,107 +9,6 @@ const { isSmtpConfigured, sendPasswordResetEmail } = require("../../utils/mailer
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 
-const buildFrontendAuthRedirect = (query) => {
-	const url = new URL("/auth/callback", FRONTEND_URL);
-	Object.entries(query).forEach(([key, value]) => {
-		if (value !== undefined && value !== null && value !== "") {
-			url.searchParams.set(key, value);
-		}
-	});
-	return url.toString();
-};
-
-const getGoogleAuthUrl = () => {
-	if (!process.env.GOOGLE_CLIENT_ID) {
-		throw createError(500, "GOOGLE_CLIENT_ID is not configured");
-	}
-
-	const redirectUri =
-		process.env.GOOGLE_REDIRECT_URI ||
-		`${process.env.BACKEND_URL || "http://localhost:3000"}/api/v1/auth/google/callback`;
-
-	const url = new URL("https://accounts.google.com/o/oauth2/v2/auth");
-	url.searchParams.set("client_id", process.env.GOOGLE_CLIENT_ID);
-	url.searchParams.set("redirect_uri", redirectUri);
-	url.searchParams.set("response_type", "code");
-	url.searchParams.set("scope", "openid email profile");
-	url.searchParams.set("access_type", "offline");
-	url.searchParams.set("prompt", "select_account");
-
-	return url.toString();
-};
-
-const exchangeGoogleCodeForUser = async (code) => {
-	if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-		throw createError(500, "Google OAuth credentials are not configured");
-	}
-
-	const redirectUri =
-		process.env.GOOGLE_REDIRECT_URI ||
-		`${process.env.BACKEND_URL || "http://localhost:3000"}/api/v1/auth/google/callback`;
-
-	const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
-		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body: new URLSearchParams({
-			code,
-			client_id: process.env.GOOGLE_CLIENT_ID,
-			client_secret: process.env.GOOGLE_CLIENT_SECRET,
-			redirect_uri: redirectUri,
-			grant_type: "authorization_code",
-		}),
-	});
-
-	if (!tokenResponse.ok) {
-		throw createError(401, "Google token exchange failed");
-	}
-
-	const tokenPayload = await tokenResponse.json();
-	if (!tokenPayload.access_token) {
-		throw createError(401, "Google token exchange did not return access token");
-	}
-
-	const userInfoResponse = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
-		headers: { Authorization: `Bearer ${tokenPayload.access_token}` },
-	});
-
-	if (!userInfoResponse.ok) {
-		throw createError(401, "Google user info could not be retrieved");
-	}
-
-	const profile = await userInfoResponse.json();
-
-	if (!profile.email || !profile.email_verified) {
-		throw createError(401, "Google account does not provide a verified email");
-	}
-
-	return profile;
-};
-
-const findOrCreateGoogleUser = async (profile) => {
-	const email = profile.email.toLowerCase().trim();
-	let user = await User.findOne({ email });
-
-	if (!user) {
-		const generatedPassword = crypto.randomBytes(32).toString("hex");
-		user = new User({
-			name: profile.name || email.split("@")[0],
-			email,
-			password: generatedPassword,
-			profileImageUrl: profile.picture,
-			vkProgression: {
-				currentMainSequence: null,
-				completedSequences: [],
-			},
-		});
-	} else if (!user.profileImageUrl && profile.picture) {
-		user.profileImageUrl = profile.picture;
-	}
-
-	await user.save();
-	return user;
-};
-
 /**
  * Controller: register
  * ------------------------
@@ -281,32 +180,6 @@ const logout = async (_req, res, next) => {
 	}
 };
 
-const googleAuthStart = async (_req, res, next) => {
-	try {
-		const googleUrl = getGoogleAuthUrl();
-		return res.redirect(googleUrl);
-	} catch (error) {
-		return next(error);
-	}
-};
-
-const googleAuthCallback = async (req, res) => {
-	try {
-		const code = req.query.code;
-		if (!code) {
-			return res.redirect(buildFrontendAuthRedirect({ error: "missing_google_code" }));
-		}
-
-		const profile = await exchangeGoogleCodeForUser(code);
-		const user = await findOrCreateGoogleUser(profile);
-		const token = generateToken(user._id, user.email);
-
-		return res.redirect(buildFrontendAuthRedirect({ token }));
-	} catch (_error) {
-		return res.redirect(buildFrontendAuthRedirect({ error: "google_auth_failed" }));
-	}
-};
-
 const requestPasswordReset = async (req, res, next) => {
 	try {
 		const { email, locale = "es" } = req.body;
@@ -396,8 +269,6 @@ module.exports = {
 	login,
 	me,
 	logout,
-	googleAuthStart,
-	googleAuthCallback,
 	requestPasswordReset,
 	resetPassword,
 };
