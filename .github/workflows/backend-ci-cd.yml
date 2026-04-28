@@ -75,7 +75,24 @@ jobs:
       - name: Start temporary MongoDB
         run: |
           docker network create herya-ci
-          docker run -d --name herya-mongo --network herya-ci mongo:7
+          docker run -d --name herya-mongo --network herya-ci \
+            --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 }).ok' || exit 1" \
+            --health-interval 2s --health-timeout 5s --health-retries 30 \
+            mongo:7
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          for i in {1..30}; do
+            status=$(docker inspect --format='{{.State.Health.Status}}' herya-mongo 2>/dev/null || echo "starting")
+            if [ "$status" = "healthy" ]; then
+              echo "MongoDB is healthy"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "MongoDB did not become healthy in time"
+          docker logs herya-mongo
+          exit 1
 
       - name: Start backend container
         run: |

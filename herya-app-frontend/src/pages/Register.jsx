@@ -1,11 +1,27 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
 import { Button } from "@/components/ui";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function FieldError({ id, message }) {
+	if (!message) return null;
+	return (
+		<p
+			id={id}
+			role="alert"
+			className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--color-error-text)]"
+		>
+			<AlertCircle size={14} aria-hidden="true" />
+			<span>{message}</span>
+		</p>
+	);
+}
 
 export default function Register() {
 	const navigate = useNavigate();
@@ -20,17 +36,67 @@ export default function Register() {
 	});
 	const [showPw, setShowPw] = useState(false);
 	const [showConfirmPw, setShowConfirmPw] = useState(false);
-	const [error, setError] = useState("");
+	const [errors, setErrors] = useState({});
+	const [formError, setFormError] = useState("");
 	const [loading, setLoading] = useState(false);
+
+	const updateField = (field, value) => {
+		setForm((f) => ({ ...f, [field]: value }));
+		if (errors[field]) {
+			setErrors((prev) => {
+				const next = { ...prev };
+				delete next[field];
+				return next;
+			});
+		}
+	};
+
+	const validate = () => {
+		const next = {};
+		if (!form.name.trim()) next.name = t("register.errors.name_required");
+		if (!form.email.trim()) next.email = t("register.errors.email_required");
+		else if (!EMAIL_RE.test(form.email.trim()))
+			next.email = t("register.errors.email_invalid");
+		if (!form.password) next.password = t("register.errors.password_required");
+		else if (form.password.length < 8)
+			next.password = t("register.errors.password_too_short");
+		if (!form.passwordConfirm)
+			next.passwordConfirm = t("register.errors.confirm_required");
+		else if (form.password && form.password !== form.passwordConfirm)
+			next.passwordConfirm = t("register.password_mismatch");
+		return next;
+	};
+
+	const mapServerError = (err) => {
+		const status = err?.response?.status;
+		const message = err?.response?.data?.message || "";
+		const lower = message.toLowerCase();
+
+		if (status === 409 || lower.includes("already") || lower.includes("in use") || lower.includes("exist")) {
+			setErrors((prev) => ({ ...prev, email: t("register.errors.email_in_use") }));
+			return;
+		}
+		if (lower.includes("email")) {
+			setErrors((prev) => ({ ...prev, email: t("register.errors.email_invalid") }));
+			return;
+		}
+		if (lower.includes("password")) {
+			setErrors((prev) => ({ ...prev, password: t("register.errors.password_too_short") }));
+			return;
+		}
+		setFormError(message || t("register.errors.generic"));
+	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError("");
+		setFormError("");
 
-		if (form.password !== form.passwordConfirm) {
-			setError(t("register.password_mismatch"));
+		const validation = validate();
+		if (Object.keys(validation).length > 0) {
+			setErrors(validation);
 			return;
 		}
+		setErrors({});
 
 		setLoading(true);
 		try {
@@ -42,11 +108,16 @@ export default function Register() {
 			});
 			navigate("/");
 		} catch (err) {
-			setError(err?.response?.data?.message || t("register.error"));
+			mapServerError(err);
 		} finally {
 			setLoading(false);
 		}
 	};
+
+	const inputErrorStyle = (field) =>
+		errors[field]
+			? { borderColor: "var(--color-error-text)", boxShadow: "0 0 0 1px var(--color-error-text)" }
+			: undefined;
 
 	return (
 		<div
@@ -68,13 +139,17 @@ export default function Register() {
 						</h1>
 					</div>
 
-					{error && (
-						<div role="alert" className="mb-4 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]">
-							{error}
+					{formError && (
+						<div
+							role="alert"
+							className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
+						>
+							<AlertCircle size={16} aria-hidden="true" />
+							<span>{formError}</span>
 						</div>
 					)}
 
-					<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+					<form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
 						<div>
 							<p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
 								{t("register.account_type_label")}
@@ -120,93 +195,109 @@ export default function Register() {
 								</button>
 							</div>
 						</div>
-						<div className="relative">
-							<User
-								size={18}
-								className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							/>
-							<input
-								type="text"
-								autoComplete="name"
-								required
-								aria-label={t("register.full_name")}
-								placeholder={t("register.full_name")}
-								value={form.name}
-								onChange={(e) =>
-									setForm((f) => ({ ...f, name: e.target.value }))
-								}
-								className="input-base pl-10 pr-4"
-							/>
+
+						<div>
+							<div className="relative">
+								<User
+									size={18}
+									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+								/>
+								<input
+									type="text"
+									autoComplete="name"
+									aria-label={t("register.full_name")}
+									aria-invalid={!!errors.name}
+									aria-describedby={errors.name ? "name-error" : undefined}
+									placeholder={t("register.full_name")}
+									value={form.name}
+									onChange={(e) => updateField("name", e.target.value)}
+									className="input-base pl-10 pr-4"
+									style={inputErrorStyle("name")}
+								/>
+							</div>
+							<FieldError id="name-error" message={errors.name} />
 						</div>
-						<div className="relative">
-							<Mail
-								size={18}
-								className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							/>
-							<input
-								type="email"
-								autoComplete="email"
-								required
-								aria-label={t("login.email_placeholder")}
-								placeholder={t("login.email_placeholder")}
-								value={form.email}
-								onChange={(e) =>
-									setForm((f) => ({ ...f, email: e.target.value }))
-								}
-								className="input-base pl-10 pr-4"
-							/>
+
+						<div>
+							<div className="relative">
+								<Mail
+									size={18}
+									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+								/>
+								<input
+									type="email"
+									autoComplete="email"
+									aria-label={t("login.email_placeholder")}
+									aria-invalid={!!errors.email}
+									aria-describedby={errors.email ? "email-error" : undefined}
+									placeholder={t("login.email_placeholder")}
+									value={form.email}
+									onChange={(e) => updateField("email", e.target.value)}
+									className="input-base pl-10 pr-4"
+									style={inputErrorStyle("email")}
+								/>
+							</div>
+							<FieldError id="email-error" message={errors.email} />
 						</div>
-						<div className="relative">
-							<Lock
-								size={18}
-								className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							/>
-							<input
-								type={showPw ? "text" : "password"}
-								autoComplete="new-password"
-								required
-								aria-label={t("register.password_placeholder")}
-								placeholder={t("register.password_placeholder")}
-								value={form.password}
-								onChange={(e) =>
-									setForm((f) => ({ ...f, password: e.target.value }))
-								}
-								className="input-base pl-10 pr-11"
-							/>
-							<button
-								type="button"
-								onClick={() => setShowPw((v) => !v)}
-								aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
-								className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							>
-								{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-							</button>
+
+						<div>
+							<div className="relative">
+								<Lock
+									size={18}
+									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+								/>
+								<input
+									type={showPw ? "text" : "password"}
+									autoComplete="new-password"
+									aria-label={t("register.password_placeholder")}
+									aria-invalid={!!errors.password}
+									aria-describedby={errors.password ? "password-error" : undefined}
+									placeholder={t("register.password_placeholder")}
+									value={form.password}
+									onChange={(e) => updateField("password", e.target.value)}
+									className="input-base pl-10 pr-11"
+									style={inputErrorStyle("password")}
+								/>
+								<button
+									type="button"
+									onClick={() => setShowPw((v) => !v)}
+									aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
+									className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+								>
+									{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
+							</div>
+							<FieldError id="password-error" message={errors.password} />
 						</div>
-						<div className="relative">
-							<Lock
-								size={18}
-								className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							/>
-							<input
-								type={showConfirmPw ? "text" : "password"}
-								autoComplete="new-password"
-								required
-								aria-label={t("register.confirm_password")}
-								placeholder={t("register.confirm_password")}
-								value={form.passwordConfirm}
-								onChange={(e) =>
-									setForm((f) => ({ ...f, passwordConfirm: e.target.value }))
-								}
-								className="input-base pl-10 pr-11"
-							/>
-							<button
-								type="button"
-								onClick={() => setShowConfirmPw((v) => !v)}
-								aria-label={showConfirmPw ? t("login.hide_password") : t("login.show_password")}
-								className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							>
-								{showConfirmPw ? <EyeOff size={18} /> : <Eye size={18} />}
-							</button>
+
+						<div>
+							<div className="relative">
+								<Lock
+									size={18}
+									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+								/>
+								<input
+									type={showConfirmPw ? "text" : "password"}
+									autoComplete="new-password"
+									aria-label={t("register.confirm_password")}
+									aria-invalid={!!errors.passwordConfirm}
+									aria-describedby={errors.passwordConfirm ? "confirm-error" : undefined}
+									placeholder={t("register.confirm_password")}
+									value={form.passwordConfirm}
+									onChange={(e) => updateField("passwordConfirm", e.target.value)}
+									className="input-base pl-10 pr-11"
+									style={inputErrorStyle("passwordConfirm")}
+								/>
+								<button
+									type="button"
+									onClick={() => setShowConfirmPw((v) => !v)}
+									aria-label={showConfirmPw ? t("login.hide_password") : t("login.show_password")}
+									className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+								>
+									{showConfirmPw ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
+							</div>
+							<FieldError id="confirm-error" message={errors.passwordConfirm} />
 						</div>
 
 						<Button type="submit" disabled={loading} className="mt-1 w-full">

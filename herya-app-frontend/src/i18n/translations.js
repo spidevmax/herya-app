@@ -134,6 +134,16 @@ export const translations = {
 			have_account: "Already have an account?",
 			login_link: "Log in",
 			error: "Error creating account",
+			errors: {
+				name_required: "Please enter your full name",
+				email_required: "Please enter your email",
+				email_invalid: "Please enter a valid email address",
+				email_in_use: "This email is already in use",
+				password_required: "Please enter a password",
+				password_too_short: "Password must be at least 8 characters",
+				confirm_required: "Please confirm your password",
+				generic: "Something went wrong. Please try again.",
+			},
 		},
 		not_found: {
 			title: "Page not found",
@@ -1429,6 +1439,16 @@ export const translations = {
 			have_account: "¿Ya tienes cuenta?",
 			login_link: "Inicia sesión",
 			error: "Error al crear la cuenta",
+			errors: {
+				name_required: "Introduce tu nombre completo",
+				email_required: "Introduce tu correo electrónico",
+				email_invalid: "Introduce un correo electrónico válido",
+				email_in_use: "Este correo ya está en uso",
+				password_required: "Introduce una contraseña",
+				password_too_short: "La contraseña debe tener al menos 8 caracteres",
+				confirm_required: "Confirma tu contraseña",
+				generic: "Algo salió mal. Inténtalo de nuevo.",
+			},
 		},
 		not_found: {
 			title: "Pagina no encontrada",
