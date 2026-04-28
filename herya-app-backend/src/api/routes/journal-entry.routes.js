@@ -6,15 +6,9 @@ const {
 	updateJournalEntry,
 	deleteJournalEntry,
 } = require("../controllers/journalEntry.controller");
-const {
-	authenticateToken,
-} = require("../../middlewares/authorization.middleware");
-const {
-	handleValidationErrors,
-} = require("../../middlewares/validation.middleware");
-const {
-	uploadJournalMixed,
-} = require("../../middlewares/upload/journal.upload");
+const { authenticateToken } = require("../../middlewares/authorization.middleware");
+const { handleValidationErrors } = require("../../middlewares/validation.middleware");
+const { uploadJournalMixed } = require("../../middlewares/upload/journal.upload");
 const {
 	journalValidations,
 	journalIdValidation,
@@ -96,12 +90,7 @@ router.use(authenticateToken());
  *       500:
  *         description: Server error
  */
-router.get(
-	"/",
-	getJournalEntriesValidation,
-	handleValidationErrors,
-	getJournalEntries,
-);
+router.get("/", getJournalEntriesValidation, handleValidationErrors, getJournalEntries);
 
 /**
  * @swagger
@@ -313,12 +302,7 @@ router.post(
  *       500:
  *         description: Server error
  */
-router.get(
-	"/:id",
-	journalIdValidation,
-	handleValidationErrors,
-	getJournalEntryById,
-);
+router.get("/:id", journalIdValidation, handleValidationErrors, getJournalEntryById);
 
 /**
  * @swagger
@@ -482,11 +466,6 @@ router.put(
  *       500:
  *         description: Server error
  */
-router.delete(
-	"/:id",
-	journalIdValidation,
-	handleValidationErrors,
-	deleteJournalEntry,
-);
+router.delete("/:id", journalIdValidation, handleValidationErrors, deleteJournalEntry);
 
 module.exports = router;

@@ -362,7 +362,12 @@ usersRouter.get("/me/stats", getMyStats);
  *       500:
  *         description: Server error
  */
-usersRouter.put("/me/image", profileWriteLimiter, uploadUserImage.single("profileImage"), updateMyProfileImage);
+usersRouter.put(
+	"/me/image",
+	profileWriteLimiter,
+	uploadUserImage.single("profileImage"),
+	updateMyProfileImage,
+);
 
 /**
  * @swagger

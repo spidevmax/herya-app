@@ -182,9 +182,7 @@ const createPoseValidation = [
 	body("techniqueFamily")
 		.optional()
 		.isIn(BREATHING_TECHNIQUE_FAMILIES)
-		.withMessage(
-			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
-		),
+		.withMessage(`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`),
 ];
 
 /**
@@ -219,9 +217,7 @@ const updatePoseValidation = [
 	body("techniqueFamily")
 		.optional()
 		.isIn(BREATHING_TECHNIQUE_FAMILIES)
-		.withMessage(
-			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
-		),
+		.withMessage(`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`),
 ];
 
 /**
@@ -273,9 +269,7 @@ const createBreathingPatternValidation = [
 	body("techniqueFamily")
 		.optional()
 		.isIn(BREATHING_TECHNIQUE_FAMILIES)
-		.withMessage(
-			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
-		),
+		.withMessage(`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`),
 
 	body("variantOf")
 		.optional()
@@ -309,9 +303,7 @@ const updateBreathingPatternValidation = [
 	body("techniqueFamily")
 		.optional()
 		.isIn(BREATHING_TECHNIQUE_FAMILIES)
-		.withMessage(
-			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
-		),
+		.withMessage(`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`),
 
 	body("variantOf")
 		.optional()

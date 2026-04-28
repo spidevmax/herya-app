@@ -91,22 +91,16 @@ const inferTechniqueMeta = (docLike = {}) => {
 		return { techniqueKey: "nadi_shodhana", techniqueFamily: "alternate_nostril" };
 	if (name === "surya bhedana")
 		return { techniqueKey: "surya_bhedana", techniqueFamily: "alternate_nostril" };
-	if (
-		name === "candra bhedana" ||
-		name === "chandra bhedana" ||
-		name === "candra bedhana"
-	)
+	if (name === "candra bhedana" || name === "chandra bhedana" || name === "candra bedhana")
 		return { techniqueKey: "candra_bhedana", techniqueFamily: "alternate_nostril" };
 	if (name === "murccha") return { techniqueKey: "murccha", techniqueFamily: "retention" };
 	if (name === "plavini") return { techniqueKey: "plavini", techniqueFamily: "expansion" };
-	if (name === "sama vritti")
-		return { techniqueKey: "sama_vritti", techniqueFamily: "balancing" };
+	if (name === "sama vritti") return { techniqueKey: "sama_vritti", techniqueFamily: "balancing" };
 	if (name === "bhramari") return { techniqueKey: "bhramari", techniqueFamily: "humming" };
 	if (name === "agni" || name === "agni prasana")
 		return { techniqueKey: "agni", techniqueFamily: "heating" };
 	if (name === "bhastrika") return { techniqueKey: "bhastrika", techniqueFamily: "heating" };
-	if (name === "kapalabhati")
-		return { techniqueKey: "kapalabhati", techniqueFamily: "cleansing" };
+	if (name === "kapalabhati") return { techniqueKey: "kapalabhati", techniqueFamily: "cleansing" };
 	if (name === "sitali" || coolingType === "sitali")
 		return { techniqueKey: "sitali", techniqueFamily: "cooling" };
 
@@ -564,7 +558,9 @@ breathingPatternSchema.pre("validate", async function () {
 		const rounds = this?.vkTechniques?.kapalabhati?.rounds || this?.vkTechniques?.bhastrika?.rounds;
 		const hasCountConfig = Number.isFinite(pumpingRate) || Number.isFinite(rounds);
 		if (!hasCountConfig) {
-			throw new Error("Count-based breathing pattern must define count-oriented technique settings");
+			throw new Error(
+				"Count-based breathing pattern must define count-oriented technique settings",
+			);
 		}
 	}
 });

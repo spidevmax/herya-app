@@ -16,9 +16,7 @@ describe("Users — GET /me", () => {
 			name: "Profile User",
 			email: "profile@test.com",
 		});
-		const res = await request(app)
-			.get(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 		expect(res.body.data).toHaveProperty("email", "profile@test.com");
@@ -31,9 +29,7 @@ describe("Users — GET /me", () => {
 			role: "tutor",
 		});
 
-		const res = await request(app)
-			.get(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
@@ -43,27 +39,21 @@ describe("Users — GET /me", () => {
 
 	it("does not include vkProgression in the response", async () => {
 		const { token } = await createUser({ email: "no-vk@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).not.toHaveProperty("vkProgression");
 	});
 
 	it("does not include password in the response", async () => {
 		const { token } = await createUser({ email: "no-pwd@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).not.toHaveProperty("password");
 	});
 
 	it("includes bestStreak in the response", async () => {
 		const { token } = await createUser({ email: "streak@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("bestStreak");
 	});
@@ -198,9 +188,7 @@ describe("Users — PUT /me", () => {
 describe("Users — GET /me/stats", () => {
 	it("returns stats for the authenticated user", async () => {
 		const { token } = await createUser({ email: "stats@test.com" });
-		const res = await request(app)
-			.get(`${BASE}/me/stats`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/me/stats`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("totalSessions");
 		expect(res.body.data).toHaveProperty("totalMinutes");
@@ -247,9 +235,7 @@ describe("Users — DELETE /me", () => {
 	it("deletes the account and all associated data", async () => {
 		const { token, user } = await createUser({ email: "delete-me@test.com" });
 
-		const res = await request(app)
-			.delete(`${BASE}/me`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).delete(`${BASE}/me`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 

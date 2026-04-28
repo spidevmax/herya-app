@@ -99,11 +99,7 @@ const SUPPLEMENTAL_PATTERNS = [
 			cycles: { min: 4, max: 16, default: 8 },
 		},
 		benefits: ["builds precision", "steadies the mind", "improves segmented control"],
-		benefitsEs: [
-			"desarrolla precision",
-			"estabiliza la mente",
-			"mejora el control segmentado",
-		],
+		benefitsEs: ["desarrolla precision", "estabiliza la mente", "mejora el control segmentado"],
 		contraindications: ["dizziness", "acute anxiety"],
 		contraindicationsEs: ["mareo", "ansiedad aguda"],
 		vkContext: {
@@ -320,115 +316,115 @@ async function seedBreathingPatterns() {
 			});
 
 			return {
-			// IDENTIFICATION
-			romanizationName: row.romanizationName?.trim(),
-			iastName: row.iastName?.trim(),
-			sanskritName: row.sanskritName?.trim(),
-			alias: toArray(row.alias),
-			description: row.description?.trim(),
-			descriptionEs: row.descriptionEs?.trim() || undefined,
+				// IDENTIFICATION
+				romanizationName: row.romanizationName?.trim(),
+				iastName: row.iastName?.trim(),
+				sanskritName: row.sanskritName?.trim(),
+				alias: toArray(row.alias),
+				description: row.description?.trim(),
+				descriptionEs: row.descriptionEs?.trim() || undefined,
 
-			// CLASSIFICATION
-			difficulty: row.difficulty?.trim() || "beginner",
-			techniqueKey: row.techniqueKey?.trim() || inferredMeta.techniqueKey,
-			techniqueFamily: row.techniqueFamily?.trim() || inferredMeta.techniqueFamily,
-			variantOf: row.variantOf?.trim() || undefined,
+				// CLASSIFICATION
+				difficulty: row.difficulty?.trim() || "beginner",
+				techniqueKey: row.techniqueKey?.trim() || inferredMeta.techniqueKey,
+				techniqueFamily: row.techniqueFamily?.trim() || inferredMeta.techniqueFamily,
+				variantOf: row.variantOf?.trim() || undefined,
 
-			// BREATHING PATTERN
-			patternType: row.patternType?.trim() || "ratio_based",
-			patternRatio: {
-				inhale: row["patternRatio.inhale"] ?? 1,
-				hold: row["patternRatio.hold"] ?? 0,
-				exhale: row["patternRatio.exhale"] ?? 1,
-				holdAfterExhale: row["patternRatio.holdAfterExhale"] ?? 0,
-			},
-			baseBreathDuration: row.baseBreathDuration ?? 5,
+				// BREATHING PATTERN
+				patternType: row.patternType?.trim() || "ratio_based",
+				patternRatio: {
+					inhale: row["patternRatio.inhale"] ?? 1,
+					hold: row["patternRatio.hold"] ?? 0,
+					exhale: row["patternRatio.exhale"] ?? 1,
+					holdAfterExhale: row["patternRatio.holdAfterExhale"] ?? 0,
+				},
+				baseBreathDuration: row.baseBreathDuration ?? 5,
 
-			// RECOMMENDED PRACTICE
-			recommendedPractice: {
-				measureBy: row["recommendedPractice.measureBy"] || "cycles",
-				durationMinutes: {
-					min: row["recommendedPractice.durationMinutes.min"] ?? 3,
-					max: row["recommendedPractice.durationMinutes.max"] ?? 10,
-					default: row["recommendedPractice.durationMinutes.default"] ?? 5,
+				// RECOMMENDED PRACTICE
+				recommendedPractice: {
+					measureBy: row["recommendedPractice.measureBy"] || "cycles",
+					durationMinutes: {
+						min: row["recommendedPractice.durationMinutes.min"] ?? 3,
+						max: row["recommendedPractice.durationMinutes.max"] ?? 10,
+						default: row["recommendedPractice.durationMinutes.default"] ?? 5,
+					},
+					cycles: {
+						min: row["recommendedPractice.cycles.min"] ?? 5,
+						max: row["recommendedPractice.cycles.max"] ?? 20,
+						default: row["recommendedPractice.cycles.default"] ?? 10,
+					},
 				},
-				cycles: {
-					min: row["recommendedPractice.cycles.min"] ?? 5,
-					max: row["recommendedPractice.cycles.max"] ?? 20,
-					default: row["recommendedPractice.cycles.default"] ?? 10,
-				},
-			},
 
-			// VK TECHNIQUES
-			vkTechniques: {
-				nadishodhana: {
-					enabled: toBool(row["vkTechniques.nadishodhana.enabled"]),
-					...(row["vkTechniques.nadishodhana.pattern"] && {
-						pattern: row["vkTechniques.nadishodhana.pattern"],
-					}),
+				// VK TECHNIQUES
+				vkTechniques: {
+					nadishodhana: {
+						enabled: toBool(row["vkTechniques.nadishodhana.enabled"]),
+						...(row["vkTechniques.nadishodhana.pattern"] && {
+							pattern: row["vkTechniques.nadishodhana.pattern"],
+						}),
+					},
+					kapalabhati: {
+						enabled: toBool(row["vkTechniques.kapalabhati.enabled"]),
+						...(row["vkTechniques.kapalabhati.pumpingRate"] != null && {
+							pumpingRate: row["vkTechniques.kapalabhati.pumpingRate"],
+						}),
+						rounds: row["vkTechniques.kapalabhati.rounds"] ?? 3,
+					},
+					bhastrika: {
+						enabled: toBool(row["vkTechniques.bhastrika.enabled"]),
+						intensity: row["vkTechniques.bhastrika.intensity"] || "gentle",
+						rounds: row["vkTechniques.bhastrika.rounds"] ?? 3,
+					},
+					ujjayi: {
+						enabled: toBool(row["vkTechniques.ujjayi.enabled"]),
+						withSound:
+							row["vkTechniques.ujjayi.withSound"] != null
+								? toBool(row["vkTechniques.ujjayi.withSound"])
+								: true,
+					},
+					bhramari: {
+						enabled: toBool(row["vkTechniques.bhramari.enabled"]),
+						pitch: row["vkTechniques.bhramari.pitch"] || "medium",
+					},
+					cooling: {
+						enabled: toBool(row["vkTechniques.cooling.enabled"]),
+						type: row["vkTechniques.cooling.type"] || "sitali",
+					},
+					bandhas: {
+						mula: toBool(row["vkTechniques.bandhas.mula"]),
+						uddiyana: toBool(row["vkTechniques.bandhas.uddiyana"]),
+						jalandhara: toBool(row["vkTechniques.bandhas.jalandhara"]),
+						whenToApply: row["vkTechniques.bandhas.whenToApply"] || "none",
+					},
+					mudra: row["vkTechniques.mudra"] || "none",
 				},
-				kapalabhati: {
-					enabled: toBool(row["vkTechniques.kapalabhati.enabled"]),
-					...(row["vkTechniques.kapalabhati.pumpingRate"] != null && {
-						pumpingRate: row["vkTechniques.kapalabhati.pumpingRate"],
-					}),
-					rounds: row["vkTechniques.kapalabhati.rounds"] ?? 3,
-				},
-				bhastrika: {
-					enabled: toBool(row["vkTechniques.bhastrika.enabled"]),
-					intensity: row["vkTechniques.bhastrika.intensity"] || "gentle",
-					rounds: row["vkTechniques.bhastrika.rounds"] ?? 3,
-				},
-				ujjayi: {
-					enabled: toBool(row["vkTechniques.ujjayi.enabled"]),
-					withSound:
-						row["vkTechniques.ujjayi.withSound"] != null
-							? toBool(row["vkTechniques.ujjayi.withSound"])
-							: true,
-				},
-				bhramari: {
-					enabled: toBool(row["vkTechniques.bhramari.enabled"]),
-					pitch: row["vkTechniques.bhramari.pitch"] || "medium",
-				},
-				cooling: {
-					enabled: toBool(row["vkTechniques.cooling.enabled"]),
-					type: row["vkTechniques.cooling.type"] || "sitali",
-				},
-				bandhas: {
-					mula: toBool(row["vkTechniques.bandhas.mula"]),
-					uddiyana: toBool(row["vkTechniques.bandhas.uddiyana"]),
-					jalandhara: toBool(row["vkTechniques.bandhas.jalandhara"]),
-					whenToApply: row["vkTechniques.bandhas.whenToApply"] || "none",
-				},
-				mudra: row["vkTechniques.mudra"] || "none",
-			},
 
-			// BENEFITS AND CONTRAINDICATIONS
-			benefits: toArray(row.benefits),
-			benefitsEs: toArray(row.benefitsEs),
-			contraindications: toArray(row.contraindications),
-			contraindicationsEs: toArray(row.contraindicationsEs),
-			warnings: row.warnings?.trim() || undefined,
-			warningsEs: row.warningsEs?.trim() || undefined,
+				// BENEFITS AND CONTRAINDICATIONS
+				benefits: toArray(row.benefits),
+				benefitsEs: toArray(row.benefitsEs),
+				contraindications: toArray(row.contraindications),
+				contraindicationsEs: toArray(row.contraindicationsEs),
+				warnings: row.warnings?.trim() || undefined,
+				warningsEs: row.warningsEs?.trim() || undefined,
 
-			// VK CONTEXT
-			vkContext: {
-				practicePhase: row["vkContext.practicePhase"]?.trim() || "opening",
-				recommendedBefore: toArray(row["vkContext.recommendedBefore"]),
-				progressionNotes: row["vkContext.progressionNotes"]?.trim() || undefined,
-			},
+				// VK CONTEXT
+				vkContext: {
+					practicePhase: row["vkContext.practicePhase"]?.trim() || "opening",
+					recommendedBefore: toArray(row["vkContext.recommendedBefore"]),
+					progressionNotes: row["vkContext.progressionNotes"]?.trim() || undefined,
+				},
 
-			// UI/UX
-			visualType: row.visualType?.trim() || "circle",
-			soundCue: row.soundCue?.trim() || "bell",
+				// UI/UX
+				visualType: row.visualType?.trim() || "circle",
+				soundCue: row.soundCue?.trim() || "bell",
 
-			// EFFECTS
-			energyEffect: row.energyEffect?.trim() || "balancing",
-			bestTimeOfDay: toArray(row.bestTimeOfDay),
+				// EFFECTS
+				energyEffect: row.energyEffect?.trim() || "balancing",
+				bestTimeOfDay: toArray(row.bestTimeOfDay),
 
-			// METADATA
-			tags: toArray(row.tags),
-			isSystemPattern: toBool(row.isSystemPattern),
+				// METADATA
+				tags: toArray(row.tags),
+				isSystemPattern: toBool(row.isSystemPattern),
 			};
 		});
 
@@ -441,8 +437,7 @@ async function seedBreathingPatterns() {
 				breathingPatterns.push({
 					...supplementalPattern,
 					techniqueKey: supplementalPattern.techniqueKey || inferredMeta.techniqueKey,
-					techniqueFamily:
-						supplementalPattern.techniqueFamily || inferredMeta.techniqueFamily,
+					techniqueFamily: supplementalPattern.techniqueFamily || inferredMeta.techniqueFamily,
 					variantOf: supplementalPattern.variantOf,
 				});
 			}

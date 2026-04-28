@@ -15,10 +15,7 @@ const createChildProfileValidations = [
 		.isLength({ max: 60 })
 		.withMessage("Name must be 60 characters or less"),
 
-	check("age")
-		.optional()
-		.isInt({ min: 3, max: 18 })
-		.withMessage("Age must be between 3 and 18"),
+	check("age").optional().isInt({ min: 3, max: 18 }).withMessage("Age must be between 3 and 18"),
 
 	check("avatarColor")
 		.optional()
@@ -35,20 +32,14 @@ const createChildProfileValidations = [
 		.isLength({ max: 120 })
 		.withMessage("Safety anchor body cue must be 120 characters or less"),
 
-	check("knownTriggers")
-		.optional()
-		.isArray()
-		.withMessage("knownTriggers must be an array"),
+	check("knownTriggers").optional().isArray().withMessage("knownTriggers must be an array"),
 
 	check("knownTriggers.*")
 		.optional()
 		.isLength({ max: 200 })
 		.withMessage("Each trigger must be 200 characters or less"),
 
-	check("contraindications")
-		.optional()
-		.isArray()
-		.withMessage("contraindications must be an array"),
+	check("contraindications").optional().isArray().withMessage("contraindications must be an array"),
 
 	check("contraindications.*")
 		.optional()
@@ -68,10 +59,7 @@ const updateChildProfileValidations = [
 		.isLength({ min: 1, max: 60 })
 		.withMessage("Name must be between 1 and 60 characters"),
 
-	check("age")
-		.optional()
-		.isInt({ min: 3, max: 18 })
-		.withMessage("Age must be between 3 and 18"),
+	check("age").optional().isInt({ min: 3, max: 18 }).withMessage("Age must be between 3 and 18"),
 
 	check("avatarColor")
 		.optional()
@@ -88,10 +76,7 @@ const updateChildProfileValidations = [
 		.isLength({ max: 120 })
 		.withMessage("Safety anchor body cue must be 120 characters or less"),
 
-	check("active")
-		.optional()
-		.isBoolean()
-		.withMessage("active must be a boolean"),
+	check("active").optional().isBoolean().withMessage("active must be a boolean"),
 ];
 
 module.exports = {

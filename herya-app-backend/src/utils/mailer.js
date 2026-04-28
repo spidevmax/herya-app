@@ -23,8 +23,7 @@ const RESET_EMAIL_COPY = {
 		body: "Recibimos una solicitud para restablecer tu contraseña de Herya.",
 		cta: "Crear nueva contraseña",
 		expires: "Este enlace es válido durante 30 minutos.",
-		disclaimer:
-			"Si no solicitaste este cambio, puedes ignorar este mensaje con tranquilidad.",
+		disclaimer: "Si no solicitaste este cambio, puedes ignorar este mensaje con tranquilidad.",
 		brandLine: "Respira, practica y vuelve a tu centro.",
 	},
 	en: {
@@ -34,8 +33,7 @@ const RESET_EMAIL_COPY = {
 		body: "We received a request to reset your Herya password.",
 		cta: "Create new password",
 		expires: "This link is valid for 30 minutes.",
-		disclaimer:
-			"If you did not request this change, you can safely ignore this email.",
+		disclaimer: "If you did not request this change, you can safely ignore this email.",
 		brandLine: "Breathe, practice, and return to your center.",
 	},
 };
@@ -43,16 +41,11 @@ const RESET_EMAIL_COPY = {
 const buildPasswordResetEmail = ({ locale, name, resetUrl }) => {
 	const selectedLocale = normalizeLocale(locale);
 	const copy = RESET_EMAIL_COPY[selectedLocale];
-	const safeName = escapeHtml(
-		name || (selectedLocale === "es" ? "amiga" : "friend"),
-	);
+	const safeName = escapeHtml(name || (selectedLocale === "es" ? "amiga" : "friend"));
 	const safeResetUrl = escapeHtml(resetUrl);
 
 	const text = [
-		copy.greeting.replace(
-			"{name}",
-			name || (selectedLocale === "es" ? "amiga" : "friend"),
-		),
+		copy.greeting.replace("{name}", name || (selectedLocale === "es" ? "amiga" : "friend")),
 		"",
 		copy.body,
 		"",
@@ -101,8 +94,7 @@ const getSmtpConfig = () => {
 	const user = process.env.SMTP_USER;
 	const pass = process.env.SMTP_PASS;
 	const secure = parseBoolean(process.env.SMTP_SECURE || false);
-	const from =
-		process.env.SMTP_FROM || `Herya <${user || "no-reply@herya.app"}>`;
+	const from = process.env.SMTP_FROM || `Herya <${user || "no-reply@herya.app"}>`;
 
 	return {
 		host,
@@ -128,12 +120,7 @@ const getTransporter = () => {
 	});
 };
 
-const sendPasswordResetEmail = async ({
-	to,
-	name,
-	resetUrl,
-	locale = "es",
-}) => {
+const sendPasswordResetEmail = async ({ to, name, resetUrl, locale = "es" }) => {
 	const transporter = getTransporter();
 	const { from } = getSmtpConfig();
 	const payload = buildPasswordResetEmail({ locale, name, resetUrl });

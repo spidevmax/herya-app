@@ -28,9 +28,7 @@ describe("Journal Entries — GET /", () => {
 
 	it("returns an empty list for a new user", async () => {
 		const { token } = await createUser({ email: "journal-list@test.com" });
-		const res = await request(app)
-			.get(BASE)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(BASE).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.success).toBe(true);
 		expect(Array.isArray(res.body.data.journals)).toBe(true);
@@ -72,9 +70,7 @@ describe("Journal Entries — GET /:id", () => {
 			.set("Authorization", `Bearer ${token}`)
 			.send(JOURNAL_PAYLOAD(session._id));
 		const id = create.body.data._id;
-		const res = await request(app)
-			.get(`${BASE}/${id}`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).get(`${BASE}/${id}`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 		expect(res.body.data).toHaveProperty("_id", id);
 	});
@@ -115,9 +111,7 @@ describe("Journal Entries — DELETE /:id", () => {
 			.set("Authorization", `Bearer ${token}`)
 			.send(JOURNAL_PAYLOAD(session._id));
 		const id = create.body.data._id;
-		const res = await request(app)
-			.delete(`${BASE}/${id}`)
-			.set("Authorization", `Bearer ${token}`);
+		const res = await request(app).delete(`${BASE}/${id}`).set("Authorization", `Bearer ${token}`);
 		expect(res.status).toBe(200);
 	});
 });

@@ -21,9 +21,7 @@ const createTemplateValidations = [
 		.isIn(["vk_sequence", "pranayama", "meditation", "complete_practice"])
 		.withMessage("Invalid session type"),
 
-	check("blocks")
-		.isArray({ min: 1 })
-		.withMessage("At least one block is required"),
+	check("blocks").isArray({ min: 1 }).withMessage("At least one block is required"),
 
 	check("blocks.*.blockType")
 		.notEmpty()
@@ -31,9 +29,7 @@ const createTemplateValidations = [
 		.isIn(["vk_sequence", "pranayama", "meditation"])
 		.withMessage("Invalid block type"),
 
-	check("blocks.*.label")
-		.notEmpty()
-		.withMessage("Block label is required"),
+	check("blocks.*.label").notEmpty().withMessage("Block label is required"),
 
 	check("blocks.*.durationMinutes")
 		.notEmpty()
@@ -53,10 +49,7 @@ const createTemplateValidations = [
 		.isInt({ min: 1 })
 		.withMessage("Total minutes must be at least 1"),
 
-	check("preset")
-		.optional()
-		.isIn(["adult", "tutor"])
-		.withMessage("Preset must be adult or tutor"),
+	check("preset").optional().isIn(["adult", "tutor"]).withMessage("Preset must be adult or tutor"),
 
 	check("childProfile")
 		.optional()
@@ -76,20 +69,14 @@ const updateTemplateValidations = [
 		.isIn(["vk_sequence", "pranayama", "meditation", "complete_practice"])
 		.withMessage("Invalid session type"),
 
-	check("blocks")
-		.optional()
-		.isArray({ min: 1 })
-		.withMessage("At least one block is required"),
+	check("blocks").optional().isArray({ min: 1 }).withMessage("At least one block is required"),
 
 	check("totalMinutes")
 		.optional()
 		.isInt({ min: 1 })
 		.withMessage("Total minutes must be at least 1"),
 
-	check("preset")
-		.optional()
-		.isIn(["adult", "tutor"])
-		.withMessage("Preset must be adult or tutor"),
+	check("preset").optional().isIn(["adult", "tutor"]).withMessage("Preset must be adult or tutor"),
 ];
 
 module.exports = {

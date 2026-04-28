@@ -44,9 +44,7 @@ const getBreathingPatternsValidation = [
 	query("techniqueFamily")
 		.optional()
 		.isIn(BREATHING_TECHNIQUE_FAMILIES)
-		.withMessage(
-			`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`,
-		),
+		.withMessage(`Technique family must be one of: ${BREATHING_TECHNIQUE_FAMILIES.join(", ")}`),
 
 	query("recommendedBefore")
 		.optional()

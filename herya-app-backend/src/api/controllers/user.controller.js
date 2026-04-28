@@ -360,7 +360,13 @@ const updateMyProfileImage = async (req, res, next) => {
 			await deleteImgCloudinary(oldImageId);
 		}
 
-		return sendResponse(res, 200, true, "Profile image updated successfully", sanitizeUser(updatedUser));
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile image updated successfully",
+			sanitizeUser(updatedUser),
+		);
 	} catch (error) {
 		// Clean up new image if save failed
 		if (imageUploaded && req.file?.filename) {
@@ -395,7 +401,13 @@ const deleteMyProfileImage = async (req, res, next) => {
 		user.profileImageId = null;
 		const updatedUser = await user.save();
 
-		return sendResponse(res, 200, true, "Profile image deleted successfully", sanitizeUser(updatedUser));
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Profile image deleted successfully",
+			sanitizeUser(updatedUser),
+		);
 	} catch (error) {
 		return next(error);
 	}
