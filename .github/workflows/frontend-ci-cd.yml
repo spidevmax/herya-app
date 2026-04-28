@@ -44,44 +44,44 @@ jobs:
         run: npm test -- --maxWorkers=1
         working-directory: herya-app-frontend
 
-      - name: Build
-        run: npm run build
-        working-directory: herya-app-frontend
+      deploy:
+        runs-on: ubuntu-latest
+        needs: docker-smoke
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
-  docker-smoke:
-    runs-on: ubuntu-latest
-    needs: ci
+        steps:
+          - name: Ensure sh exists
+            run: sudo ln -sf $(which dash) /bin/sh || sudo apt-get update && sudo apt-get install -y dash
 
-    steps:
-      - uses: actions/checkout@v5
+          - uses: actions/checkout@v5
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+          - name: Setup Node.js 22
+            uses: actions/setup-node@v5
+            with:
+              node-version: 22
 
-      - name: Build frontend production image
-        uses: docker/build-push-action@v6
-        with:
-          context: herya-app-frontend
-          target: prod
-          tags: herya-frontend:ci
-          load: true
-          build-args: |
-            VITE_API_URL=http://localhost:3000/api/v1
-          cache-from: type=gha,scope=herya-frontend
-          cache-to: type=gha,mode=max,scope=herya-frontend
+          - name: Pull Vercel project settings
+            working-directory: herya-app-frontend
+            env:
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+            run: |
+              npx vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
 
-      - name: Start frontend container
-        run: docker run -d --name herya-frontend -p 8080:80 herya-frontend:ci
+          - name: Build Vercel production output
+            working-directory: herya-app-frontend
+            env:
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            run: |
+              npx vercel build --prod --token "$VERCEL_TOKEN"
 
-      - name: Frontend smoke test
-        run: |
-          for i in {1..20}; do
-            if curl -fsS http://127.0.0.1:8080/ > /dev/null && curl -fsS http://127.0.0.1:8080/health > /dev/null; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "Frontend did not become healthy in time"
+          - name: Deploy frontend to Vercel
+            working-directory: herya-app-frontend
+            env:
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+            run: |
+              npx vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"
           docker logs herya-frontend
           exit 1
 
