@@ -59,6 +59,22 @@ describe("Journal Entries — POST /", () => {
 			.send({ moodBefore: ["calm"] }); // missing most required fields
 		expect(res.status).toBe(400);
 	});
+
+	it("stores physicalSensations as an array of tags", async () => {
+		const { token } = await createUser({ email: "journal-sensations@test.com" });
+		const session = await createSession(token);
+		const res = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				...JOURNAL_PAYLOAD(session._id),
+				physicalSensations: ["tight_shoulders", "calm"],
+			});
+		expect(res.status).toBe(201);
+		expect(Array.isArray(res.body.data.physicalSensations)).toBe(true);
+		expect(res.body.data.physicalSensations).toEqual(["tight_shoulders", "calm"]);
+	});
+
 });
 
 describe("Journal Entries — GET /:id", () => {
@@ -99,6 +115,69 @@ describe("Journal Entries — PUT /:id", () => {
 			.send({ energyLevel: { before: 4, after: 9 } });
 		expect(res.status).toBe(200);
 		expect(res.body.data.energyLevel.after).toBe(9);
+	});
+});
+
+describe("Journal Entries — phase: before + PATCH /:id/complete", () => {
+	const BEFORE_PAYLOAD = (sessionId) => ({
+		session: sessionId,
+		phase: "before",
+		moodBefore: ["focused"],
+		energyLevel: { before: 5 },
+		stressLevel: { before: 6 },
+	});
+
+	it("creates a 'before' stub without after fields", async () => {
+		const { token } = await createUser({ email: "journal-stub@test.com" });
+		const session = await createSession(token);
+		const res = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send(BEFORE_PAYLOAD(session._id));
+		expect(res.status).toBe(201);
+		expect(res.body.data.phase).toBe("before");
+		expect(res.body.data.energyLevel.after).toBeUndefined();
+		expect(res.body.data.stressLevel.after).toBeUndefined();
+	});
+
+	it("completes a stub via PATCH /:id/complete and merges before/after", async () => {
+		const { token } = await createUser({ email: "journal-complete@test.com" });
+		const session = await createSession(token);
+		const create = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send(BEFORE_PAYLOAD(session._id));
+		const id = create.body.data._id;
+
+		const res = await request(app)
+			.patch(`${BASE}/${id}/complete`)
+			.set("Authorization", `Bearer ${token}`)
+			.send({
+				moodAfter: ["calm"],
+				energyLevel: { after: 8 },
+				stressLevel: { after: 3 },
+			});
+		expect(res.status).toBe(200);
+		expect(res.body.data.phase).toBe("completed");
+		expect(res.body.data.energyLevel.before).toBe(5);
+		expect(res.body.data.energyLevel.after).toBe(8);
+		expect(res.body.data.stressLevel.before).toBe(6);
+		expect(res.body.data.stressLevel.after).toBe(3);
+	});
+
+	it("rejects re-completing an already completed entry", async () => {
+		const { token } = await createUser({ email: "journal-recomplete@test.com" });
+		const session = await createSession(token);
+		const create = await request(app)
+			.post(BASE)
+			.set("Authorization", `Bearer ${token}`)
+			.send(JOURNAL_PAYLOAD(session._id));
+		const id = create.body.data._id;
+		const res = await request(app)
+			.patch(`${BASE}/${id}/complete`)
+			.set("Authorization", `Bearer ${token}`)
+			.send({ moodAfter: ["calm"] });
+		expect(res.status).toBe(400);
 	});
 });
 

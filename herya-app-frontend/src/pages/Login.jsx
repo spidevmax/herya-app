@@ -1,12 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
+import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
 import { Button } from "@/components/ui";
 import { requestPasswordReset } from "@/api/auth.api";
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function FieldError({ id, message }) {
+	if (!message) return null;
+	return (
+		<p
+			id={id}
+			role="alert"
+			className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--color-error-text)]"
+		>
+			<AlertCircle size={14} aria-hidden="true" />
+			<span>{message}</span>
+		</p>
+	);
+}
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -14,7 +30,8 @@ export default function Login() {
 	const { t } = useLanguage();
 	const [form, setForm] = useState({ email: "", password: "" });
 	const [showPw, setShowPw] = useState(false);
-	const [error, setError] = useState("");
+	const [errors, setErrors] = useState({});
+	const [formError, setFormError] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [showForgot, setShowForgot] = useState(false);
 	const [forgotEmail, setForgotEmail] = useState("");
@@ -22,15 +39,76 @@ export default function Login() {
 	const [forgotMessage, setForgotMessage] = useState("");
 	const [forgotStatus, setForgotStatus] = useState("");
 
+	const updateField = (field, value) => {
+		setForm((f) => ({ ...f, [field]: value }));
+		if (errors[field]) {
+			setErrors((prev) => {
+				const next = { ...prev };
+				delete next[field];
+				return next;
+			});
+		}
+	};
+
+	const validate = () => {
+		const next = {};
+		if (!form.email.trim()) next.email = t("login.errors.email_required");
+		else if (!EMAIL_RE.test(form.email.trim()))
+			next.email = t("login.errors.email_invalid");
+		if (!form.password) next.password = t("login.errors.password_required");
+		return next;
+	};
+
+	const mapServerError = (err) => {
+		const status = err?.response?.status;
+		const message = err?.response?.data?.message || "";
+		const fieldErrors = err?.response?.data?.errors;
+
+		// express-validator field-level errors
+		if (Array.isArray(fieldErrors) && fieldErrors.length > 0) {
+			const next = {};
+			for (const fe of fieldErrors) {
+				if (fe.field === "email") {
+					next.email = /valid/i.test(fe.message)
+						? t("login.errors.email_invalid")
+						: t("login.errors.email_required");
+				} else if (fe.field === "password") {
+					next.password = t("login.errors.password_required");
+				}
+			}
+			if (Object.keys(next).length > 0) {
+				setErrors(next);
+				return;
+			}
+		}
+
+		// 401 (wrong password) and 404 (user not found) collapse to a single
+		// "invalid email or password" to avoid leaking account existence.
+		if (status === 401 || status === 404) {
+			setErrors({ email: t("login.errors.invalid_credentials") });
+			return;
+		}
+
+		setFormError(message || t("login.errors.generic"));
+	};
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError("");
+		setFormError("");
+
+		const validation = validate();
+		if (Object.keys(validation).length > 0) {
+			setErrors(validation);
+			return;
+		}
+		setErrors({});
+
 		setLoading(true);
 		try {
 			await login(form);
 			navigate("/");
 		} catch (err) {
-			setError(err?.response?.data?.message || t("login.error"));
+			mapServerError(err);
 		} finally {
 			setLoading(false);
 		}
@@ -61,6 +139,11 @@ export default function Login() {
 		}
 	};
 
+	const inputErrorStyle = (field) =>
+		errors[field]
+			? { borderColor: "var(--color-error-text)", boxShadow: "0 0 0 1px var(--color-error-text)" }
+			: undefined;
+
 	return (
 		<div
 			className="min-h-dvh w-full px-4 py-8 sm:px-6 sm:py-10"
@@ -83,56 +166,67 @@ export default function Login() {
 								</h2>
 							</div>
 
-							{error && (
-								<div role="alert" className="mb-4 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]">
-									{error}
+							{formError && (
+								<div
+									role="alert"
+									className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
+								>
+									<AlertCircle size={16} aria-hidden="true" />
+									<span>{formError}</span>
 								</div>
 							)}
 
-							<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-								<div className="relative">
-									<Mail
-										size={18}
-										className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									/>
-									<input
-										type="email"
-										autoComplete="email"
-										required
-										aria-label={t("login.email_placeholder")}
-										placeholder={t("login.email_placeholder")}
-										value={form.email}
-										onChange={(e) =>
-											setForm((f) => ({ ...f, email: e.target.value }))
-										}
-										className="input-base pl-10 pr-4"
-									/>
+							<form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+								<div>
+									<div className="relative">
+										<Mail
+											size={18}
+											className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+										/>
+										<input
+											type="email"
+											autoComplete="email"
+											aria-label={t("login.email_placeholder")}
+											aria-invalid={!!errors.email}
+											aria-describedby={errors.email ? "login-email-error" : undefined}
+											placeholder={t("login.email_placeholder")}
+											value={form.email}
+											onChange={(e) => updateField("email", e.target.value)}
+											className="input-base pl-10 pr-4"
+											style={inputErrorStyle("email")}
+										/>
+									</div>
+									<FieldError id="login-email-error" message={errors.email} />
 								</div>
-								<div className="relative">
-									<Lock
-										size={18}
-										className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									/>
-									<input
-										type={showPw ? "text" : "password"}
-										autoComplete="current-password"
-										required
-										aria-label={t("login.password")}
-										placeholder={t("login.password")}
-										value={form.password}
-										onChange={(e) =>
-											setForm((f) => ({ ...f, password: e.target.value }))
-										}
-										className="input-base pl-10 pr-11"
-									/>
-									<button
-										type="button"
-										onClick={() => setShowPw((v) => !v)}
-										aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
-										className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									>
-										{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-									</button>
+
+								<div>
+									<div className="relative">
+										<Lock
+											size={18}
+											className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+										/>
+										<input
+											type={showPw ? "text" : "password"}
+											autoComplete="current-password"
+											aria-label={t("login.password")}
+											aria-invalid={!!errors.password}
+											aria-describedby={errors.password ? "login-password-error" : undefined}
+											placeholder={t("login.password")}
+											value={form.password}
+											onChange={(e) => updateField("password", e.target.value)}
+											className="input-base pl-10 pr-11"
+											style={inputErrorStyle("password")}
+										/>
+										<button
+											type="button"
+											onClick={() => setShowPw((v) => !v)}
+											aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
+											className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+										>
+											{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+										</button>
+									</div>
+									<FieldError id="login-password-error" message={errors.password} />
 								</div>
 
 								<div className="text-right">

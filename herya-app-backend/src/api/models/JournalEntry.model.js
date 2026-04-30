@@ -134,7 +134,17 @@ const journalEntrySchema = new mongoose.Schema(
 			enum: ["green", "yellow", "red"],
 		},
 
+		// PHASE
+		// "before" = check-in stub written when the user starts practice;
+		// "completed" = post-practice fields have been filled in.
+		phase: {
+			type: String,
+			enum: ["before", "completed"],
+			default: "completed",
+		},
+
 		// LEVELS BEFORE AND AFTER
+		// `*.after` is required only when phase is "completed".
 		energyLevel: {
 			before: {
 				type: Number,
@@ -146,7 +156,9 @@ const journalEntrySchema = new mongoose.Schema(
 				type: Number,
 				min: 1,
 				max: 10,
-				required: true,
+				required: function () {
+					return this.phase === "completed";
+				},
 			},
 		},
 		stressLevel: {
@@ -160,15 +172,25 @@ const journalEntrySchema = new mongoose.Schema(
 				type: Number,
 				min: 1,
 				max: 10,
-				required: true,
+				required: function () {
+					return this.phase === "completed";
+				},
 			},
 		},
 
 		// PHYSICAL REFLECTION
+		// Array of short tags (e.g. "tight_shoulders", "calm"). Legacy entries
+		// stored a single comma-joined string; the controller normalizes string
+		// payloads at the request boundary for backward compat.
 		physicalSensations: {
-			type: String,
-			trim: true,
-			maxlength: 2000,
+			type: [
+				{
+					type: String,
+					trim: true,
+					maxlength: 80,
+				},
+			],
+			default: [],
 		},
 		bodyAreas: [
 			{
@@ -486,12 +508,11 @@ journalEntrySchema
 		"At least one mood before practice must be selected",
 	);
 
-journalEntrySchema
-	.path("moodAfter")
-	.validate(
-		(value) => value && value.length > 0,
-		"At least one mood after practice must be selected",
-	);
+journalEntrySchema.path("moodAfter").validate(function (value) {
+	// Required only when the entry has been completed.
+	if (this.phase !== "completed") return true;
+	return value && value.length > 0;
+}, "At least one mood after practice must be selected");
 
 // VALIDATION: Prevent duplicate mood selections
 journalEntrySchema

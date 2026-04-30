@@ -662,10 +662,89 @@ function _calculatePhysicalProgress(journals) {
 	return bodyAreaProgress;
 }
 
+/**
+ * Controller: completeJournalEntry
+ * --------------------------------
+ * Promotes a "before" stub journal entry into a fully completed entry by
+ * patching post-practice fields and flipping `phase` to "completed".
+ *
+ * Endpoint: PATCH /api/v1/journal-entries/:id/complete
+ *
+ * Workflow:
+ * 1. Load the journal entry and verify ownership.
+ * 2. Reject if already completed (use PUT /:id for further edits).
+ * 3. Apply post-practice fields from req.body.
+ * 4. Set phase to "completed" and save (triggers full validation).
+ */
+const completeJournalEntry = async (req, res, next) => {
+	try {
+		const { id } = req.params;
+		const journal = await JournalEntry.findById(id);
+
+		if (!journal) {
+			throw createError(404, "Journal entry not found");
+		}
+		if (journal.user.toString() !== req.user._id.toString()) {
+			throw createError(403, "You don't have access to this journal entry");
+		}
+		if (journal.phase === "completed") {
+			throw createError(400, "Journal entry is already completed");
+		}
+
+		const completionFields = [
+			"moodAfter",
+			"signalAfter",
+			"energyLevel",
+			"stressLevel",
+			"physicalSensations",
+			"bodyAreas",
+			"emotionalNotes",
+			"insights",
+			"gratitude",
+			"favoritePoses",
+			"challengingPoses",
+			"difficultyFeedback",
+			"pacingFeedback",
+			"vkReflection",
+			"nextSessionGoals",
+			"tags",
+		];
+
+		completionFields.forEach((field) => {
+			if (req.body[field] !== undefined) {
+				if (
+					(field === "energyLevel" || field === "stressLevel") &&
+					typeof req.body[field] === "object"
+				) {
+					// Merge before/after so we don't drop the check-in values.
+					journal[field] = { ...journal[field]?.toObject?.(), ...req.body[field] };
+				} else {
+					journal[field] = req.body[field];
+				}
+			}
+		});
+
+		journal.phase = "completed";
+		const completedJournal = await journal.save();
+		await completedJournal.populate("session", "sessionType duration");
+
+		return sendResponse(
+			res,
+			200,
+			true,
+			"Journal entry completed successfully",
+			completedJournal,
+		);
+	} catch (error) {
+		return next(error);
+	}
+};
+
 module.exports = {
 	createJournalEntry,
 	getJournalEntries,
 	getJournalEntryById,
 	updateJournalEntry,
 	deleteJournalEntry,
+	completeJournalEntry,
 };

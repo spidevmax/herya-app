@@ -5,6 +5,7 @@ const {
 	createJournalEntry,
 	updateJournalEntry,
 	deleteJournalEntry,
+	completeJournalEntry,
 } = require("../controllers/journalEntry.controller");
 const { authenticateToken } = require("../../middlewares/authorization.middleware");
 const { handleValidationErrors } = require("../../middlewares/validation.middleware");
@@ -467,5 +468,41 @@ router.put(
  *         description: Server error
  */
 router.delete("/:id", journalIdValidation, handleValidationErrors, deleteJournalEntry);
+
+/**
+ * @swagger
+ * /api/v1/journal-entries/{id}/complete:
+ *   patch:
+ *     summary: Complete a "before" journal stub
+ *     description: |
+ *       Patches post-practice fields onto an existing pre-session journal stub
+ *       and flips its phase to "completed". Returns 400 if the entry is already
+ *       complete.
+ *     tags:
+ *       - Journal Entries
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Journal entry completed successfully
+ *       400:
+ *         description: Already completed or invalid payload
+ *       403:
+ *         description: Not the owner
+ *       404:
+ *         description: Journal entry not found
+ */
+router.patch(
+	"/:id/complete",
+	journalIdValidation,
+	handleValidationErrors,
+	completeJournalEntry,
+);
 
 module.exports = router;

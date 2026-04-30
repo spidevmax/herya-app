@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { getBreathingPatternById } from "@/api/breathing.api";
 import {
+	completeJournalEntry,
 	createJournalEntry,
 	getJournalEntries,
 } from "@/api/journalEntries.api";
@@ -21,18 +22,18 @@ import {
 	createSession,
 	startSessionTimer,
 } from "@/api/sessions.api";
+import JournalCard from "@/components/journal/JournalCard";
+import SliderPanel from "@/components/journal/SliderPanel";
 import GuidedPracticePlayer from "@/components/session/GuidedPracticePlayer";
 import PostPracticeJournal from "@/components/session/PostPracticeJournal";
 import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
 import SessionBuilder from "@/components/session/SessionBuilder";
 import ChildProfileManager from "@/components/tutor/ChildProfileManager";
-import { Button, ConfirmModal, StickyHeader } from "@/components/ui";
+import { Button, ConfirmModal, MoodSelector, StickyHeader } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import useSessionPersistence from "@/hooks/useSessionPersistence";
-import { MOOD_COLORS, MOOD_OPTIONS } from "@/utils/constants";
-
-const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-primary)";
+import { MOOD_OPTIONS } from "@/utils/constants";
 
 const PRACTICE_PRESETS = {
 	ADULT: "adult",
@@ -232,6 +233,7 @@ export default function StartPractice() {
 	const [sessionId, setSessionId] = useState(() =>
 		hasNavigationResume ? navigationResumeSession.sessionId : null,
 	);
+	const [journalStubId, setJournalStubId] = useState(null);
 	const [sessionSummary, setSessionSummary] = useState(null);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState(null);
@@ -713,6 +715,32 @@ export default function StartPractice() {
 					const id = session._id;
 					setSessionId(id);
 
+					// Promote the check-in to a real JournalEntry stub so the
+					// "before" data (mood, energy, stress, intention) is persisted
+					// even if the user abandons the session. The post-practice
+					// save then completes this stub instead of creating a new one.
+					if (sanitizedCheckIn) {
+						try {
+							const validMoodBefore = new Set(MOOD_OPTIONS);
+							const safeMoodBefore = Array.isArray(sanitizedCheckIn.mood)
+								? sanitizedCheckIn.mood.filter((m) => validMoodBefore.has(m))
+								: [];
+							const stubRes = await createJournalEntry({
+								session: id,
+								phase: "before",
+								moodBefore:
+									safeMoodBefore.length > 0 ? safeMoodBefore : ["focused"],
+								energyLevel: { before: sanitizedCheckIn.energyLevel ?? 5 },
+								stressLevel: { before: sanitizedCheckIn.stressLevel ?? 5 },
+							});
+							const stub = stubRes.data?.data || stubRes.data;
+							if (stub?._id) setJournalStubId(stub._id);
+						} catch (stubErr) {
+							// Non-fatal: fall back to creating a full entry on save.
+							console.warn("Failed to create journal stub:", stubErr);
+						}
+					}
+
 					// Don't start the backend timer here — it will be started
 					// when the user presses play (or when a guided block auto-starts).
 					return { id };
@@ -796,14 +824,24 @@ export default function StartPractice() {
 					? journalData.moodBefore.filter((m) => validMoodBefore.has(m))
 					: [];
 
-				await createJournalEntry({
-					...journalData,
-					session: sessionId,
-					moodBefore: safeMoodBefore.length > 0 ? safeMoodBefore : ["focused"],
-				});
+				if (journalStubId) {
+					// Complete the existing "before" stub instead of creating a new
+					// entry. The stub already holds session + moodBefore + before
+					// energy/stress; we only patch the after-side fields.
+					const { moodBefore: _mb, ...afterPayload } = journalData;
+					await completeJournalEntry(journalStubId, afterPayload);
+				} else {
+					await createJournalEntry({
+						...journalData,
+						session: sessionId,
+						moodBefore:
+							safeMoodBefore.length > 0 ? safeMoodBefore : ["focused"],
+					});
+				}
 			}
 			await refreshUser();
 			persistence.clearSession();
+			setJournalStubId(null);
 			setPhase("done");
 		} catch (err) {
 			console.error("Failed to save journal:", err);
@@ -855,16 +893,6 @@ export default function StartPractice() {
 		navigationResumeSession,
 		persistence,
 	]);
-
-	const toggleCheckInMood = (mood) => {
-		setCheckInMood((prev) =>
-			prev.includes(mood)
-				? prev.filter((m) => m !== mood)
-				: prev.length < 3
-					? [...prev, mood]
-					: prev,
-		);
-	};
 
 	const handleTutorSignalChange = (signal) => {
 		setTutorSignal(signal);
@@ -1084,220 +1112,173 @@ export default function StartPractice() {
 							initial={{ opacity: 0, x: 20 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: -20 }}
-							className="flex flex-col gap-5 pt-4"
+							className="flex flex-col gap-6 pt-4"
 						>
-							<h2
-								id="checkin-heading"
-								className="text-xl font-semibold text-[var(--color-text-primary)]"
+							<JournalCard
+								title={
+									isTutorPractice
+										? t("practice.checkin_title_tutor")
+										: t("practice.checkin_title")
+								}
+								subtitle={
+									isTutorPractice && selectedChild?.name
+										? selectedChild.name
+										: t("practice.checkin_subtitle")
+								}
 							>
-								{isTutorPractice
-									? t("practice.checkin_title_tutor")
-									: t("practice.checkin_title")}
-							</h2>
-
-							<fieldset
-								className="rounded-2xl p-5 border-0"
-								style={{ backgroundColor: "var(--color-surface-card)" }}
-							>
-								<legend
-									className="text-sm font-medium mb-3"
-									style={{ color: "var(--color-text-primary)" }}
+								<div
+									id="checkin-heading"
+									className="flex flex-col gap-6"
 								>
-									{isTutorPractice
-										? t("practice.checkin_signal")
-										: t("practice.checkin_mood")}
-									{isTutorPractice && selectedChild?.name ? (
-										<span
-											className="block mt-1 text-xs font-normal"
-											style={{ color: "var(--color-text-muted)" }}
-										>
-											{selectedChild.name}
-										</span>
-									) : null}
-								</legend>
-								{isTutorPractice ? (
-									<div
-										className="grid grid-cols-1 sm:grid-cols-3 gap-2"
-										role="radiogroup"
-										aria-label={t("practice.checkin_signal")}
-									>
-										{["green", "yellow", "red"].map((signal) => {
-											const selected = tutorSignal === signal;
-											const meta = SIGNAL_META[signal];
-											const { Icon, colorVar, titleKey, hintKey } = meta;
-											return (
-												<label
-													key={signal}
-													className={`relative rounded-2xl px-3.5 py-3.5 cursor-pointer min-h-[104px] flex flex-col items-start gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-[transform,box-shadow,background-color,border-color] duration-200 ease-out will-change-transform ${selected ? "-translate-y-0.5" : "hover:-translate-y-0.5"}`}
-													style={{
-														backgroundColor: selected
-															? `color-mix(in srgb, ${colorVar} 12%, var(--color-surface-card))`
-															: "var(--color-surface)",
-														color: "var(--color-text-primary)",
-														border: `2px solid ${selected ? colorVar : "var(--color-border-soft)"}`,
-														boxShadow: selected
-															? `0 6px 16px -6px color-mix(in srgb, ${colorVar} 55%, transparent), inset 0 0 0 1px color-mix(in srgb, ${colorVar} 30%, transparent)`
-															: "var(--shadow-card)",
-														"--tw-ring-color": colorVar,
-													}}
-												>
-													<input
-														type="radio"
-														name="tutor-signal"
-														value={signal}
-														checked={selected}
-														onChange={() => handleTutorSignalChange(signal)}
-														className="sr-only"
-														aria-checked={selected}
-													/>
-													<span
-														aria-hidden="true"
-														className="absolute top-3 right-3 w-2 h-2 rounded-full transition-transform duration-200"
-														style={{
-															backgroundColor: colorVar,
-															boxShadow: selected
-																? `0 0 0 4px color-mix(in srgb, ${colorVar} 22%, transparent)`
-																: "none",
-															transform: selected ? "scale(1.25)" : "scale(1)",
-														}}
-													/>
-													<div className="flex items-center gap-2 w-full">
-														<span
-															aria-hidden="true"
-															className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+									{isTutorPractice ? (
+										<fieldset className="m-0 p-0 border-0">
+											<legend className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">
+												{t("practice.checkin_signal")}
+											</legend>
+											<div
+												className="grid grid-cols-1 sm:grid-cols-3 gap-2"
+												role="radiogroup"
+												aria-label={t("practice.checkin_signal")}
+											>
+												{["green", "yellow", "red"].map((signal) => {
+													const selected = tutorSignal === signal;
+													const meta = SIGNAL_META[signal];
+													const { Icon, colorVar, titleKey, hintKey } = meta;
+													return (
+														<label
+															key={signal}
+															className={`relative rounded-2xl px-3.5 py-3.5 cursor-pointer min-h-[104px] flex flex-col items-start gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-[transform,box-shadow,background-color,border-color] duration-200 ease-out will-change-transform ${selected ? "-translate-y-0.5" : "hover:-translate-y-0.5"}`}
 															style={{
 																backgroundColor: selected
-																	? colorVar
-																	: `color-mix(in srgb, ${colorVar} 14%, transparent)`,
+																	? `color-mix(in srgb, ${colorVar} 12%, var(--color-surface-card))`
+																	: "var(--color-surface)",
+																color: "var(--color-text-primary)",
+																border: `2px solid ${selected ? colorVar : "var(--color-border-soft)"}`,
+																boxShadow: selected
+																	? `0 6px 16px -6px color-mix(in srgb, ${colorVar} 55%, transparent), inset 0 0 0 1px color-mix(in srgb, ${colorVar} 30%, transparent)`
+																	: "var(--shadow-card)",
+																"--tw-ring-color": colorVar,
 															}}
 														>
-															<Icon
-																size={18}
-																style={{ color: selected ? "white" : colorVar }}
+															<input
+																type="radio"
+																name="tutor-signal"
+																value={signal}
+																checked={selected}
+																onChange={() => handleTutorSignalChange(signal)}
+																className="sr-only"
+																aria-checked={selected}
 															/>
-														</span>
-														<span
-															className="text-sm font-semibold leading-snug tracking-tight"
-															style={{ color: "var(--color-text-primary)" }}
-														>
-															{t(titleKey)}
-														</span>
-													</div>
-													<span
-														className="text-xs leading-snug"
-														style={{ color: "var(--color-text-muted)" }}
-													>
-														{t(hintKey)}
-													</span>
-												</label>
-											);
-										})}
-									</div>
-								) : (
-									<div className="flex flex-wrap gap-2">
-										{MOOD_OPTIONS.map((m) => {
-											const selected = checkInMood.includes(m);
-											const color = getMoodColor(m);
-											return (
-												<button
-													type="button"
-													aria-pressed={selected}
-													key={m}
-													onClick={() => toggleCheckInMood(m)}
-													className="px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition"
-													style={{
-														backgroundColor: selected
-															? color
-															: "var(--color-surface)",
-														color: selected
-															? "white"
-															: "var(--color-text-secondary)",
-													}}
+															<span
+																aria-hidden="true"
+																className="absolute top-3 right-3 w-2 h-2 rounded-full transition-transform duration-200"
+																style={{
+																	backgroundColor: colorVar,
+																	boxShadow: selected
+																		? `0 0 0 4px color-mix(in srgb, ${colorVar} 22%, transparent)`
+																		: "none",
+																	transform: selected ? "scale(1.25)" : "scale(1)",
+																}}
+															/>
+															<div className="flex items-center gap-2 w-full">
+																<span
+																	aria-hidden="true"
+																	className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors"
+																	style={{
+																		backgroundColor: selected
+																			? colorVar
+																			: `color-mix(in srgb, ${colorVar} 14%, transparent)`,
+																	}}
+																>
+																	<Icon
+																		size={18}
+																		style={{ color: selected ? "white" : colorVar }}
+																	/>
+																</span>
+																<span
+																	className="text-sm font-semibold leading-snug tracking-tight"
+																	style={{ color: "var(--color-text-primary)" }}
+																>
+																	{t(titleKey)}
+																</span>
+															</div>
+															<span
+																className="text-xs leading-snug"
+																style={{ color: "var(--color-text-muted)" }}
+															>
+																{t(hintKey)}
+															</span>
+														</label>
+													);
+												})}
+											</div>
+										</fieldset>
+									) : (
+										<>
+											<MoodSelector
+												value={checkInMood}
+												onChange={setCheckInMood}
+												label={t("practice.checkin_mood")}
+												options={MOOD_OPTIONS}
+												maxSelection={3}
+											/>
+
+											<div className="grid gap-4 lg:grid-cols-2">
+												<SliderPanel
+													id="checkin-energy"
+													label={t("journal_form.energy")}
+													value={checkInEnergy}
+													onChange={(e) =>
+														setCheckInEnergy(+e.target.value)
+													}
+													accent="var(--color-primary)"
+													lowLabel={t("journal_form.slider_low_energy")}
+													highLabel={t("journal_form.slider_high_energy")}
+												/>
+												<SliderPanel
+													id="checkin-stress"
+													label={t("journal_form.stress")}
+													value={checkInStress}
+													onChange={(e) =>
+														setCheckInStress(+e.target.value)
+													}
+													accent="var(--color-danger)"
+													lowLabel={t("journal_form.slider_low_stress")}
+													highLabel={t("journal_form.slider_high_stress")}
+												/>
+											</div>
+
+											<div>
+												<label
+													htmlFor="checkin-intention"
+													className="mb-2 block text-sm font-semibold text-[var(--color-text-primary)]"
 												>
-													{t(`session.moods.${m}`)}
-												</button>
-											);
-										})}
-									</div>
-								)}
-							</fieldset>
-
-							{!isTutorPractice && (
-								<div
-									className="rounded-2xl p-5"
-									style={{ backgroundColor: "var(--color-surface-card)" }}
-								>
-									<p
-										className="text-sm font-medium mb-3"
-										style={{ color: "var(--color-text-primary)" }}
-									>
-										{t("practice.checkin_energy", { n: checkInEnergy })}
-									</p>
-									<input
-										type="range"
-										min={1}
-										max={10}
-										value={checkInEnergy}
-										onChange={(e) => setCheckInEnergy(+e.target.value)}
-										aria-label={t("practice.aria_energy_slider")}
-										className="w-full"
-										style={{ accentColor: "var(--color-primary)" }}
-									/>
+													{t("practice.checkin_intention")}
+												</label>
+												<input
+													id="checkin-intention"
+													type="text"
+													value={checkInIntention}
+													onChange={(e) =>
+														setCheckInIntention(e.target.value)
+													}
+													placeholder={t(
+														"practice.checkin_intention_placeholder",
+													)}
+													maxLength={200}
+													className="w-full rounded-2xl border p-3 text-sm outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+													style={{
+														backgroundColor: "var(--color-surface)",
+														color: "var(--color-text-primary)",
+														borderColor:
+															"color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+													}}
+												/>
+											</div>
+										</>
+									)}
 								</div>
-							)}
-
-							{!isTutorPractice && (
-								<div
-									className="rounded-2xl p-5"
-									style={{ backgroundColor: "var(--color-surface-card)" }}
-								>
-									<p
-										className="text-sm font-medium mb-3"
-										style={{ color: "var(--color-text-primary)" }}
-									>
-										{t("practice.checkin_stress", { n: checkInStress })}
-									</p>
-									<input
-										type="range"
-										min={1}
-										max={10}
-										value={checkInStress}
-										onChange={(e) => setCheckInStress(+e.target.value)}
-										aria-label={t("practice.checkin_stress", {
-											n: checkInStress,
-										})}
-										className="w-full"
-										style={{ accentColor: "var(--color-danger)" }}
-									/>
-								</div>
-							)}
-
-							{!isTutorPractice && (
-								<div
-									className="rounded-2xl p-5"
-									style={{ backgroundColor: "var(--color-surface-card)" }}
-								>
-									<p
-										className="text-sm font-medium mb-3"
-										style={{ color: "var(--color-text-primary)" }}
-									>
-										{t("practice.checkin_intention")}
-									</p>
-									<input
-										type="text"
-										value={checkInIntention}
-										onChange={(e) => setCheckInIntention(e.target.value)}
-										placeholder={t("practice.checkin_intention_placeholder")}
-										maxLength={200}
-										className="w-full text-sm rounded-xl p-3 outline-none focus:ring-1 border"
-										style={{
-											backgroundColor: "var(--color-surface)",
-											color: "var(--color-text-primary)",
-											borderColor: "var(--color-border-soft)",
-										}}
-									/>
-								</div>
-							)}
+							</JournalCard>
 
 							<Button
 								onClick={handleCheckInComplete}

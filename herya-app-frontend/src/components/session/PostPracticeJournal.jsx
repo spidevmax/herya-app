@@ -3,6 +3,9 @@ import { motion } from "framer-motion";
 import { CheckCircle, Check, Minus, X } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui";
+import JournalCard from "@/components/journal/JournalCard";
+import SliderPanel from "@/components/journal/SliderPanel";
+import SensationChips from "@/components/journal/SensationChips";
 import PostPracticeNudge from "./PostPracticeNudge";
 import {
 	MOOD_AFTER_OPTIONS,
@@ -22,123 +25,9 @@ const SIGNAL_SCORES = {
 	red: 0,
 };
 
-const SENSATION_OPTIONS = [
-	"relaxed",
-	"energized",
-	"light",
-	"heavy",
-	"open",
-	"tight",
-	"warm",
-	"cool",
-];
 const VALID_MOOD_BEFORE = new Set(MOOD_OPTIONS);
 const VALID_MOOD_AFTER = new Set(MOOD_AFTER_OPTIONS);
 
-function JournalSection({
-	title,
-	subtitle = null,
-	children,
-	tone = "default",
-}) {
-	const toneStyles = {
-		default: {
-			border: "1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
-			background:
-				"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 94%, white 6%) 0%, var(--color-surface-card) 100%)",
-		},
-		soft: {
-			border: "1px solid color-mix(in srgb, var(--color-secondary) 12%, var(--color-border-soft) 88%)",
-			background:
-				"linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 5%, var(--color-surface-card) 95%) 0%, var(--color-surface-card) 100%)",
-		},
-	};
-
-	return (
-		<section
-			className="rounded-[28px] p-5 sm:p-6"
-			style={toneStyles[tone] || toneStyles.default}
-		>
-			<div className="mb-4 flex items-start justify-between gap-4">
-				<div>
-					<h3
-						className="m-0 text-lg font-semibold tracking-[-0.01em]"
-						style={{ color: "var(--color-text-primary)" }}
-					>
-						{title}
-					</h3>
-					{subtitle && (
-						<p
-							className="mt-1 text-sm m-0"
-							style={{ color: "var(--color-text-muted)" }}
-						>
-							{subtitle}
-						</p>
-					)}
-				</div>
-			</div>
-			{children}
-		</section>
-	);
-}
-
-function PostPracticeSlider({
-	id,
-	label,
-	value,
-	onChange,
-	accent,
-	trackTint,
-	lowLabel,
-	highLabel,
-}) {
-	return (
-		<div
-			className="rounded-2xl p-4"
-			style={{
-				background:
-					"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
-				border: "1px solid color-mix(in srgb, var(--color-border-soft) 70%, transparent)",
-			}}
-		>
-			<div className="mb-3 flex items-center justify-between gap-3">
-				<label
-					htmlFor={id}
-					className="text-sm font-medium"
-					style={{ color: "var(--color-text-primary)" }}
-				>
-					{label}
-				</label>
-				<span
-					className="min-w-[52px] rounded-full px-2.5 py-1 text-center text-xs font-semibold"
-					style={{
-						backgroundColor: trackTint,
-						color: accent,
-					}}
-				>
-					{value}/10
-				</span>
-			</div>
-			<input
-				id={id}
-				type="range"
-				min={1}
-				max={10}
-				value={value}
-				onChange={onChange}
-				className="w-full"
-				style={{ accentColor: accent }}
-			/>
-			<div
-				className="mt-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.08em]"
-				style={{ color: "var(--color-text-muted)" }}
-			>
-				<span>{lowLabel}</span>
-				<span>{highLabel}</span>
-			</div>
-		</div>
-	);
-}
 
 export default function PostPracticeJournal({
 	sessionSummary,
@@ -210,7 +99,7 @@ export default function PostPracticeJournal({
 				before: checkInData?.stressLevel ?? 5,
 				after: normalizedStressAfter,
 			},
-			physicalSensations: physicalSensations.join(", "),
+			physicalSensations,
 			emotionalNotes,
 			gratitude,
 			insights: learnings,
@@ -378,7 +267,7 @@ export default function PostPracticeJournal({
 			</section>
 
 			{/* Mood after */}
-			<JournalSection
+			<JournalCard
 				title={
 					isTutorMode
 						? t("practice.checkout_signal")
@@ -457,11 +346,11 @@ export default function PostPracticeJournal({
 						})}
 					</div>
 				)}
-			</JournalSection>
+			</JournalCard>
 
 			{/* Energy & Stress */}
 			{!isTutorMode && (
-				<JournalSection
+				<JournalCard
 					title="Body Check"
 					subtitle="A quick read of your current energy and nervous system load."
 				>
@@ -469,66 +358,40 @@ export default function PostPracticeJournal({
 						aria-label={t("practice.journal_energy_after", { n: energyAfter })}
 						className="grid gap-4 lg:grid-cols-2"
 					>
-						<PostPracticeSlider
+						<SliderPanel
 							id="post-practice-energy"
 							label={t("practice.journal_energy_after", { n: energyAfter })}
 							value={energyAfter}
 							onChange={(e) => setEnergyAfter(+e.target.value)}
-							accent="var(--color-secondary)"
-							trackTint="color-mix(in srgb, var(--color-secondary) 14%, white 86%)"
-							lowLabel="Low"
-							highLabel="High"
+							accent="var(--color-primary)"
+							lowLabel={t("journal_form.slider_low_energy")}
+							highLabel={t("journal_form.slider_high_energy")}
 						/>
-						<PostPracticeSlider
+						<SliderPanel
 							id="post-practice-stress"
 							label={t("practice.journal_stress_after", { n: stressAfter })}
 							value={stressAfter}
 							onChange={(e) => setStressAfter(+e.target.value)}
-							accent="var(--color-accent)"
-							trackTint="color-mix(in srgb, var(--color-accent) 14%, white 86%)"
-							lowLabel="Soft"
-							highLabel="Intense"
+							accent="var(--color-danger)"
+							lowLabel={t("journal_form.slider_low_stress")}
+							highLabel={t("journal_form.slider_high_stress")}
 						/>
 					</section>
-				</JournalSection>
+				</JournalCard>
 			)}
 
 			{/* Physical sensations */}
 			{!isTutorMode && (
-				<JournalSection
+				<JournalCard
 					title={t("practice.journal_sensations")}
 					subtitle="Notice the clearest body sensations that are present after practice."
 				>
-					<div className="flex flex-wrap gap-2.5">
-						{SENSATION_OPTIONS.map((s) => (
-							<button
-								type="button"
-								key={s}
-								aria-pressed={physicalSensations.includes(s)}
-								onClick={() => toggleSensation(s)}
-								className="px-4 py-2 rounded-full text-sm font-semibold capitalize transition-transform duration-200 hover:-translate-y-0.5"
-								style={{
-									background: physicalSensations.includes(s)
-										? "linear-gradient(135deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 82%, black 18%) 100%)"
-										: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
-									color: physicalSensations.includes(s)
-										? "white"
-										: "var(--color-text-secondary)",
-									border: `1px solid ${
-										physicalSensations.includes(s)
-											? "var(--color-accent)"
-											: "color-mix(in srgb, var(--color-border-soft) 75%, transparent)"
-									}`,
-									boxShadow: physicalSensations.includes(s)
-										? "0 10px 24px rgba(25, 40, 72, 0.12)"
-										: "none",
-								}}
-							>
-								{t(`practice.sensation_${s}`)}
-							</button>
-						))}
-					</div>
-				</JournalSection>
+					<SensationChips
+						value={physicalSensations}
+						onToggle={toggleSensation}
+						getLabel={(s) => t(`journal.sensations.${s}`)}
+					/>
+				</JournalCard>
 			)}
 
 			{/* Free-form notes */}

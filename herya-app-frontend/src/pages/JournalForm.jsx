@@ -10,122 +10,20 @@ import {
 } from "@/api/journalEntries.api";
 import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
 import { Button, MoodSelector } from "@/components/ui";
+import JournalCard from "@/components/journal/JournalCard";
+import SliderPanel from "@/components/journal/SliderPanel";
+import SensationChips, {
+	DEFAULT_SENSATIONS as SENSATIONS,
+} from "@/components/journal/SensationChips";
 import { useLanguage } from "@/context/LanguageContext";
 
-const SENSATIONS = [
-	"tight_shoulders",
-	"sore_back",
-	"sore_legs",
-	"tight_hips",
-	"low_energy",
-	"high_energy",
-	"focused",
-	"distracted",
-	"calm",
-	"anxious",
-	"headache",
-	"stiff_neck",
-];
-
 const AUTO_NAVIGATE_DELAY = 2500;
-
-const CARD_STYLE = {
-	border: "1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
-	background:
-		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 94%, white 6%) 0%, var(--color-surface-card) 100%)",
-};
 
 const SOFT_PANEL_STYLE = {
 	border: "1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
 	background:
 		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
 };
-
-const SensationChip = ({ label, active, onToggle }) => {
-	return (
-		<button
-			type="button"
-			onClick={onToggle}
-			aria-pressed={active}
-			className="px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 hover:-translate-y-0.5"
-			style={{
-				background: active
-					? "linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%)"
-					: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
-				color: active ? "white" : "var(--color-text-secondary)",
-				borderColor: active
-					? "var(--color-primary)"
-					: "color-mix(in srgb, var(--color-border-soft) 75%, transparent)",
-				boxShadow: active
-					? "0 10px 24px rgba(32, 73, 158, 0.14)"
-					: "none",
-			}}
-		>
-			{label}
-		</button>
-	);
-};
-
-const JournalCard = ({ title, subtitle = null, children }) => (
-	<section className="rounded-[28px] p-5 shadow-[var(--shadow-card)] sm:p-6" style={CARD_STYLE}>
-		<div className="mb-4">
-			<h2 className="m-0 font-display text-2xl font-bold text-[var(--color-text-primary)]">
-				{title}
-			</h2>
-			{subtitle && (
-				<p className="mt-1 mb-0 text-sm text-[var(--color-text-muted)]">
-					{subtitle}
-				</p>
-			)}
-		</div>
-		{children}
-	</section>
-);
-
-const SliderPanel = ({
-	id,
-	label,
-	value,
-	onChange,
-	accent,
-	lowLabel,
-	highLabel,
-}) => (
-	<div className="rounded-2xl p-4" style={SOFT_PANEL_STYLE}>
-		<div className="mb-3 flex items-center justify-between gap-3">
-			<label
-				htmlFor={id}
-				className="text-sm font-semibold text-[var(--color-text-primary)]"
-			>
-				{label}
-			</label>
-			<span
-				className="min-w-[56px] rounded-full px-2.5 py-1 text-center text-xs font-bold"
-				style={{
-					backgroundColor: `color-mix(in srgb, ${accent} 14%, white 86%)`,
-					color: accent,
-				}}
-			>
-				{value}/10
-			</span>
-		</div>
-		<input
-			id={id}
-			type="range"
-			min={1}
-			max={10}
-			value={value}
-			aria-label={label}
-			onChange={onChange}
-			className="w-full"
-			style={{ accentColor: accent }}
-		/>
-		<div className="mt-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
-			<span>{lowLabel}</span>
-			<span>{highLabel}</span>
-		</div>
-	</div>
-);
 
 const SuccessOverlay = ({ onDone, t }) => {
 	useEffect(() => {
@@ -202,6 +100,7 @@ const JournalForm = () => {
 		stressAfter: null,
 		reflection: "",
 		insights: "",
+		gratitude: "",
 		physicalSensations: [],
 		photos: [],
 		session: null,
@@ -238,11 +137,10 @@ const JournalForm = () => {
 						stressAfter: e.stressLevel?.after ?? null,
 						reflection: e.emotionalNotes || "",
 						insights: e.insights || "",
+						gratitude: e.gratitude || "",
 						physicalSensations: Array.isArray(e.physicalSensations)
 							? e.physicalSensations
-							: typeof e.physicalSensations === "string" && e.physicalSensations
-								? e.physicalSensations.split(",").map((s) => s.trim()).filter(Boolean)
-								: [],
+							: [],
 						photos: (e.photos || []).map((p) => ({
 							previewUrl: p.url,
 							cloudinaryId: p.cloudinaryId,
@@ -290,9 +188,10 @@ const JournalForm = () => {
 			if (form.reflection)
 				payload.append("emotionalNotes", form.reflection);
 			if (form.insights) payload.append("insights", form.insights);
-			if (form.physicalSensations.length > 0) {
-				payload.append("physicalSensations", form.physicalSensations.join(", "));
-			}
+			if (form.gratitude) payload.append("gratitude", form.gratitude);
+			form.physicalSensations.forEach((s) => {
+				payload.append("physicalSensations[]", s);
+			});
 			form.photos.forEach((p) => {
 				const file = p.file || p;
 				if (file instanceof File) payload.append("photos", file);
@@ -450,16 +349,12 @@ const JournalForm = () => {
 						title={t("journal_form.sensations")}
 						subtitle={t("journal_form.sensations_subtitle")}
 					>
-						<div className="flex flex-wrap gap-2.5">
-							{SENSATIONS.map((s) => (
-								<SensationChip
-									key={s}
-									label={t(`journal_form.sensations_map.${s}`)}
-									active={form.physicalSensations.includes(s)}
-									onToggle={() => toggleSensation(s)}
-								/>
-							))}
-						</div>
+						<SensationChips
+							options={SENSATIONS}
+							value={form.physicalSensations}
+							onToggle={toggleSensation}
+							getLabel={(s) => t(`journal.sensations.${s}`)}
+						/>
 					</JournalCard>
 
 					{/* Reflection */}
@@ -504,6 +399,27 @@ const JournalForm = () => {
 								setForm((f) => ({ ...f, insights: e.target.value }))
 							}
 							placeholder={t("journal_form.insights_placeholder")}
+							rows={3}
+							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							style={SOFT_PANEL_STYLE}
+						/>
+					</JournalCard>
+
+					{/* Gratitude */}
+					<JournalCard
+						title={t("journal_form.gratitude")}
+						subtitle={t("journal_form.gratitude_subtitle")}
+					>
+						<label htmlFor="gratitude" className="sr-only">
+							{t("journal_form.gratitude")}
+						</label>
+						<textarea
+							id="gratitude"
+							value={form.gratitude}
+							onChange={(e) =>
+								setForm((f) => ({ ...f, gratitude: e.target.value }))
+							}
+							placeholder={t("journal_form.gratitude_placeholder")}
 							rows={3}
 							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
 							style={SOFT_PANEL_STYLE}

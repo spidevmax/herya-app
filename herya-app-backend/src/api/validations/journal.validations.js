@@ -53,7 +53,9 @@ const journalValidations = [
 		])
 		.withMessage("Invalid mood value in moodBefore"),
 
+	// moodAfter is required only when the entry is created in "completed" phase.
 	check("moodAfter")
+		.if((_value, { req }) => (req.body.phase || "completed") === "completed")
 		.notEmpty()
 		.withMessage("At least one mood after practice is required")
 		.isArray({ min: 1 })
@@ -91,6 +93,7 @@ const journalValidations = [
 		.withMessage("Energy level must be between 1 and 10"),
 
 	check("energyLevel.after")
+		.if((_value, { req }) => (req.body.phase || "completed") === "completed")
 		.notEmpty()
 		.withMessage("Energy level after practice is required")
 		.isInt({ min: 1, max: 10 })
@@ -103,10 +106,16 @@ const journalValidations = [
 		.withMessage("Stress level must be between 1 and 10"),
 
 	check("stressLevel.after")
+		.if((_value, { req }) => (req.body.phase || "completed") === "completed")
 		.notEmpty()
 		.withMessage("Stress level after practice is required")
 		.isInt({ min: 1, max: 10 })
 		.withMessage("Stress level must be between 1 and 10"),
+
+	check("phase")
+		.optional()
+		.isIn(["before", "completed"])
+		.withMessage('phase must be "before" or "completed"'),
 
 	// Only validate signalAfter enum when present (tutor mode sends it, adult mode doesn't)
 	check("signalAfter")
