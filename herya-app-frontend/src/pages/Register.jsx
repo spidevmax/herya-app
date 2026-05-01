@@ -124,39 +124,38 @@ export default function Register() {
 			className="min-h-dvh w-full px-4 py-8 sm:px-6 sm:py-10 lg:flex lg:h-dvh lg:min-h-0 lg:items-center lg:justify-center lg:overflow-auto lg:px-8 lg:py-8 xl:px-10"
 			style={{ background: "var(--gradient-primary)" }}
 		>
-			<div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md items-center justify-center lg:grid lg:min-h-0 lg:max-w-[90rem] lg:grid-cols-2 lg:items-stretch lg:overflow-hidden lg:rounded-[2rem] lg:border lg:border-white/45 lg:bg-[#fbfdfb] lg:shadow-[0_28px_90px_rgba(15,73,48,0.18)]">
-				<aside className="hidden min-w-0 flex-col items-center justify-center bg-[#e7f8ee] px-8 py-8 text-center lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-12 xl:py-10">
-					<div
-						className="relative flex h-14 w-14 items-center justify-center rounded-[1.15rem] shadow-[var(--shadow-card)]"
-						style={{
-							background:
-								"linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
-						}}
-					>
-						<img
-							src="/favicon-96x96.png"
-							alt={t("ui.herya_logo_alt")}
-							className="h-12 w-12 rounded-[0.85rem] object-cover"
-						/>
-					</div>
-					<div className="mt-5 flex w-full flex-1 items-center justify-center xl:mt-7">
+			<div
+				className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md items-center justify-center lg:grid lg:min-h-0 lg:max-w-[90rem] lg:grid-cols-2 lg:items-stretch lg:overflow-hidden lg:rounded-[2rem] lg:shadow-[0_28px_90px_rgba(15,30,60,0.22)]"
+				style={{
+					backgroundColor: "var(--color-surface-card)",
+					border: "1px solid var(--color-border)",
+				}}
+			>
+				<aside
+					className="hidden min-w-0 flex-col px-10 py-10 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-14 xl:py-12"
+					style={{ backgroundColor: "var(--color-surface-secondary)" }}
+				>
+					<h1 className="font-display text-4xl font-bold tracking-tight text-[var(--color-text-primary)] xl:text-5xl">
+						Herya
+					</h1>
+
+					<div className="mt-6 flex w-full flex-1 items-center justify-center">
 						<img
 							src="/images/rex-mascot-register.png"
 							alt="Rex, mascota de Herya practicando yoga en equilibrio junto al mar"
-							className="h-[min(28rem,52dvh)] w-full max-w-[31rem] rounded-[1.5rem] object-cover object-center shadow-[0_18px_50px_rgba(15,73,48,0.14)] xl:h-[min(34rem,58dvh)] xl:max-w-[34rem]"
+							className="h-full max-h-[min(36rem,62dvh)] w-full max-w-[34rem] object-contain"
 						/>
 					</div>
-					<div className="mt-5 max-w-md xl:mt-8">
-						<h1 className="text-3xl font-semibold text-[var(--color-text-primary)] xl:text-4xl">
-							Herya
-						</h1>
-						<p className="mt-3 text-base font-medium leading-7 text-[var(--color-text-secondary)] xl:mt-4 xl:text-lg xl:leading-8">
-							{t("login.subtitle")}
-						</p>
-					</div>
+
+					<p className="mt-6 max-w-lg text-2xl font-semibold leading-snug text-[var(--color-text-primary)] xl:text-3xl">
+						{t("login.subtitle")}
+					</p>
 				</aside>
 
-				<div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full min-w-0 max-w-md items-center justify-center lg:mx-0 lg:min-h-[min(52rem,calc(100dvh-5rem))] lg:max-w-none lg:bg-[#fbfdfb] lg:px-12 lg:py-10 xl:px-20">
+				<div
+					className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full min-w-0 max-w-md items-center justify-center lg:mx-0 lg:min-h-[min(52rem,calc(100dvh-5rem))] lg:max-w-none lg:px-12 lg:py-10 xl:px-20"
+					style={{ backgroundColor: "var(--color-surface-card)" }}
+				>
 				<motion.div
 					initial={false}
 					animate={{ opacity: 1, y: 0 }}
@@ -231,15 +230,21 @@ export default function Register() {
 						</div>
 
 						<div>
+							<label
+								htmlFor="register-name"
+								className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
+							>
+								{t("register.full_name")}
+							</label>
 							<div className="relative">
 								<User
 									size={18}
 									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
 								/>
 								<input
+									id="register-name"
 									type="text"
 									autoComplete="name"
-									aria-label={t("register.full_name")}
 									aria-invalid={!!errors.name}
 									aria-describedby={errors.name ? "name-error" : undefined}
 									placeholder={t("register.full_name")}
@@ -253,15 +258,21 @@ export default function Register() {
 						</div>
 
 						<div>
+							<label
+								htmlFor="register-email"
+								className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
+							>
+								{t("login.email_placeholder")}
+							</label>
 							<div className="relative">
 								<Mail
 									size={18}
 									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
 								/>
 								<input
+									id="register-email"
 									type="email"
 									autoComplete="email"
-									aria-label={t("login.email_placeholder")}
 									aria-invalid={!!errors.email}
 									aria-describedby={errors.email ? "email-error" : undefined}
 									placeholder={t("login.email_placeholder")}
@@ -275,15 +286,21 @@ export default function Register() {
 						</div>
 
 						<div>
+							<label
+								htmlFor="register-password"
+								className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
+							>
+								{t("register.password_label")}
+							</label>
 							<div className="relative">
 								<Lock
 									size={18}
 									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
 								/>
 								<input
+									id="register-password"
 									type={showPw ? "text" : "password"}
 									autoComplete="new-password"
-									aria-label={t("register.password_placeholder")}
 									aria-invalid={!!errors.password}
 									aria-describedby={errors.password ? "password-error" : undefined}
 									placeholder={t("register.password_placeholder")}
@@ -305,15 +322,21 @@ export default function Register() {
 						</div>
 
 						<div>
+							<label
+								htmlFor="register-confirm-password"
+								className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
+							>
+								{t("register.confirm_password")}
+							</label>
 							<div className="relative">
 								<Lock
 									size={18}
 									className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
 								/>
 								<input
+									id="register-confirm-password"
 									type={showConfirmPw ? "text" : "password"}
 									autoComplete="new-password"
-									aria-label={t("register.confirm_password")}
 									aria-invalid={!!errors.passwordConfirm}
 									aria-describedby={errors.passwordConfirm ? "confirm-error" : undefined}
 									placeholder={t("register.confirm_password")}

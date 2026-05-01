@@ -410,7 +410,7 @@ export default function SequenceManager() {
 								</p>
 
 								<div
-									className="mt-auto flex items-center justify-between gap-2 border-t pt-3 mt-4"
+									className="mt-4 flex items-center justify-between gap-2 border-t pt-3"
 									style={{ borderColor: "var(--color-border-soft)" }}
 								>
 									<Button
