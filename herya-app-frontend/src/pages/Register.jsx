@@ -121,17 +121,51 @@ export default function Register() {
 
 	return (
 		<div
-			className="min-h-dvh w-full px-4 py-8 sm:px-6 sm:py-10"
+			className="min-h-dvh w-full px-4 py-8 sm:px-6 sm:py-10 lg:flex lg:h-dvh lg:min-h-0 lg:items-center lg:justify-center lg:overflow-auto lg:px-8 lg:py-8 xl:px-10"
 			style={{ background: "var(--gradient-primary)" }}
 		>
-			<div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md items-center justify-center">
+			<div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md items-center justify-center lg:grid lg:min-h-0 lg:max-w-[90rem] lg:grid-cols-2 lg:items-stretch lg:overflow-hidden lg:rounded-[2rem] lg:border lg:border-white/45 lg:bg-[#fbfdfb] lg:shadow-[0_28px_90px_rgba(15,73,48,0.18)]">
+				<aside className="hidden min-w-0 flex-col items-center justify-center bg-[#e7f8ee] px-8 py-8 text-center lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-12 xl:py-10">
+					<div
+						className="relative flex h-14 w-14 items-center justify-center rounded-[1.15rem] shadow-[var(--shadow-card)]"
+						style={{
+							background:
+								"linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)",
+						}}
+					>
+						<img
+							src="/favicon-96x96.png"
+							alt={t("ui.herya_logo_alt")}
+							className="h-12 w-12 rounded-[0.85rem] object-cover"
+						/>
+					</div>
+					<div className="mt-5 flex w-full flex-1 items-center justify-center xl:mt-7">
+						<img
+							src="/images/rex-mascot-register.png"
+							alt="Rex, mascota de Herya practicando yoga en equilibrio junto al mar"
+							className="h-[min(28rem,52dvh)] w-full max-w-[31rem] rounded-[1.5rem] object-cover object-center shadow-[0_18px_50px_rgba(15,73,48,0.14)] xl:h-[min(34rem,58dvh)] xl:max-w-[34rem]"
+						/>
+					</div>
+					<div className="mt-5 max-w-md xl:mt-8">
+						<h1 className="text-3xl font-semibold text-[var(--color-text-primary)] xl:text-4xl">
+							Herya
+						</h1>
+						<p className="mt-3 text-base font-medium leading-7 text-[var(--color-text-secondary)] xl:mt-4 xl:text-lg xl:leading-8">
+							{t("login.subtitle")}
+						</p>
+					</div>
+				</aside>
+
+				<div className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full min-w-0 max-w-md items-center justify-center lg:mx-0 lg:min-h-[min(52rem,calc(100dvh-5rem))] lg:max-w-none lg:bg-[#fbfdfb] lg:px-12 lg:py-10 xl:px-20">
 				<motion.div
-					initial={{ opacity: 0, y: 16 }}
+					initial={false}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ duration: 0.35 }}
-					className="w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] sm:p-8"
+					className="w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] sm:p-8 lg:max-w-md lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
 				>
-					<AuthBrandHeader />
+					<div className="lg:hidden">
+						<AuthBrandHeader />
+					</div>
 
 					<div className="mb-7 text-center">
 						<h1 className="text-3xl font-semibold text-[var(--color-text-primary)]">
@@ -315,6 +349,7 @@ export default function Register() {
 						</Link>
 					</p>
 				</motion.div>
+			</div>
 			</div>
 		</div>
 	);

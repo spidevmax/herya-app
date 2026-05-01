@@ -79,7 +79,7 @@ export default function ResetPassword() {
 
 	return (
 		<main
-			className="min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden"
+			className="min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(24rem,30rem)] lg:gap-12 lg:px-12 xl:px-20"
 			style={{ background: "var(--gradient-warm)" }}
 		>
 			<div
@@ -91,13 +91,29 @@ export default function ResetPassword() {
 				className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl"
 			/>
 
+			<aside className="relative z-10 hidden min-h-dvh items-center justify-center lg:flex">
+				<div className="max-w-xl">
+					<AuthBrandHeader showSubtitle={false} />
+					<div className="mt-10 rounded-[2rem] border border-white/25 bg-white/20 p-8 shadow-[var(--shadow-card)] backdrop-blur-sm">
+						<p className="text-lg font-semibold leading-8 text-[var(--color-text-primary)]">
+							{tr(
+								"reset_password.subtitle",
+								"Choose a secure password to access your account.",
+							)}
+						</p>
+					</div>
+				</div>
+			</aside>
+
 			<motion.div
 				initial={{ opacity: 0, y: 24 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
-				className="w-full max-w-sm relative z-10"
+				className="w-full max-w-sm relative z-10 lg:max-w-md"
 			>
-				<AuthBrandHeader compact showSubtitle={false} />
+				<div className="lg:hidden">
+					<AuthBrandHeader compact showSubtitle={false} />
+				</div>
 
 				{!success && (
 					<>

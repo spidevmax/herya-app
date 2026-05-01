@@ -1,5 +1,4 @@
-import { LogOut, Shield } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import SectionTitle from "./SectionTitle";
@@ -7,7 +6,6 @@ import SectionTitle from "./SectionTitle";
 const cardStyle = { backgroundColor: "var(--color-surface-card)" };
 
 export default function ProfileActions({
-	user,
 	savingProfile,
 	saveSuccess,
 	saveError,
@@ -16,7 +14,6 @@ export default function ProfileActions({
 	onLogout,
 	onDeleteClick,
 }) {
-	const navigate = useNavigate();
 	const { t } = useLanguage();
 
 	return (
@@ -62,19 +59,6 @@ export default function ProfileActions({
 						? t("profile.saved")
 						: t("profile.save_changes")}
 			</Button>
-
-			{/* Admin Panel */}
-			{user?.role === "admin" && (
-				<Button
-					variant="outline"
-					onClick={() => navigate("/admin")}
-					className="flex items-center justify-center gap-2 w-full"
-					style={{ color: "var(--color-primary)" }}
-				>
-					<Shield size={16} />
-					{t("profile.admin_panel")}
-				</Button>
-			)}
 
 			<Button
 				variant="ghost"

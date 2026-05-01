@@ -623,7 +623,24 @@ const updateBreathingPattern = async (req, res, next) => {
 	try {
 		const { id } = req.params;
 
-		const pattern = await BreathingPattern.findByIdAndUpdate(id, req.body, {
+		// Optional enum fields can be cleared by the admin UI. Empty string or
+		// null on these means "remove" — translate to $unset so we don't fail
+		// enum validation and so the document actually loses the value.
+		const CLEARABLE_FIELDS = ["techniqueKey", "techniqueFamily", "variantOf"];
+		const setOps = { ...req.body };
+		const unsetOps = {};
+		for (const field of CLEARABLE_FIELDS) {
+			if (setOps[field] === "" || setOps[field] === null) {
+				delete setOps[field];
+				unsetOps[field] = "";
+			}
+		}
+
+		const update = {};
+		if (Object.keys(setOps).length > 0) update.$set = setOps;
+		if (Object.keys(unsetOps).length > 0) update.$unset = unsetOps;
+
+		const pattern = await BreathingPattern.findByIdAndUpdate(id, update, {
 			returnDocument: "after",
 			runValidators: true,
 		}).populate("vkContext.prerequisiteBreathing");

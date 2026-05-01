@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-	ChevronLeft,
 	Users,
 	BarChart2,
 	BookOpen,
 	List,
-	Shield,
+	ShieldCheck,
 	UserRound,
 } from "lucide-react";
 import {
@@ -365,28 +365,74 @@ export default function Admin() {
 
 	if (!user || user.role !== "admin") return null;
 
+	const hour = new Date().getHours();
+	const greetingKey =
+		hour < 6
+			? "dashboard.greeting_night"
+			: hour < 12
+				? "dashboard.greeting_morning"
+				: hour < 17
+					? "dashboard.greeting_afternoon"
+					: hour < 21
+						? "dashboard.greeting_evening"
+						: "dashboard.greeting_night";
+	const firstName = user?.name?.split(" ")[0] ?? t("dashboard.default_name");
+	const initial = (firstName?.[0] || "·").toUpperCase();
+
 	return (
 		<main className="flex flex-col pt-4 pb-6">
-			<header className="flex items-center gap-3 px-4 mb-5">
-				<button
-					type="button"
-					onClick={() => navigate(-1)}
-					aria-label={t("admin.title")}
-					className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-[var(--shadow-card)]"
+			<motion.header
+				initial={{ opacity: 0, y: -8 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3 }}
+				className="flex items-center gap-3 px-4 mb-5"
+			>
+				<span
+					aria-hidden="true"
+					className="w-11 h-11 rounded-full flex items-center justify-center font-display text-lg font-bold shrink-0 overflow-hidden"
+					style={{
+						backgroundColor: "color-mix(in srgb, var(--color-primary) 14%, transparent)",
+						color: "var(--color-primary)",
+						border: "2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+					}}
 				>
-					<ChevronLeft
-						size={20}
-						aria-hidden="true"
-						className="text-[var(--color-text-secondary)]"
-					/>
-				</button>
-				<div className="flex items-center gap-2">
-					<Shield size={20} aria-hidden="true" className="text-[var(--color-primary)]" />
-					<h1 className="font-display text-xl font-bold text-[var(--color-text-primary)]">
-						{t("admin.title")}
-					</h1>
+					{user?.profileImageUrl || user?.avatar ? (
+						<img
+							src={user.profileImageUrl || user.avatar}
+							alt=""
+							className="w-full h-full object-cover"
+						/>
+					) : (
+						initial
+					)}
+				</span>
+				<div className="min-w-0">
+					<p
+						className="text-sm font-medium"
+						style={{ color: "var(--color-text-secondary)" }}
+					>
+						{t(greetingKey)},
+					</p>
+					<div className="flex items-center gap-2 flex-wrap">
+						<h1 className="font-display text-2xl font-bold tracking-tight text-[var(--color-primary)] truncate">
+							{firstName}
+						</h1>
+						<span
+							className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full"
+							style={{
+								backgroundColor:
+									"color-mix(in srgb, var(--color-info) 14%, transparent)",
+								color: "var(--color-info)",
+								border:
+									"1px solid color-mix(in srgb, var(--color-info) 28%, transparent)",
+							}}
+						>
+							<ShieldCheck size={11} aria-hidden="true" />
+							{t("dashboard.role_admin")}
+						</span>
+					</div>
 				</div>
-			</header>
+			</motion.header>
 
 			<TabBar
 				tabs={[

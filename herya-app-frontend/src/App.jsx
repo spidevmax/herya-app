@@ -194,7 +194,7 @@ const AppRoutes = () => {
 							</AdminRoute>
 						}
 					>
-						<Route index element={<Navigate replace to="/" />} />
+						<Route index element={<Admin />} />
 					</Route>
 
 					<Route path="*" element={<NotFound />} />

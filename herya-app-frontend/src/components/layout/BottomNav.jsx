@@ -13,7 +13,7 @@ const BottomNav = () => {
 	const NAV_ITEMS = [
 		{ to: "/", icon: Home, label: t("nav.home") },
 		{ to: "/library", icon: BookOpen, label: t("nav.library") },
-		{ fab: true },
+		!isAdmin && { fab: true },
 		!isAdmin && { to: "/journal", icon: Leaf, label: t("nav.journal") },
 		{ to: "/profile", icon: User, label: t("nav.profile") },
 	].filter(Boolean);

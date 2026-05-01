@@ -95,9 +95,11 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 				sanskritName: form.sanskritName.trim(),
 				description: form.description.trim(),
 				difficulty: form.difficulty,
-				techniqueKey: form.techniqueKey || undefined,
-				techniqueFamily: form.techniqueFamily || undefined,
-				variantOf: form.variantOf || undefined,
+				// Send empty string (rather than undefined) when cleared so the
+				// backend can translate it to $unset and remove the value.
+				techniqueKey: form.techniqueKey,
+				techniqueFamily: form.techniqueFamily,
+				variantOf: form.variantOf,
 				energyEffect: form.energyEffect,
 				patternType: form.patternType,
 				baseBreathDuration: Number(form.baseBreathDuration || 5),
@@ -587,14 +589,33 @@ export default function BreathingPatternManager() {
 						<li key={item._id}>
 							<article
 								aria-labelledby={`breathing-card-${item._id}-title`}
-								className="rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)]"
+								className="flex h-full flex-col rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)] transition-shadow hover:shadow-md"
 							>
-								<h3 id={`breathing-card-${item._id}-title`} className="text-base font-semibold text-[var(--color-text-primary)]">
-									{item.romanizationName}
-								</h3>
-								<p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-									{item.iastName}
-								</p>
+								<header className="flex items-start justify-between gap-3">
+									<div className="min-w-0">
+										<h3 id={`breathing-card-${item._id}-title`} className="truncate text-base font-semibold text-[var(--color-text-primary)]">
+											{item.romanizationName}
+										</h3>
+										<p className="truncate text-sm text-[var(--color-text-secondary)]">
+											{item.iastName}
+										</p>
+									</div>
+									<span
+										className="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums"
+										style={{
+											backgroundColor:
+												"color-mix(in srgb, var(--color-primary) 12%, transparent)",
+											color: "var(--color-primary)",
+										}}
+										title="Inhale : Hold : Exhale : Hold (after exhale)"
+									>
+										{item.patternRatio?.inhale ?? 1}:
+										{item.patternRatio?.hold ?? 0}:
+										{item.patternRatio?.exhale ?? 1}:
+										{item.patternRatio?.holdAfterExhale ?? 0}
+									</span>
+								</header>
+
 								<ul className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
 									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
 										{humanize(item.difficulty || "beginner")}
@@ -617,21 +638,20 @@ export default function BreathingPatternManager() {
 											Variant of {humanize(item.variantOf)}
 										</li>
 									)}
-									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
-										{item.patternRatio?.inhale ?? 1}:
-										{item.patternRatio?.hold ?? 0}:
-										{item.patternRatio?.exhale ?? 1}:
-										{item.patternRatio?.holdAfterExhale ?? 0}
-									</li>
 								</ul>
+
 								<p className="mt-3 line-clamp-2 text-xs text-[var(--color-text-muted)]">
-									{item.description}
+									{item.description || "—"}
 								</p>
-								<div className="mt-4 flex gap-2">
+
+								<div
+									className="mt-auto flex items-center justify-between gap-2 border-t pt-3 mt-4"
+									style={{ borderColor: "var(--color-border-soft)" }}
+								>
 									<Button
 										variant="outline"
 										size="sm"
-										className="flex-1"
+										className="inline-flex items-center gap-1.5 whitespace-nowrap"
 										onClick={() => {
 											setEditingItem(item);
 											setShowModal(true);
@@ -640,15 +660,15 @@ export default function BreathingPatternManager() {
 										<Edit2 size={14} aria-hidden="true" />
 										{t("admin.breathing_manager_edit")}
 									</Button>
-									<Button
-										variant="ghost"
-										size="sm"
-										className="flex-1 text-[var(--color-danger)]"
+									<button
+										type="button"
 										onClick={() => setDeleteTarget(item)}
+										className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1"
+										style={{ color: "var(--color-danger)" }}
 									>
 										<Trash2 size={14} aria-hidden="true" />
 										{t("admin.breathing_manager_delete")}
-									</Button>
+									</button>
 								</div>
 							</article>
 						</li>

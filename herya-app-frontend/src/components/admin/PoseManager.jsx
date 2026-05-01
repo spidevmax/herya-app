@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import {
 	AlertTriangle,
 	Edit2,
+	ImageOff,
 	Plus,
 	Search,
 	Trash2,
@@ -634,20 +635,33 @@ export default function PoseManager() {
 						<li key={pose._id}>
 							<article
 								aria-labelledby={`pose-card-${pose._id}-name`}
-								className="overflow-hidden rounded-3xl bg-[var(--color-surface-card)] shadow-[var(--shadow-card)]"
+								className="flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] shadow-[var(--shadow-card)] transition-shadow hover:shadow-md"
 							>
 								{pose.media?.thumbnail?.url ? (
 									<img
 										src={pose.media.thumbnail.url}
 										alt={pose.name}
-										className="h-44 w-full object-cover"
+										className="h-40 w-full object-cover"
 									/>
 								) : (
-									<p className="flex h-44 items-center justify-center bg-[var(--color-surface)] text-sm text-[var(--color-text-muted)] m-0">
-										{t("admin.pose_manager_no_thumbnail")}
-									</p>
+									<div
+										className="flex h-40 w-full flex-col items-center justify-center gap-1.5"
+										style={{
+											background:
+												"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+										}}
+									>
+										<ImageOff
+											size={22}
+											aria-hidden="true"
+											className="text-[var(--color-text-muted)] opacity-70"
+										/>
+										<p className="m-0 text-xs font-medium text-[var(--color-text-muted)]">
+											{t("admin.pose_manager_no_thumbnail")}
+										</p>
+									</div>
 								)}
-								<div className="space-y-3 p-4">
+								<div className="flex flex-1 flex-col gap-3 p-5">
 									<header className="flex items-start justify-between gap-3">
 										<div className="min-w-0">
 											<h3 id={`pose-card-${pose._id}-name`} className="truncate text-base font-semibold text-[var(--color-text-primary)]">
@@ -673,16 +687,19 @@ export default function PoseManager() {
 									</ul>
 
 									{pose.media?.images?.length > 0 && (
-										<p className="text-xs text-[var(--color-text-muted)]">
+										<p className="m-0 text-xs text-[var(--color-text-muted)]">
 											{pose.media.images.length} {t("admin.pose_manager_images")}
 										</p>
 									)}
 
-									<div className="flex gap-2 pt-1">
+									<div
+										className="mt-auto flex items-center justify-between gap-2 border-t pt-3"
+										style={{ borderColor: "var(--color-border-soft)" }}
+									>
 										<Button
 											variant="outline"
 											size="sm"
-											className="flex-1"
+											className="inline-flex items-center gap-1.5 whitespace-nowrap"
 											onClick={() => {
 												setEditingPose(pose);
 												setShowForm(true);
@@ -691,15 +708,15 @@ export default function PoseManager() {
 											<Edit2 size={14} aria-hidden="true" />
 											{t("admin.pose_manager_edit")}
 										</Button>
-										<Button
-											variant="ghost"
-											size="sm"
-											className="flex-1 text-[var(--color-danger)]"
+										<button
+											type="button"
 											onClick={() => setDeleteTarget(pose)}
+											className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1"
+											style={{ color: "var(--color-danger)" }}
 										>
 											<Trash2 size={14} aria-hidden="true" />
 											{t("admin.pose_manager_delete")}
-										</Button>
+										</button>
 									</div>
 								</div>
 							</article>
