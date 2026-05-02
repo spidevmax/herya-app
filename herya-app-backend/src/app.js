@@ -93,6 +93,14 @@ app.get("/", (_req, res) => {
 	});
 });
 
+app.get("/health", (_req, res) => {
+	res.status(200).json({
+		status: "ok",
+		uptime: process.uptime(),
+		env: process.env.NODE_ENV,
+	});
+});
+
 // === API Routes ===
 app.use("/api/v1/auth", authLimiter, authRouter);
 app.use("/api/v1/admin", apiLimiter, adminRouter);
