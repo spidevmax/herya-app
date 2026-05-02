@@ -37,14 +37,7 @@ const { deleteImgCloudinary } = require("../../utils/deleteImage");
 const getJournalEntries = async (req, res, next) => {
 	try {
 		// req.user verified by authenticateToken middleware
-		const {
-			page = 1,
-			limit = 20,
-			startDate,
-			endDate,
-			sequenceFamily,
-			sortBy = "date",
-		} = req.query;
+		const { page = 1, limit = 20, startDate, endDate, sequenceFamily, sortBy = "date" } = req.query;
 
 		// Build filter
 		const filter = { user: req.user._id };
@@ -91,21 +84,15 @@ const getJournalEntries = async (req, res, next) => {
 
 		const total = await JournalEntry.countDocuments(filter);
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Journal entries retrieved successfully",
-			{
-				journals,
-				pagination: {
-					page: parseInt(page, 10),
-					limit: parseInt(limit, 10),
-					total,
-					pages: Math.ceil(total / parseInt(limit, 10)),
-				},
+		return sendResponse(res, 200, true, "Journal entries retrieved successfully", {
+			journals,
+			pagination: {
+				page: parseInt(page, 10),
+				limit: parseInt(limit, 10),
+				total,
+				pages: Math.ceil(total / parseInt(limit, 10)),
 			},
-		);
+		});
 	} catch (error) {
 		return next(error);
 	}
@@ -153,13 +140,7 @@ const getJournalEntryById = async (req, res, next) => {
 			throw createError(403, "You don't have access to this journal entry");
 		}
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Journal entry retrieved successfully",
-			journal,
-		);
+		return sendResponse(res, 200, true, "Journal entry retrieved successfully", journal);
 	} catch (error) {
 		return next(error);
 	}
@@ -293,13 +274,7 @@ const createJournalEntry = async (req, res, next) => {
 		await savedJournal.populate("favoritePoses.pose");
 		await savedJournal.populate("challengingPoses.pose");
 
-		return sendResponse(
-			res,
-			201,
-			true,
-			"Journal entry created successfully",
-			savedJournal,
-		);
+		return sendResponse(res, 201, true, "Journal entry created successfully", savedJournal);
 	} catch (error) {
 		// Clean up uploaded files on error
 		if (uploadedPhotos.length > 0 || uploadedVoiceNotes.length > 0) {
@@ -418,9 +393,9 @@ const updateJournalEntry = async (req, res, next) => {
 		// Trigger VK progression if readyForNextLevel was set via this update
 		if (updatedJournal.vkReflection?.readyForNextLevel) {
 			try {
-				const populatedSession = await Session.findById(
-					updatedJournal.session,
-				).populate("vkSequence");
+				const populatedSession = await Session.findById(updatedJournal.session).populate(
+					"vkSequence",
+				);
 				if (populatedSession?.vkSequence) {
 					await updateUserVKProgression(
 						req.user._id,
@@ -439,13 +414,7 @@ const updateJournalEntry = async (req, res, next) => {
 		await updatedJournal.populate("favoritePoses.pose");
 		await updatedJournal.populate("challengingPoses.pose");
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Journal entry updated successfully",
-			updatedJournal,
-		);
+		return sendResponse(res, 200, true, "Journal entry updated successfully", updatedJournal);
 	} catch (error) {
 		// Clean up newly uploaded files on error
 		if (uploadedPhotos.length > 0 || uploadedVoiceNotes.length > 0) {
@@ -528,13 +497,7 @@ const deleteJournalEntry = async (req, res, next) => {
 
 		await JournalEntry.findByIdAndDelete(id);
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Journal entry deleted successfully",
-			null,
-		);
+		return sendResponse(res, 200, true, "Journal entry deleted successfully", null);
 	} catch (error) {
 		return next(error);
 	}
@@ -632,9 +595,7 @@ function _calculateEmotionalTrends(journals) {
 		}
 	});
 
-	trends.avgEnergyImprovement = (totalEnergyChange / journals.length).toFixed(
-		1,
-	);
+	trends.avgEnergyImprovement = (totalEnergyChange / journals.length).toFixed(1);
 	trends.avgStressReduction = (totalStressChange / journals.length).toFixed(1);
 
 	if (Object.keys(moodBeforeCount).length > 0) {
@@ -672,10 +633,7 @@ function _calculatePhysicalProgress(journals) {
 	if (!Array.isArray(journals)) return bodyAreaProgress;
 
 	journals.forEach((journal) => {
-		if (
-			journal.vkReflection &&
-			Array.isArray(journal.vkReflection.anatomicalObservations)
-		) {
+		if (journal.vkReflection && Array.isArray(journal.vkReflection.anatomicalObservations)) {
 			journal.vkReflection.anatomicalObservations.forEach((obs) => {
 				if (!obs.area) return; // Skip if no area specified
 
@@ -691,11 +649,7 @@ function _calculatePhysicalProgress(journals) {
 
 				bodyAreaProgress[obs.area].observations++;
 
-				if (
-					obs.improvement &&
-					obs.improvement !== "none" &&
-					obs.improvement !== "regressed"
-				) {
+				if (obs.improvement && obs.improvement !== "none" && obs.improvement !== "regressed") {
 					bodyAreaProgress[obs.area].improvements++;
 					if (bodyAreaProgress[obs.area][obs.improvement] !== undefined) {
 						bodyAreaProgress[obs.area][obs.improvement]++;
@@ -777,13 +731,7 @@ const completeJournalEntry = async (req, res, next) => {
 		const completedJournal = await journal.save();
 		await completedJournal.populate("session", "sessionType duration");
 
-		return sendResponse(
-			res,
-			200,
-			true,
-			"Journal entry completed successfully",
-			completedJournal,
-		);
+		return sendResponse(res, 200, true, "Journal entry completed successfully", completedJournal);
 	} catch (error) {
 		return next(error);
 	}

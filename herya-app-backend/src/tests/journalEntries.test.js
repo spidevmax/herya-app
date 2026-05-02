@@ -74,7 +74,6 @@ describe("Journal Entries — POST /", () => {
 		expect(Array.isArray(res.body.data.physicalSensations)).toBe(true);
 		expect(res.body.data.physicalSensations).toEqual(["tight_shoulders", "calm"]);
 	});
-
 });
 
 describe("Journal Entries — GET /:id", () => {

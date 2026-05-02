@@ -498,11 +498,6 @@ router.delete("/:id", journalIdValidation, handleValidationErrors, deleteJournal
  *       404:
  *         description: Journal entry not found
  */
-router.patch(
-	"/:id/complete",
-	journalIdValidation,
-	handleValidationErrors,
-	completeJournalEntry,
-);
+router.patch("/:id/complete", journalIdValidation, handleValidationErrors, completeJournalEntry);
 
 module.exports = router;

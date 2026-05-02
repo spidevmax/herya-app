@@ -1,4 +1,5 @@
 {
+	"root": false,
 	"linter": {
 		"rules": {
 			"recommended": true
