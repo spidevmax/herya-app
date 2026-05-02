@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
+import { VK_FAMILY_MAP } from "@/utils/constants";
 import { localized, localizedName } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
@@ -138,7 +138,6 @@ export default function SequencePicker({
 								placeholder={t("guided.search_sequences")}
 								className="flex-1 text-sm bg-transparent outline-none"
 								style={{ color: "var(--color-text-primary)" }}
-								autoFocus
 							/>
 							{search && (
 								<button type="button" onClick={() => setSearch("")}>
