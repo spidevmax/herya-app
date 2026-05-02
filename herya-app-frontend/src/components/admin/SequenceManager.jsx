@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Edit2, Plus, Search, Trash2, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import {
 	createSequence,
 	deleteSequence,
@@ -94,7 +94,12 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 	};
 
 	return (
-		<div role="dialog" aria-modal="true" aria-labelledby="sequence-modal-title" className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4">
+		<div
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="sequence-modal-title"
+			className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4"
+		>
 			<section
 				aria-labelledby="sequence-modal-title"
 				className="relative w-full max-w-2xl rounded-3xl p-5 shadow-[var(--shadow-card-hover)] sm:p-6"
@@ -109,14 +114,20 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 					<X size={18} aria-hidden="true" />
 				</button>
 
-				<h2 id="sequence-modal-title" className="pr-10 font-display text-2xl font-bold text-[var(--color-text-primary)]">
+				<h2
+					id="sequence-modal-title"
+					className="pr-10 font-display text-2xl font-bold text-[var(--color-text-primary)]"
+				>
 					{isEditing
 						? t("admin.sequence_manager_edit")
 						: t("admin.sequence_manager_create")}
 				</h2>
 
 				{error && (
-					<p role="alert" className="mt-4 rounded-2xl border border-[var(--color-danger)] bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-danger)]">
+					<p
+						role="alert"
+						className="mt-4 rounded-2xl border border-[var(--color-danger)] bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-danger)]"
+					>
 						{error}
 					</p>
 				)}
@@ -328,7 +339,10 @@ export default function SequenceManager() {
 	};
 
 	return (
-		<section aria-label={t("admin.tab_sequences") || "Sequences"} className="flex flex-col gap-4">
+		<section
+			aria-label={t("admin.tab_sequences") || "Sequences"}
+			className="flex flex-col gap-4"
+		>
 			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search
@@ -355,14 +369,20 @@ export default function SequenceManager() {
 			</search>
 
 			{error && (
-				<p role="alert" className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
+				<p
+					role="alert"
+					className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]"
+				>
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.sequence_manager_load_error")}</span>
 				</p>
 			)}
 
 			{loading ? (
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+				<div
+					className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+					aria-busy="true"
+				>
 					{["s1", "s2", "s3", "s4", "s5", "s6"].map((key) => (
 						<SkeletonCard key={key} />
 					))}
@@ -377,7 +397,10 @@ export default function SequenceManager() {
 							>
 								<header className="flex items-start justify-between gap-3">
 									<div className="min-w-0">
-										<h3 id={`sequence-card-${item._id}-title`} className="truncate text-base font-semibold text-[var(--color-text-primary)]">
+										<h3
+											id={`sequence-card-${item._id}-title`}
+											className="truncate text-base font-semibold text-[var(--color-text-primary)]"
+										>
 											{item.englishName}
 										</h3>
 										<p className="truncate text-sm text-[var(--color-text-secondary)]">

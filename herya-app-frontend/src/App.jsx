@@ -164,7 +164,9 @@ const AppRoutes = () => {
 							<Route path="/start-practice" element={<StartPractice />} />
 						)}
 						{!isAdmin && <Route path="/session/:type" element={<Session />} />}
-						{!isAdmin && <Route path="/sessions" element={<SessionHistory />} />}
+						{!isAdmin && (
+							<Route path="/sessions" element={<SessionHistory />} />
+						)}
 						{!isAdmin && (
 							<Route path="/sessions/:id" element={<SessionDetail />} />
 						)}

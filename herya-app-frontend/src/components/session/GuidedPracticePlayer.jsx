@@ -1,25 +1,30 @@
-import { useEffect, useRef, useCallback, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-	Play,
-	Pause,
-	SkipForward,
-	SkipBack,
-	Square,
 	ChevronRight,
 	Leaf,
+	Pause,
 	PersonStanding,
-	Wind,
+	Play,
 	Shuffle,
+	SkipBack,
+	SkipForward,
+	Square,
+	Wind,
 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+	Button,
+	CircleProgress,
+	ConfirmModal,
+	ProgressBar,
+} from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { Button, ProgressBar, CircleProgress, ConfirmModal } from "@/components/ui";
 import useSessionTimer from "@/hooks/useSessionTimer";
-import PoseByPosePlayer from "./PoseByPosePlayer";
 import CycleBreathingPlayer from "./CycleBreathingPlayer";
 import PhasedMeditationPlayer from "./PhasedMeditationPlayer";
-import VisualSchedule from "./VisualSchedule";
+import PoseByPosePlayer from "./PoseByPosePlayer";
 import TransitionWarning from "./TransitionWarning";
+import VisualSchedule from "./VisualSchedule";
 
 const formatTime = (totalSec) => {
 	const m = Math.floor(totalSec / 60);
@@ -210,7 +215,16 @@ export default function GuidedPracticePlayer({
 		} else {
 			timer.nextBlock();
 		}
-	}, [timer.isLastBlock, timer.nextBlock, timer.pause, timer.resume, timer.currentBlockIndex, handleFinish, isTutorMode, blocks]);
+	}, [
+		timer.isLastBlock,
+		timer.nextBlock,
+		timer.pause,
+		timer.resume,
+		timer.currentBlockIndex,
+		handleFinish,
+		isTutorMode,
+		blocks,
+	]);
 
 	const handleTransitionEnd = useCallback(() => {
 		setTransitionVisible(false);
@@ -246,7 +260,10 @@ export default function GuidedPracticePlayer({
 	const isWaitingToStart = !timer.isRunning && timer.globalElapsedSec === 0;
 
 	return (
-		<section aria-label={t("practice.session_progress")} className="flex flex-col gap-5 pt-2 pb-4">
+		<section
+			aria-label={t("practice.session_progress")}
+			className="flex flex-col gap-5 pt-2 pb-4"
+		>
 			{/* Global progress bar */}
 			<section aria-label={t("practice.session_progress")}>
 				<header className="flex justify-between items-center mb-1.5">
@@ -302,18 +319,25 @@ export default function GuidedPracticePlayer({
 			</section>
 
 			{/* Block indicator dots */}
-			<nav aria-label={t("practice.next_block")} className="flex justify-center">
+			<nav
+				aria-label={t("practice.next_block")}
+				className="flex justify-center"
+			>
 				<ol className="flex justify-center gap-1.5 list-none m-0 p-0">
 					{blocks.map((block, idx) => (
-						<li key={
-							block.id ??
-							block._id ??
-							`block-${block.order ?? block.label ?? block.blockType}`
-						}>
+						<li
+							key={
+								block.id ??
+								block._id ??
+								`block-${block.order ?? block.label ?? block.blockType}`
+							}
+						>
 							<button
 								type="button"
 								onClick={() => timer.goToBlock(idx)}
-								aria-current={idx === timer.currentBlockIndex ? "step" : undefined}
+								aria-current={
+									idx === timer.currentBlockIndex ? "step" : undefined
+								}
 								aria-label={block.label || `Block ${idx + 1}`}
 								className="transition-all rounded-full block"
 								style={{
@@ -361,7 +385,9 @@ export default function GuidedPracticePlayer({
 								lowStimMode={lowStimMode}
 								autoAdvance={currentBlock.config?.autoAdvancePoses !== false}
 								blockDurationSec={(currentBlock.durationMinutes || 0) * 60}
-								distributionMode={currentBlock.config?.distributionMode || "auto"}
+								distributionMode={
+									currentBlock.config?.distributionMode || "auto"
+								}
 								manualOverrides={currentBlock.config?.manualOverrides || {}}
 								onComplete={handleBlockPlayerComplete}
 							/>
@@ -417,14 +443,18 @@ export default function GuidedPracticePlayer({
 										style={{ color: blockColor }}
 									/>
 								</span>
-								<h3 id={`block-start-heading-${timer.currentBlockIndex}`} className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+								<h3
+									id={`block-start-heading-${timer.currentBlockIndex}`}
+									className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]"
+								>
 									{currentBlock.label}
 								</h3>
 								<p
 									className="text-sm mb-5"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
-									{t(`practice.type_${currentBlock.blockType}`)} · {currentBlock.durationMinutes}m
+									{t(`practice.type_${currentBlock.blockType}`)} ·{" "}
+									{currentBlock.durationMinutes}m
 								</p>
 								<motion.button
 									type="button"
@@ -473,7 +503,10 @@ export default function GuidedPracticePlayer({
 									/>
 								</span>
 
-								<h3 id={`block-timer-heading-${timer.currentBlockIndex}`} className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+								<h3
+									id={`block-timer-heading-${timer.currentBlockIndex}`}
+									className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]"
+								>
 									{currentBlock.label}
 								</h3>
 
@@ -505,7 +538,12 @@ export default function GuidedPracticePlayer({
 									</>
 								) : (
 									/* Block timer circle — only shown after user presses play */
-									<div className="flex justify-center mb-4" role="timer" aria-live="off" aria-label={t("practice.block_remaining")}>
+									<div
+										className="flex justify-center mb-4"
+										role="timer"
+										aria-live="off"
+										aria-label={t("practice.block_remaining")}
+									>
 										<CircleProgress
 											value={timer.blockElapsedSec}
 											max={(currentBlock.durationMinutes || 1) * 60}
@@ -599,7 +637,11 @@ export default function GuidedPracticePlayer({
 									: startTimerWithBackend
 						}
 						aria-pressed={timer.isRunning}
-						aria-label={timer.isRunning ? t("practice.aria_pause") : t("practice.aria_play")}
+						aria-label={
+							timer.isRunning
+								? t("practice.aria_pause")
+								: t("practice.aria_play")
+						}
 						className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 						style={{ backgroundColor: blockColor }}
 					>
@@ -668,15 +710,24 @@ export default function GuidedPracticePlayer({
 							<figure className="flex flex-col items-center py-3 m-0">
 								<motion.span
 									animate={{ scale: [1, 1.3, 1] }}
-									transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+									transition={{
+										duration: 6,
+										repeat: Infinity,
+										ease: "easeInOut",
+									}}
 									className="w-16 h-16 rounded-full flex items-center justify-center"
 									style={{
-										backgroundColor: "color-mix(in srgb, var(--color-primary) 15%, transparent)",
+										backgroundColor:
+											"color-mix(in srgb, var(--color-primary) 15%, transparent)",
 										border: "2px solid var(--color-primary)",
 									}}
 									aria-hidden="true"
 								>
-									<Leaf size={24} aria-hidden="true" style={{ color: "var(--color-primary)" }} />
+									<Leaf
+										size={24}
+										aria-hidden="true"
+										style={{ color: "var(--color-primary)" }}
+									/>
 								</motion.span>
 								<figcaption
 									className="text-[11px] mt-2"
@@ -802,10 +853,14 @@ export default function GuidedPracticePlayer({
 				</>
 			)}
 			<div className="flex gap-2 pt-2">
-				<Button variant="ghost" className="flex-1" onClick={() => {
-					timer.pause();
-					setAbandonModalOpen(true);
-				}}>
+				<Button
+					variant="ghost"
+					className="flex-1"
+					onClick={() => {
+						timer.pause();
+						setAbandonModalOpen(true);
+					}}
+				>
 					<Square size={14} aria-hidden="true" />
 					{t("practice.end_session")}
 				</Button>

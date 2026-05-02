@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
+import { Card, LoadingSpinner, SurfaceCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
 import {
+	getMoodColorStyle,
 	resolveEntryId,
 	toMoodTokens,
 	translateMoodLabel,
 	translateWithFallback,
-	getMoodColorStyle,
 } from "@/utils/journalHelpers";
-import { Card, LoadingSpinner, SurfaceCard } from "@/components/ui";
 
 // ── Skeleton ─────────────────────────────────────────────────────────────────
 export const EntryCardSkeleton = () => (
@@ -138,7 +138,11 @@ export const EntryList = ({
 
 			{/* Load more sentinel / spinner */}
 			{hasMore && (
-				<div ref={sentinelRef} className="flex justify-center py-4" aria-live="polite">
+				<div
+					ref={sentinelRef}
+					className="flex justify-center py-4"
+					aria-live="polite"
+				>
 					{loadingMore && <LoadingSpinner size={24} />}
 				</div>
 			)}

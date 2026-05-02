@@ -1,33 +1,33 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-	Users,
 	BarChart2,
 	BookOpen,
 	List,
 	ShieldCheck,
 	UserRound,
+	Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-	getAnalyticsDashboard,
-	getAdminUsers,
 	changeUserRole,
 	deleteAdminUser,
+	getAdminUsers,
+	getAnalyticsDashboard,
 } from "@/api/admin.api";
-import { getSequences } from "@/api/sequences.api";
-import { getPoses } from "@/api/poses.api";
 import { getBreathingPatterns } from "@/api/breathing.api";
-import {
-	TabBar,
-	StatCard,
-	ConfirmModal,
-	SkeletonCard,
-	Badge,
-} from "@/components/ui";
+import { getPoses } from "@/api/poses.api";
+import { getSequences } from "@/api/sequences.api";
+import BreathingPatternManager from "@/components/admin/BreathingPatternManager";
 import PoseManager from "@/components/admin/PoseManager";
 import SequenceManager from "@/components/admin/SequenceManager";
-import BreathingPatternManager from "@/components/admin/BreathingPatternManager";
+import {
+	Badge,
+	ConfirmModal,
+	SkeletonCard,
+	StatCard,
+	TabBar,
+} from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -83,7 +83,10 @@ function AdminDashboard({ stats, loading, t }) {
 					aria-labelledby="admin-popular-sequences-heading"
 					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
 				>
-					<h2 id="admin-popular-sequences-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+					<h2
+						id="admin-popular-sequences-heading"
+						className="font-semibold text-[var(--color-text-primary)] text-sm mb-3"
+					>
 						{t("admin.dashboard_popular_sequences")}
 					</h2>
 					<ul className="list-none m-0 p-0">
@@ -109,7 +112,10 @@ function AdminDashboard({ stats, loading, t }) {
 					aria-labelledby="admin-sessions-by-type-heading"
 					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
 				>
-					<h2 id="admin-sessions-by-type-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+					<h2
+						id="admin-sessions-by-type-heading"
+						className="font-semibold text-[var(--color-text-primary)] text-sm mb-3"
+					>
 						{t("admin.dashboard_sessions_by_type")}
 					</h2>
 					<dl className="m-0">
@@ -142,9 +148,15 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 	}, [user.role]);
 
 	return (
-		<article aria-label={user.name} className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]">
+		<article
+			aria-label={user.name}
+			className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+		>
 			<header className="flex items-center gap-3 mb-3">
-				<div aria-hidden="true" className="w-10 h-10 rounded-full bg-[color:var(--color-primary)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0">
+				<div
+					aria-hidden="true"
+					className="w-10 h-10 rounded-full bg-[color:var(--color-primary)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0"
+				>
 					{user.profileImageUrl || user.avatar ? (
 						<img
 							src={user.profileImageUrl || user.avatar}
@@ -217,7 +229,10 @@ function ContentSection({ title, items, loading, color }) {
 			aria-labelledby={headingId}
 			className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
 		>
-			<h2 id={headingId} className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
+			<h2
+				id={headingId}
+				className="font-semibold text-[var(--color-text-primary)] text-sm mb-2"
+			>
 				{title}{" "}
 				<span className="text-[var(--color-text-muted)] font-normal">
 					({items.length})
@@ -391,9 +406,11 @@ export default function Admin() {
 					aria-hidden="true"
 					className="w-11 h-11 rounded-full flex items-center justify-center font-display text-lg font-bold shrink-0 overflow-hidden"
 					style={{
-						backgroundColor: "color-mix(in srgb, var(--color-primary) 14%, transparent)",
+						backgroundColor:
+							"color-mix(in srgb, var(--color-primary) 14%, transparent)",
 						color: "var(--color-primary)",
-						border: "2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+						border:
+							"2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
 					}}
 				>
 					{user?.profileImageUrl || user?.avatar ? (
@@ -454,7 +471,10 @@ export default function Admin() {
 				{tab === "breathing" && <BreathingPatternManager />}
 
 				{tab === "users" && (
-					<ul className="flex flex-col gap-3 list-none m-0 p-0" aria-busy={usersLoading || undefined}>
+					<ul
+						className="flex flex-col gap-3 list-none m-0 p-0"
+						aria-busy={usersLoading || undefined}
+					>
 						{usersLoading
 							? ["u1", "u2", "u3"].map((k) => (
 									<li key={k}>
@@ -473,7 +493,6 @@ export default function Admin() {
 								))}
 					</ul>
 				)}
-
 			</section>
 
 			<ConfirmModal

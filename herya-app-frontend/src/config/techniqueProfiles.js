@@ -54,15 +54,28 @@ const AUDIO = {
 	// Soft ocean-like noise burst
 	ocean: { type: "noise", freq: 0, gain: 0.06, attack: 0.4, release: 0.6 },
 	// Gentle sine bell
-	bell: { type: "sine", freq: 528, gain: 0.10, attack: 0.01, release: 0.8 },
+	bell: { type: "sine", freq: 528, gain: 0.1, attack: 0.01, release: 0.8 },
 	// Soft click
 	click: { type: "sine", freq: 880, gain: 0.08, attack: 0.005, release: 0.08 },
 	// Continuous low hum (for bhramari exhale)
-	hum: { type: "sine", freq: 220, gain: 0.07, attack: 0.3, release: 0.5, sustain: true },
+	hum: {
+		type: "sine",
+		freq: 220,
+		gain: 0.07,
+		attack: 0.3,
+		release: 0.5,
+		sustain: true,
+	},
 	// Neutral mid-range tone
 	tone: { type: "sine", freq: 396, gain: 0.08, attack: 0.05, release: 0.4 },
 	// Short energetic pulse
-	pulse: { type: "square", freq: 440, gain: 0.06, attack: 0.005, release: 0.06 },
+	pulse: {
+		type: "square",
+		freq: 440,
+		gain: 0.06,
+		attack: 0.005,
+		release: 0.06,
+	},
 	// Silence
 	none: null,
 };
@@ -341,7 +354,13 @@ const PROFILES = {
 			holdAfterExhale: AUDIO.none,
 			phaseChange: AUDIO.click,
 		},
-		haptic: { inhale: 15, hold: 10, exhale: 15, holdAfterExhale: 10, phaseChange: 30 },
+		haptic: {
+			inhale: 15,
+			hold: 10,
+			exhale: 15,
+			holdAfterExhale: 10,
+			phaseChange: 30,
+		},
 		stimulation: "medium",
 		safety: { maxCyclesBeginner: 8 },
 		pauseBetweenCycles: 3,
@@ -355,15 +374,43 @@ const PROFILES = {
 			inhale: { scale: 1.22, ease: [0.25, 0.1, 0.25, 1] },
 			exhale: { scale: 0.82, ease: [0.42, 0, 0.58, 1] },
 		},
-		visual: { circleStyle: "wave", palette: "balanced", phaseEmphasis: "exhale" },
-		audio: { inhale: AUDIO.ocean, exhale: AUDIO.ocean, phaseChange: AUDIO.bell },
+		visual: {
+			circleStyle: "wave",
+			palette: "balanced",
+			phaseEmphasis: "exhale",
+		},
+		audio: {
+			inhale: AUDIO.ocean,
+			exhale: AUDIO.ocean,
+			phaseChange: AUDIO.bell,
+		},
 		haptic: { inhale: 15, exhale: 0, phaseChange: 20 },
 		stimulation: "low",
 		phaseSequence: [
-			{ key: "inhale_both_1", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 0.5 },
-			{ key: "exhale_left", phaseKey: "exhale", nostrilFlow: "left", durationMultiplier: 0.5 },
-			{ key: "inhale_both_2", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 0.5 },
-			{ key: "exhale_right", phaseKey: "exhale", nostrilFlow: "right", durationMultiplier: 0.5 },
+			{
+				key: "inhale_both_1",
+				phaseKey: "inhale",
+				nostrilFlow: "both",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "exhale_left",
+				phaseKey: "exhale",
+				nostrilFlow: "left",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "inhale_both_2",
+				phaseKey: "inhale",
+				nostrilFlow: "both",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "exhale_right",
+				phaseKey: "exhale",
+				nostrilFlow: "right",
+				durationMultiplier: 0.5,
+			},
 		],
 		safety: { maxCyclesBeginner: 12 },
 		pauseBetweenCycles: 1,
@@ -377,15 +424,43 @@ const PROFILES = {
 			inhale: { scale: 1.22, ease: [0.25, 0.1, 0.25, 1] },
 			exhale: { scale: 0.82, ease: [0.42, 0, 0.58, 1] },
 		},
-		visual: { circleStyle: "wave", palette: "balanced", phaseEmphasis: "inhale" },
-		audio: { inhale: AUDIO.ocean, exhale: AUDIO.ocean, phaseChange: AUDIO.click },
+		visual: {
+			circleStyle: "wave",
+			palette: "balanced",
+			phaseEmphasis: "inhale",
+		},
+		audio: {
+			inhale: AUDIO.ocean,
+			exhale: AUDIO.ocean,
+			phaseChange: AUDIO.click,
+		},
 		haptic: { inhale: 15, exhale: 0, phaseChange: 20 },
 		stimulation: "medium",
 		phaseSequence: [
-			{ key: "inhale_left", phaseKey: "inhale", nostrilFlow: "left", durationMultiplier: 0.5 },
-			{ key: "exhale_both_1", phaseKey: "exhale", nostrilFlow: "both", durationMultiplier: 0.5 },
-			{ key: "inhale_right", phaseKey: "inhale", nostrilFlow: "right", durationMultiplier: 0.5 },
-			{ key: "exhale_both_2", phaseKey: "exhale", nostrilFlow: "both", durationMultiplier: 0.5 },
+			{
+				key: "inhale_left",
+				phaseKey: "inhale",
+				nostrilFlow: "left",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "exhale_both_1",
+				phaseKey: "exhale",
+				nostrilFlow: "both",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "inhale_right",
+				phaseKey: "inhale",
+				nostrilFlow: "right",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "exhale_both_2",
+				phaseKey: "exhale",
+				nostrilFlow: "both",
+				durationMultiplier: 0.5,
+			},
 		],
 		safety: { maxCyclesBeginner: 8 },
 		pauseBetweenCycles: 2,
@@ -401,15 +476,45 @@ const PROFILES = {
 			exhale: { scale: 0.86, ease: [0.42, 0, 0.58, 1] },
 		},
 		visual: { circleStyle: "wave", palette: "balanced", phaseEmphasis: null },
-		audio: { inhale: AUDIO.ocean, hold: AUDIO.none, exhale: AUDIO.tone, phaseChange: AUDIO.click },
+		audio: {
+			inhale: AUDIO.ocean,
+			hold: AUDIO.none,
+			exhale: AUDIO.tone,
+			phaseChange: AUDIO.click,
+		},
 		haptic: { inhale: 10, hold: 8, exhale: 10, phaseChange: 18 },
 		stimulation: "low",
 		phaseSequence: [
-			{ key: "inhale_part_1", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 1 / 3 },
-			{ key: "pause_after_inhale_1", phaseKey: "hold", nostrilFlow: "none", durationMultiplier: 0.5 },
-			{ key: "inhale_part_2", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 1 / 3 },
-			{ key: "pause_after_inhale_2", phaseKey: "hold", nostrilFlow: "none", durationMultiplier: 0.5 },
-			{ key: "inhale_part_3", phaseKey: "inhale", nostrilFlow: "both", durationMultiplier: 1 / 3 },
+			{
+				key: "inhale_part_1",
+				phaseKey: "inhale",
+				nostrilFlow: "both",
+				durationMultiplier: 1 / 3,
+			},
+			{
+				key: "pause_after_inhale_1",
+				phaseKey: "hold",
+				nostrilFlow: "none",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "inhale_part_2",
+				phaseKey: "inhale",
+				nostrilFlow: "both",
+				durationMultiplier: 1 / 3,
+			},
+			{
+				key: "pause_after_inhale_2",
+				phaseKey: "hold",
+				nostrilFlow: "none",
+				durationMultiplier: 0.5,
+			},
+			{
+				key: "inhale_part_3",
+				phaseKey: "inhale",
+				nostrilFlow: "both",
+				durationMultiplier: 1 / 3,
+			},
 			{ key: "exhale_continuous", phaseKey: "exhale", nostrilFlow: "both" },
 		],
 		safety: { maxCyclesBeginner: 10 },
@@ -426,7 +531,12 @@ const PROFILES = {
 			exhale: { scale: 0.88, ease: [0.33, 0, 0.67, 1] },
 		},
 		visual: { circleStyle: "pulse", palette: "calming", phaseEmphasis: "hold" },
-		audio: { inhale: AUDIO.none, hold: AUDIO.hum, exhale: AUDIO.none, phaseChange: AUDIO.none },
+		audio: {
+			inhale: AUDIO.none,
+			hold: AUDIO.hum,
+			exhale: AUDIO.none,
+			phaseChange: AUDIO.none,
+		},
 		haptic: { inhale: 0, hold: 0, exhale: 0, phaseChange: 0 },
 		stimulation: "low",
 		safety: { maxCyclesBeginner: 4 },
@@ -442,8 +552,17 @@ const PROFILES = {
 			hold: { scale: 1.28, ease: "linear" },
 			exhale: { scale: 0.9, ease: [0.42, 0, 0.58, 1] },
 		},
-		visual: { circleStyle: "circle", palette: "balanced", phaseEmphasis: "inhale" },
-		audio: { inhale: AUDIO.tone, hold: AUDIO.none, exhale: AUDIO.tone, phaseChange: AUDIO.bell },
+		visual: {
+			circleStyle: "circle",
+			palette: "balanced",
+			phaseEmphasis: "inhale",
+		},
+		audio: {
+			inhale: AUDIO.tone,
+			hold: AUDIO.none,
+			exhale: AUDIO.tone,
+			phaseChange: AUDIO.bell,
+		},
 		haptic: { inhale: 12, hold: 0, exhale: 12, phaseChange: 20 },
 		stimulation: "low",
 		safety: { maxCyclesBeginner: 6 },
@@ -488,7 +607,13 @@ const DEFAULT_PROFILE = {
 		holdAfterExhale: AUDIO.none,
 		phaseChange: AUDIO.bell,
 	},
-	haptic: { inhale: 15, hold: 0, exhale: 15, holdAfterExhale: 0, phaseChange: 25 },
+	haptic: {
+		inhale: 15,
+		hold: 0,
+		exhale: 15,
+		holdAfterExhale: 0,
+		phaseChange: 25,
+	},
 	stimulation: "low",
 	safety: { maxCyclesBeginner: 15 },
 	pauseBetweenCycles: 0,
@@ -570,8 +695,15 @@ function resolveProfile(base, ratio, baseDur) {
 }
 
 export function getProfile(pattern) {
-	if (!pattern) return resolveProfile(DEFAULT_PROFILE, DEFAULT_PROFILE.defaultRatio, DEFAULT_PROFILE.baseDuration);
-	const rawKey = (pattern.techniqueKey || pattern.romanizationName || "").trim().toLowerCase();
+	if (!pattern)
+		return resolveProfile(
+			DEFAULT_PROFILE,
+			DEFAULT_PROFILE.defaultRatio,
+			DEFAULT_PROFILE.baseDuration,
+		);
+	const rawKey = (pattern.techniqueKey || pattern.romanizationName || "")
+		.trim()
+		.toLowerCase();
 	const key = PROFILE_ALIASES[rawKey] || rawKey;
 	const base = PROFILES[key] || DEFAULT_PROFILE;
 
@@ -587,9 +719,10 @@ function hasUsableRatio(ratio) {
 	if (!ratio || typeof ratio !== "object") return false;
 	return (
 		(Number(ratio.inhale) || 0) +
-		(Number(ratio.hold) || 0) +
-		(Number(ratio.exhale) || 0) +
-		(Number(ratio.holdAfterExhale) || 0) > 0
+			(Number(ratio.hold) || 0) +
+			(Number(ratio.exhale) || 0) +
+			(Number(ratio.holdAfterExhale) || 0) >
+		0
 	);
 }
 

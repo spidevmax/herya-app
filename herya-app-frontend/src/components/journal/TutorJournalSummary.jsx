@@ -1,5 +1,5 @@
-import { useMemo } from "react";
 import { ShieldCheck } from "lucide-react";
+import { useMemo } from "react";
 import { SurfaceCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -82,7 +82,11 @@ export const TutorJournalSummary = ({ entries }) => {
 		: t("journal.tutor_summary_no_data");
 
 	return (
-		<SurfaceCard role="region" aria-labelledby="tutor-summary-heading" className="p-4 shadow-none">
+		<SurfaceCard
+			role="region"
+			aria-labelledby="tutor-summary-heading"
+			className="p-4 shadow-none"
+		>
 			<header className="flex items-center justify-between gap-3 mb-3">
 				<div>
 					<h2

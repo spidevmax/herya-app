@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Camera, Check, ChevronLeft, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -8,19 +8,20 @@ import {
 	getJournalEntryById,
 	updateJournalEntry,
 } from "@/api/journalEntries.api";
-import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
-import { Button, MoodSelector } from "@/components/ui";
 import JournalCard from "@/components/journal/JournalCard";
-import SliderPanel from "@/components/journal/SliderPanel";
 import SensationChips, {
 	DEFAULT_SENSATIONS as SENSATIONS,
 } from "@/components/journal/SensationChips";
+import SliderPanel from "@/components/journal/SliderPanel";
+import { Button, MoodSelector } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
 
 const AUTO_NAVIGATE_DELAY = 2500;
 
 const SOFT_PANEL_STYLE = {
-	border: "1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+	border:
+		"1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
 	background:
 		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
 };
@@ -185,8 +186,7 @@ const JournalForm = () => {
 			payload.append("energyLevel[after]", form.energyAfter ?? 5);
 			payload.append("stressLevel[before]", form.stressBefore);
 			payload.append("stressLevel[after]", form.stressAfter ?? 5);
-			if (form.reflection)
-				payload.append("emotionalNotes", form.reflection);
+			if (form.reflection) payload.append("emotionalNotes", form.reflection);
 			if (form.insights) payload.append("insights", form.insights);
 			if (form.gratitude) payload.append("gratitude", form.gratitude);
 			form.physicalSensations.forEach((s) => {
@@ -208,9 +208,7 @@ const JournalForm = () => {
 				err?.response?.data?.message ||
 				err?.response?.data?.error ||
 				err?.message;
-			setSaveError(
-				serverMsg || t("journal_form.save_error"),
-			);
+			setSaveError(serverMsg || t("journal_form.save_error"));
 		} finally {
 			setLoading(false);
 		}
@@ -362,10 +360,7 @@ const JournalForm = () => {
 						title={t("journal_form.reflection")}
 						subtitle={t("journal_form.reflection_subtitle")}
 					>
-						<label
-							htmlFor="reflection"
-							className="sr-only"
-						>
+						<label htmlFor="reflection" className="sr-only">
 							{t("journal_form.reflection")}
 						</label>
 						<textarea
@@ -386,10 +381,7 @@ const JournalForm = () => {
 						title={t("journal_form.insights")}
 						subtitle={t("journal_form.insights_subtitle")}
 					>
-						<label
-							htmlFor="insights"
-							className="sr-only"
-						>
+						<label htmlFor="insights" className="sr-only">
 							{t("journal_form.insights")}
 						</label>
 						<textarea
@@ -523,9 +515,7 @@ const JournalForm = () => {
 											<button
 												type="button"
 												onClick={() => removePhoto(i)}
-												aria-label={
-													t("journal_form.remove_photo")
-												}
+												aria-label={t("journal_form.remove_photo")}
 												className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--color-danger)] text-white flex items-center justify-center shadow-sm"
 											>
 												<X size={12} />

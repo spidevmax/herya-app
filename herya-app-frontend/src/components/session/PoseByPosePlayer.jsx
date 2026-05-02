@@ -1,20 +1,27 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-	ChevronLeft,
-	ChevronRight,
-	Pause,
-	Play,
-	RotateCcw,
-	PersonStanding,
-	Eye,
-	EyeOff,
 	AlertTriangle,
 	ArrowLeftRight,
+	ChevronLeft,
+	ChevronRight,
+	Eye,
+	EyeOff,
+	Pause,
+	PersonStanding,
+	Play,
+	RotateCcw,
 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { distributePoseTime, formatPoseDuration } from "@/utils/distributePoseTime";
-import { localized, localizedName, localizedArray } from "@/utils/libraryHelpers";
+import {
+	distributePoseTime,
+	formatPoseDuration,
+} from "@/utils/distributePoseTime";
+import {
+	localized,
+	localizedArray,
+	localizedName,
+} from "@/utils/libraryHelpers";
 
 const TABS = ["alignment", "breathing", "mistakes", "benefits"];
 
@@ -47,9 +54,14 @@ export default function PoseByPosePlayer({
 	// Compute time distribution for all poses
 	const distribution = useMemo(() => {
 		if (!corePoses.length) return null;
-		const effectiveDuration = blockDurationSec > 0
-			? blockDurationSec
-			: corePoses.length * 20 * (corePoses.some(cp => cp?.pose?.sidedness?.type === "both_sides") ? 2 : 1);
+		const effectiveDuration =
+			blockDurationSec > 0
+				? blockDurationSec
+				: corePoses.length *
+					20 *
+					(corePoses.some((cp) => cp?.pose?.sidedness?.type === "both_sides")
+						? 2
+						: 1);
 		return distributePoseTime({
 			corePoses,
 			blockTotalSec: effectiveDuration,
@@ -61,7 +73,9 @@ export default function PoseByPosePlayer({
 
 	const currentPoseAlloc = distribution?.poses?.[poseIndex];
 	const targetSec = currentPoseAlloc
-		? (side ? currentPoseAlloc.perSideSec : currentPoseAlloc.totalSec)
+		? side
+			? currentPoseAlloc.perSideSec
+			: currentPoseAlloc.totalSec
 		: 20;
 	const targetBreaths = currentPoseAlloc?.breaths || 5;
 	const isAsymmetric = pose?.sidedness?.type === "both_sides";
@@ -167,7 +181,10 @@ export default function PoseByPosePlayer({
 	return (
 		<section aria-label={t("guided.pose")} className="flex flex-col gap-4">
 			{/* Pose dots */}
-			<nav aria-label={t("guided.pose")} className="flex justify-center gap-1.5 flex-wrap">
+			<nav
+				aria-label={t("guided.pose")}
+				className="flex justify-center gap-1.5 flex-wrap"
+			>
 				{corePoses.map((cp, idx) => (
 					<button
 						key={cp._id || idx}
@@ -296,7 +313,8 @@ export default function PoseByPosePlayer({
 								className="text-xs font-medium"
 								style={{ color: "var(--color-text-secondary)" }}
 							>
-								{localized(pose, "breathingCue", lang) || t("guided.breathe_steadily")}
+								{localized(pose, "breathingCue", lang) ||
+									t("guided.breathe_steadily")}
 							</span>
 							<div className="flex items-center gap-2">
 								{currentPoseAlloc?.bilateral && side && (
@@ -308,7 +326,9 @@ export default function PoseByPosePlayer({
 										}}
 									>
 										<ArrowLeftRight size={9} />
-										{side === "left" ? t("guided.side_left") : t("guided.side_right")}
+										{side === "left"
+											? t("guided.side_left")
+											: t("guided.side_right")}
 									</span>
 								)}
 								<span
@@ -345,7 +365,8 @@ export default function PoseByPosePlayer({
 								className="text-[10px]"
 								style={{ color: "var(--color-text-muted)" }}
 							>
-								{formatPoseDuration(Math.round(elapsedSec))} / {formatPoseDuration(targetSec)}
+								{formatPoseDuration(Math.round(elapsedSec))} /{" "}
+								{formatPoseDuration(targetSec)}
 							</span>
 						</div>
 					</div>
@@ -467,15 +488,18 @@ export default function PoseByPosePlayer({
 
 function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 	const alignmentPoints = pose.alignmentDetails?.keyPoints || [];
-	const mistakes = localizedArray(pose, "commonMistakes", lang).length > 0
-		? localizedArray(pose, "commonMistakes", lang)
-		: (pose.commonMistakes || []);
-	const benefits = localizedArray(pose, "benefits", lang).length > 0
-		? localizedArray(pose, "benefits", lang)
-		: (pose.benefits || []);
-	const contraindications = localizedArray(pose, "contraindications", lang).length > 0
-		? localizedArray(pose, "contraindications", lang)
-		: (pose.contraindications || []);
+	const mistakes =
+		localizedArray(pose, "commonMistakes", lang).length > 0
+			? localizedArray(pose, "commonMistakes", lang)
+			: pose.commonMistakes || [];
+	const benefits =
+		localizedArray(pose, "benefits", lang).length > 0
+			? localizedArray(pose, "benefits", lang)
+			: pose.benefits || [];
+	const contraindications =
+		localizedArray(pose, "contraindications", lang).length > 0
+			? localizedArray(pose, "contraindications", lang)
+			: pose.contraindications || [];
 	const cues = corePose?.contextualCues || [];
 	const instructions = pose.instructions || {};
 
@@ -600,7 +624,8 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 							className="text-sm font-medium"
 							style={{ color: "var(--color-text-primary)" }}
 						>
-							{localized(pose, "breathingCue", lang) || t("guided.breathe_steadily")}
+							{localized(pose, "breathingCue", lang) ||
+								t("guided.breathe_steadily")}
 						</p>
 						{instructions.setup?.length > 0 && (
 							<div>

@@ -29,7 +29,12 @@ import PostPracticeJournal from "@/components/session/PostPracticeJournal";
 import PracticeTypeSelector from "@/components/session/PracticeTypeSelector";
 import SessionBuilder from "@/components/session/SessionBuilder";
 import ChildProfileManager from "@/components/tutor/ChildProfileManager";
-import { Button, ConfirmModal, MoodSelector, StickyHeader } from "@/components/ui";
+import {
+	Button,
+	ConfirmModal,
+	MoodSelector,
+	StickyHeader,
+} from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import useSessionPersistence from "@/hooks/useSessionPersistence";
@@ -1126,10 +1131,7 @@ export default function StartPractice() {
 										: t("practice.checkin_subtitle")
 								}
 							>
-								<div
-									id="checkin-heading"
-									className="flex flex-col gap-6"
-								>
+								<div id="checkin-heading" className="flex flex-col gap-6">
 									{isTutorPractice ? (
 										<fieldset className="m-0 p-0 border-0">
 											<legend className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">
@@ -1177,7 +1179,9 @@ export default function StartPractice() {
 																	boxShadow: selected
 																		? `0 0 0 4px color-mix(in srgb, ${colorVar} 22%, transparent)`
 																		: "none",
-																	transform: selected ? "scale(1.25)" : "scale(1)",
+																	transform: selected
+																		? "scale(1.25)"
+																		: "scale(1)",
 																}}
 															/>
 															<div className="flex items-center gap-2 w-full">
@@ -1192,7 +1196,9 @@ export default function StartPractice() {
 																>
 																	<Icon
 																		size={18}
-																		style={{ color: selected ? "white" : colorVar }}
+																		style={{
+																			color: selected ? "white" : colorVar,
+																		}}
 																	/>
 																</span>
 																<span
@@ -1228,9 +1234,7 @@ export default function StartPractice() {
 													id="checkin-energy"
 													label={t("journal_form.energy")}
 													value={checkInEnergy}
-													onChange={(e) =>
-														setCheckInEnergy(+e.target.value)
-													}
+													onChange={(e) => setCheckInEnergy(+e.target.value)}
 													accent="var(--color-primary)"
 													lowLabel={t("journal_form.slider_low_energy")}
 													highLabel={t("journal_form.slider_high_energy")}
@@ -1239,9 +1243,7 @@ export default function StartPractice() {
 													id="checkin-stress"
 													label={t("journal_form.stress")}
 													value={checkInStress}
-													onChange={(e) =>
-														setCheckInStress(+e.target.value)
-													}
+													onChange={(e) => setCheckInStress(+e.target.value)}
 													accent="var(--color-danger)"
 													lowLabel={t("journal_form.slider_low_stress")}
 													highLabel={t("journal_form.slider_high_stress")}
@@ -1259,9 +1261,7 @@ export default function StartPractice() {
 													id="checkin-intention"
 													type="text"
 													value={checkInIntention}
-													onChange={(e) =>
-														setCheckInIntention(e.target.value)
-													}
+													onChange={(e) => setCheckInIntention(e.target.value)}
 													placeholder={t(
 														"practice.checkin_intention_placeholder",
 													)}

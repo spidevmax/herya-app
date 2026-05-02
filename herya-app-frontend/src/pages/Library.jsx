@@ -1,31 +1,25 @@
-import {
-	useDeferredValue,
-	useEffect,
-	useId,
-	useMemo,
-	useState,
-} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search, X } from "lucide-react";
+import { useDeferredValue, useEffect, useId, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getBreathingPatterns } from "@/api/breathing.api";
 import { getPoses } from "@/api/poses.api";
 import { getSequences } from "@/api/sequences.api";
-import { EmptyState, SkeletonCard } from "@/components/ui";
 import RetroCard from "@/components/library/RetroCard";
+import { EmptyState, SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import {
-	translateWithFallback,
+	filterByDifficulty,
+	filterByEffect,
+	filterByQuery,
 	getCardType,
 	getItemId,
 	getTypeLabel,
-	filterByQuery,
-	filterByDifficulty,
-	filterByEffect,
-	sortItems,
 	INTENSITY_DIFFICULTY_ORDER,
+	sortItems,
 	TIME_EFFECT_ORDER,
+	translateWithFallback,
 } from "@/utils/libraryHelpers";
 
 const ALL_TAB_PREVIEW_LIMIT = 6;
@@ -118,7 +112,8 @@ const Library = () => {
 				if (seqRes.status === "fulfilled") {
 					const seqPayload = seqRes.value.data?.data || seqRes.value.data || {};
 					const seqList =
-						seqPayload.sequences ?? (Array.isArray(seqPayload) ? seqPayload : []);
+						seqPayload.sequences ??
+						(Array.isArray(seqPayload) ? seqPayload : []);
 					setSequences(
 						(Array.isArray(seqList) ? seqList : []).map((s) => ({
 							...s,
@@ -134,7 +129,8 @@ const Library = () => {
 					const posePayload =
 						poseRes.value.data?.data || poseRes.value.data || {};
 					const poseList =
-						posePayload.poses ?? (Array.isArray(posePayload) ? posePayload : []);
+						posePayload.poses ??
+						(Array.isArray(posePayload) ? posePayload : []);
 					setPoses(
 						(Array.isArray(poseList) ? poseList : []).map((p) => ({
 							...p,
@@ -285,7 +281,10 @@ const Library = () => {
 					"Explore and study sequences, poses, and pranayama.",
 				)
 			: tab === "sequences"
-				? t("library.empty_sequences_hint", "Try another filter or search term.")
+				? t(
+						"library.empty_sequences_hint",
+						"Try another filter or search term.",
+					)
 				: tab === "poses"
 					? t("library.empty_poses_hint", "Try another filter or search term.")
 					: t(
@@ -295,7 +294,9 @@ const Library = () => {
 	const noResultsHint = tr("library.no_results", "No results found");
 	const clearFiltersLabel = tr("library.clear_filters", "Clear filters");
 	const hasFatalError = failedTypes.length === 3;
-	const failedTypeLabels = failedTypes.map((type) => cardTypeLabel(type)).join(", ");
+	const failedTypeLabels = failedTypes
+		.map((type) => cardTypeLabel(type))
+		.join(", ");
 	const warningTitle = tr("library.error_title", "Could not load content");
 	const warningHint =
 		failedTypes.length > 0
@@ -315,7 +316,10 @@ const Library = () => {
 	const translateDifficulty = (option) =>
 		option === "all"
 			? tr("library.filters_all_difficulties", "All difficulties")
-			: tr(`library.${option}`, option.charAt(0).toUpperCase() + option.slice(1));
+			: tr(
+					`library.${option}`,
+					option.charAt(0).toUpperCase() + option.slice(1),
+				);
 
 	const translateEffect = (option) =>
 		option === "all"
@@ -391,7 +395,9 @@ const Library = () => {
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
 						placeholder={searchLabel}
-						aria-describedby={searchHelpText ? `${tabsId}-search-help` : undefined}
+						aria-describedby={
+							searchHelpText ? `${tabsId}-search-help` : undefined
+						}
 						className="w-full rounded-2xl border-2 py-2.5 pr-11 pl-11 text-sm font-medium transition focus:outline-none"
 						style={{
 							backgroundColor: "var(--color-surface-card)",
@@ -562,13 +568,22 @@ const Library = () => {
 			>
 				<AnimatePresence mode="wait">
 					{loading ? (
-						<div key="loading" className="flex flex-col gap-4" aria-live="polite" aria-busy="true">
+						<div
+							key="loading"
+							className="flex flex-col gap-4"
+							aria-live="polite"
+							aria-busy="true"
+						>
 							{["s1", "s2", "s3"].map((key) => (
 								<SkeletonCard key={key} />
 							))}
 						</div>
 					) : hasFatalError ? (
-						<motion.div key="error" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+						<motion.div
+							key="error"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+						>
 							<EmptyState
 								title={warningTitle}
 								description={tr(
@@ -591,10 +606,16 @@ const Library = () => {
 							/>
 						</motion.div>
 					) : prioritizedItems.length === 0 ? (
-						<motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+						<motion.div
+							key="empty"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+						>
 							<EmptyState
 								title={emptyTitle}
-								description={deferredQuery.length >= 2 ? noResultsHint : emptyHint}
+								description={
+									deferredQuery.length >= 2 ? noResultsHint : emptyHint
+								}
 							/>
 						</motion.div>
 					) : (

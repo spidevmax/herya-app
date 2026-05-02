@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 /**
  * Web Audio API engine for pranayama.
@@ -65,8 +65,7 @@ export default function usePranayamaAudio({
 			const ctx = getCtx();
 			if (!ctx) return;
 
-			const vol =
-				category === "cue" ? cueVolume : guideVolume;
+			const vol = category === "cue" ? cueVolume : guideVolume;
 			const baseGain = descriptor.gain * vol * (reducedMotion ? 0.5 : 1);
 			if (baseGain <= 0.001) return;
 
@@ -97,9 +96,10 @@ export default function usePranayamaAudio({
 
 			const now = ctx.currentTime;
 			const attackEnd = now + (attack || 0.01);
-			const totalDur = sustain && durationSec
-				? durationSec
-				: (attack || 0.01) + (release || 0.3);
+			const totalDur =
+				sustain && durationSec
+					? durationSec
+					: (attack || 0.01) + (release || 0.3);
 
 			// Envelope
 			gainNode.gain.setValueAtTime(0.001, now);
@@ -108,7 +108,10 @@ export default function usePranayamaAudio({
 			if (sustain && durationSec) {
 				// Hold gain until near the end, then release
 				const releaseStart = now + durationSec - (release || 0.3);
-				gainNode.gain.setValueAtTime(baseGain, Math.max(attackEnd, releaseStart));
+				gainNode.gain.setValueAtTime(
+					baseGain,
+					Math.max(attackEnd, releaseStart),
+				);
 				gainNode.gain.exponentialRampToValueAtTime(0.001, now + durationSec);
 			} else {
 				gainNode.gain.exponentialRampToValueAtTime(0.001, now + totalDur);

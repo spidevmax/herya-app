@@ -9,8 +9,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getSessionById, deleteSession } from "@/api/sessions.api";
-import { ConfirmModal, SkeletonCard, Badge } from "@/components/ui";
+import { deleteSession, getSessionById } from "@/api/sessions.api";
+import { Badge, ConfirmModal, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { VK_FAMILIES } from "@/utils/constants";
 import { format } from "@/utils/helpers";
@@ -83,7 +83,11 @@ export default function SessionDetail() {
 
 	if (loading) {
 		return (
-			<main className="px-4 pt-4 flex flex-col gap-4" aria-busy="true" aria-live="polite">
+			<main
+				className="px-4 pt-4 flex flex-col gap-4"
+				aria-busy="true"
+				aria-live="polite"
+			>
 				<SkeletonCard lines={5} />
 				<SkeletonCard lines={3} />
 			</main>
@@ -164,7 +168,11 @@ export default function SessionDetail() {
 					aria-label={t("session_detail.delete_title")}
 					className="w-9 h-9 rounded-full bg-[var(--color-tone-danger-bg)] flex items-center justify-center"
 				>
-					<Trash2 size={16} aria-hidden="true" className="text-[var(--color-danger)]" />
+					<Trash2
+						size={16}
+						aria-hidden="true"
+						className="text-[var(--color-danger)]"
+					/>
 				</button>
 			</header>
 
@@ -179,7 +187,9 @@ export default function SessionDetail() {
 					}}
 				>
 					{family?.emoji ? (
-						<span className="text-4xl" aria-hidden="true">{family.emoji}</span>
+						<span className="text-4xl" aria-hidden="true">
+							{family.emoji}
+						</span>
 					) : (
 						<TypeIcon
 							size={34}
@@ -206,7 +216,10 @@ export default function SessionDetail() {
 				</section>
 
 				{/* Stats */}
-				<section aria-label={t("session_detail.title")} className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
+				<section
+					aria-label={t("session_detail.title")}
+					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]"
+				>
 					<dl className="grid grid-cols-2 gap-4">
 						<div className="text-center">
 							<dt className="text-[var(--color-text-muted)] text-xs order-2">
@@ -222,7 +235,10 @@ export default function SessionDetail() {
 									? t("session_detail.completed")
 									: t("session_detail.in_progress")}
 							</dt>
-							<dd className="font-bold text-2xl text-[var(--color-text-primary)]" aria-hidden={!session.completed}>
+							<dd
+								className="font-bold text-2xl text-[var(--color-text-primary)]"
+								aria-hidden={!session.completed}
+							>
 								{session.completed ? "✓" : "—"}
 							</dd>
 						</div>
@@ -235,7 +251,10 @@ export default function SessionDetail() {
 						aria-labelledby="session-mood-heading"
 						className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]"
 					>
-						<h2 id="session-mood-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+						<h2
+							id="session-mood-heading"
+							className="font-semibold text-[var(--color-text-primary)] text-sm mb-3"
+						>
 							{t("session_detail.mood")}
 						</h2>
 						{session.moodBefore?.length > 0 && (
@@ -275,8 +294,14 @@ export default function SessionDetail() {
 
 				{/* Notes */}
 				{session.notes && (
-					<section aria-labelledby="session-notes-heading" className="bg-[var(--color-surface-card)] rounded-2xl p-4">
-						<h2 id="session-notes-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-2">
+					<section
+						aria-labelledby="session-notes-heading"
+						className="bg-[var(--color-surface-card)] rounded-2xl p-4"
+					>
+						<h2
+							id="session-notes-heading"
+							className="font-semibold text-[var(--color-text-primary)] text-sm mb-2"
+						>
 							{t("session_detail.notes")}
 						</h2>
 						<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed">
@@ -287,8 +312,14 @@ export default function SessionDetail() {
 
 				{/* VK Feedback */}
 				{session.vkFeedback && (
-					<section aria-labelledby="session-feedback-heading" className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]">
-						<h2 id="session-feedback-heading" className="font-semibold text-[var(--color-text-primary)] text-sm mb-3">
+					<section
+						aria-labelledby="session-feedback-heading"
+						className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-soft)]"
+					>
+						<h2
+							id="session-feedback-heading"
+							className="font-semibold text-[var(--color-text-primary)] text-sm mb-3"
+						>
 							{t("session_detail.vk_feedback")}
 						</h2>
 						<dl className="flex flex-col gap-2">

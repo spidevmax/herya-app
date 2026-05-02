@@ -78,7 +78,9 @@ describe("distributePoseTime", () => {
 			expect(result.poses).toHaveLength(2);
 
 			// Pose with 10 breaths should get roughly 2x the time of pose with 5
-			expect(result.poses[1].totalSec).toBeGreaterThan(result.poses[0].totalSec);
+			expect(result.poses[1].totalSec).toBeGreaterThan(
+				result.poses[0].totalSec,
+			);
 		});
 
 		it("sum of pose times exactly equals block total", () => {
@@ -104,7 +106,9 @@ describe("distributePoseTime", () => {
 			});
 
 			// Bilateral should get ~2x the time
-			expect(result.poses[1].totalSec).toBeGreaterThan(result.poses[0].totalSec);
+			expect(result.poses[1].totalSec).toBeGreaterThan(
+				result.poses[0].totalSec,
+			);
 			expect(result.poses[1].bilateral).toBe(true);
 			expect(result.poses[1].perSideSec).toBe(
 				Math.round(result.poses[1].totalSec / 2),

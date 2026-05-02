@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Droplets, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const getDismissKey = () => {

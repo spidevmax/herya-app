@@ -1,5 +1,5 @@
 // Common UI primitives
-import { useEffect, useRef, useCallback, useState } from "react";
+
 import { motion } from "framer-motion";
 import {
 	Anchor,
@@ -23,15 +23,22 @@ import {
 	Sprout,
 	Sun,
 	Target,
-	Wind,
 	Waves,
+	Wind,
 	X,
 	Zap,
 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
-export const Card = ({ children, className = "", onClick, hover = true, ...props }) => {
+export const Card = ({
+	children,
+	className = "",
+	onClick,
+	hover = true,
+	...props
+}) => {
 	const Component = onClick ? motion.button : motion.div;
 
 	return (
@@ -82,9 +89,9 @@ export const SearchBar = ({
 					aria-label={clearLabel}
 					className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
 				>
-						<X size={16} aria-hidden="true" />
-					</button>
-				) : null}
+					<X size={16} aria-hidden="true" />
+				</button>
+			) : null}
 		</div>
 	);
 };
@@ -106,7 +113,12 @@ export const Input = ({
 				{label}
 			</label>
 		) : null}
-		<input id={id} type={type} className={`input-base px-4 ${inputClassName}`} {...props} />
+		<input
+			id={id}
+			type={type}
+			className={`input-base px-4 ${inputClassName}`}
+			{...props}
+		/>
 	</div>
 );
 
@@ -261,7 +273,8 @@ export const TabBar = ({
 						tabIndex={active === tabId ? 0 : -1}
 						onClick={() => onSelect(tabId)}
 						onKeyDown={(event) => {
-							if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+							if (event.key !== "ArrowRight" && event.key !== "ArrowLeft")
+								return;
 							event.preventDefault();
 							const nextIndex =
 								event.key === "ArrowRight"
@@ -309,7 +322,13 @@ const MOOD_ICONS = {
 	stiff: Anchor,
 };
 
-export const MoodSelector = ({ value, onChange, label, options, maxSelection = 5 }) => {
+export const MoodSelector = ({
+	value,
+	onChange,
+	label,
+	options,
+	maxSelection = 5,
+}) => {
 	const { t } = useLanguage();
 	const moods = options || [
 		"calm",
@@ -371,32 +390,32 @@ export const MoodSelector = ({ value, onChange, label, options, maxSelection = 5
 						<li key={mood}>
 							<motion.button
 								type="button"
-							onClick={() => toggle(mood)}
-							disabled={isDisabled}
-							aria-pressed={isSelected}
-							whileHover={isDisabled ? {} : { y: -2, scale: 1.01 }}
-							whileTap={isDisabled ? {} : { scale: 0.985 }}
-							className="w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[22px] transition-all text-sm font-medium min-h-[120px]"
-							style={{
-								background: isSelected
-									? "linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%)"
-									: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 92%, white 8%) 0%, var(--color-surface-card) 100%)",
-								color: isSelected
-									? "white"
-									: isDisabled
-										? "var(--color-text-muted)"
-										: "var(--color-text-secondary)",
-								border: `1px solid ${
-									isSelected
-										? "color-mix(in srgb, var(--color-primary) 80%, black 20%)"
-										: "color-mix(in srgb, var(--color-border-soft) 72%, transparent)"
-								}`,
-								boxShadow: isSelected
-									? "0 16px 36px rgba(32, 73, 158, 0.18)"
-									: "0 8px 20px rgba(25, 40, 72, 0.04)",
-								opacity: isDisabled ? 0.4 : 1,
-								cursor: isDisabled ? "not-allowed" : "pointer",
-							}}
+								onClick={() => toggle(mood)}
+								disabled={isDisabled}
+								aria-pressed={isSelected}
+								whileHover={isDisabled ? {} : { y: -2, scale: 1.01 }}
+								whileTap={isDisabled ? {} : { scale: 0.985 }}
+								className="w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[22px] transition-all text-sm font-medium min-h-[120px]"
+								style={{
+									background: isSelected
+										? "linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%)"
+										: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 92%, white 8%) 0%, var(--color-surface-card) 100%)",
+									color: isSelected
+										? "white"
+										: isDisabled
+											? "var(--color-text-muted)"
+											: "var(--color-text-secondary)",
+									border: `1px solid ${
+										isSelected
+											? "color-mix(in srgb, var(--color-primary) 80%, black 20%)"
+											: "color-mix(in srgb, var(--color-border-soft) 72%, transparent)"
+									}`,
+									boxShadow: isSelected
+										? "0 16px 36px rgba(32, 73, 158, 0.18)"
+										: "0 8px 20px rgba(25, 40, 72, 0.04)",
+									opacity: isDisabled ? 0.4 : 1,
+									cursor: isDisabled ? "not-allowed" : "pointer",
+								}}
 							>
 								<span
 									aria-hidden="true"
@@ -451,11 +470,18 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 };
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
-export const Badge = ({ children, color = "var(--color-secondary)", className = "" }) => {
+export const Badge = ({
+	children,
+	color = "var(--color-secondary)",
+	className = "",
+}) => {
 	return (
 		<span
 			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}
-			style={{ backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, color }}
+			style={{
+				backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
+				color,
+			}}
 		>
 			{children}
 		</span>
@@ -524,11 +550,21 @@ export const EmptyState = ({
 			className={`flex flex-col items-center justify-center text-center py-16 px-6 ${className}`}
 		>
 			{icon ? (
-				<motion.span aria-hidden="true" className="mb-4 float inline-block" animate={{}} style={{}}>
+				<motion.span
+					aria-hidden="true"
+					className="mb-4 float inline-block"
+					animate={{}}
+					style={{}}
+				>
 					{icon}
 				</motion.span>
 			) : illustration ? (
-				<motion.span aria-hidden="true" className="text-6xl mb-4 float inline-block" animate={{}} style={{}}>
+				<motion.span
+					aria-hidden="true"
+					className="text-6xl mb-4 float inline-block"
+					animate={{}}
+					style={{}}
+				>
 					{illustration}
 				</motion.span>
 			) : null}
@@ -546,7 +582,12 @@ export const EmptyState = ({
 };
 
 // ── ProgressBar ───────────────────────────────────────────────────────────────
-export const ProgressBar = ({ value, max, color = "var(--color-secondary)", className = "" }) => {
+export const ProgressBar = ({
+	value,
+	max,
+	color = "var(--color-secondary)",
+	className = "",
+}) => {
 	const pct = Math.min(100, Math.round((value / max) * 100));
 	return (
 		<div
@@ -656,25 +697,22 @@ export const ConfirmModal = ({
 	}, [open, loading, onClose]);
 
 	// Focus trap
-	const handleKeyDown = useCallback(
-		(e) => {
-			if (e.key !== "Tab" || !dialogRef.current) return;
-			const focusable = dialogRef.current.querySelectorAll(
-				'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-			);
-			if (focusable.length === 0) return;
-			const first = focusable[0];
-			const last = focusable[focusable.length - 1];
-			if (e.shiftKey && document.activeElement === first) {
-				e.preventDefault();
-				last.focus();
-			} else if (!e.shiftKey && document.activeElement === last) {
-				e.preventDefault();
-				first.focus();
-			}
-		},
-		[],
-	);
+	const handleKeyDown = useCallback((e) => {
+		if (e.key !== "Tab" || !dialogRef.current) return;
+		const focusable = dialogRef.current.querySelectorAll(
+			'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+		);
+		if (focusable.length === 0) return;
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+		if (e.shiftKey && document.activeElement === first) {
+			e.preventDefault();
+			last.focus();
+		} else if (!e.shiftKey && document.activeElement === last) {
+			e.preventDefault();
+			first.focus();
+		}
+	}, []);
 
 	if (!open) return null;
 
@@ -772,13 +810,22 @@ export const SurfaceCard = ({ children, className = "", ...props }) => (
 	</div>
 );
 
-export const PageHeader = ({ title, description, className = "", titleClassName = "" }) => (
+export const PageHeader = ({
+	title,
+	description,
+	className = "",
+	titleClassName = "",
+}) => (
 	<header className={`page-header ${className}`}>
-		<h1 className={`text-display-md text-[var(--color-text-primary)] ${titleClassName}`}>
+		<h1
+			className={`text-display-md text-[var(--color-text-primary)] ${titleClassName}`}
+		>
 			{title}
 		</h1>
 		{description ? (
-			<p className="text-body-sm text-[var(--color-text-secondary)]">{description}</p>
+			<p className="text-body-sm text-[var(--color-text-secondary)]">
+				{description}
+			</p>
 		) : null}
 	</header>
 );
@@ -794,7 +841,11 @@ export const StickyHeader = ({ onBack, title, children }) => {
 					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
 					style={{ backgroundColor: "var(--color-surface-card)" }}
 				>
-					<ArrowLeft size={20} aria-hidden="true" style={{ color: "var(--color-text-primary)" }} />
+					<ArrowLeft
+						size={20}
+						aria-hidden="true"
+						style={{ color: "var(--color-text-primary)" }}
+					/>
 				</button>
 			)}
 			{title && (

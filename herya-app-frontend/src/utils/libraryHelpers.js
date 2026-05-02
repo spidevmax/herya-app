@@ -125,7 +125,8 @@ export const localizedArray = (item, field, lang) => {
 	if (!item) return [];
 	if (lang === "es") {
 		const esKey = `${field}Es`;
-		if (Array.isArray(item[esKey]) && item[esKey].length > 0) return item[esKey];
+		if (Array.isArray(item[esKey]) && item[esKey].length > 0)
+			return item[esKey];
 	}
 	return Array.isArray(item[field]) ? item[field] : [];
 };
@@ -142,16 +143,24 @@ export const getMonogram = (title) =>
 
 export const getCardTitle = (item, fallbackItemLabel, lang) => {
 	if (lang === "es") {
-		return item.spanishName || item.nameEs || item.englishName || item.name || item.romanizationName || fallbackItemLabel;
+		return (
+			item.spanishName ||
+			item.nameEs ||
+			item.englishName ||
+			item.name ||
+			item.romanizationName ||
+			fallbackItemLabel
+		);
 	}
-	return item.englishName || item.name || item.romanizationName || fallbackItemLabel;
+	return (
+		item.englishName || item.name || item.romanizationName || fallbackItemLabel
+	);
 };
 
 export const getCardSubtitle = (item) =>
 	item.romanizationName || item.sanskritName || item.romanizedName || "";
 
-export const getCardType = (item, fallbackType) =>
-	item.__kind || fallbackType;
+export const getCardType = (item, fallbackType) => item.__kind || fallbackType;
 
 export const getItemId = (item) =>
 	item._id ||

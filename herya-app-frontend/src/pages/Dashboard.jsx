@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { AlertTriangle, RotateCcw, ShieldCheck } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getRecommendedSequence } from "@/api/sequences.api";
-import { getSessions, getSessionStats } from "@/api/sessions.api";
+import { getSessionStats, getSessions } from "@/api/sessions.api";
+import AdminQuickCard from "@/components/dashboard/AdminQuickCard";
 import CalendarStrip from "@/components/dashboard/CalendarStrip";
 import HeroCard from "@/components/dashboard/HeroCard";
 import PracticeSnapshotCard from "@/components/dashboard/PracticeSnapshotCard";
-import SoftReminderCard from "@/components/dashboard/SoftReminderCard";
 import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
+import SoftReminderCard from "@/components/dashboard/SoftReminderCard";
 import TutorInsightsCard from "@/components/dashboard/TutorInsightsCard";
-import AdminQuickCard from "@/components/dashboard/AdminQuickCard";
 import { Button, SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -116,9 +116,11 @@ export default function Dashboard() {
 						aria-hidden="true"
 						className="w-11 h-11 rounded-full flex items-center justify-center font-display text-lg font-bold shrink-0 overflow-hidden"
 						style={{
-							backgroundColor: "color-mix(in srgb, var(--color-primary) 14%, transparent)",
+							backgroundColor:
+								"color-mix(in srgb, var(--color-primary) 14%, transparent)",
 							color: "var(--color-primary)",
-							border: "2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+							border:
+								"2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
 						}}
 					>
 						{user?.profileImageUrl || user?.avatar ? (
@@ -171,7 +173,11 @@ export default function Dashboard() {
 						border: "1px solid var(--color-warning-border)",
 					}}
 				>
-					<AlertTriangle size={20} aria-hidden="true" style={{ color: "var(--color-warning)" }} />
+					<AlertTriangle
+						size={20}
+						aria-hidden="true"
+						style={{ color: "var(--color-warning)" }}
+					/>
 					<div className="flex-1 min-w-0">
 						<p className="text-sm font-semibold text-[var(--color-text-primary)]">
 							{t("dashboard.error_title")}
@@ -260,117 +266,120 @@ export default function Dashboard() {
 						transition={{ duration: 0.35, delay: 0.25 }}
 						className="flex flex-col gap-3"
 					>
-					{loading ? (
-						<>
-							<div className="h-4 w-36 rounded-lg skeleton" />
-							{["s1", "s2", "s3"].map((k) => (
-								<SkeletonCard key={k} />
-							))}
-						</>
-					) : (
-						<>
-							{pendingSession && (
-								<article
-									className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3"
-									style={{
-										backgroundColor: "var(--color-surface-card)",
-										border: "1px solid var(--color-border-soft)",
-									}}
-								>
-									<div className="min-w-0">
-										<p
-											className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1"
-											style={{ color: "var(--color-text-muted)" }}
-										>
-											{t("dashboard.resume_practice")}
-										</p>
-										<p
-											className="text-sm font-semibold truncate"
-											style={{ color: "var(--color-text-primary)" }}
-										>
-											{t(`dashboard.${pendingSession.sessionType}`)}
-										</p>
-										<p
-											className="text-xs"
-											style={{ color: "var(--color-text-secondary)" }}
-										>
-											{t("session_detail.in_progress")} ·{" "}
-											{pendingSession.duration} min
-										</p>
-									</div>
-									<Button
-										variant="primary"
-										size="sm"
-										className="shrink-0"
-										onClick={() => {
-											const hasBlocks =
-												Array.isArray(pendingSession.plannedBlocks) &&
-												pendingSession.plannedBlocks.length > 0;
-											navigate(
-												"/start-practice",
-												hasBlocks
-													? {
-															state: {
-																resumeSession: {
-																	_id: pendingSession._id,
-																	sessionType: pendingSession.sessionType,
-																	duration: pendingSession.duration,
-																	plannedBlocks: pendingSession.plannedBlocks,
-																},
-															},
-														}
-													: undefined,
-											);
+						{loading ? (
+							<>
+								<div className="h-4 w-36 rounded-lg skeleton" />
+								{["s1", "s2", "s3"].map((k) => (
+									<SkeletonCard key={k} />
+								))}
+							</>
+						) : (
+							<>
+								{pendingSession && (
+									<article
+										className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3"
+										style={{
+											backgroundColor: "var(--color-surface-card)",
+											border: "1px solid var(--color-border-soft)",
 										}}
 									>
-										<RotateCcw size={12} aria-hidden="true" />
-										{t("practice.resume")}
-									</Button>
-								</article>
-							)}
-
-							{completedSessions.length > 0 ? (
-								<section aria-labelledby="recent-practice-heading" className="flex flex-col gap-3">
-									<h2
-										id="recent-practice-heading"
-										className="font-display text-[11px] font-bold uppercase tracking-[0.1em]"
-										style={{ color: "var(--color-text-muted)" }}
-									>
-										{t("dashboard.recent_practice")}
-									</h2>
-									<ul className="flex flex-col gap-3 list-none m-0 p-0">
-										{completedSessions.map((s, i) => (
-											<li key={s._id}>
-												<RecentSessionCard session={s} index={i} />
-											</li>
-										))}
-									</ul>
-								</section>
-							) : (
-								!pendingSession && (
-									<section
-										aria-label={t("dashboard.no_sessions_title")}
-										className="rounded-3xl p-6 text-center shadow-[var(--shadow-card)]"
-										style={{ backgroundColor: "var(--color-surface-card)" }}
-									>
-										<p
-											className="text-sm font-semibold mb-1"
-											style={{ color: "var(--color-text-primary)" }}
+										<div className="min-w-0">
+											<p
+												className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1"
+												style={{ color: "var(--color-text-muted)" }}
+											>
+												{t("dashboard.resume_practice")}
+											</p>
+											<p
+												className="text-sm font-semibold truncate"
+												style={{ color: "var(--color-text-primary)" }}
+											>
+												{t(`dashboard.${pendingSession.sessionType}`)}
+											</p>
+											<p
+												className="text-xs"
+												style={{ color: "var(--color-text-secondary)" }}
+											>
+												{t("session_detail.in_progress")} ·{" "}
+												{pendingSession.duration} min
+											</p>
+										</div>
+										<Button
+											variant="primary"
+											size="sm"
+											className="shrink-0"
+											onClick={() => {
+												const hasBlocks =
+													Array.isArray(pendingSession.plannedBlocks) &&
+													pendingSession.plannedBlocks.length > 0;
+												navigate(
+													"/start-practice",
+													hasBlocks
+														? {
+																state: {
+																	resumeSession: {
+																		_id: pendingSession._id,
+																		sessionType: pendingSession.sessionType,
+																		duration: pendingSession.duration,
+																		plannedBlocks: pendingSession.plannedBlocks,
+																	},
+																},
+															}
+														: undefined,
+												);
+											}}
 										>
-											{t("dashboard.no_sessions_title")}
-										</p>
-										<p
-											className="text-xs"
+											<RotateCcw size={12} aria-hidden="true" />
+											{t("practice.resume")}
+										</Button>
+									</article>
+								)}
+
+								{completedSessions.length > 0 ? (
+									<section
+										aria-labelledby="recent-practice-heading"
+										className="flex flex-col gap-3"
+									>
+										<h2
+											id="recent-practice-heading"
+											className="font-display text-[11px] font-bold uppercase tracking-[0.1em]"
 											style={{ color: "var(--color-text-muted)" }}
 										>
-											{t("dashboard.no_sessions_hint")}
-										</p>
+											{t("dashboard.recent_practice")}
+										</h2>
+										<ul className="flex flex-col gap-3 list-none m-0 p-0">
+											{completedSessions.map((s, i) => (
+												<li key={s._id}>
+													<RecentSessionCard session={s} index={i} />
+												</li>
+											))}
+										</ul>
 									</section>
-								)
-							)}
-						</>
-					)}
-				</motion.div>
+								) : (
+									!pendingSession && (
+										<section
+											aria-label={t("dashboard.no_sessions_title")}
+											className="rounded-3xl p-6 text-center shadow-[var(--shadow-card)]"
+											style={{ backgroundColor: "var(--color-surface-card)" }}
+										>
+											<p
+												className="text-sm font-semibold mb-1"
+												style={{ color: "var(--color-text-primary)" }}
+											>
+												{t("dashboard.no_sessions_title")}
+											</p>
+											<p
+												className="text-xs"
+												style={{ color: "var(--color-text-muted)" }}
+											>
+												{t("dashboard.no_sessions_hint")}
+											</p>
+										</section>
+									)
+								)}
+							</>
+						)}
+					</motion.div>
 				</div>
 
 				{/* Right column (desktop): Calendar + Snapshot + Tutor */}

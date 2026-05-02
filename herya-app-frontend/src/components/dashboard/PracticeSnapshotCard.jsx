@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { BookOpen, PlayCircle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui";
-import { format } from "@/utils/helpers";
 import { useLanguage } from "@/context/LanguageContext";
+import { format } from "@/utils/helpers";
 
 const Stat = ({ label, value }) => (
 	<div
@@ -52,8 +52,14 @@ export default function PracticeSnapshotCard({
 			>
 				<div className="flex items-start justify-between gap-3">
 					<div className="flex-1">
-						<span className="skeleton h-3 w-32 rounded-lg block mb-1" aria-hidden="true" />
-						<span className="skeleton h-3 w-48 rounded-lg block" aria-hidden="true" />
+						<span
+							className="skeleton h-3 w-32 rounded-lg block mb-1"
+							aria-hidden="true"
+						/>
+						<span
+							className="skeleton h-3 w-48 rounded-lg block"
+							aria-hidden="true"
+						/>
 					</div>
 					<span className="skeleton w-8 h-8 rounded-xl" aria-hidden="true" />
 				</div>

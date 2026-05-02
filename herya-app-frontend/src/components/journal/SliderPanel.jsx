@@ -1,5 +1,6 @@
 const SOFT_PANEL_STYLE = {
-	border: "1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+	border:
+		"1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
 	background:
 		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
 };

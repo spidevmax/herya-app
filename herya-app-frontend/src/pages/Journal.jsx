@@ -1,9 +1,9 @@
-import { useEffect } from "react";
 import { BookOpen } from "lucide-react";
-import { JournalHeader } from "@/components/journal/JournalHeader";
-import { JournalFilters } from "@/components/journal/JournalFilters";
-import { EntryList, EntryCardSkeleton } from "@/components/journal/EntryList";
+import { useEffect } from "react";
+import { EntryCardSkeleton, EntryList } from "@/components/journal/EntryList";
 import { EntryModal } from "@/components/journal/EntryModal";
+import { JournalFilters } from "@/components/journal/JournalFilters";
+import { JournalHeader } from "@/components/journal/JournalHeader";
 import { TutorJournalSummary } from "@/components/journal/TutorJournalSummary";
 import { EmptyState } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";

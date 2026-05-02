@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { InlineLink } from "@/components/ui";
-import { format } from "@/utils/helpers";
 import { useLanguage } from "@/context/LanguageContext";
+import { format } from "@/utils/helpers";
 import {
+	getMoodColorStyle,
 	resolveEntryId,
 	toMoodTokens,
 	translateMoodLabel,
 	translateWithFallback,
-	getMoodColorStyle,
 } from "@/utils/journalHelpers";
 
 export const EntryModal = ({ entry, isOpen, onClose }) => {
@@ -66,7 +66,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 	// Compute derived data only when entry exists (but outside AnimatePresence
 	// so exit animations still work with stale data)
 	const entryId = entry ? resolveEntryId(entry) : null;
-	const moods = entry ? (entry.moodAfter || entry.moodBefore || []) : [];
+	const moods = entry ? entry.moodAfter || entry.moodBefore || [] : [];
 	const moodTokens = toMoodTokens(moods, `modal-${entryId || "none"}`);
 	const created = entry ? format.date(entry.date || entry.createdAt, lang) : "";
 	const durationMinutes = Math.max(
@@ -127,10 +127,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 										{created}
 									</h2>
 									{entryId ? (
-										<InlineLink
-											onClick={handleOpenEntry}
-											className="mt-1"
-										>
+										<InlineLink onClick={handleOpenEntry} className="mt-1">
 											{translateWithFallback(
 												t,
 												"journal.view_entry",
@@ -232,7 +229,11 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 											style={{ color: "var(--color-text-primary)" }}
 										>
 											{durationMinutes}{" "}
-											{translateWithFallback(t, "session_detail.minutes", "min")}
+											{translateWithFallback(
+												t,
+												"session_detail.minutes",
+												"min",
+											)}
 										</p>
 									</div>
 								)}

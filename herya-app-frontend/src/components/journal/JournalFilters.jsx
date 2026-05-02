@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, Loader2 } from "lucide-react";
+import { useState } from "react";
 import {
 	ChipButton,
 	SearchBar,
@@ -8,7 +8,10 @@ import {
 	SurfaceCard,
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { translateMoodLabel, translateWithFallback } from "@/utils/journalHelpers";
+import {
+	translateMoodLabel,
+	translateWithFallback,
+} from "@/utils/journalHelpers";
 
 const DATE_PRESETS = [7, 30, 90];
 
@@ -44,7 +47,11 @@ export const JournalFilters = ({
 	].filter(Boolean).length;
 
 	return (
-		<SurfaceCard role="search" aria-label={t("journal.filters_label")} className="flex flex-col gap-3 p-3 shadow-none">
+		<SurfaceCard
+			role="search"
+			aria-label={t("journal.filters_label")}
+			className="flex flex-col gap-3 p-3 shadow-none"
+		>
 			{/* Search + toggle row */}
 			<div className="flex items-center gap-2">
 				<div className="relative flex-1">
@@ -86,9 +93,7 @@ export const JournalFilters = ({
 								backgroundColor: hasActiveFilters
 									? "white"
 									: "var(--color-primary)",
-								color: hasActiveFilters
-									? "var(--color-primary)"
-									: "white",
+								color: hasActiveFilters ? "var(--color-primary)" : "white",
 							}}
 						>
 							{activeFilterCount}
@@ -136,10 +141,7 @@ export const JournalFilters = ({
 							{/* Mood + Type + Date selects */}
 							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 items-start">
 								<div className="flex flex-col">
-									<label
-										htmlFor="journal-filter-mood"
-										className="sr-only"
-									>
+									<label htmlFor="journal-filter-mood" className="sr-only">
 										{t("journal.all_moods")}
 									</label>
 									<SelectField
@@ -159,10 +161,7 @@ export const JournalFilters = ({
 								</div>
 
 								<div className="flex flex-col">
-									<label
-										htmlFor="journal-filter-type"
-										className="sr-only"
-									>
+									<label htmlFor="journal-filter-type" className="sr-only">
 										{t("journal.all_types")}
 									</label>
 									<SelectField
@@ -186,10 +185,7 @@ export const JournalFilters = ({
 								</div>
 
 								<div className="flex flex-col">
-									<label
-										htmlFor="journal-filter-from"
-										className="sr-only"
-									>
+									<label htmlFor="journal-filter-from" className="sr-only">
 										{t("journal.date_from")}
 									</label>
 									<input
@@ -207,10 +203,7 @@ export const JournalFilters = ({
 								</div>
 
 								<div className="flex flex-col">
-									<label
-										htmlFor="journal-filter-to"
-										className="sr-only"
-									>
+									<label htmlFor="journal-filter-to" className="sr-only">
 										{t("journal.date_to")}
 									</label>
 									<input

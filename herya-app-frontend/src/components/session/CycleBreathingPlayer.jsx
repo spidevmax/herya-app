@@ -1,26 +1,26 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-	Play,
+	Accessibility,
 	Pause,
+	Play,
 	RotateCcw,
+	Vibrate,
 	Volume2,
 	VolumeX,
-	Vibrate,
-	Accessibility,
 } from "lucide-react";
-import { useLanguage } from "@/context/LanguageContext";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-	getProfile,
 	applyLowStim,
+	getProfile,
 	PHASE_COLORS,
 	PHASE_LABEL_KEYS,
 } from "@/config/techniqueProfiles";
+import { useLanguage } from "@/context/LanguageContext";
 import useBreathingEngine from "@/hooks/useBreathingEngine";
 import usePranayamaAudio from "@/hooks/usePranayamaAudio";
 import { localizedArray } from "@/utils/libraryHelpers";
-import SafetyBanner from "./SafetyBanner";
 import NostrilIndicator from "./NostrilIndicator";
+import SafetyBanner from "./SafetyBanner";
 
 const formatTime = (sec) => {
 	const m = Math.floor(sec / 60);
@@ -30,11 +30,26 @@ const formatTime = (sec) => {
 
 // Palette tints per profile style
 const PALETTE_TINTS = {
-	warm: { bg: "var(--color-prana-warm)", accent: "var(--color-prana-warm-accent)" },
-	calming: { bg: "var(--color-prana-calming)", accent: "var(--color-prana-calming)" },
-	cooling: { bg: "var(--color-prana-cooling)", accent: "var(--color-prana-cooling)" },
-	energizing: { bg: "var(--color-prana-energizing)", accent: "var(--color-prana-energizing-accent)" },
-	balanced: { bg: "var(--color-prana-balanced)", accent: "var(--color-prana-balanced)" },
+	warm: {
+		bg: "var(--color-prana-warm)",
+		accent: "var(--color-prana-warm-accent)",
+	},
+	calming: {
+		bg: "var(--color-prana-calming)",
+		accent: "var(--color-prana-calming)",
+	},
+	cooling: {
+		bg: "var(--color-prana-cooling)",
+		accent: "var(--color-prana-cooling)",
+	},
+	energizing: {
+		bg: "var(--color-prana-energizing)",
+		accent: "var(--color-prana-energizing-accent)",
+	},
+	balanced: {
+		bg: "var(--color-prana-balanced)",
+		accent: "var(--color-prana-balanced)",
+	},
 };
 
 export default function CycleBreathingPlayer({
@@ -100,7 +115,8 @@ export default function CycleBreathingPlayer({
 	}, [config.customRatio, pattern, profile]);
 
 	const enginePhases = useMemo(
-		() => profile.enginePhases.filter((phaseKey) => phaseDurations[phaseKey] > 0),
+		() =>
+			profile.enginePhases.filter((phaseKey) => phaseDurations[phaseKey] > 0),
 		[phaseDurations, profile.enginePhases],
 	);
 	const runtimePhaseSequence = useMemo(
@@ -190,7 +206,10 @@ export default function CycleBreathingPlayer({
 		[phaseDurations, profile.activePhases, runtimePhaseSequence],
 	);
 	const displayActivePhases = useMemo(
-		() => profile.activePhases.filter((phase) => (displayPhaseDurations[phase] || 0) > 0),
+		() =>
+			profile.activePhases.filter(
+				(phase) => (displayPhaseDurations[phase] || 0) > 0,
+			),
 		[displayPhaseDurations, profile.activePhases],
 	);
 
@@ -208,7 +227,10 @@ export default function CycleBreathingPlayer({
 	const showCompletionState = engine.finished;
 
 	return (
-		<section aria-label={pattern.romanizationName} className="flex flex-col items-center gap-4 py-2">
+		<section
+			aria-label={pattern.romanizationName}
+			className="flex flex-col items-center gap-4 py-2"
+		>
 			{/* Header */}
 			<header className="text-center">
 				<h3
@@ -264,12 +286,12 @@ export default function CycleBreathingPlayer({
 			{/* Nostril indicator for alternate-nostril techniques */}
 			{runtimePhaseSequence.some((step) => step.nostrilFlow !== "both") &&
 				engine.isRunning && (
-				<NostrilIndicator
-					nostrilFlow={currentNostrilFlow}
-					phaseKey={currentPhaseKey}
-					color={color}
-				/>
-			)}
+					<NostrilIndicator
+						nostrilFlow={currentNostrilFlow}
+						phaseKey={currentPhaseKey}
+						color={color}
+					/>
+				)}
 
 			{/* Main breathing circle */}
 			<div className="relative flex items-center justify-center">
@@ -356,10 +378,7 @@ export default function CycleBreathingPlayer({
 							) : (
 								<>
 									<p className="font-semibold text-base" style={{ color }}>
-										{t(
-											PHASE_LABEL_KEYS[currentPhaseKey] ||
-												"pranayama.inhale",
-										)}
+										{t(PHASE_LABEL_KEYS[currentPhaseKey] || "pranayama.inhale")}
 									</p>
 									<p
 										className="text-3xl font-bold tabular-nums"
@@ -521,7 +540,7 @@ export default function CycleBreathingPlayer({
 						contraindications={
 							localizedArray(pattern, "contraindications", lang).length > 0
 								? localizedArray(pattern, "contraindications", lang)
-								: (pattern.contraindications || [])
+								: pattern.contraindications || []
 						}
 						warnings={
 							profile.safety.warningKey
@@ -588,7 +607,11 @@ export default function CycleBreathingPlayer({
 					)}
 					aria-pressed={audioEnabled}
 				>
-					{audioEnabled ? <Volume2 size={16} aria-hidden="true" /> : <VolumeX size={16} aria-hidden="true" />}
+					{audioEnabled ? (
+						<Volume2 size={16} aria-hidden="true" />
+					) : (
+						<VolumeX size={16} aria-hidden="true" />
+					)}
 				</button>
 			</div>
 

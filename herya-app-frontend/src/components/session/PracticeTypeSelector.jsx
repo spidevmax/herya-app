@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Sparkles, Wind, Brain, Star } from "lucide-react";
+import { Brain, Sparkles, Star, Wind } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const PRACTICE_TYPES = [
@@ -33,15 +33,15 @@ export default function PracticeTypeSelector({ onSelect }) {
 	const { t } = useLanguage();
 
 	return (
-		<section aria-label={t("practice.select_type_title")} className="flex flex-col gap-6 pt-4">
+		<section
+			aria-label={t("practice.select_type_title")}
+			className="flex flex-col gap-6 pt-4"
+		>
 			<header className="text-center">
 				<h2 className="text-2xl font-semibold mb-2 text-[var(--color-text-primary)]">
 					{t("practice.select_type_title")}
 				</h2>
-				<p
-					className="text-sm"
-					style={{ color: "var(--color-text-secondary)" }}
-				>
+				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
 					{t("practice.select_type_subtitle")}
 				</p>
 			</header>
@@ -68,11 +68,7 @@ export default function PracticeTypeSelector({ onSelect }) {
 								className="w-14 h-14 rounded-2xl flex items-center justify-center"
 								style={{ backgroundColor: `${type.color}15` }}
 							>
-								<Icon
-									size={28}
-									strokeWidth={2}
-									style={{ color: type.color }}
-								/>
+								<Icon size={28} strokeWidth={2} style={{ color: type.color }} />
 							</div>
 							<div className="text-center">
 								<p

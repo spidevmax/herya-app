@@ -1,15 +1,15 @@
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	deleteMyAccount,
 	deleteProfileImage,
 	updateProfile,
 	updateProfileImage,
 } from "@/api/users.api";
-import { ConfirmModal } from "@/components/ui";
-import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
 import AccountDetailsCard from "@/components/profile/AccountDetailsCard";
 import PracticePreferencesCard from "@/components/profile/PracticePreferencesCard";
 import ProfileActions from "@/components/profile/ProfileActions";
+import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
+import { ConfirmModal } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -181,9 +181,7 @@ export default function Profile() {
 					setFieldErrors(mapped);
 				}
 			}
-			setSaveError(
-				err.response?.data?.message || t("profile.save_error"),
-			);
+			setSaveError(err.response?.data?.message || t("profile.save_error"));
 			setTimeout(() => setSaveError(""), 3000);
 		} finally {
 			setSavingProfile(false);

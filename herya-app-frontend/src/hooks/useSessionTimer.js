@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Robust session timer that handles:
@@ -69,12 +69,15 @@ export default function useSessionTimer(blocks = []) {
 	// Auto-advance block when block time expires
 	useEffect(() => {
 		if (!isRunning || !currentBlock) return;
-		if (blockElapsedSec >= currentBlockDurationSec && currentBlockDurationSec > 0) {
+		if (
+			blockElapsedSec >= currentBlockDurationSec &&
+			currentBlockDurationSec > 0
+		) {
 			if (currentBlockIndex < blocks.length - 1) {
 				goToBlock(currentBlockIndex + 1);
 			}
 		}
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [blockElapsedSec, currentBlockDurationSec, isRunning]);
 
 	const start = useCallback(() => {
@@ -91,12 +94,14 @@ export default function useSessionTimer(blocks = []) {
 		// Save current elapsed as offset so we can resume accurately
 		const now = Date.now();
 		if (startTimeRef.current != null) {
-			globalOffsetRef.current +=
-				Math.floor((now - startTimeRef.current) / 1000);
+			globalOffsetRef.current += Math.floor(
+				(now - startTimeRef.current) / 1000,
+			);
 		}
 		if (blockStartTimeRef.current != null) {
-			blockOffsetRef.current +=
-				Math.floor((now - blockStartTimeRef.current) / 1000);
+			blockOffsetRef.current += Math.floor(
+				(now - blockStartTimeRef.current) / 1000,
+			);
 		}
 		startTimeRef.current = null;
 		blockStartTimeRef.current = null;

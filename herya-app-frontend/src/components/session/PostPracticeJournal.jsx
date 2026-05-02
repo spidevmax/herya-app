@@ -1,17 +1,17 @@
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle, Check, Minus, X } from "lucide-react";
-import { useLanguage } from "@/context/LanguageContext";
-import { Button } from "@/components/ui";
+import { Check, CheckCircle, Minus, X } from "lucide-react";
+import { useState } from "react";
 import JournalCard from "@/components/journal/JournalCard";
-import SliderPanel from "@/components/journal/SliderPanel";
 import SensationChips from "@/components/journal/SensationChips";
-import PostPracticeNudge from "./PostPracticeNudge";
+import SliderPanel from "@/components/journal/SliderPanel";
+import { Button } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 import {
 	MOOD_AFTER_OPTIONS,
-	MOOD_OPTIONS,
 	MOOD_COLORS,
+	MOOD_OPTIONS,
 } from "@/utils/constants";
+import PostPracticeNudge from "./PostPracticeNudge";
 
 const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-secondary)";
 const TUTOR_SIGNAL_AFTER_MAP = {
@@ -27,7 +27,6 @@ const SIGNAL_SCORES = {
 
 const VALID_MOOD_BEFORE = new Set(MOOD_OPTIONS);
 const VALID_MOOD_AFTER = new Set(MOOD_AFTER_OPTIONS);
-
 
 export default function PostPracticeJournal({
 	sessionSummary,
@@ -194,7 +193,10 @@ export default function PostPracticeJournal({
 						className="mx-auto mb-3"
 					/>
 				</motion.span>
-				<h2 id="post-practice-heading" className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]">
+				<h2
+					id="post-practice-heading"
+					className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]"
+				>
 					{t("practice.journal_title")}
 				</h2>
 				{sessionSummary && (
@@ -291,11 +293,7 @@ export default function PostPracticeJournal({
 										? "var(--color-signal-yellow)"
 										: "var(--color-signal-red)";
 							const SignalIcon =
-								signal === "green"
-									? Check
-									: signal === "yellow"
-										? Minus
-										: X;
+								signal === "green" ? Check : signal === "yellow" ? Minus : X;
 							return (
 								<button
 									type="button"

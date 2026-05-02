@@ -1,6 +1,6 @@
-import { ThemeProvider } from "../context/ThemeContext";
-import { LanguageProvider } from "../context/LanguageContext";
 import { AuthProvider } from "../context/AuthContext";
+import { LanguageProvider } from "../context/LanguageContext";
+import { ThemeProvider } from "../context/ThemeContext";
 
 const Providers = ({ children }) => (
 	<ThemeProvider>

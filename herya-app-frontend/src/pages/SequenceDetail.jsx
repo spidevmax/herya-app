@@ -1,5 +1,3 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
 	BookOpen,
@@ -8,11 +6,17 @@ import {
 	Dumbbell,
 	PersonStanding,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { getSequenceById } from "@/api/sequences.api";
-import { VK_FAMILY_MAP, LEVEL_LABELS, LEVEL_LABEL_KEYS } from "@/utils/constants";
-import { colorMix, localizedName, localized } from "@/utils/libraryHelpers";
 import { Badge, SkeletonCard, StickyHeader } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+	LEVEL_LABEL_KEYS,
+	LEVEL_LABELS,
+	VK_FAMILY_MAP,
+} from "@/utils/constants";
+import { colorMix, localized, localizedName } from "@/utils/libraryHelpers";
 
 export default function SequenceDetail() {
 	const { id } = useParams();
@@ -49,9 +53,11 @@ export default function SequenceDetail() {
 	const localizeInstruction = (instruction) => {
 		if (!instruction) return null;
 		const enterMatch = instruction.match(/^Enter from (.+)$/);
-		if (enterMatch) return t("sequence_detail.enter_from", { pose: enterMatch[1] });
+		if (enterMatch)
+			return t("sequence_detail.enter_from", { pose: enterMatch[1] });
 		const returnMatch = instruction.match(/^Return to (.+)$/);
-		if (returnMatch) return t("sequence_detail.return_to", { pose: returnMatch[1] });
+		if (returnMatch)
+			return t("sequence_detail.return_to", { pose: returnMatch[1] });
 		return instruction;
 	};
 
@@ -166,11 +172,17 @@ export default function SequenceDetail() {
 		<main className="pb-6">
 			<StickyHeader
 				onBack={() => navigate(-1)}
-				title={loading ? t("sequence_detail.loading") : localizedName(seq, lang)}
+				title={
+					loading ? t("sequence_detail.loading") : localizedName(seq, lang)
+				}
 			/>
 
 			{loading ? (
-				<div className="px-4 flex flex-col gap-4 mt-2" aria-busy="true" aria-live="polite">
+				<div
+					className="px-4 flex flex-col gap-4 mt-2"
+					aria-busy="true"
+					aria-live="polite"
+				>
 					<SkeletonCard />
 					<SkeletonCard />
 					<SkeletonCard />
@@ -190,7 +202,10 @@ export default function SequenceDetail() {
 							background: `linear-gradient(135deg, ${family.color}, ${colorMix(family.color, 67)})`,
 						}}
 					>
-						<div aria-hidden="true" className="absolute right-4 bottom-4 opacity-20 float select-none">
+						<div
+							aria-hidden="true"
+							className="absolute right-4 bottom-4 opacity-20 float select-none"
+						>
 							{family.emoji ? (
 								<span className="text-8xl">{family.emoji}</span>
 							) : (
@@ -204,7 +219,10 @@ export default function SequenceDetail() {
 						<p className="text-white/80 text-xs font-bold uppercase tracking-widest">
 							{family.labelKey ? t(family.labelKey) : family.label}
 						</p>
-						<h1 id="sequence-title" className="font-display text-2xl font-bold text-white mt-1 mb-1">
+						<h1
+							id="sequence-title"
+							className="font-display text-2xl font-bold text-white mt-1 mb-1"
+						>
 							{localizedName(seq, lang)}
 						</h1>
 						<p className="text-white/70 text-sm italic mb-4">
@@ -224,7 +242,9 @@ export default function SequenceDetail() {
 								<li>
 									<Badge className="text-white bg-white/20 border-0">
 										<Dumbbell size={12} aria-hidden="true" />
-										{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
+										{LEVEL_LABEL_KEYS[seq.level]
+											? t(LEVEL_LABEL_KEYS[seq.level])
+											: (LEVEL_LABELS[seq.level] ?? seq.level)}
 									</Badge>
 								</li>
 							)}
@@ -293,7 +313,9 @@ export default function SequenceDetail() {
 											className="text-sm font-semibold mt-0.5"
 											style={{ color: "var(--color-text-primary)" }}
 										>
-											{LEVEL_LABEL_KEYS[seq.level] ? t(LEVEL_LABEL_KEYS[seq.level]) : (LEVEL_LABELS[seq.level] ?? seq.level)}
+											{LEVEL_LABEL_KEYS[seq.level]
+												? t(LEVEL_LABEL_KEYS[seq.level])
+												: (LEVEL_LABELS[seq.level] ?? seq.level)}
 										</dd>
 									</div>
 								) : null}
@@ -380,7 +402,8 @@ export default function SequenceDetail() {
 							>
 								{tr("sequence_detail.therapeutic_focus", "Therapeutic focus")}
 							</h2>
-							{(localized(therapeuticFocus, "primaryBenefit", lang) || therapeuticFocus.primaryBenefit) ? (
+							{localized(therapeuticFocus, "primaryBenefit", lang) ||
+							therapeuticFocus.primaryBenefit ? (
 								<p
 									className="text-sm leading-relaxed"
 									style={{ color: "var(--color-text-secondary)" }}
@@ -396,7 +419,10 @@ export default function SequenceDetail() {
 							) : null}
 							{Array.isArray(therapeuticFocus.targetConditions) &&
 							therapeuticFocus.targetConditions.length > 0 ? (
-								<section aria-labelledby="target-conditions-heading" className="mt-3">
+								<section
+									aria-labelledby="target-conditions-heading"
+									className="mt-3"
+								>
 									<h3
 										id="target-conditions-heading"
 										className="text-xs font-bold uppercase tracking-widest mb-2"
@@ -420,7 +446,10 @@ export default function SequenceDetail() {
 							) : null}
 							{Array.isArray(therapeuticFocus.contraindications) &&
 							therapeuticFocus.contraindications.length > 0 ? (
-								<section aria-labelledby="contraindications-heading" className="mt-3">
+								<section
+									aria-labelledby="contraindications-heading"
+									className="mt-3"
+								>
 									<h3
 										id="contraindications-heading"
 										className="text-xs font-bold uppercase tracking-widest mb-2"
@@ -438,7 +467,8 @@ export default function SequenceDetail() {
 												className="text-sm"
 												style={{ color: "var(--color-text-secondary)" }}
 											>
-												<span aria-hidden="true">• </span>{item}
+												<span aria-hidden="true">• </span>
+												{item}
 											</li>
 										))}
 									</ul>
@@ -561,7 +591,8 @@ export default function SequenceDetail() {
 								className="font-semibold mb-3 flex items-center gap-2"
 								style={{ color: "var(--color-text-primary)" }}
 							>
-								<BookOpen size={16} aria-hidden="true" /> {t("sequence_detail.full_sequence")}
+								<BookOpen size={16} aria-hidden="true" />{" "}
+								{t("sequence_detail.full_sequence")}
 							</h2>
 							<p
 								className="text-xs font-medium mb-4"
@@ -576,7 +607,11 @@ export default function SequenceDetail() {
 							</p>
 							<div className="flex flex-col gap-4">
 								{sequenceSections.map((section) => (
-									<section key={section.key} aria-labelledby={`sequence-section-${section.key}`} className="flex flex-col gap-2">
+									<section
+										key={section.key}
+										aria-labelledby={`sequence-section-${section.key}`}
+										className="flex flex-col gap-2"
+									>
 										<h3
 											id={`sequence-section-${section.key}`}
 											className="text-xs font-bold uppercase tracking-widest"
@@ -589,7 +624,9 @@ export default function SequenceDetail() {
 												<li
 													key={pose.id}
 													className="rounded-xl border"
-													style={{ borderColor: `${colorMix(family.color, 20)}` }}
+													style={{
+														borderColor: `${colorMix(family.color, 20)}`,
+													}}
 												>
 													{pose.poseId ? (
 														<button
@@ -599,7 +636,9 @@ export default function SequenceDetail() {
 															}
 															aria-label={`${viewPoseLabel}: ${pose.name}`}
 															className="group w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left transition hover:brightness-95 hover:-translate-y-[1px] cursor-pointer"
-															style={{ backgroundColor: `${colorMix(family.color, 6)}` }}
+															style={{
+																backgroundColor: `${colorMix(family.color, 6)}`,
+															}}
 														>
 															<div className="min-w-0">
 																<p
@@ -657,7 +696,9 @@ export default function SequenceDetail() {
 													) : (
 														<div
 															className="w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3"
-															style={{ backgroundColor: `${colorMix(family.color, 6)}` }}
+															style={{
+																backgroundColor: `${colorMix(family.color, 6)}`,
+															}}
 														>
 															<div className="min-w-0">
 																<p

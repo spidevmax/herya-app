@@ -991,7 +991,8 @@ export const translations = {
 			insights_subtitle: "Keep one or two key learnings from the practice.",
 			insights_placeholder: "Any insights or learnings?",
 			gratitude: "What helped",
-			gratitude_subtitle: "A person, thing, or moment that supported your practice.",
+			gratitude_subtitle:
+				"A person, thing, or moment that supported your practice.",
 			gratitude_placeholder: "A person, thing, or moment",
 			photos: "Photos",
 			photos_subtitle: "Optional snapshots that help you remember the context.",

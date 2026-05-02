@@ -1,13 +1,10 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, RotateCcw } from "lucide-react";
-import { PRANAYAMA_PATTERNS } from "@/utils/constants";
-import {
-	PHASE_COLORS,
-	PHASE_LABEL_KEYS,
-} from "@/config/techniqueProfiles";
-import useBreathingEngine from "@/hooks/useBreathingEngine";
+import { AnimatePresence, motion } from "framer-motion";
+import { Pause, Play, RotateCcw } from "lucide-react";
+import { useMemo, useState } from "react";
+import { PHASE_COLORS, PHASE_LABEL_KEYS } from "@/config/techniqueProfiles";
 import { useLanguage } from "@/context/LanguageContext";
+import useBreathingEngine from "@/hooks/useBreathingEngine";
+import { PRANAYAMA_PATTERNS } from "@/utils/constants";
 
 const PHASE_KEYS = ["inhale", "hold", "exhale", "holdAfterExhale"];
 
@@ -50,8 +47,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 		setSelectedKey(key);
 	};
 
-	const color =
-		PHASE_COLORS[engine.currentPhaseKey] || PHASE_COLORS.inhale;
+	const color = PHASE_COLORS[engine.currentPhaseKey] || PHASE_COLORS.inhale;
 	const scale =
 		engine.currentPhaseKey === "inhale"
 			? 1.3
@@ -64,9 +60,15 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 		window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
 	return (
-		<section aria-label="Pranayama Metronome" className="flex flex-col items-center gap-6 py-6">
+		<section
+			aria-label="Pranayama Metronome"
+			className="flex flex-col items-center gap-6 py-6"
+		>
 			{/* Pattern selector */}
-			<ul className="flex gap-2 flex-wrap justify-center list-none m-0 p-0" aria-label="Patterns">
+			<ul
+				className="flex gap-2 flex-wrap justify-center list-none m-0 p-0"
+				aria-label="Patterns"
+			>
 				{Object.entries(PRANAYAMA_PATTERNS).map(([key, p]) => (
 					<li key={key}>
 						<button
@@ -82,8 +84,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 											boxShadow: "var(--shadow-button)",
 										}
 									: {
-											backgroundColor:
-												"var(--color-surface-card)",
+											backgroundColor: "var(--color-surface-card)",
 											color: "var(--color-text-secondary)",
 											border: "1px solid var(--color-border-soft)",
 										}
@@ -119,8 +120,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					aria-live="polite"
 					className="w-44 h-44 rounded-full flex flex-col items-center justify-center shadow-lg"
 					animate={{
-						scale:
-							engine.isRunning && !reducedMotion ? scale : 1,
+						scale: engine.isRunning && !reducedMotion ? scale : 1,
 					}}
 					transition={{
 						duration: engine.currentPhaseDuration,
@@ -144,20 +144,13 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 							exit={{ opacity: 0, y: -8 }}
 							className="text-center"
 						>
-							<p
-								className="font-semibold text-lg"
-								style={{ color }}
-							>
+							<p className="font-semibold text-lg" style={{ color }}>
 								{t(
-									PHASE_LABEL_KEYS[
-										engine.currentPhaseKey
-									] || "pranayama.inhale",
+									PHASE_LABEL_KEYS[engine.currentPhaseKey] ||
+										"pranayama.inhale",
 								)}
 							</p>
-							<p
-								className="text-3xl font-bold tabular-nums"
-								style={{ color }}
-							>
+							<p className="text-3xl font-bold tabular-nums" style={{ color }}>
 								{engine.isRunning
 									? Math.ceil(engine.phaseRemaining)
 									: Math.ceil(engine.currentPhaseDuration)}
@@ -202,11 +195,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
 					style={{ backgroundColor: color }}
 					aria-pressed={engine.isRunning}
-					aria-label={
-						engine.isRunning
-							? t("guided.pause")
-							: t("guided.play")
-					}
+					aria-label={engine.isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{engine.isRunning ? (
 						<Pause size={24} aria-hidden="true" />
@@ -233,9 +222,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 							className="text-[10px] font-semibold uppercase"
 							style={{ color: "var(--color-text-muted)" }}
 						>
-							{t(
-								PHASE_LABEL_KEYS[phase] || "pranayama.inhale",
-							)}
+							{t(PHASE_LABEL_KEYS[phase] || "pranayama.inhale")}
 						</dt>
 						<dd
 							className="text-lg font-bold tabular-nums m-0"

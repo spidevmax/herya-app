@@ -65,7 +65,9 @@ vi.mock("framer-motion", () => ({
 }));
 
 vi.mock("@/components/ui", () => ({
-	Button: ({ children, onClick, disabled, loading: _, ...props }) => ( // eslint-disable-line no-unused-vars
+	Button: (
+		{ children, onClick, disabled, loading: _, ...props }, // eslint-disable-line no-unused-vars
+	) => (
 		<button
 			onClick={onClick}
 			disabled={disabled}

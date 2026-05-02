@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
-	getProfile,
 	applyLowStim,
-	PHASE_KEYS,
+	getProfile,
 	PHASE_COLORS,
+	PHASE_KEYS,
 	PHASE_LABEL_KEYS,
 } from "./techniqueProfiles";
 
@@ -130,11 +130,7 @@ describe("techniqueProfiles", () => {
 
 			it("Nadi Shodhana has inhale → hold → exhale", () => {
 				const profile = getProfile(MOCK_PATTERNS.nadiShodhana);
-				expect(profile.activePhases).toEqual([
-					"inhale",
-					"hold",
-					"exhale",
-				]);
+				expect(profile.activePhases).toEqual(["inhale", "hold", "exhale"]);
 			});
 
 			it("Nadi Shodhana expands a full left-right round", () => {
@@ -263,9 +259,9 @@ describe("techniqueProfiles", () => {
 
 			it("Ujjayi does not have nostrilAlternation", () => {
 				const profile = getProfile(MOCK_PATTERNS.ujjayi);
-				expect(profile.phaseSequence.every((step) => step.nostrilFlow === "both")).toBe(
-					true,
-				);
+				expect(
+					profile.phaseSequence.every((step) => step.nostrilFlow === "both"),
+				).toBe(true);
 			});
 		});
 
@@ -279,15 +275,11 @@ describe("techniqueProfiles", () => {
 			});
 
 			it("Kapalabhati is high stimulation", () => {
-				expect(getProfile(MOCK_PATTERNS.kapalabhati).stimulation).toBe(
-					"high",
-				);
+				expect(getProfile(MOCK_PATTERNS.kapalabhati).stimulation).toBe("high");
 			});
 
 			it("Bhastrika is high stimulation", () => {
-				expect(getProfile(MOCK_PATTERNS.bhastrika).stimulation).toBe(
-					"high",
-				);
+				expect(getProfile(MOCK_PATTERNS.bhastrika).stimulation).toBe("high");
 			});
 		});
 
@@ -295,9 +287,7 @@ describe("techniqueProfiles", () => {
 			it("Kapalabhati has safety warning", () => {
 				const profile = getProfile(MOCK_PATTERNS.kapalabhati);
 				expect(profile.safety.showWarning).toBe(true);
-				expect(profile.safety.warningKey).toBe(
-					"pranayama.safety_kapalabhati",
-				);
+				expect(profile.safety.warningKey).toBe("pranayama.safety_kapalabhati");
 			});
 
 			it("Bhastrika has safety warning", () => {
@@ -325,9 +315,9 @@ describe("techniqueProfiles", () => {
 					expect(profile.audio).toBeDefined();
 					// At minimum, each active phase should have a key in audio
 					for (const phase of profile.activePhases) {
-						expect(phase in profile.audio || "phaseChange" in profile.audio).toBe(
-							true,
-						);
+						expect(
+							phase in profile.audio || "phaseChange" in profile.audio,
+						).toBe(true);
 					}
 				}
 			});
@@ -346,15 +336,13 @@ describe("techniqueProfiles", () => {
 			});
 
 			it("Kapalabhati has 3s pause", () => {
-				expect(
-					getProfile(MOCK_PATTERNS.kapalabhati).pauseBetweenCycles,
-				).toBe(3);
+				expect(getProfile(MOCK_PATTERNS.kapalabhati).pauseBetweenCycles).toBe(
+					3,
+				);
 			});
 
 			it("Bhastrika has 4s pause", () => {
-				expect(
-					getProfile(MOCK_PATTERNS.bhastrika).pauseBetweenCycles,
-				).toBe(4);
+				expect(getProfile(MOCK_PATTERNS.bhastrika).pauseBetweenCycles).toBe(4);
 			});
 		});
 	});

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, Leaf, Eye, EyeOff } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Eye, EyeOff, Leaf, Pause, Play } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const DEFAULT_PHASES = [
@@ -77,8 +77,9 @@ export default function PhasedMeditationPlayer({
 		if (!isRunning) {
 			clearInterval(intervalRef.current);
 			if (startTimeRef.current != null) {
-				offsetRef.current +=
-					Math.floor((Date.now() - startTimeRef.current) / 1000);
+				offsetRef.current += Math.floor(
+					(Date.now() - startTimeRef.current) / 1000,
+				);
 				startTimeRef.current = null;
 			}
 			return;
@@ -141,7 +142,10 @@ export default function PhasedMeditationPlayer({
 		phaseColors[currentPhase.phase.type] || "var(--color-accent)";
 
 	return (
-		<section aria-label={t(`session.meditation_types.${meditationType}`)} className="flex flex-col items-center gap-5 py-2">
+		<section
+			aria-label={t(`session.meditation_types.${meditationType}`)}
+			className="flex flex-col items-center gap-5 py-2"
+		>
 			{/* Header */}
 			<header className="text-center">
 				<p
@@ -290,7 +294,11 @@ export default function PhasedMeditationPlayer({
 					className="flex items-center gap-1.5 text-xs font-medium"
 					style={{ color: "var(--color-accent)" }}
 				>
-					{showGuide ? <EyeOff size={12} aria-hidden="true" /> : <Eye size={12} aria-hidden="true" />}
+					{showGuide ? (
+						<EyeOff size={12} aria-hidden="true" />
+					) : (
+						<Eye size={12} aria-hidden="true" />
+					)}
 					{showGuide
 						? t("guided.hide_instructions")
 						: t("guided.show_instructions")}

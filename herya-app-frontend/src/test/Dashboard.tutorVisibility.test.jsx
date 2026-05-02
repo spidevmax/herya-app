@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import Dashboard from "../pages/Dashboard";
 
 const mockNavigate = vi.fn();
@@ -65,7 +65,11 @@ vi.mock("@/components/dashboard/TutorInsightsCard", () => ({
 
 vi.mock("@/components/ui", () => ({
 	SkeletonCard: () => <div data-testid="skeleton-card" />,
-	Button: ({ children, ...props }) => <button type="button" {...props}>{children}</button>,
+	Button: ({ children, ...props }) => (
+		<button type="button" {...props}>
+			{children}
+		</button>
+	),
 	LoadingSpinner: () => <div data-testid="loading-spinner" />,
 	ConfirmModal: () => null,
 	StickyHeader: ({ children }) => <div>{children}</div>,

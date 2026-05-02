@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Droplets, Sparkles, Wind, X } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function PostPracticeNudge({

@@ -1,6 +1,6 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Leaf, PersonStanding, Wind } from "lucide-react";
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { PersonStanding, Wind, Leaf } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const BLOCK_ICONS = {

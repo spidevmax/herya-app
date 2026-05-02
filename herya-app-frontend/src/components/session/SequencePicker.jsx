@@ -1,17 +1,17 @@
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-	Search,
+	Check,
 	ChevronDown,
 	ChevronUp,
-	Check,
-	X,
 	Eye,
 	PersonStanding,
+	Search,
+	X,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
-import { VK_FAMILY_MAP, LEVEL_LABELS } from "@/utils/constants";
-import { localizedName, localized } from "@/utils/libraryHelpers";
+import { LEVEL_LABELS, VK_FAMILY_MAP } from "@/utils/constants";
+import { localized, localizedName } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
 const formatFamily = (family, t) => {
@@ -126,7 +126,11 @@ export default function SequencePicker({
 							className="flex items-center gap-2 px-3 py-2 border-b"
 							style={{ borderColor: "var(--color-border-soft)" }}
 						>
-							<Search size={14} aria-hidden="true" style={{ color: "var(--color-text-muted)" }} />
+							<Search
+								size={14}
+								aria-hidden="true"
+								style={{ color: "var(--color-text-muted)" }}
+							/>
 							<input
 								type="text"
 								value={search}
@@ -290,7 +294,8 @@ function SequencePreview({ sequence }) {
 			style={{ borderColor: "var(--color-border-soft)" }}
 		>
 			{/* Therapeutic focus */}
-			{(localized(sequence.therapeuticFocus, "primaryBenefit", lang) || sequence.therapeuticFocus?.primaryBenefit) && (
+			{(localized(sequence.therapeuticFocus, "primaryBenefit", lang) ||
+				sequence.therapeuticFocus?.primaryBenefit) && (
 				<p
 					className="text-xs mt-2 mb-2 italic"
 					style={{ color: "var(--color-text-secondary)" }}
@@ -305,7 +310,11 @@ function SequencePreview({ sequence }) {
 					{poses.map((cp, i) => {
 						const pose = cp.pose;
 						if (!pose) return null;
-						const name = localizedName(pose, lang) || pose.romanizationName || pose.name || "—";
+						const name =
+							localizedName(pose, lang) ||
+							pose.romanizationName ||
+							pose.name ||
+							"—";
 						return (
 							<div key={cp._id || i} className="flex items-center gap-2 py-1">
 								<span

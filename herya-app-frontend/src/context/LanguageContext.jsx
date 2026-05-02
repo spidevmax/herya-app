@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import { translations } from '@/i18n/translations';
+import { translations } from "@/i18n/translations";
 
 const LanguageContext = createContext(null);
 const SUPPORTED_LANGS = ["es", "en"];

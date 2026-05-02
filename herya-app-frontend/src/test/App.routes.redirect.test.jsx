@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Outlet, useLocation } from "react-router-dom";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import AppRoutes from "@/App";
 
 let mockUser = { role: "user", preferences: {} };

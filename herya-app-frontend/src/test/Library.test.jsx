@@ -74,12 +74,16 @@ describe("Library", () => {
 	it("keeps successful content visible when one source fails", async () => {
 		getSequences.mockResolvedValue(
 			wrapResponse({
-				sequences: [{ _id: "seq-1", englishName: "Evening Flow", difficulty: "beginner" }],
+				sequences: [
+					{ _id: "seq-1", englishName: "Evening Flow", difficulty: "beginner" },
+				],
 			}),
 		);
 		getPoses.mockResolvedValue(
 			wrapResponse({
-				poses: [{ _id: "pose-1", englishName: "Tadasana", difficulty: "beginner" }],
+				poses: [
+					{ _id: "pose-1", englishName: "Tadasana", difficulty: "beginner" },
+				],
 			}),
 		);
 		getBreathingPatterns.mockRejectedValue(new Error("network"));
@@ -96,9 +100,21 @@ describe("Library", () => {
 		getSequences.mockResolvedValue(
 			wrapResponse({
 				sequences: [
-					{ _id: "seq-a", englishName: "Advanced Flow", difficulty: "advanced" },
-					{ _id: "seq-b", englishName: "Beginner Flow", difficulty: "beginner" },
-					{ _id: "seq-c", englishName: "Moderate Flow", difficulty: "intermediate" },
+					{
+						_id: "seq-a",
+						englishName: "Advanced Flow",
+						difficulty: "advanced",
+					},
+					{
+						_id: "seq-b",
+						englishName: "Beginner Flow",
+						difficulty: "beginner",
+					},
+					{
+						_id: "seq-c",
+						englishName: "Moderate Flow",
+						difficulty: "intermediate",
+					},
 				],
 			}),
 		);

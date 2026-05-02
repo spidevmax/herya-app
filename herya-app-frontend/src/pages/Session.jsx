@@ -1,28 +1,27 @@
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
 	CheckCircle,
-	ClipboardList,
-	Clock,
 	ChevronLeft,
 	ChevronRight,
+	ClipboardList,
+	Clock,
 	Hourglass,
-	PersonStanding,
-	Wind,
 	Leaf,
+	PersonStanding,
 	Star,
+	Wind,
 } from "lucide-react";
-import { createSession } from "@/api/sessions.api";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { getBreathingPatterns } from "@/api/breathing.api";
-import { getSequences } from "@/api/sequences.api";
-import { getSequenceById } from "@/api/sequences.api";
-import { getPosesByFamily, getPoses } from "@/api/poses.api";
-import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
+import { getPoses, getPosesByFamily } from "@/api/poses.api";
+import { getSequenceById, getSequences } from "@/api/sequences.api";
+import { createSession } from "@/api/sessions.api";
 import CycleBreathingPlayer from "@/components/session/CycleBreathingPlayer";
 import PostPracticeNudge from "@/components/session/PostPracticeNudge";
 import { Button, StickyHeader } from "@/components/ui";
+import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { SESSION_TYPES } from "@/utils/constants";
 
 const MOOD_OPTIONS = [
@@ -416,14 +415,14 @@ export default function Session() {
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-6 pt-4"
 						>
-							<h2 id="session-pre-heading" className="text-xl font-semibold text-[var(--color-text-primary)]">
+							<h2
+								id="session-pre-heading"
+								className="text-xl font-semibold text-[var(--color-text-primary)]"
+							>
 								{t("session.pre_title")}
 							</h2>
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
 									{t("session.pre_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
@@ -445,10 +444,7 @@ export default function Session() {
 								</div>
 							</div>
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
 									{t("session.pre_energy", { n: energyBefore })}
 								</p>
 								<input
@@ -461,10 +457,7 @@ export default function Session() {
 								/>
 							</div>
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3 flex items-center gap-2"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
 									<Clock size={16} />{" "}
 									{t("session.pre_duration", { n: duration })}
 								</p>
@@ -538,10 +531,7 @@ export default function Session() {
 										<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">
 											{t("fab.complete_practice")}
 										</p>
-										<h3
-											className="text-xl font-semibold text-[var(--color-text-primary)] mb-2"
-					
-										>
+										<h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
 											{completeSelectedMain.length > 0
 												? tr(
 														"session.complete_ready_title",
@@ -637,20 +627,14 @@ export default function Session() {
 											style={{ color: "var(--color-primary)" }}
 										/>
 									</div>
-									<p
-										className="text-xl font-semibold text-[var(--color-text-primary)]"
-				
-									>
+									<p className="text-xl font-semibold text-[var(--color-text-primary)]">
 										{tr("session.loading_sequence", "Loading sequence...")}
 									</p>
 								</div>
 							) : seqId && sequence && practicePoses.length > 0 ? (
 								<>
 									<div className="w-full">
-										<p
-											className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-widest text-center mb-3"
-					
-										>
+										<p className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-widest text-center mb-3">
 											{tr(
 												"session.pose_progress",
 												"Pose {current} of {total}",
@@ -673,25 +657,16 @@ export default function Session() {
 													style={{ color: "var(--color-primary)" }}
 												/>
 											</div>
-											<h3
-												className="text-xl font-semibold text-[var(--color-text-primary)] mb-2"
-						
-											>
+											<h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
 												{currentPoseName}
 											</h3>
 											{currentPoseSanskrit && (
-												<p
-													className="text-sm italic text-[var(--color-text-muted)] mb-4"
-							
-												>
+												<p className="text-sm italic text-[var(--color-text-muted)] mb-4">
 													{currentPoseSanskrit}
 												</p>
 											)}
 											{currentPoseDescription && (
-												<p
-													className="text-sm text-[var(--color-text-muted)] mt-4"
-							
-												>
+												<p className="text-sm text-[var(--color-text-muted)] mt-4">
 													{currentPoseDescription}
 												</p>
 											)}
@@ -749,10 +724,7 @@ export default function Session() {
 											style={{ color: "var(--color-primary)" }}
 										/>
 									</div>
-									<p
-										className="text-xl font-semibold text-[var(--color-text-primary)]"
-				
-									>
+									<p className="text-xl font-semibold text-[var(--color-text-primary)]">
 										{tr(
 											"session.no_poses_in_sequence",
 											"No poses found in this sequence",
@@ -767,16 +739,10 @@ export default function Session() {
 											style={{ color: "var(--color-primary)" }}
 										/>
 									</div>
-									<p
-										className="text-xl font-semibold text-[var(--color-text-primary)]"
-				
-									>
+									<p className="text-xl font-semibold text-[var(--color-text-primary)]">
 										{t("session.active_title")}
 									</p>
-									<p
-										className="text-[var(--color-text-muted)] text-sm font-medium mt-2"
-				
-									>
+									<p className="text-[var(--color-text-muted)] text-sm font-medium mt-2">
 										{tr("session.active_minutes", "{n} minutes", {
 											n: duration,
 										})}
@@ -792,10 +758,7 @@ export default function Session() {
 					{isCompletePractice && (
 						<div className="bg-[var(--color-surface-card)] rounded-2xl p-5 flex flex-col gap-4">
 							<div>
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
 									{tr(
 										"session.complete_builder_title",
 										"Build your complete practice",
@@ -1004,10 +967,7 @@ export default function Session() {
 							</h2>
 							<PostPracticeNudge durationMinutes={duration} />
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
 									{t("session.post_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
@@ -1029,10 +989,7 @@ export default function Session() {
 								</div>
 							</div>
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
 									{t("session.post_energy", { n: energyAfter })}
 								</p>
 								<input
@@ -1045,10 +1002,7 @@ export default function Session() {
 								/>
 							</div>
 							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p
-									className="text-sm font-medium text-[var(--color-text-primary)] mb-3"
-			
-								>
+								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
 									{t("session.post_notes")}
 								</p>
 								<textarea

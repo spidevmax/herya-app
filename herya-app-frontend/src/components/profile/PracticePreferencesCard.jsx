@@ -1,6 +1,6 @@
+import { useLanguage } from "@/context/LanguageContext";
 import SectionTitle from "./SectionTitle";
 import Toggle from "./Toggle";
-import { useLanguage } from "@/context/LanguageContext";
 
 const PRACTICE_INTENSITIES = ["gentle", "moderate", "vigorous"];
 const TIME_OF_DAY_OPTIONS = ["morning", "afternoon", "evening", "anytime"];
@@ -46,10 +46,7 @@ export default function PracticePreferencesCard({
 					<select
 						value={draft.preferences.practiceIntensity}
 						onChange={(event) =>
-							setPreference(
-								"preferences.practiceIntensity",
-								event.target.value,
-							)
+							setPreference("preferences.practiceIntensity", event.target.value)
 						}
 						className="w-full rounded-xl px-4 py-3 border outline-none"
 						style={inputStyle}
@@ -140,10 +137,7 @@ export default function PracticePreferencesCard({
 							label={t("profile.low_stim_mode")}
 							checked={draft.preferences.lowStimMode}
 							onChange={(event) =>
-								setPreference(
-									"preferences.lowStimMode",
-									event.target.checked,
-								)
+								setPreference("preferences.lowStimMode", event.target.checked)
 							}
 						/>
 					</div>
@@ -163,9 +157,7 @@ export default function PracticePreferencesCard({
 										event.target.value,
 									)
 								}
-								placeholder={t(
-									"profile.safety_anchor_phrase_placeholder",
-								)}
+								placeholder={t("profile.safety_anchor_phrase_placeholder")}
 								maxLength={120}
 								className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
 								style={inputStyle}
@@ -186,9 +178,7 @@ export default function PracticePreferencesCard({
 										event.target.value,
 									)
 								}
-								placeholder={t(
-									"profile.safety_anchor_body_cue_placeholder",
-								)}
+								placeholder={t("profile.safety_anchor_body_cue_placeholder")}
 								maxLength={120}
 								className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
 								style={inputStyle}

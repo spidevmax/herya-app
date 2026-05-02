@@ -1,5 +1,5 @@
-import { useLanguage } from "@/context/LanguageContext";
 import { PageHeader } from "@/components/ui";
+import { useLanguage } from "@/context/LanguageContext";
 
 export const JournalHeader = ({ entryCount }) => {
 	const { t } = useLanguage();

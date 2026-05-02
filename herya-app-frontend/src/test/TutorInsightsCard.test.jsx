@@ -6,8 +6,8 @@ import {
 	waitFor,
 	within,
 } from "@testing-library/react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { BrowserRouter } from "react-router-dom";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import TutorInsightsCard from "../components/dashboard/TutorInsightsCard";
 
 const mockNavigate = vi.fn();

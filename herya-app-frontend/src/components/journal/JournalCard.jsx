@@ -1,11 +1,13 @@
 const TONE_STYLES = {
 	default: {
-		border: "1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
+		border:
+			"1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
 		background:
 			"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 94%, white 6%) 0%, var(--color-surface-card) 100%)",
 	},
 	soft: {
-		border: "1px solid color-mix(in srgb, var(--color-secondary) 12%, var(--color-border-soft) 88%)",
+		border:
+			"1px solid color-mix(in srgb, var(--color-secondary) 12%, var(--color-border-soft) 88%)",
 		background:
 			"linear-gradient(180deg, color-mix(in srgb, var(--color-secondary) 5%, var(--color-surface-card) 95%) 0%, var(--color-surface-card) 100%)",
 	},

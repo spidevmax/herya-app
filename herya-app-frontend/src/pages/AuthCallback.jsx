@@ -62,7 +62,10 @@ export default function AuthCallback() {
 			>
 				{error ? (
 					<>
-						<p role="alert" className="text-[var(--color-error-text)] text-sm font-semibold mb-4">
+						<p
+							role="alert"
+							className="text-[var(--color-error-text)] text-sm font-semibold mb-4"
+						>
 							{error}
 						</p>
 						<button
@@ -75,7 +78,10 @@ export default function AuthCallback() {
 					</>
 				) : (
 					<>
-						<div aria-hidden="true" className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin" />
+						<div
+							aria-hidden="true"
+							className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin"
+						/>
 						<p className="text-[var(--color-text-primary)] text-sm font-semibold">
 							{t("auth_callback.completing")}
 						</p>

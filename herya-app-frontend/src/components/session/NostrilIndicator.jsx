@@ -29,10 +29,7 @@ export default function NostrilIndicator({
 				: t(isLeft ? "pranayama.nostril_left" : "pranayama.nostril_right");
 
 	return (
-		<figure
-			className="flex flex-col items-center gap-1 m-0"
-			aria-label={label}
-		>
+		<figure className="flex flex-col items-center gap-1 m-0" aria-label={label}>
 			<svg
 				width="48"
 				height="56"
@@ -50,32 +47,32 @@ export default function NostrilIndicator({
 				/>
 
 				{/* Left nostril */}
-					<motion.ellipse
-						cx="17"
-						cy="46"
-						rx="5"
-						ry="4"
-						animate={{
-							fill: leftActive ? color : "var(--color-border-soft)",
-							opacity: leftActive ? 1 : 0.3,
-							scale: leftActive && phaseKey === "inhale" ? 1.15 : 1,
-						}}
+				<motion.ellipse
+					cx="17"
+					cy="46"
+					rx="5"
+					ry="4"
+					animate={{
+						fill: leftActive ? color : "var(--color-border-soft)",
+						opacity: leftActive ? 1 : 0.3,
+						scale: leftActive && phaseKey === "inhale" ? 1.15 : 1,
+					}}
 					transition={{ duration: 0.4, ease: "easeInOut" }}
 					stroke="var(--color-border)"
 					strokeWidth="1"
 				/>
 
 				{/* Right nostril */}
-					<motion.ellipse
-						cx="31"
-						cy="46"
-						rx="5"
-						ry="4"
-						animate={{
-							fill: rightActive ? color : "var(--color-border-soft)",
-							opacity: rightActive ? 1 : 0.3,
-							scale: rightActive && phaseKey === "inhale" ? 1.15 : 1,
-						}}
+				<motion.ellipse
+					cx="31"
+					cy="46"
+					rx="5"
+					ry="4"
+					animate={{
+						fill: rightActive ? color : "var(--color-border-soft)",
+						opacity: rightActive ? 1 : 0.3,
+						scale: rightActive && phaseKey === "inhale" ? 1.15 : 1,
+					}}
 					transition={{ duration: 0.4, ease: "easeInOut" }}
 					stroke="var(--color-border)"
 					strokeWidth="1"

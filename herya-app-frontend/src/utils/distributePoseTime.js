@@ -215,9 +215,7 @@ function capDominantAllocations(allocations, total, maxRatio) {
 			}
 		}
 		if (excess <= 0) break;
-		const openIdx = result
-			.map((_, i) => i)
-			.filter((i) => !capped[i]);
+		const openIdx = result.map((_, i) => i).filter((i) => !capped[i]);
 		if (openIdx.length === 0) break;
 		const openSum = openIdx.reduce((s, i) => s + result[i], 0);
 		if (openSum <= 0) {

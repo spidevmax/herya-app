@@ -1,17 +1,17 @@
 import { motion } from "framer-motion";
 import { PersonStanding } from "lucide-react";
-import {
-	getPalette,
-	getCardTitle,
-	getCardSubtitle,
-	getMonogram,
-	getSequencePoseCount,
-	colorMix,
-	translateWithFallback,
-	localized,
-	DIFF_COLORS,
-} from "@/utils/libraryHelpers";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+	colorMix,
+	DIFF_COLORS,
+	getCardSubtitle,
+	getCardTitle,
+	getMonogram,
+	getPalette,
+	getSequencePoseCount,
+	localized,
+	translateWithFallback,
+} from "@/utils/libraryHelpers";
 
 const StatBox = ({ value, label, bg, color }) => (
 	<div
@@ -63,15 +63,19 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 	const imageSrc =
 		item.image || item.media?.thumbnail?.url || item.media?.images?.[0]?.url;
 
-	const translateDifficulty = (d) => d ? tr(`library.${d}`, d) : "—";
-	const translateFamily = (f) => f ? tr(`library.families.${f}`, String(f).replace(/_/g, " ")) : "—";
+	const translateDifficulty = (d) => (d ? tr(`library.${d}`, d) : "—");
+	const translateFamily = (f) =>
+		f ? tr(`library.families.${f}`, String(f).replace(/_/g, " ")) : "—";
 	const translateCategory = (c) => {
 		if (!c) return "—";
 		const cat = Array.isArray(c) ? c[0] : c;
-		return cat ? tr(`library.categories.${cat}`, String(cat).replace(/_/g, " ")) : "—";
+		return cat
+			? tr(`library.categories.${cat}`, String(cat).replace(/_/g, " "))
+			: "—";
 	};
-	const translateEffect = (e) => e ? tr(`library.effects.${e}`, e) : "—";
-	const translateDrishti = (d) => d ? tr(`library.drishti.${d}`, String(d).replace(/_/g, " ")) : "—";
+	const translateEffect = (e) => (e ? tr(`library.effects.${e}`, e) : "—");
+	const translateDrishti = (d) =>
+		d ? tr(`library.drishti.${d}`, String(d).replace(/_/g, " ")) : "—";
 
 	const formatRatio = (ratio) => {
 		if (!ratio || typeof ratio !== "object") return "—";
@@ -88,12 +92,25 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 
 	const buildSequenceStats = () => {
 		const base = [
-			{ value: tr(`library.level_${item.level}`, item.level ?? "—"), label: tr("library.stat_level", "LEVEL") },
-			{ value: translateFamily(item.family), label: tr("library.stat_family", "FAMILY") },
-			{ value: getSequencePoseCount(item) ?? "—", label: tr("library.stat_poses", "POSES") },
+			{
+				value: tr(`library.level_${item.level}`, item.level ?? "—"),
+				label: tr("library.stat_level", "LEVEL"),
+			},
+			{
+				value: translateFamily(item.family),
+				label: tr("library.stat_family", "FAMILY"),
+			},
+			{
+				value: getSequencePoseCount(item) ?? "—",
+				label: tr("library.stat_poses", "POSES"),
+			},
 		];
 		const duration = formatDuration(item.duration ?? item.estimatedDuration);
-		if (duration) base.push({ value: duration, label: tr("library.stat_duration", "TIME") });
+		if (duration)
+			base.push({
+				value: duration,
+				label: tr("library.stat_duration", "TIME"),
+			});
 		return base;
 	};
 
@@ -133,7 +150,9 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 	const ariaLabel = [
 		typeLabel,
 		title,
-		difficultyLabel ? `${tr("library.stat_difficulty", "Difficulty")}: ${difficultyLabel}` : null,
+		difficultyLabel
+			? `${tr("library.stat_difficulty", "Difficulty")}: ${difficultyLabel}`
+			: null,
 	]
 		.filter(Boolean)
 		.join(" — ");

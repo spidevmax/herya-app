@@ -1,4 +1,3 @@
-import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
 	AlertTriangle,
@@ -10,6 +9,7 @@ import {
 	Upload,
 	X,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { createPose, deletePose, updatePose } from "@/api/admin.api";
 import { getPoses } from "@/api/poses.api";
 import { Badge, Button, ConfirmModal, SkeletonCard } from "@/components/ui";
@@ -162,12 +162,18 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 					<p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
 						{t("admin.tab_poses")}
 					</p>
-					<h2 id="pose-form-title" className="mt-1 font-display text-2xl font-bold text-[var(--color-text-primary)]">
+					<h2
+						id="pose-form-title"
+						className="mt-1 font-display text-2xl font-bold text-[var(--color-text-primary)]"
+					>
 						{isEditing
 							? t("admin.pose_manager_edit")
 							: t("admin.pose_manager_create")}
 					</h2>
-					<p id="pose-form-subtitle" className="mt-2 text-sm text-[var(--color-text-secondary)]">
+					<p
+						id="pose-form-subtitle"
+						className="mt-2 text-sm text-[var(--color-text-secondary)]"
+					>
 						{t("admin.pose_manager_subtitle")}
 					</p>
 				</header>
@@ -182,7 +188,11 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 							color: "var(--color-danger)",
 						}}
 					>
-						<AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+						<AlertTriangle
+							size={16}
+							aria-hidden="true"
+							className="mt-0.5 shrink-0"
+						/>
 						<span>{error}</span>
 					</p>
 				)}
@@ -610,21 +620,35 @@ export default function PoseManager() {
 			</search>
 
 			{error && (
-				<p role="alert" className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]">
+				<p
+					role="alert"
+					className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]"
+				>
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.pose_manager_load_error")}</span>
 				</p>
 			)}
 
 			{actionError && (
-				<p role="alert" className="flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm" style={{ backgroundColor: "var(--color-error-bg)", borderColor: "var(--color-danger)", color: "var(--color-danger)" }}>
+				<p
+					role="alert"
+					className="flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm"
+					style={{
+						backgroundColor: "var(--color-error-bg)",
+						borderColor: "var(--color-danger)",
+						color: "var(--color-danger)",
+					}}
+				>
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{actionError}</span>
 				</p>
 			)}
 
 			{loading ? (
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-busy="true">
+				<div
+					className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+					aria-busy="true"
+				>
 					{["p1", "p2", "p3", "p4", "p5", "p6"].map((key) => (
 						<SkeletonCard key={key} />
 					))}
@@ -664,14 +688,19 @@ export default function PoseManager() {
 								<div className="flex flex-1 flex-col gap-3 p-5">
 									<header className="flex items-start justify-between gap-3">
 										<div className="min-w-0">
-											<h3 id={`pose-card-${pose._id}-name`} className="truncate text-base font-semibold text-[var(--color-text-primary)]">
+											<h3
+												id={`pose-card-${pose._id}-name`}
+												className="truncate text-base font-semibold text-[var(--color-text-primary)]"
+											>
 												{pose.name}
 											</h3>
 											<p className="truncate text-sm text-[var(--color-text-secondary)]">
 												{pose.romanizationName}
 											</p>
 										</div>
-										<Badge color="var(--color-primary)">{pose.difficulty}</Badge>
+										<Badge color="var(--color-primary)">
+											{pose.difficulty}
+										</Badge>
 									</header>
 
 									<ul className="flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
@@ -688,7 +717,8 @@ export default function PoseManager() {
 
 									{pose.media?.images?.length > 0 && (
 										<p className="m-0 text-xs text-[var(--color-text-muted)]">
-											{pose.media.images.length} {t("admin.pose_manager_images")}
+											{pose.media.images.length}{" "}
+											{t("admin.pose_manager_images")}
 										</p>
 									)}
 

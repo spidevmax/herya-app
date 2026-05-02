@@ -1,5 +1,5 @@
-import SectionTitle from "./SectionTitle";
 import { useLanguage } from "@/context/LanguageContext";
+import SectionTitle from "./SectionTitle";
 
 const GOAL_OPTIONS = [
 	"increase_flexibility",
@@ -140,7 +140,11 @@ export default function AccountDetailsCard({
 							{t("profile.goals_hint")}
 						</span>
 					</div>
-					<div className="flex flex-wrap gap-2" role="group" aria-label={t("profile.goals_title")}>
+					<div
+						className="flex flex-wrap gap-2"
+						role="group"
+						aria-label={t("profile.goals_title")}
+					>
 						{GOAL_OPTIONS.map((goal) => {
 							const active = selectedGoals.includes(goal);
 							return (

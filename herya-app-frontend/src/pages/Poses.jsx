@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, PersonStanding } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getPoses, searchPoses } from "@/api/poses.api";
 import {
-	SearchBar,
-	FilterChips,
-	SkeletonCard,
-	EmptyState,
 	Badge,
+	EmptyState,
+	FilterChips,
+	SearchBar,
+	SkeletonCard,
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -319,8 +319,14 @@ export default function Poses() {
 			</div>
 
 			{loading ? (
-				<div className="px-4 flex flex-col gap-3" aria-busy="true" aria-live="polite">
-					{["p1", "p2", "p3", "p4", "p5"].map((k) => <SkeletonCard key={k} />)}
+				<div
+					className="px-4 flex flex-col gap-3"
+					aria-busy="true"
+					aria-live="polite"
+				>
+					{["p1", "p2", "p3", "p4", "p5"].map((k) => (
+						<SkeletonCard key={k} />
+					))}
 				</div>
 			) : poses.length === 0 ? (
 				<div className="px-4">

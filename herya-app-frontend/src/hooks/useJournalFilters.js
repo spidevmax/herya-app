@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { GARDEN_MOOD_ORDER } from "@/utils/constants";
 import {
@@ -93,10 +93,9 @@ export const useJournalFilters = (entriesWithId) => {
 		if (q) next.set("q", q);
 
 		const nextStr = next.toString();
-		setSearchParams(
-			(prev) => (prev.toString() === nextStr ? prev : next),
-			{ replace: true },
-		);
+		setSearchParams((prev) => (prev.toString() === nextStr ? prev : next), {
+			replace: true,
+		});
 	}, [
 		activeDatePreset,
 		debouncedSearchText,
@@ -160,7 +159,14 @@ export const useJournalFilters = (entriesWithId) => {
 					new Date(b.date || b.createdAt).getTime() -
 					new Date(a.date || a.createdAt).getTime(),
 			),
-		[dateFrom, dateTo, debouncedSearchText, entriesWithId, selectedMood, selectedType],
+		[
+			dateFrom,
+			dateTo,
+			debouncedSearchText,
+			entriesWithId,
+			selectedMood,
+			selectedType,
+		],
 	);
 
 	// ── Actions ──────────────────────────────────────────────────────

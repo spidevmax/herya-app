@@ -1,14 +1,14 @@
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
-	Users,
-	List,
-	BookOpen,
+	ArrowRight,
 	BarChart2,
+	BookOpen,
+	List,
 	Plus,
 	Shield,
-	ArrowRight,
+	Users,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAnalyticsDashboard } from "@/api/admin.api";
 import { useLanguage } from "@/context/LanguageContext";
@@ -16,52 +16,58 @@ import { useLanguage } from "@/context/LanguageContext";
 const StatTile = ({ icon, label, value, tone = "var(--color-primary)" }) => {
 	const Icon = icon;
 	return (
-	<li className="rounded-2xl p-3"
-		style={{
-			backgroundColor: "var(--color-surface)",
-			border: "1px solid var(--color-border-soft)",
-		}}
-	>
-		<div className="flex items-center gap-2 mb-1">
-			<span
-				aria-hidden="true"
-				className="w-7 h-7 rounded-lg flex items-center justify-center"
-				style={{ backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)` }}
-			>
-				<Icon size={14} style={{ color: tone }} />
-			</span>
+		<li
+			className="rounded-2xl p-3"
+			style={{
+				backgroundColor: "var(--color-surface)",
+				border: "1px solid var(--color-border-soft)",
+			}}
+		>
+			<div className="flex items-center gap-2 mb-1">
+				<span
+					aria-hidden="true"
+					className="w-7 h-7 rounded-lg flex items-center justify-center"
+					style={{
+						backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`,
+					}}
+				>
+					<Icon size={14} style={{ color: tone }} />
+				</span>
+				<p
+					className="text-[10px] font-bold uppercase tracking-[0.1em]"
+					style={{ color: "var(--color-text-muted)" }}
+				>
+					{label}
+				</p>
+			</div>
 			<p
-				className="text-[10px] font-bold uppercase tracking-[0.1em]"
-				style={{ color: "var(--color-text-muted)" }}
+				className="text-lg font-bold"
+				style={{ color: "var(--color-text-primary)" }}
 			>
-				{label}
+				{value}
 			</p>
-		</div>
-		<p className="text-lg font-bold" style={{ color: "var(--color-text-primary)" }}>
-			{value}
-		</p>
-	</li>
+		</li>
 	);
 };
 
 const QuickAction = ({ icon, label, onClick, tone }) => {
 	const Icon = icon;
 	return (
-	<button
-		type="button"
-		onClick={onClick}
-		className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
-		style={{
-			backgroundColor: `color-mix(in srgb, ${tone} 10%, transparent)`,
-			color: tone,
-			border: `1px solid color-mix(in srgb, ${tone} 28%, transparent)`,
-			"--tw-ring-color": tone,
-		}}
-	>
-		<Plus size={14} aria-hidden="true" />
-		<Icon size={14} aria-hidden="true" />
-		<span>{label}</span>
-	</button>
+		<button
+			type="button"
+			onClick={onClick}
+			className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+			style={{
+				backgroundColor: `color-mix(in srgb, ${tone} 10%, transparent)`,
+				color: tone,
+				border: `1px solid color-mix(in srgb, ${tone} 28%, transparent)`,
+				"--tw-ring-color": tone,
+			}}
+		>
+			<Plus size={14} aria-hidden="true" />
+			<Icon size={14} aria-hidden="true" />
+			<span>{label}</span>
+		</button>
 	);
 };
 
@@ -119,7 +125,8 @@ export default function AdminQuickCard() {
 					aria-hidden="true"
 					className="w-9 h-9 rounded-xl flex items-center justify-center"
 					style={{
-						backgroundColor: "color-mix(in srgb, var(--color-primary) 12%, transparent)",
+						backgroundColor:
+							"color-mix(in srgb, var(--color-primary) 12%, transparent)",
 					}}
 				>
 					<Shield size={18} style={{ color: "var(--color-primary)" }} />
@@ -127,7 +134,10 @@ export default function AdminQuickCard() {
 			</header>
 
 			{loading ? (
-				<ul className="grid grid-cols-2 gap-2 mb-3 list-none m-0 p-0" aria-busy="true">
+				<ul
+					className="grid grid-cols-2 gap-2 mb-3 list-none m-0 p-0"
+					aria-busy="true"
+				>
 					{["s1", "s2", "s3", "s4"].map((k) => (
 						<li key={k} className="skeleton h-16 rounded-2xl" />
 					))}
@@ -161,7 +171,9 @@ export default function AdminQuickCard() {
 				</ul>
 			)}
 
-			<nav aria-label={t("dashboard.admin_quick_actions", "Admin quick actions")}>
+			<nav
+				aria-label={t("dashboard.admin_quick_actions", "Admin quick actions")}
+			>
 				<ul className="flex flex-wrap gap-2 list-none m-0 p-0 mb-3">
 					<li>
 						<QuickAction

@@ -11,7 +11,7 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSessions } from "@/api/sessions.api";
-import { FilterChips, SkeletonCard, EmptyState } from "@/components/ui";
+import { EmptyState, FilterChips, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import { VK_FAMILIES } from "@/utils/constants";
 import { format } from "@/utils/helpers";
@@ -163,8 +163,14 @@ export default function SessionHistory() {
 			</header>
 
 			{loading ? (
-				<div className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3" aria-busy="true" aria-live="polite">
-					{["s1", "s2", "s3", "s4"].map((k) => <SkeletonCard key={k} />)}
+				<div
+					className="px-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3"
+					aria-busy="true"
+					aria-live="polite"
+				>
+					{["s1", "s2", "s3", "s4"].map((k) => (
+						<SkeletonCard key={k} />
+					))}
 				</div>
 			) : sessions.length === 0 ? (
 				<div className="px-4">

@@ -1,9 +1,12 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function SafetyBanner({ contraindications = [], warnings = "" }) {
+export default function SafetyBanner({
+	contraindications = [],
+	warnings = "",
+}) {
 	const { t } = useLanguage();
 	const [expanded, setExpanded] = useState(false);
 
@@ -41,7 +44,10 @@ export default function SafetyBanner({ contraindications = [], warnings = "" }) 
 					{t("guided.safety_warning")} ({items.length})
 				</span>
 				{items.length > 0 && (
-					<span aria-hidden="true" style={{ color: "var(--color-warning-text, #92400E)" }}>
+					<span
+						aria-hidden="true"
+						style={{ color: "var(--color-warning-text, #92400E)" }}
+					>
 						{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
 					</span>
 				)}

@@ -9,9 +9,9 @@ import {
 	XCircle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 import { VK_FAMILY_MAP } from "@/utils/constants";
 import { format } from "@/utils/helpers";
-import { useLanguage } from "@/context/LanguageContext";
 import { colorMix } from "@/utils/libraryHelpers";
 
 export default function RecentSessionCard({ session, index = 0 }) {
@@ -35,7 +35,12 @@ export default function RecentSessionCard({ session, index = 0 }) {
 			animate={{ opacity: 1, x: 0 }}
 			transition={{ delay: index * 0.08 }}
 			onClick={() => navigate(`/sessions/${session._id}`)}
-			onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate(`/sessions/${session._id}`); } }}
+			onKeyDown={(e) => {
+				if (e.key === "Enter" || e.key === " ") {
+					e.preventDefault();
+					navigate(`/sessions/${session._id}`);
+				}
+			}}
 			role="button"
 			tabIndex={0}
 			className="flex items-center gap-3 rounded-2xl p-4 shadow-[var(--shadow-card)] cursor-pointer active:scale-[0.98] transition-transform"
@@ -60,7 +65,9 @@ export default function RecentSessionCard({ session, index = 0 }) {
 					className="font-semibold text-sm truncate"
 					style={{ color: "var(--color-text-primary)" }}
 				>
-					{session.vkSequence?.englishName || t(`dashboard.${session.sessionType}`) || t("dashboard.sessions")}
+					{session.vkSequence?.englishName ||
+						t(`dashboard.${session.sessionType}`) ||
+						t("dashboard.sessions")}
 				</p>
 				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
 					{format.date(session.date || session.createdAt, lang)}

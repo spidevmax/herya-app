@@ -1,6 +1,6 @@
+import { AnimatePresence, motion } from "framer-motion";
+import { Camera, Trash2, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Camera, Upload, Trash2, X } from "lucide-react";
 import { LoadingSpinner } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -105,8 +105,16 @@ const ProfileHeroCard = ({
 							aria-haspopup={hasPhoto ? "menu" : undefined}
 							aria-expanded={hasPhoto ? menuOpen : undefined}
 							className="relative shrink-0 group rounded-[28px] cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:cursor-wait"
-							title={hasPhoto ? t("profile.photo_actions_title") : t("profile.change_photo")}
-							aria-label={hasPhoto ? t("profile.photo_actions_title") : t("profile.change_photo")}
+							title={
+								hasPhoto
+									? t("profile.photo_actions_title")
+									: t("profile.change_photo")
+							}
+							aria-label={
+								hasPhoto
+									? t("profile.photo_actions_title")
+									: t("profile.change_photo")
+							}
 						>
 							<div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] bg-white/18 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20 shadow-[var(--shadow-card-hover)] relative">
 								{hasPhoto ? (

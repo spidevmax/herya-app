@@ -1,9 +1,13 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
 import { LoadingSpinner } from "@/components/ui";
+import { useAuth } from "@/context/AuthContext";
 
 const FullPageSpinner = () => (
-	<div role="status" aria-live="polite" className="min-h-dvh flex items-center justify-center">
+	<div
+		role="status"
+		aria-live="polite"
+		className="min-h-dvh flex items-center justify-center"
+	>
 		<LoadingSpinner size={40} color="var(--color-primary)" />
 	</div>
 );

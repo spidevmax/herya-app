@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import {
 	ChevronLeft,
 	Flame,
@@ -10,10 +8,18 @@ import {
 	Wind,
 	Zap,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { DIFF_COLORS as SHARED_DIFF_COLORS, colorMix, translateWithFallback, localized, localizedArray } from "@/utils/libraryHelpers";
+import {
+	colorMix,
+	localized,
+	localizedArray,
+	DIFF_COLORS as SHARED_DIFF_COLORS,
+	translateWithFallback,
+} from "@/utils/libraryHelpers";
 
 const DIFF_COLORS = SHARED_DIFF_COLORS;
 
@@ -64,7 +70,11 @@ export default function BreathingDetail() {
 
 	if (loading) {
 		return (
-			<main className="px-4 pt-4 flex flex-col gap-4" aria-busy="true" aria-live="polite">
+			<main
+				className="px-4 pt-4 flex flex-col gap-4"
+				aria-busy="true"
+				aria-live="polite"
+			>
 				<div
 					aria-hidden="true"
 					className="h-48 rounded-3xl animate-pulse"
@@ -94,7 +104,8 @@ export default function BreathingDetail() {
 					className="mt-4 text-sm font-semibold"
 					style={{ color: "var(--color-primary)" }}
 				>
-					<span aria-hidden="true">← </span>{t("breathing_detail.back")}
+					<span aria-hidden="true">← </span>
+					{t("breathing_detail.back")}
 				</button>
 			</main>
 		);
@@ -103,8 +114,14 @@ export default function BreathingDetail() {
 	const ratio = pattern.patternRatio ?? {};
 	const diffColor = DIFF_COLORS[pattern.difficulty] ?? "var(--color-primary)";
 	const EnergyIcon = ENERGY_ICONS[pattern.energyEffect] ?? Wind;
-	const benefits = localizedArray(pattern, "benefits", lang).length > 0 ? localizedArray(pattern, "benefits", lang) : (pattern.benefits ?? []);
-	const contraindications = localizedArray(pattern, "contraindications", lang).length > 0 ? localizedArray(pattern, "contraindications", lang) : (pattern.contraindications ?? []);
+	const benefits =
+		localizedArray(pattern, "benefits", lang).length > 0
+			? localizedArray(pattern, "benefits", lang)
+			: (pattern.benefits ?? []);
+	const contraindications =
+		localizedArray(pattern, "contraindications", lang).length > 0
+			? localizedArray(pattern, "contraindications", lang)
+			: (pattern.contraindications ?? []);
 	const instructions = pattern.instructions ?? [];
 	const ratioStr = pattern.patternRatio
 		? `${ratio.inhale ?? 1}:${ratio.hold ?? 0}:${ratio.exhale ?? 1}:${ratio.holdAfterExhale ?? 0}`
@@ -172,7 +189,11 @@ export default function BreathingDetail() {
 							className="px-3 py-1 rounded-full text-xs font-bold text-white"
 							style={{ backgroundColor: diffColor }}
 						>
-							{translateWithFallback(t, `library.${pattern.difficulty}`, pattern.difficulty)}
+							{translateWithFallback(
+								t,
+								`library.${pattern.difficulty}`,
+								pattern.difficulty,
+							)}
 						</span>
 					</li>
 					{pattern.energyEffect && (
@@ -185,7 +206,11 @@ export default function BreathingDetail() {
 								}}
 							>
 								<EnergyIcon size={13} aria-hidden="true" />
-								{translateWithFallback(t, `library.effects.${pattern.energyEffect}`, pattern.energyEffect)}
+								{translateWithFallback(
+									t,
+									`library.effects.${pattern.energyEffect}`,
+									pattern.energyEffect,
+								)}
 							</span>
 						</li>
 					)}
@@ -253,7 +278,10 @@ export default function BreathingDetail() {
 						className="rounded-2xl p-4"
 						style={{ backgroundColor: "var(--color-surface-card)" }}
 					>
-						<h2 id="breathing-benefits-heading" className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
+						<h2
+							id="breathing-benefits-heading"
+							className="font-display font-bold mb-3 text-[var(--color-text-primary)]"
+						>
 							{t("breathing_detail.benefits")}
 						</h2>
 						<ul className="flex flex-col gap-2 list-none m-0 p-0">
@@ -263,7 +291,12 @@ export default function BreathingDetail() {
 									className="flex items-start gap-2 text-sm"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
-									<span aria-hidden="true" style={{ color: "var(--color-primary)" }}>✓</span>
+									<span
+										aria-hidden="true"
+										style={{ color: "var(--color-primary)" }}
+									>
+										✓
+									</span>
 									{b}
 								</li>
 							))}
@@ -277,14 +310,18 @@ export default function BreathingDetail() {
 						aria-labelledby="breathing-contraindications-heading"
 						className="rounded-2xl p-4"
 						style={{
-							backgroundColor: "color-mix(in srgb, var(--color-warning) 6%, var(--color-surface-card))",
-							border: "1px solid color-mix(in srgb, var(--color-warning) 30%, transparent)",
+							backgroundColor:
+								"color-mix(in srgb, var(--color-warning) 6%, var(--color-surface-card))",
+							border:
+								"1px solid color-mix(in srgb, var(--color-warning) 30%, transparent)",
 						}}
 					>
 						<h2
 							id="breathing-contraindications-heading"
 							className="font-display font-bold mb-3"
-							style={{ color: "var(--color-warning-text, var(--color-text-primary))" }}
+							style={{
+								color: "var(--color-warning-text, var(--color-text-primary))",
+							}}
 						>
 							{t("breathing_detail.contraindications")}
 						</h2>
@@ -295,7 +332,12 @@ export default function BreathingDetail() {
 									className="flex items-start gap-2 text-sm"
 									style={{ color: "var(--color-text-secondary)" }}
 								>
-									<span aria-hidden="true" style={{ color: "var(--color-warning)" }}>⚠</span>
+									<span
+										aria-hidden="true"
+										style={{ color: "var(--color-warning)" }}
+									>
+										⚠
+									</span>
 									{c}
 								</li>
 							))}
@@ -306,7 +348,10 @@ export default function BreathingDetail() {
 				{/* Step-by-step instructions */}
 				{instructions.length > 0 && (
 					<section aria-labelledby="breathing-instructions-heading">
-						<h2 id="breathing-instructions-heading" className="font-display font-bold mb-3 text-[var(--color-text-primary)]">
+						<h2
+							id="breathing-instructions-heading"
+							className="font-display font-bold mb-3 text-[var(--color-text-primary)]"
+						>
 							{t("breathing_detail.instructions")}
 						</h2>
 						<ol className="flex flex-col gap-3 list-none m-0 p-0">

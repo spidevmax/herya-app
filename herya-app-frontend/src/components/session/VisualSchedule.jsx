@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { PersonStanding, Wind, Leaf, Check } from "lucide-react";
+import { Check, Leaf, PersonStanding, Wind } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 const BLOCK_ICONS = {
@@ -118,7 +118,8 @@ export default function VisualSchedule({
 									className="text-[10px]"
 									style={{ color: "var(--color-text-muted)" }}
 								>
-									{t(`practice.type_${block.blockType}`)} · {block.durationMinutes}m
+									{t(`practice.type_${block.blockType}`)} ·{" "}
+									{block.durationMinutes}m
 								</p>
 							</div>
 

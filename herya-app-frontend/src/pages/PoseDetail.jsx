@@ -1,5 +1,3 @@
-import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import {
 	motion,
 	useReducedMotion,
@@ -14,10 +12,17 @@ import {
 	Target,
 	Wind,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
 import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { translateWithFallback, localizedName, localized, localizedArray } from "@/utils/libraryHelpers";
+import {
+	localized,
+	localizedArray,
+	localizedName,
+	translateWithFallback,
+} from "@/utils/libraryHelpers";
 
 const DIFF_COLORS = {
 	beginner: "var(--color-info)",
@@ -105,8 +110,16 @@ export default function PoseDetail() {
 		target: heroRef,
 		offset: ["start start", "end start"],
 	});
-	const heroY = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? ["0%", "0%"] : ["0%", "14%"]);
-	const heroScale = useTransform(scrollYProgress, [0, 1], prefersReducedMotion ? [1, 1] : [1, 1.08]);
+	const heroY = useTransform(
+		scrollYProgress,
+		[0, 1],
+		prefersReducedMotion ? ["0%", "0%"] : ["0%", "14%"],
+	);
+	const heroScale = useTransform(
+		scrollYProgress,
+		[0, 1],
+		prefersReducedMotion ? [1, 1] : [1, 1.08],
+	);
 
 	useEffect(() => {
 		Promise.allSettled([getPoseById(id), getRelatedPoses(id)])
@@ -124,8 +137,15 @@ export default function PoseDetail() {
 
 	if (loading) {
 		return (
-			<main className="px-4 pt-4 flex flex-col gap-4" aria-busy="true" aria-live="polite">
-				<div className="h-56 rounded-3xl bg-[var(--color-surface-card)] animate-pulse" aria-hidden="true" />
+			<main
+				className="px-4 pt-4 flex flex-col gap-4"
+				aria-busy="true"
+				aria-live="polite"
+			>
+				<div
+					className="h-56 rounded-3xl bg-[var(--color-surface-card)] animate-pulse"
+					aria-hidden="true"
+				/>
 				<SkeletonCard lines={4} />
 				<SkeletonCard lines={3} />
 			</main>
@@ -161,11 +181,20 @@ export default function PoseDetail() {
 		advanced: t("library.advanced"),
 	};
 
-	const benefits = localizedArray(pose, "benefits", lang).length > 0 ? localizedArray(pose, "benefits", lang) : normalizeList(pose.benefits);
-	const contraindications = localizedArray(pose, "contraindications", lang).length > 0 ? localizedArray(pose, "contraindications", lang) : normalizeList(pose.contraindications);
+	const benefits =
+		localizedArray(pose, "benefits", lang).length > 0
+			? localizedArray(pose, "benefits", lang)
+			: normalizeList(pose.benefits);
+	const contraindications =
+		localizedArray(pose, "contraindications", lang).length > 0
+			? localizedArray(pose, "contraindications", lang)
+			: normalizeList(pose.contraindications);
 	const targetMuscles = normalizeList(pose.targetMuscles);
 	const jointFocus = normalizeList(pose.jointFocus);
-	const commonMistakes = localizedArray(pose, "commonMistakes", lang).length > 0 ? localizedArray(pose, "commonMistakes", lang) : normalizeList(pose.commonMistakes);
+	const commonMistakes =
+		localizedArray(pose, "commonMistakes", lang).length > 0
+			? localizedArray(pose, "commonMistakes", lang)
+			: normalizeList(pose.commonMistakes);
 	const props = normalizeList(pose.props);
 	const aliases = normalizeList(pose.alias);
 	const setupSteps = normalizeList(pose.instructions?.setup);
@@ -220,14 +249,21 @@ export default function PoseDetail() {
 						/>
 					</motion.div>
 				)}
-				<div aria-hidden="true" className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/18 via-transparent to-transparent" />
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/18 via-transparent to-transparent"
+				/>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
 					aria-label={t("pose_detail.back")}
 					className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm"
 				>
-					<ChevronLeft size={20} aria-hidden="true" className="text-[var(--color-text-primary)]" />
+					<ChevronLeft
+						size={20}
+						aria-hidden="true"
+						className="text-[var(--color-text-primary)]"
+					/>
 				</button>
 			</figure>
 
@@ -261,7 +297,10 @@ export default function PoseDetail() {
 
 						<div className="relative flex items-start justify-between gap-3">
 							<div className="min-w-0">
-								<h1 id="pose-title" className="font-display text-2xl font-bold leading-tight text-[var(--color-text-primary)]">
+								<h1
+									id="pose-title"
+									className="font-display text-2xl font-bold leading-tight text-[var(--color-text-primary)]"
+								>
 									{poseDisplayName}
 								</h1>
 								{poseDisplayRomanized && (
@@ -284,7 +323,11 @@ export default function PoseDetail() {
 								}}
 							>
 								<Sparkles size={12} aria-hidden="true" />
-								{translateWithFallback(t, "pose_detail.profile_label", "Pose Profile")}
+								{translateWithFallback(
+									t,
+									"pose_detail.profile_label",
+									"Pose Profile",
+								)}
 							</div>
 						</div>
 
@@ -357,7 +400,8 @@ export default function PoseDetail() {
 										</p>
 									</div>
 								)}
-								{(localized(pose, "breathingCue", lang) || pose.breathingCue) && (
+								{(localized(pose, "breathingCue", lang) ||
+									pose.breathingCue) && (
 									<div
 										className="rounded-xl px-3 py-2.5 border"
 										style={{
@@ -430,7 +474,9 @@ export default function PoseDetail() {
 									: ""}
 							</p>
 						)}
-						{formatValue(localized(pose, "breathingCue", lang) || pose.breathingCue) && (
+						{formatValue(
+							localized(pose, "breathingCue", lang) || pose.breathingCue,
+						) && (
 							<p>
 								<b className="text-[var(--color-text-primary)]">
 									{t("pose_detail.breathe")}
@@ -520,7 +566,10 @@ export default function PoseDetail() {
 						<div className="flex flex-col gap-4">
 							{setupSteps.length > 0 && (
 								<section aria-labelledby="instructions-setup-heading">
-									<h3 id="instructions-setup-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="instructions-setup-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.setup")}
 									</h3>
 									<ol className="flex flex-col gap-3 list-none m-0 p-0">
@@ -529,7 +578,10 @@ export default function PoseDetail() {
 												key={`setup-${step}`}
 												className="flex items-start gap-3"
 											>
-												<span aria-hidden="true" className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+												<span
+													aria-hidden="true"
+													className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+												>
 													{i + 1}
 												</span>
 												<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed flex-1">
@@ -542,7 +594,10 @@ export default function PoseDetail() {
 							)}
 							{alignmentSteps.length > 0 && (
 								<section aria-labelledby="instructions-alignment-heading">
-									<h3 id="instructions-alignment-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="instructions-alignment-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.alignment")}
 									</h3>
 									<ul className="flex flex-col gap-2 list-none m-0 p-0">
@@ -551,7 +606,10 @@ export default function PoseDetail() {
 												key={`alignment-${step}`}
 												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
 											>
-												<span aria-hidden="true" className="text-[var(--color-success)] mt-0.5 flex-shrink-0">
+												<span
+													aria-hidden="true"
+													className="text-[var(--color-success)] mt-0.5 flex-shrink-0"
+												>
 													•
 												</span>
 												<span>{step}</span>
@@ -562,7 +620,10 @@ export default function PoseDetail() {
 							)}
 							{modificationSteps.length > 0 && (
 								<section aria-labelledby="instructions-modifications-heading">
-									<h3 id="instructions-modifications-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="instructions-modifications-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.modifications")}
 									</h3>
 									<ul className="flex flex-col gap-2 list-none m-0 p-0">
@@ -571,7 +632,10 @@ export default function PoseDetail() {
 												key={`mod-${step}`}
 												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
 											>
-												<span aria-hidden="true" className="text-[var(--color-warning)] mt-0.5 flex-shrink-0">
+												<span
+													aria-hidden="true"
+													className="text-[var(--color-warning)] mt-0.5 flex-shrink-0"
+												>
 													•
 												</span>
 												<span>{step}</span>
@@ -582,7 +646,10 @@ export default function PoseDetail() {
 							)}
 							{exitSteps.length > 0 && (
 								<section aria-labelledby="instructions-exit-heading">
-									<h3 id="instructions-exit-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="instructions-exit-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.exit")}
 									</h3>
 									<ul className="flex flex-col gap-2 list-none m-0 p-0">
@@ -591,7 +658,10 @@ export default function PoseDetail() {
 												key={`exit-${step}`}
 												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
 											>
-												<span aria-hidden="true" className="text-[var(--color-danger)] mt-0.5 flex-shrink-0">
+												<span
+													aria-hidden="true"
+													className="text-[var(--color-danger)] mt-0.5 flex-shrink-0"
+												>
 													•
 												</span>
 												<span>{step}</span>
@@ -602,7 +672,10 @@ export default function PoseDetail() {
 							)}
 							{keyPoints.length > 0 && (
 								<section aria-labelledby="instructions-keypoints-heading">
-									<h3 id="instructions-keypoints-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="instructions-keypoints-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.alignment_details")}
 									</h3>
 									<ul className="flex flex-col gap-2 list-none m-0 p-0">
@@ -704,13 +777,19 @@ export default function PoseDetail() {
 									}
 						}
 					>
-						<h2 id="related-poses-heading" className="font-display font-bold text-[var(--color-text-primary)] mb-3">
+						<h2
+							id="related-poses-heading"
+							className="font-display font-bold text-[var(--color-text-primary)] mb-3"
+						>
 							{t("pose_detail.related_poses")}
 						</h2>
 						<div className="flex flex-col gap-4">
 							{preparatory.length > 0 && (
 								<section aria-labelledby="related-preparation-heading">
-									<h3 id="related-preparation-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="related-preparation-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.preparation")}
 									</h3>
 									<ul className="flex gap-3 overflow-x-auto pb-1 no-scrollbar list-none m-0 p-0">
@@ -728,7 +807,10 @@ export default function PoseDetail() {
 							)}
 							{followUp.length > 0 && (
 								<section aria-labelledby="related-continuation-heading">
-									<h3 id="related-continuation-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="related-continuation-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.continuation")}
 									</h3>
 									<ul className="flex gap-3 overflow-x-auto pb-1 no-scrollbar list-none m-0 p-0">
@@ -746,7 +828,10 @@ export default function PoseDetail() {
 							)}
 							{counterposes.length > 0 && (
 								<section aria-labelledby="related-counterposes-heading">
-									<h3 id="related-counterposes-heading" className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2">
+									<h3
+										id="related-counterposes-heading"
+										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+									>
 										{t("pose_detail.counterposes")}
 									</h3>
 									<ul className="flex gap-3 overflow-x-auto pb-1 no-scrollbar list-none m-0 p-0">

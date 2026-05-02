@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useRef } from "react";
 import { Check } from "lucide-react";
+import { useEffect, useMemo, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { DAY_LABEL_KEYS } from "@/utils/constants";
 
@@ -57,7 +57,10 @@ export default function CalendarStrip({
 				</div>
 				<div className="flex gap-2 pb-1" aria-hidden="true">
 					{SKELETON_DAYS.map((key) => (
-						<div key={key} className="flex-shrink-0 flex flex-col items-center gap-1 w-10">
+						<div
+							key={key}
+							className="flex-shrink-0 flex flex-col items-center gap-1 w-10"
+						>
 							<span className="skeleton h-2.5 w-6 rounded" />
 							<span className="skeleton w-9 h-9 rounded-full" />
 						</div>
@@ -137,7 +140,11 @@ export default function CalendarStrip({
 									: "none",
 							}}
 						>
-							{d.practiced && !d.isToday ? <Check size={16} strokeWidth={3} /> : d.day}
+							{d.practiced && !d.isToday ? (
+								<Check size={16} strokeWidth={3} />
+							) : (
+								d.day
+							)}
 						</div>
 					</motion.li>
 				))}

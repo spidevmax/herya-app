@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Core breathing engine — drives the pranayama session with accurate timing.
@@ -42,9 +42,15 @@ export default function useBreathingEngine({
 	const onPhaseChangeRef = useRef(onPhaseChange);
 	const onCycleCompleteRef = useRef(onCycleComplete);
 	const onCompleteRef = useRef(onComplete);
-	useEffect(() => { onPhaseChangeRef.current = onPhaseChange; }, [onPhaseChange]);
-	useEffect(() => { onCycleCompleteRef.current = onCycleComplete; }, [onCycleComplete]);
-	useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+	useEffect(() => {
+		onPhaseChangeRef.current = onPhaseChange;
+	}, [onPhaseChange]);
+	useEffect(() => {
+		onCycleCompleteRef.current = onCycleComplete;
+	}, [onCycleComplete]);
+	useEffect(() => {
+		onCompleteRef.current = onComplete;
+	}, [onComplete]);
 
 	// Mutable state ref for the interval callback
 	const stateRef = useRef({
@@ -60,7 +66,9 @@ export default function useBreathingEngine({
 	const currentPhaseDuration = phaseDurations[currentPhaseKey] || 4;
 	const phaseRemaining = Math.max(0, currentPhaseDuration - phaseElapsed);
 	const phaseProgress =
-		currentPhaseDuration > 0 ? Math.min(1, phaseElapsed / currentPhaseDuration) : 0;
+		currentPhaseDuration > 0
+			? Math.min(1, phaseElapsed / currentPhaseDuration)
+			: 0;
 
 	const totalCycleDuration = activePhases.reduce(
 		(sum, k) => sum + (phaseDurations[k] || 0),
@@ -160,7 +168,14 @@ export default function useBreathingEngine({
 			clearInterval(intervalRef.current);
 			intervalRef.current = null;
 		};
-	}, [isRunning, finished, activePhases, phaseDurations, targetCycles, pauseBetween]);
+	}, [
+		isRunning,
+		finished,
+		activePhases,
+		phaseDurations,
+		targetCycles,
+		pauseBetween,
+	]);
 
 	// ── Controls ────────────────────────────────────────────────────────
 	const start = useCallback(() => {
