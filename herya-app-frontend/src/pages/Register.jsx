@@ -131,25 +131,45 @@ export default function Register() {
 					border: "1px solid var(--color-border)",
 				}}
 			>
-				<aside
-					className="hidden min-w-0 flex-col px-10 py-10 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-14 xl:py-12"
-					style={{ backgroundColor: "var(--color-surface-secondary)" }}
-				>
-					<h1 className="font-display text-4xl font-bold tracking-tight text-[var(--color-text-primary)] xl:text-5xl">
-						Herya
-					</h1>
+				<aside className="relative hidden min-w-0 flex-col overflow-hidden bg-[#f5e7d4] bg-[url('/images/rex-mascot-register.png')] bg-no-repeat [background-position:right_-8%_bottom_4%] [background-size:62%] px-14 py-16 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:[background-size:55%] xl:px-20 xl:py-20 dark:bg-[#1f1611]">
+					<div
+						aria-hidden="true"
+						className="absolute inset-0"
+						style={{
+							background:
+								"linear-gradient(135deg, #faf1e3 0%, #f5e7d4 35%, rgba(204,140,103,0.55) 75%, rgba(160,89,57,0.65) 100%)",
+						}}
+					/>
+					<div
+						aria-hidden="true"
+						className="absolute inset-0"
+						style={{
+							background:
+								"radial-gradient(ellipse 60% 50% at 18% 22%, rgba(255,250,240,0.55), transparent 70%)",
+						}}
+					/>
+					<div
+						aria-hidden="true"
+						className="absolute inset-0 mix-blend-overlay opacity-[0.06]"
+						style={{
+							backgroundImage:
+								"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
+						}}
+					/>
+					<div
+						aria-hidden="true"
+						className="pointer-events-none absolute inset-y-0 right-0 w-px"
+						style={{ boxShadow: "inset -1px 0 0 rgba(0,0,0,0.04)" }}
+					/>
 
-					<div className="mt-6 flex w-full flex-1 items-center justify-center">
-						<img
-							src="/images/rex-mascot-register.png"
-							alt="Rex, mascota de Herya practicando yoga en equilibrio junto al mar"
-							className="h-full max-h-[min(36rem,62dvh)] w-full max-w-[34rem] object-contain"
-						/>
+					<div className="relative z-10 max-w-[28ch]">
+						<h1 className="font-display font-medium tracking-[-0.01em] leading-none text-[44px] xl:text-[52px] text-[#2b1d14] dark:text-[#f3e9da]">
+							Herya
+						</h1>
+						<p className="mt-5 max-w-[26ch] text-[18px] xl:text-[20px] leading-[1.55] font-normal text-[#5a4536]/90 dark:text-[#bfa78f]">
+							{t("login.subtitle")}
+						</p>
 					</div>
-
-					<p className="mt-6 max-w-lg text-2xl font-semibold leading-snug text-[var(--color-text-primary)] xl:text-3xl">
-						{t("login.subtitle")}
-					</p>
 				</aside>
 
 				<div
