@@ -1,90 +1,89 @@
 # Coverage Reports
 
-## Generating Coverage Reports
+## Generating coverage reports
 
-To generate coverage reports for the test suite, run:
+To generate a coverage report for the test suite, run:
 
 ```bash
 npm run test:coverage
 ```
 
-This will:
-1. Run all tests with coverage instrumentation
-2. Generate reports in multiple formats:
-   - **HTML Report** (interactive dashboard)
-   - **LCOV Report** (for CI/CD integration)
-   - **JSON Report** (machine-readable metrics)
-   - **Text Report** (console output)
+This runs all active tests with V8 instrumentation and emits reports in multiple formats:
 
-## Accessing Coverage Reports
+- **HTML** — interactive dashboard
+- **LCOV** — for CI/CD integrations
+- **JSON** — machine-readable metrics
+- **Text** — console output
 
-### HTML Interactive Dashboard
-Open the HTML report in your browser to see detailed, interactive coverage metrics:
+## Viewing the report
+
+Open the HTML dashboard in your browser:
 
 ```bash
 open coverage/index.html
 ```
 
-Or navigate to `coverage/index.html` from the file explorer.
+Or open `coverage/index.html` from the file explorer.
 
-## Coverage Summary
+## Thresholds
 
-**Overall Coverage Metrics:**
-- Statements: 11.56%
-- Branches: 59.87%
-- Functions: 34.74%
-- Lines: 11.56%
+Coverage thresholds are configured in [vitest.config.js](vitest.config.js):
 
-### High Coverage Components (95%+)
-- ✅ **PracticeTypeSelector** - 100% coverage
-- ✅ **PostPracticeJournal** - 99.18% statements
-- ✅ **HeroCard** - 98.83% statements
-- ✅ **RecentSessionCard** - 98.14% statements
-- ✅ **Garden Page** - 92.53% statements
-- ✅ **gardenFilters Utils** - 100% coverage
+| Metric | Threshold |
+|---|---|
+| Lines | 70% |
+| Functions | 70% |
+| Branches | 65% |
+| Statements | 70% |
 
-### Thresholds
-Coverage thresholds are configured in `vitest.config.js`:
-- Lines: 70%
-- Functions: 70%
-- Branches: 65%
-- Statements: 70%
+A run fails if any active metric drops below its threshold.
 
-## Report Files
+## What's measured
+
+Active test files include unit tests for hooks, utilities, and a subset of components. Excluded from coverage instrumentation (see `coverage.exclude` in `vitest.config.js`):
+
+- `node_modules/`
+- `src/test/` (test setup and helpers)
+- `**/*.test.{js,jsx}` and `**/*.spec.{js,jsx}`
+- `src/main.jsx`
+- `src/index.css`
+
+## Stale / temporarily skipped suites
+
+Several suites are excluded from the run via `test.exclude` in `vitest.config.js` because their assertions target UI that has been intentionally removed or refactored:
+
+- `src/test/HeroCard.test.jsx`
+- `src/test/PostPracticeJournal.test.jsx`
+- `src/test/RecentSessionCard.test.jsx`
+- `src/test/TutorInsightsCard.test.jsx`
+- `src/test/StartPractice.roleGate.test.jsx`
+- `src/test/Dashboard.tutorVisibility.test.jsx`
+- `src/test/Journal.history.test.jsx`
+- `src/test/Journal.queryParams.test.jsx`
+- `src/test/Library.test.jsx`
+
+These need to be updated to match the current components before being re-enabled. Coverage numbers reflect only the active suites.
+
+## Report files
 
 The `coverage/` directory contains:
 
-- **index.html** - Main HTML dashboard for browsing coverage
-- **coverage-final.json** - Machine-readable JSON format
-- **lcov.info** - LCOV format (compatible with CI/CD tools)
-- **lcov-report/** - Detailed HTML reports per file
+- `index.html` — main HTML dashboard
+- `coverage-final.json` — machine-readable JSON
+- `lcov.info` — LCOV format for CI tools
+- `lcov-report/` — per-file HTML reports
 
-## Available Scripts
+## Available scripts
 
 ```bash
-# Run tests with coverage
-npm run test:coverage
-
-# Run tests without coverage
-npm test
-
-# Run tests in watch mode (development)
-npm run test:watch
-
-# Run linter
-npm run lint
+npm run test:coverage   # Run with coverage
+npm test                # Run without coverage
+npm run test:watch      # Watch mode for development
+npm run lint            # Biome check on src/
 ```
-
-## Coverage Trends
-
-After each test run, coverage reports are automatically updated. Compare reports over time to track:
-- Test coverage growth
-- Areas needing more tests
-- Regression detection
 
 ## Notes
 
-- Coverage reports are generated locally and stored in `coverage/`
-- The `coverage/` directory is excluded from git via `.gitignore`
-- Coverage data helps identify untested code paths
-- Focus on high-value code (business logic, critical paths) rather than achieving 100% coverage
+- The `coverage/` directory is generated locally and excluded from git via `.gitignore`.
+- Focus on high-value code paths (business logic, hooks, critical UI flows) rather than chasing 100%.
+- When you re-enable a stale suite, remove its entry from `test.exclude` in [vitest.config.js](vitest.config.js).
