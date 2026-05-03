@@ -159,7 +159,7 @@ export default function Login() {
 					border: "1px solid var(--color-border)",
 				}}
 			>
-				<aside className="relative hidden min-w-0 flex-col overflow-hidden bg-[#f5e7d4] bg-[url('/images/rex-mascot-login.png')] bg-no-repeat [background-position:right_-8%_bottom_4%] [background-size:62%] px-14 py-16 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:[background-size:55%] xl:px-20 xl:py-20 dark:bg-[#1f1611]">
+				<aside className="relative hidden min-w-0 flex-col overflow-hidden bg-[#f5e7d4] bg-[url('/images/rex-mascot-login.png')] bg-cover bg-center bg-no-repeat px-14 py-16 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-20 xl:py-20 dark:bg-[#1f1611]">
 					<div
 						aria-hidden="true"
 						className="absolute inset-0"
