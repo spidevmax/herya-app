@@ -9,22 +9,17 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
 ```
 .
 ├── docs/
-│   ├── DOCKER.md
 │   ├── PLANNING.md
 │   ├── herya-insomnia.json
-│   └── start-practice-architecture.md
 ├── herya-app-backend/
 │   ├── src/
-│   ├── Dockerfile
 │   ├── README.md
 │   └── package.json
 ├── herya-app-frontend/
 │   ├── src/
-│   ├── Dockerfile
 │   ├── README.md
 │   └── package.json
 ├── docker-compose.yml
-├── docker-compose.prod.yml
 └── README.md
 ```
 
@@ -98,11 +93,6 @@ Default local URLs:
 - **Development:**
   ```bash
   docker compose up --build
-  ```
-- **Production-like local:**
-  ```bash
-  cp .env.docker.example .env
-  docker compose -f docker-compose.prod.yml --env-file .env up --build -d
   ```
 
 ---
