@@ -960,6 +960,17 @@
       "metaSortKey": 4
     },
     {
+      "_id": "req_journal_complete",
+      "_type": "request",
+      "parentId": "fld_journal",
+      "name": "Complete journal entry",
+      "method": "PATCH",
+      "url": "{{ base_url }}/api/v1/journal-entries/{{ journal_id }}/complete",
+      "headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
+      "description": "Marks the entry as complete and flips its phase to \"completed\". Returns 400 if the entry is already complete.",
+      "metaSortKey": 5
+    },
+    {
       "_id": "req_journal_delete",
       "_type": "request",
       "parentId": "fld_journal",
@@ -968,7 +979,7 @@
       "url": "{{ base_url }}/api/v1/journal-entries/{{ journal_id }}",
       "headers": [{ "name": "Authorization", "value": "Bearer {{ token }}" }],
       "description": "Deletes entry and all associated Cloudinary media (photos + voice notes).",
-      "metaSortKey": 5
+      "metaSortKey": 6
     },
 
     {
