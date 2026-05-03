@@ -11,6 +11,8 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
 ├── docs/
 │   ├── PLANNING.md
 │   ├── herya-insomnia.json
+│   ├── herya-app-memoria.docx
+│   └── herya-app-memoria.pdf
 ├── herya-app-backend/
 │   ├── src/
 │   ├── README.md
@@ -19,6 +21,7 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
 │   ├── src/
 │   ├── README.md
 │   └── package.json
+├── biome.json
 ├── docker-compose.yml
 └── README.md
 ```
@@ -27,9 +30,9 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
 
 ## Tech Stack
 
-**Backend:** Node.js 22, Express 5, MongoDB + Mongoose 9, JWT, Cloudinary, Nodemailer, Swagger, Jest, Biome
+**Backend:** Node.js 22, Express 5, MongoDB + Mongoose 9, JWT, bcrypt, Multer, Cloudinary, Nodemailer, express-rate-limit, express-validator, Swagger, Jest, Biome
 
-**Frontend:** React 19, Vite 7, React Router 7, Tailwind CSS 4, Framer Motion, Axios, Vitest
+**Frontend:** React 19, Vite 7 (SWC), React Router 7, Tailwind CSS 4, Framer Motion, Lucide React, Axios, Vitest
 
 ---
 
@@ -103,6 +106,7 @@ Default local URLs:
 - `npm run dev` — Start backend with file watching
 - `npm start` — Start backend in production mode
 - `npm run seed` — Import seed data
+- `npm run seed:recalc-stats` — Recalculate user stats from existing data
 - `npm test` — Run Jest tests
 - `npm run lint` — Run Biome lint
 - `npm run format` — Format files with Biome
