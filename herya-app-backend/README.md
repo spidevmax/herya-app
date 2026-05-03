@@ -20,6 +20,8 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
   - [Sessions](#sessions)
   - [Journal Entries](#journal-entries)
   - [Sequences](#sequences)
+  - [Child Profiles](#child-profiles)
+  - [Session Templates](#session-templates)
   - [Admin](#admin)
 - [Authentication](#authentication)
 - [Response Format](#response-format)
@@ -89,7 +91,7 @@ REST API for the Herya yoga application. Built with Node.js, Express and MongoDB
 
 ### Prerequisites
 
-- Node.js ≥ 18
+- Node.js 22.x
 - A MongoDB instance (local or [MongoDB Atlas](https://www.mongodb.com/atlas))
 - A [Cloudinary](https://cloudinary.com) account (for image uploads)
 
@@ -153,8 +155,10 @@ Copy `.env.example` to `.env` and set the following:
 | Script | Description |
 |---|---|
 | `npm start` | Start server (production) |
-| `npm run dev` | Start server with nodemon (development) |
+| `npm run dev` | Start server with `node --watch` (development) |
+| `npm run build` | No-op (kept for parity; backend has no build step) |
 | `npm run seed` | Seed the database |
+| `npm run seed:recalc-stats` | Recalculate user practice stats from existing data |
 | `npm test` | Run Jest test suite |
 | `npm run check` | Run Biome linter + formatter check |
 | `npm run check:fix` | Auto-fix lint and format issues |
@@ -320,7 +324,6 @@ Valid `sessionType` values: `vk_sequence`, `pranayama`, `meditation`, `complete_
 |---|---|---|---|
 | GET | `/api/v1/journal-entries` | ✅ user | List user's journal entries |
 | POST | `/api/v1/journal-entries` | ✅ user | Create a journal entry |
-| GET | `/api/v1/journal-entries/digital-garden` | ✅ user | Get digital garden view |
 | GET | `/api/v1/journal-entries/:id` | ✅ user | Get entry by ID |
 | PUT | `/api/v1/journal-entries/:id` | ✅ user | Update entry |
 | DELETE | `/api/v1/journal-entries/:id` | ✅ user | Delete entry |
@@ -348,6 +351,35 @@ Valid `sessionType` values: `vk_sequence`, `pranayama`, `meditation`, `complete_
 | GET | `/api/v1/sequences/stats/recommended` | ✅ user | Get recommended sequence for authenticated user |
 | GET | `/api/v1/sequences/family/:family` | — | Filter sequences by VK family |
 | GET | `/api/v1/sequences/:id` | — | Get sequence by ID |
+
+---
+
+### Child Profiles
+
+Child profiles let a parent or tutor manage practice contexts for minors under their account.
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/v1/child-profiles` | ✅ user | List child profiles owned by the authenticated user |
+| POST | `/api/v1/child-profiles` | ✅ user | Create a child profile |
+| GET | `/api/v1/child-profiles/:id` | ✅ user | Get a child profile by ID |
+| PUT | `/api/v1/child-profiles/:id` | ✅ user | Update a child profile |
+| DELETE | `/api/v1/child-profiles/:id` | ✅ user | Delete a child profile |
+
+---
+
+### Session Templates
+
+Reusable session blueprints that can be instantiated into real practice sessions.
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/api/v1/session-templates` | ✅ user | List session templates |
+| POST | `/api/v1/session-templates` | ✅ user | Create a session template |
+| GET | `/api/v1/session-templates/:id` | ✅ user | Get template by ID |
+| PUT | `/api/v1/session-templates/:id` | ✅ user | Update a template |
+| DELETE | `/api/v1/session-templates/:id` | ✅ user | Delete a template |
+| POST | `/api/v1/session-templates/:id/use` | ✅ user | Instantiate a session from this template |
 
 ---
 
@@ -530,10 +562,7 @@ npm test
 npm test -- --coverage
 ```
 
-**Current test status:**
-
-- 8 suites passing
-- 102 tests passing
+**Test suites:**
 
 | Suite | Tests |
 |---|---|
@@ -544,7 +573,7 @@ npm test -- --coverage
 | `poses.test.js` | List, search, category filter, get by ID |
 | `breathingPatterns.test.js` | List, search, recommended, progression, get by ID |
 | `sessions.test.js` | CRUD, stats, auth guards |
-| `journalEntries.test.js` | CRUD, digital garden, auth guards |
+| `journalEntries.test.js` | CRUD, auth guards |
 
 Each test suite runs in full isolation: collections are cleared between tests via `afterEach`.
 

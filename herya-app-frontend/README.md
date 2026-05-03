@@ -1,48 +1,69 @@
 # Herya App — Frontend
 
-Frontend móvil de **Herya**, una aplicación de seguimiento de práctica de yoga. Construida con React 19, Vite y Tailwind CSS 4, con foco en una experiencia móvil fluida y animada.
+Mobile frontend for **Herya**, a yoga practice tracking app (Vinyasa Krama, pranayama, meditation, and reflective journaling). Built with React 19, Vite 7 (SWC), and Tailwind CSS 4, with a focus on a fluid, animated, and internationalized mobile experience.
 
 ---
 
-## Tecnologías principales
+## Main technologies
 
-| Tecnología | Versión | Uso |
+| Technology | Version | Use |
 |---|---|---|
-| React | 19.2 | Framework UI |
-| React Router | 7 | Enrutamiento cliente |
-| Vite + SWC | 7 | Build tool |
-| Tailwind CSS | 4 | Estilos |
-| Framer Motion | 12 | Animaciones |
-| Axios | 1.13 | Cliente HTTP |
-| Lucide React | 0.575 | Iconografía |
+| React | 19.2 | UI framework |
+| React Router | 7 | Client-side routing |
+| Vite + SWC | 7 | Build tool and dev server |
+| Tailwind CSS | 4 | Styling |
+| Framer Motion | 12 | Animations |
+| Axios | 1.13 | HTTP client |
+| Lucide React | 0.575 | Icons |
+| Vitest + Testing Library | 3 / 16 | Unit testing |
+| Biome | 2 | Lint and format (via `lint` script) |
 
 ---
 
-## Estructura del proyecto
+## Project structure
 
 ```
 herya-app-frontend/
 ├── src/
-│   ├── api/                  # Clientes Axios por dominio
-│   │   ├── axios.js          # Instancia base con interceptores JWT
+│   ├── api/                  # Axios clients per domain
+│   │   ├── axios.js          # Base instance with JWT interceptors
+│   │   ├── admin.api.js
 │   │   ├── auth.api.js
-│   │   ├── sessions.api.js
-│   │   ├── sequences.api.js
+│   │   ├── breathing.api.js
+│   │   ├── childProfiles.api.js
 │   │   ├── journalEntries.api.js
+│   │   ├── poses.api.js
+│   │   ├── sequences.api.js
+│   │   ├── sessions.api.js
 │   │   └── users.api.js
 │   ├── components/
+│   │   ├── admin/            # Admin panel views and widgets
+│   │   ├── auth/             # Login / register / reset forms
 │   │   ├── dashboard/        # HeroCard, CalendarStrip, QuickActions…
-│   │   ├── garden/           # FlowerGarden
-│   │   ├── layout/           # AppLayout, BottomNav
-│   │   ├── library/          # SequenceCard
-│   │   ├── session/          # PranayamaMetronome
-│   │   └── ui/               # Button, Card, Badge, ProgressBar…
+│   │   ├── journal/          # Journal editor and cards
+│   │   ├── layout/           # AppLayout, BottomNav, FAB
+│   │   ├── library/          # SequenceCard, filters, pose cards
+│   │   ├── profile/          # Stats, streak, preferences
+│   │   ├── routing/          # ProtectedRoute, PublicRoute, legacy redirects
+│   │   ├── session/          # PranayamaMetronome, guided controls
+│   │   ├── tutor/            # Tutor-role views
+│   │   └── ui/               # Primitives (index.jsx) and design tokens
+│   ├── config/               # Static client configuration
 │   ├── context/
-│   │   └── AuthContext.jsx   # Contexto de autenticación global
-│   ├── pages/                # Dashboard, Library, Session, Garden, Profile…
-│   ├── utils/                # Constantes y helpers
-│   ├── App.jsx               # Rutas y ProtectedRoute
-│   └── main.jsx              # Punto de entrada
+│   │   ├── AuthContext.jsx       # User session and role
+│   │   ├── LanguageContext.jsx   # Active language (es / en)
+│   │   └── ThemeContext.jsx      # Light / dark theme
+│   ├── hooks/                # useBreathingEngine, useSessionTimer…
+│   ├── i18n/
+│   │   └── translations.js   # es / en dictionaries
+│   ├── pages/                # Dashboard, Library, Session, Journal, Admin…
+│   ├── providers/
+│   │   └── Providers.jsx     # Combines Auth, Language, and Theme
+│   ├── test/                 # Vitest setup
+│   ├── utils/                # Constants and helpers
+│   ├── App.jsx               # Routes and guards
+│   ├── index.css             # Tailwind v4 + tokens
+│   └── main.jsx              # Entry point
 ├── public/
 ├── index.html
 ├── vite.config.js
@@ -51,122 +72,184 @@ herya-app-frontend/
 
 ---
 
-## Instalación y desarrollo
+## Installation and development
 
-### Requisitos previos
+### Prerequisites
 
-- Node.js 18+
-- Backend de Herya corriendo en `http://localhost:3000`
+- Node.js 22.x
+- Herya backend running at `http://localhost:3000`
 
-### Puesta en marcha
+### Getting started
 
 ```bash
-# Instalar dependencias
+# Install dependencies
 npm install
 
-# Copiar variables de entorno
-cp .env.example .env   # o editar .env directamente
+# Copy environment variables
+cp .env.example .env
 
-# Iniciar servidor de desarrollo
+# Start the dev server
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`.
+The app will be available at `http://localhost:5173`.
 
-### Scripts disponibles
+### Available scripts
 
 ```bash
-npm run dev       # Servidor de desarrollo con HMR
-npm run build     # Build de producción en /dist
-npm run preview   # Preview del build de producción
-npm run lint      # Linting con ESLint
+npm run dev             # Dev server with HMR (Vite + SWC)
+npm run build           # Production build to /dist
+npm run preview         # Preview the production build
+npm run lint            # Biome check on src/
+npm test                # Run Vitest (run mode)
+npm run test:watch      # Vitest in watch mode
+npm run test:coverage   # Vitest with V8 coverage
 ```
 
 ---
 
-## Variables de entorno
+## Environment variables
 
-Crea un archivo `.env` en la raíz del proyecto frontend:
+Create a `.env` file in the frontend root:
 
 ```env
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-> Todas las variables deben llevar el prefijo `VITE_` para ser accesibles en el cliente a través de `import.meta.env`.
+> All variables must be prefixed with `VITE_` to be exposed to the client via `import.meta.env`.
 
 ---
 
-## Autenticación
+## Authentication
 
-Se utiliza JWT almacenado en `localStorage` con las claves `herya_token` y `herya_user`. El `AuthContext` expone el hook `useAuth()` con los métodos `login`, `register`, `logout` y `refreshUser`.
+JWT is stored in `localStorage` under the keys `herya_token` and `herya_user`. `AuthContext` exposes the `useAuth()` hook with `login`, `register`, `logout`, and `refreshUser`, plus the user's role (`user`, `tutor`, `admin`).
 
-El interceptor de Axios inyecta automáticamente el token en cada petición y redirige a `/login` ante respuestas `401`.
+The Axios interceptor automatically attaches the token to every request and redirects to `/login` on `401` responses.
 
-Las rutas se protegen con dos wrappers:
-- `ProtectedRoute` — redirige a `/login` si no hay sesión.
-- `PublicRoute` — redirige al dashboard si ya existe sesión.
+Routes are protected by two wrappers in `src/components/routing/`:
+- `ProtectedRoute` — redirects to `/login` when there is no session.
+- `PublicRoute` — redirects to the dashboard when a session already exists.
 
 ---
 
-## Páginas
+## Routes
 
-| Ruta | Página | Descripción |
+### Public
+
+| Route | Page | Description |
 |---|---|---|
-| `/` | Dashboard | Saludo, calendario de actividad, secuencia recomendada y sesiones recientes |
-| `/library` | Library | Biblioteca de secuencias con filtros por familia y nivel |
-| `/library/:id` | SequenceDetail | Detalle de una secuencia |
-| `/session` | Session | Flujo de registro de práctica (4 pasos) |
-| `/garden` | Garden | Visualización del diario como jardín de flores |
-| `/profile` | Profile | Estadísticas, nivel/XP, rachas y cuenta |
-| `/login` | Login | Inicio de sesión |
-| `/register` | Register | Registro de nuevo usuario |
+| `/login` | Login | Sign in |
+| `/register` | Register | Sign up |
+| `/forgot-password` | ForgotPassword | Request a password reset email |
+| `/reset-password` | ResetPassword | Reset password with token |
+| `/auth/callback` | AuthCallback | Callback for external providers |
+
+### Protected
+
+| Route | Page | Description |
+|---|---|---|
+| `/` | Dashboard / Admin | User home; renders `Admin` if the role is admin |
+| `/library` | Library | Library of sequences, poses, and breathing patterns |
+| `/library/sequence/:id` | SequenceDetail | Sequence detail |
+| `/library/pose/:id` | PoseDetail | Pose detail |
+| `/library/breathing/:id` | BreathingDetail | Breathing pattern detail |
+| `/poses` | Poses | Pose listing (non-admin) |
+| `/start-practice` | StartPractice | Practice-type selector |
+| `/session/:type` | Session | Guided practice flow (non-admin) |
+| `/sessions` | SessionHistory | Session history |
+| `/sessions/:id` | SessionDetail | Session detail |
+| `/journal` | Journal | Reflective journal (non-admin) |
+| `/journal/new` | JournalForm | Create entry |
+| `/journal/:id/edit` | JournalForm | Edit entry |
+| `/profile` | Profile | Stats, level/XP, streaks, and account |
+| `/admin` | Admin | Admin panel |
+| `*` | NotFound | 404 |
+
+> `/garden` redirects to `/journal` for backward compatibility. `/poses/:id` and `/breathing/:id` redirect to their counterparts under `/library/*`.
 
 ---
 
-## Diseño y estilos
+## Internationalization and theming
 
-### Tema de color
+- **Languages:** Spanish and English. Dictionaries in [src/i18n/translations.js](src/i18n/translations.js); the active language is managed by `LanguageContext` and persisted to `localStorage`.
+- **Theme:** light / dark via `ThemeContext`, with tokens defined in [src/index.css](src/index.css) and [src/components/ui/tokens.js](src/components/ui/tokens.js).
 
-| Token | Valor | Uso |
+Both contexts are mounted alongside `AuthContext` in [src/providers/Providers.jsx](src/providers/Providers.jsx).
+
+---
+
+## Design and styles
+
+### Color theme
+
+| Token | Value | Use |
 |---|---|---|
-| `primary` | `#4A72FF` | Azul principal |
-| `secondary` | `#FFB347` | Naranja |
-| `accent` | `#5DB075` | Verde |
-| `surface` | `#F8F7F4` | Fondo beige |
-| `text-primary` | `#1A1A2E` | Texto principal |
-| `text-muted` | `#9CA3AF` | Texto secundario |
+| `primary` | `#4A72FF` | Main blue |
+| `secondary` | `#FFB347` | Orange |
+| `accent` | `#5DB075` | Green |
+| `surface` | `#F8F7F4` | Beige background |
+| `text-primary` | `#1A1A2E` | Primary text |
+| `text-muted` | `#9CA3AF` | Secondary text |
 
-### Tipografía
+### Typography
 
 - **Headings:** Playfair Display (serif)
 - **Body:** Inter (sans-serif)
 
 ### Responsive
 
-La aplicación está optimizada para móvil con un ancho máximo de **430px** y navegación inferior con FAB central.
+The app is optimized for mobile with a max width of **430px** and a bottom navigation with a centered FAB.
 
 ---
 
-## Componentes UI reutilizables
+## Reusable UI components
 
-Todos los primitivos viven en `src/components/ui/`:
+Primitives live in [src/components/ui/index.jsx](src/components/ui/index.jsx) and are imported from a single barrel:
 
-- `Button` — variantes: `primary`, `secondary`, `accent`, `ghost`, `outline`
-- `Card` — tarjeta animada con Framer Motion
-- `Badge` — etiqueta de color
-- `ProgressBar` / `CircleProgress` — barras de progreso lineal y circular
-- `SkeletonCard` — placeholder de carga
+- `Button` — variants: `primary`, `secondary`, `accent`, `ghost`, `outline`
+- `Card` — animated card powered by Framer Motion
+- `Badge` — colored label
+- `ProgressBar` / `CircleProgress` — linear and circular progress bars
+- `SkeletonCard` — loading placeholder
 - `LoadingSpinner` — spinner
-- `EmptyState` — estado vacío
+- `EmptyState` — empty state
 
 ---
 
-## Clientes API
+## Custom hooks
 
-Cada dominio tiene su propio módulo en `src/api/`:
+Located in [src/hooks/](src/hooks/):
 
-- **auth.api.js** — login, register, getMe, logout
-- **sessions.api.js** — CRUD de sesiones + stats
-- **sequences.api.js** — listado, detalle, búsqueda y recomendación
-- **journalEntries.api.js** — CRUD de entradas de diario + stats
-- **users.api.js** — perfil, imagen de perfil, estadísticas de usuario
+- `useBreathingEngine` — inhale / hold / exhale phase engine for pranayama
+- `usePranayamaAudio` — audio cue playback during practice
+- `useSessionTimer` — guided-session timer
+- `useSessionPersistence` — saves and restores in-progress session state
+- `useJournalEntries` / `useJournalFilters` — journal fetching and filtering
+
+---
+
+## API clients
+
+Each domain has its own module in [src/api/](src/api/):
+
+- **auth.api.js** — login, register, getMe, logout, forgot/reset password
+- **users.api.js** — profile, profile image, password change, stats
+- **sessions.api.js** — session CRUD, guided-practice control, stats, and analytics
+- **sequences.api.js** — listing, detail, search, and recommendation for VK sequences
+- **poses.api.js** — listing, search, and related poses
+- **breathing.api.js** — breathing patterns, recommendations, and progression
+- **journalEntries.api.js** — journal entry CRUD
+- **childProfiles.api.js** — child-profile management
+- **admin.api.js** — admin endpoints (users, content, analytics)
+
+---
+
+## Testing
+
+The project uses **Vitest** + **@testing-library/react** with `jsdom`. The global setup lives in [src/test/](src/test/).
+
+```bash
+npm test                # Run the full suite
+npm run test:watch      # Watch mode
+npm run test:coverage   # V8 coverage report
+```

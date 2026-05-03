@@ -106,6 +106,23 @@ Base prefix: /api/v1
 - GET /sequences/stats/recommended
 - GET /sequences/:id
 
+### Child Profiles
+
+- GET /child-profiles
+- POST /child-profiles
+- GET /child-profiles/:id
+- PUT /child-profiles/:id
+- DELETE /child-profiles/:id
+
+### Session Templates
+
+- GET /session-templates
+- POST /session-templates
+- GET /session-templates/:id
+- PUT /session-templates/:id
+- DELETE /session-templates/:id
+- POST /session-templates/:id/use
+
 ### Admin
 
 - GET /admin/users
