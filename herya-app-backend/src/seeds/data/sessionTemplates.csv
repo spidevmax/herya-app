@@ -1,0 +1,26 @@
+templateKey,userEmail,childName,name,sessionType,preset,usageCount,blockType,label,durationMinutes,order,sequenceFamily,sequenceLevel,breathingPattern,meditationType,guided,level
+morning-reset,sarah@example.com,,Morning Reset,complete_practice,adult,12,vk_sequence,Standing warm-up,20,1,tadasana,1,,,true,beginner
+morning-reset,sarah@example.com,,Morning Reset,complete_practice,adult,12,pranayama,Ujjayi breathing,8,2,,,Ujjayi,,true,beginner
+morning-reset,sarah@example.com,,Morning Reset,complete_practice,adult,12,meditation,Closing stillness,7,3,,,,body_scan,true,beginner
+desk-break,sarah@example.com,,Desk Break,pranayama,adult,31,pranayama,Sama Vritti box breathing,10,1,,,Sama Vritti,,true,beginner
+strength-builder,james@example.com,,Strength Builder,vk_sequence,adult,8,vk_sequence,Standing asymmetric work,25,1,standing_asymmetric,2,,,false,advanced
+strength-builder,james@example.com,,Strength Builder,vk_sequence,adult,8,vk_sequence,Inverted progression,20,2,inverted,2,,,false,advanced
+evening-wind-down,james@example.com,,Evening Wind Down,complete_practice,adult,17,vk_sequence,Supine release,18,1,supine,1,,,true,intermediate
+evening-wind-down,james@example.com,,Evening Wind Down,complete_practice,adult,17,pranayama,Bhramari humming,7,2,,,Bhramari,,true,intermediate
+evening-wind-down,james@example.com,,Evening Wind Down,complete_practice,adult,17,meditation,Yoga nidra,15,3,,,,yoga_nidra,true,intermediate
+therapeutic-back-care,emma@example.com,,Therapeutic Back Care,vk_sequence,adult,22,vk_sequence,Prone strengthening,22,1,prone,1,,,true,intermediate
+therapeutic-back-care,emma@example.com,,Therapeutic Back Care,vk_sequence,adult,22,vk_sequence,Bow sequence,18,2,bow_sequence,1,,,true,intermediate
+sun-salutation-flow,emma@example.com,,Sun Salutation Flow,vk_sequence,adult,14,vk_sequence,Sun salutation rounds,30,1,sun_salutation,1,,,false,advanced
+cooling-practice,emma@example.com,,Cooling Practice,pranayama,adult,5,pranayama,Sitali cooling breath,12,1,,,Sitali,,true,beginner
+seated-focus,laura@example.com,,Seated Focus,complete_practice,adult,9,vk_sequence,Seated opening,15,1,seated,1,,,true,beginner
+seated-focus,laura@example.com,,Seated Focus,complete_practice,adult,9,pranayama,Nadi Shodhana,10,2,,,Nadi Shodhana,,true,beginner
+seated-focus,laura@example.com,,Seated Focus,complete_practice,adult,9,meditation,Breath awareness,10,3,,,,breath_awareness,true,beginner
+mia-calm-down,daniel@example.com,Mia Harris,Mia - Calm Down,complete_practice,tutor,26,vk_sequence,Gentle standing grounding,10,1,tadasana,1,,,true,beginner
+mia-calm-down,daniel@example.com,Mia Harris,Mia - Calm Down,complete_practice,tutor,26,pranayama,Slow belly breathing,5,2,,,Sama Vritti,,true,beginner
+owen-consent-first,daniel@example.com,Owen Blake,Owen - Consent First,vk_sequence,tutor,11,vk_sequence,One-leg standing balance,15,1,one_leg_standing,1,,,true,intermediate
+lily-short-breath,daniel@example.com,Lily Robins,Lily - Short Breath,pranayama,tutor,19,pranayama,Bhramari for three minutes,3,1,,,Bhramari,,true,beginner
+hugo-rutina-corta,sofia@example.com,Hugo Vega,Hugo - Rutina Corta,complete_practice,tutor,23,vk_sequence,Secuencia de pie suave,8,1,tadasana,2,,,true,beginner
+hugo-rutina-corta,sofia@example.com,Hugo Vega,Hugo - Rutina Corta,complete_practice,tutor,23,meditation,Atencion a la respiracion,5,2,,,,breath_awareness,true,beginner
+carmen-de-pie,sofia@example.com,Carmen Ortiz,Carmen - De Pie,vk_sequence,tutor,7,vk_sequence,Simetrica de pie,18,1,standing_symmetric,1,,,true,beginner
+nuria-rodilla-segura,sofia@example.com,Nuria Campos,Nuria - Rodilla Segura,complete_practice,tutor,4,vk_sequence,Trabajo supino sin flexion profunda,16,1,supine,2,,,true,intermediate
+nuria-rodilla-segura,sofia@example.com,Nuria Campos,Nuria - Rodilla Segura,complete_practice,tutor,4,pranayama,Nadi Shodhana suave,9,2,,,Nadi Shodhana,,true,intermediate

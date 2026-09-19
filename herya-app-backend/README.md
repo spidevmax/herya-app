@@ -123,7 +123,7 @@ The server starts at `http://localhost:3000` by default.
 npm run seed
 ```
 
-Loads poses, breathing patterns, sequences, users, sessions and journal entries from the CSV files in `src/seeds/data/`.
+Loads ~110 documents across 8 collections from the CSV files in `src/seeds/data/`. See [Database Seeding](#database-seeding).
 
 ---
 
@@ -522,18 +522,30 @@ All async errors are caught via try-catch in each controller and forwarded to th
 npm run seed
 ```
 
-Seeds the following collections from CSV files in `src/seeds/data/`:
+Each seed script reads its CSV with Node's `fs` module and inserts the rows
+through the matching Mongoose model:
 
-| File | Collection |
-|---|---|
-| `poses.csv` | Pose |
-| `breathingPatterns.csv` | BreathingPattern |
-| `sequences.csv` | VKSequence |
-| `users.csv` | User |
-| `sessions.csv` | Session |
-| `journalEntries.csv` | JournalEntry |
+| File | Collection | Documents |
+|---|---|---|
+| `poses.csv` | Pose | 26 |
+| `sequences.csv` | VKSequence | 21 |
+| `breathingPatterns.csv` | BreathingPattern | 16 |
+| `sessionTemplates.csv` | SessionTemplate | 14 |
+| `childProfiles.csv` | ChildProfile | 10 |
+| `sessions.csv` | Session | 8 |
+| `journalEntries.csv` | JournalEntry | 8 |
+| `users.csv` | User | 7 |
+| | **Total** | **110** |
 
-> Seeds run in dependency order: poses → breathing patterns → sequences → users → sessions → journal entries.
+> Seeds run in dependency order: poses → breathing patterns → sequences → users
+> → sessions → journal entries → child profiles → session templates.
+
+References are resolved by natural key rather than raw ObjectId: seeds look up
+the user's email, the child's name, the sequence's `family:level` pair, or the
+breathing pattern's `romanizationName`, then store the resulting `_id`.
+
+`sessionTemplates.csv` is normalised one row per block, grouped by `templateKey`,
+so its 25 rows produce 14 documents.
 
 Default seeded users:
 
@@ -542,9 +554,10 @@ Default seeded users:
 | Sarah Mitchell | sarah@example.com | `SecurePass123` | user |
 | James Carter | james@example.com | `SecurePass456` | user |
 | Emma Thompson | emma@example.com | `SecurePass789` | user |
-| Daniel Harris | daniel@example.com | `SecurePass101` | user |
+| Daniel Harris | daniel@example.com | `SecurePass101` | tutor |
+| Sofia Vega | sofia@example.com | `SecurePass303` | tutor |
 | Laura Bennett | laura@example.com | `SecurePass202` | admin |
-| Admin User | admin@herya-app.com | `AdminPass123` | admin |
+| Admin | admin@herya.local | `AdminPassword123` | admin |
 
 > ⚠️ Running seed drops and recreates all seeded collections.
 

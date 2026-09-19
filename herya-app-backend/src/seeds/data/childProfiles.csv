@@ -1,0 +1,11 @@
+tutorEmail,name,age,avatarColor,safetyPhrase,bodyCue,knownTriggers,contraindications,notes,active
+daniel@example.com,Mia Harris,7,#7C6FD4,"I am safe right now","Hand on the belly","loud noises,sudden transitions","recent wrist sprain","Responds well to short guided breathing before movement",true
+daniel@example.com,Noah Harris,10,#4FA3A5,"I can slow down","Feet pressing the floor","crowded rooms","","Prefers standing sequences over seated work",true
+daniel@example.com,Lily Robins,6,#E2846B,"My breath helps me","Shoulders dropping","being rushed,bright lights","asthma - avoid rapid breathing","Keep pranayama blocks under five minutes",true
+daniel@example.com,Owen Blake,13,#6B8FE2,"I choose what feels right","Long exhale","unexpected touch","","Needs explicit consent before any hands-on cue",true
+daniel@example.com,Ava Sinclair,9,#C77FB4,"I am not alone here","Hands together","separation at drop-off","mild scoliosis - avoid deep twists","Tutor stays in view for the whole session",true
+sofia@example.com,Hugo Vega,8,#7C6FD4,"Estoy a salvo","Manos en el pecho","gritos,cambios de rutina","","Sesiones en espanol; le calma contar las respiraciones",true
+sofia@example.com,Carmen Ortiz,11,#4FA3A5,"Puedo parar cuando quiera","Pies firmes en el suelo","espacios cerrados","","Trabaja mejor con secuencias de pie y pausas frecuentes",true
+sofia@example.com,Diego Molina,5,#E2846B,"Respiro despacio","Barriga que sube y baja","ruido fuerte,esperas largas","","Bloques muy cortos; se distrae pasados diez minutos",true
+sofia@example.com,Nuria Campos,15,#6B8FE2,"Mi cuerpo decide","Hombros relajados","comentarios sobre el cuerpo","lesion de rodilla - evitar flexion profunda","Evitar lenguaje centrado en el rendimiento",true
+sofia@example.com,Teo Ramirez,12,#C77FB4,"Vuelvo a mi respiracion","Palmas abiertas","transiciones rapidas","","Ha pausado la practica; perfil inactivo hasta revision",false

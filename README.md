@@ -9,10 +9,7 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
 ```
 .
 ├── docs/
-│   ├── PLANNING.md
-│   ├── herya-insomnia.json
-│   ├── herya-app-memoria.docx
-│   └── herya-app-memoria.pdf
+│   └── herya-insomnia.json
 ├── herya-app-backend/
 │   ├── src/
 │   ├── README.md
@@ -73,6 +70,7 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
    cd herya-app-backend
    npm run seed
    ```
+   Populates the database with ~110 documents across 8 collections. See [Seed Data](#seed-data).
 
 5. **Start both servers:**
    - Backend:
@@ -100,12 +98,65 @@ Default local URLs:
 
 ---
 
+## Seed Data
+
+`npm run seed` drops the database and repopulates it from the CSV files in
+`herya-app-backend/src/seeds/data/`. Each collection has its own seed script in
+`herya-app-backend/src/seeds/`, which reads its CSV with Node's `fs` module and
+inserts the rows through the matching Mongoose model.
+
+| Collection | Documents | Source CSV |
+| --- | --- | --- |
+| `poses` | 26 | `poses.csv` |
+| `vksequences` | 21 | `sequences.csv` |
+| `breathingpatterns` | 16 | `breathingPatterns.csv` |
+| `sessiontemplates` | 14 | `sessionTemplates.csv` |
+| `childprofiles` | 10 | `childProfiles.csv` |
+| `sessions` | 8 | `sessions.csv` |
+| `journalentries` | 8 | `journalEntries.csv` |
+| `users` | 7 | `users.csv` (+ generated admin) |
+| **Total** | **110** | |
+
+### Seed order
+
+Scripts run in dependency order in `src/seeds/index.js`, because later
+collections reference earlier ones:
+
+```
+poses → breathingPatterns → sequences → users → sessions
+      → journalEntries → childProfiles → sessionTemplates
+```
+
+### Relationships
+
+- `VKSequence` → `Pose`
+- `Session` → `User`, `VKSequence`, `BreathingPattern`, `ChildProfile`
+- `JournalEntry` → `User`, `Session`
+- `ChildProfile` → `User` (tutor)
+- `SessionTemplate` → `User`, `ChildProfile`, `VKSequence`, `BreathingPattern`
+
+References are resolved by **natural key**, not by raw ObjectId: seeds look up
+the user's email, the child's name, the sequence's `family:level` pair, or the
+breathing pattern's `romanizationName`, then store the resulting `_id`. This
+keeps the CSV files readable and diff-friendly.
+
+### CSV conventions
+
+- Multi-value cells are comma-separated inside quotes, e.g. `"loud noises,bright lights"`.
+- `sessionTemplates.csv` is normalised **one row per block**, grouped by
+  `templateKey`; a template with three blocks spans three rows. That is why it
+  has 25 rows but produces 14 documents.
+- Every seed is idempotent: it checks `countDocuments()` first and skips if the
+  collection is already populated.
+
+---
+
 ## Available Scripts
 
 ### Backend (`herya-app-backend`)
 - `npm run dev` — Start backend with file watching
 - `npm start` — Start backend in production mode
-- `npm run seed` — Import seed data
+- `npm run seed` — Reset and import all seed data from CSV (see [Seed Data](#seed-data))
 - `npm run seed:recalc-stats` — Recalculate user stats from existing data
 - `npm test` — Run Jest tests
 - `npm run lint` — Run Biome lint
@@ -138,7 +189,7 @@ Default local URLs:
 ## Documentation & API
 
 - Swagger/OpenAPI: http://localhost:3000/api-docs
-- Additional docs in `/docs/`
+- Insomnia request collection: `docs/herya-insomnia.json`
 
 ---
 

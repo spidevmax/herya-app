@@ -7,6 +7,8 @@ const seedSequences = require("./sequences.seed");
 const seedUsers = require("./users.seed");
 const seedSessions = require("./sessions.seed");
 const seedJournalEntries = require("./journalEntries.seed");
+const seedChildProfiles = require("./childProfiles.seed");
+const seedSessionTemplates = require("./sessionTemplates.seed");
 
 (async () => {
 	try {
@@ -23,6 +25,8 @@ const seedJournalEntries = require("./journalEntries.seed");
 		await seedUsers(); // base users
 		await seedSessions(); // depends on users and sequences
 		await seedJournalEntries(); // depends on users and sessions
+		await seedChildProfiles(); // depends on users (tutors)
+		await seedSessionTemplates(); // depends on users, child profiles, sequences and patterns
 
 		console.log("✅ All seeds completed successfully");
 		process.exit(0);
