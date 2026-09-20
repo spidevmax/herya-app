@@ -32,7 +32,7 @@ export default function PracticePreferencesCard({
 	return (
 		<section
 			aria-label={t("profile.practice_preferences")}
-			className="rounded-3xl p-5 sm:p-6 space-y-5 "
+			className="ink-block space-y-5 p-5 sm:p-6"
 			style={cardStyle}
 		>
 			<SectionTitle>{t("profile.practice_preferences")}</SectionTitle>

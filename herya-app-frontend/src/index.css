@@ -424,41 +424,39 @@ html.dark .glass-warm {
 .select-base {
 	width: 100%;
 	min-height: 2.5rem;
-	border-radius: 0.75rem;
-	border: 1px solid var(--color-border-soft);
-	background-color: var(--color-surface);
+	border-radius: var(--radius-block);
+	border: var(--ink-width) solid var(--ink);
+	background-color: var(--paper-raised);
 	padding: 0.625rem 0.75rem;
 	font-size: 0.875rem;
-	color: var(--color-text-primary);
+	font-weight: 700;
+	color: var(--ink);
 	outline: none;
-	transition:
-		border-color 0.2s,
-		box-shadow 0.2s;
 }
 
-.select-base:focus {
-	border-color: var(--color-primary);
-	box-shadow: var(--focus-ring);
+.select-base:focus-visible {
+	outline: none;
+	box-shadow: var(--offset) var(--offset) 0 var(--chandra);
 }
 
 /* ── Chip / pill button ── */
+/* Chips keep the ink outline in both states so a group reads as one control;
+   selection is a fill, not a colour swap on a borderless pill. */
 .chip {
 	padding: 0.375rem 0.75rem;
-	border-radius: 0.75rem;
+	border-radius: var(--radius-block);
+	border: var(--ink-width) solid var(--ink);
 	font-size: 0.75rem;
-	font-weight: 600;
+	font-weight: 700;
 	text-transform: capitalize;
-	transition:
-		background-color 0.15s,
-		color 0.15s;
 }
 .chip-active {
-	background-color: var(--color-primary);
-	color: white;
+	background-color: var(--chandra);
+	color: var(--on-fill);
 }
 .chip-inactive {
-	background-color: var(--color-surface);
-	color: var(--color-text-muted);
+	background-color: var(--paper-raised);
+	color: var(--ink);
 }
 
 /* ── Section card ── */

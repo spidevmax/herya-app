@@ -255,7 +255,7 @@ export const TabBar = ({
 		<div
 			role="tablist"
 			aria-label={ariaLabel}
-			className={`flex gap-2 border-b border-[var(--ink)] ${className}`}
+			className={`flex flex-wrap gap-2 ${className}`}
 		>
 			{tabs.map((tab, index) => {
 				const tabId = tab.id ?? tab.key;
@@ -279,10 +279,13 @@ export const TabBar = ({
 									: (index - 1 + tabs.length) % tabs.length;
 							onSelect(tabs[nextIndex].id ?? tabs[nextIndex].key);
 						}}
-						className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
+						// Ink fill for the selected tab — the same device the sidebar,
+						// bottom nav and every toggle use, instead of an underline
+						// that answered "where am I" a different way on this screen.
+						className={`rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] px-4 py-2 text-sm font-bold ${
 							active === tabId
-								? "border-[var(--chandra)] text-[var(--chandra)]"
-								: "border-transparent text-[var(--ink-soft)] hover:text-[var(--ink)]"
+								? "bg-[var(--ink)] text-[var(--paper)]"
+								: "bg-[var(--paper-raised)] text-[var(--ink)]"
 						}`}
 					>
 						{tab.label}
@@ -722,7 +725,8 @@ export const ConfirmModal = ({
 			<button
 				type="button"
 				aria-label={closeAriaLabel}
-				className="absolute inset-0 bg-black/40"
+				className="absolute inset-0"
+				style={{ backgroundColor: "rgba(27, 30, 60, 0.55)" }}
 				onClick={loading ? undefined : onClose}
 			/>
 
@@ -730,8 +734,7 @@ export const ConfirmModal = ({
 				initial={{ opacity: 0, y: 12, scale: 0.98 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				transition={{ duration: 0.2, ease: "easeOut" }}
-				className="relative w-full max-w-md rounded-2xl p-6 "
-				style={{ backgroundColor: "var(--paper-raised)" }}
+				className="ink-block relative w-full max-w-md p-6"
 			>
 				<h3
 					id={titleId}
@@ -761,13 +764,9 @@ export const ConfirmModal = ({
 							value={phraseInput}
 							onChange={(e) => setPhraseInput(e.target.value)}
 							placeholder={confirmPhrase}
-							className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
+							className="ink-field"
 							style={{
-								backgroundColor: "var(--paper)",
-								borderColor: confirmBlocked
-									? "var(--ink)"
-									: "var(--alert)",
-								color: "var(--ink)",
+								borderColor: confirmBlocked ? "var(--ink)" : "var(--alert)",
 							}}
 						/>
 					</div>
@@ -782,9 +781,11 @@ export const ConfirmModal = ({
 						onClick={onConfirm}
 						disabled={loading || confirmBlocked}
 						loading={loading}
+						// --alert is a dark red, so its label takes paper rather than
+						// the on-fill ink used over the light channel colours.
 						style={
 							danger
-								? { backgroundColor: "var(--alert)", boxShadow: "none" }
+								? { backgroundColor: "var(--alert)", color: "var(--paper)" }
 								: {}
 						}
 					>

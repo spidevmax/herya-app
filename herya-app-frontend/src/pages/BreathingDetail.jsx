@@ -1,3 +1,4 @@
+import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import {
 	ChevronLeft,
 	Flame,
@@ -21,13 +22,7 @@ import {
 	translateWithFallback,
 } from "@/utils/libraryHelpers";
 
-// Accent colours, not fills: the shared DIFF_COLORS map describes card
-// backgrounds and would render as invisible text here.
-const DIFF_COLORS = {
-	beginner: "var(--ink)",
-	intermediate: "var(--chandra)",
-	advanced: "var(--surya)",
-};
+
 
 const ENERGY_ICONS = {
 	calming: Waves,
@@ -118,7 +113,7 @@ export default function BreathingDetail() {
 	}
 
 	const ratio = pattern.patternRatio ?? {};
-	const diffColor = DIFF_COLORS[pattern.difficulty] ?? "var(--chandra)";
+	const diffColor = DIFF_ACCENTS[pattern.difficulty] ?? "var(--ink)";
 	const EnergyIcon = ENERGY_ICONS[pattern.energyEffect] ?? Wind;
 	const benefits =
 		localizedArray(pattern, "benefits", lang).length > 0

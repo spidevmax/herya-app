@@ -12,6 +12,17 @@ export const DIFF_COLORS = {
 // Text colour for content sitting on DIFF_COLORS. Kept as a separate map so
 // a fill and its foreground can never drift apart — an ink fill with ink text
 // renders as a blank chip.
+/*
+ * Accent colours for outlines and text. Distinct from DIFF_COLORS, which are
+ * FILLS: passing a fill where an outline is expected renders an invisible
+ * border, which is how the beginner badge disappeared on the admin screen.
+ */
+export const DIFF_ACCENTS = {
+	beginner: "var(--ink)",
+	intermediate: "var(--chandra)",
+	advanced: "var(--surya)",
+};
+
 export const DIFF_FG = {
 	beginner: "var(--ink)",
 	intermediate: "var(--on-fill)",

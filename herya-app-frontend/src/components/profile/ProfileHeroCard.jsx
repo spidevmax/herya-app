@@ -81,18 +81,12 @@ const ProfileHeroCard = ({
 			aria-label={user?.name || t("profile.title")}
 			initial={{ opacity: 0, y: 16 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="rounded-[32px] p-6 sm:p-8 text-[var(--on-fill)] relative"
-			style={{
-				backgroundImage: "var(--gradient-secondary)",
-				boxShadow: "var(--shadow-card-hover)",
-			}}
+			className="ink-block relative p-6 sm:p-8"
+			style={{ background: "var(--chandra)", color: "var(--on-fill)" }}
 		>
 			<div
-				className="absolute inset-0 opacity-15 pointer-events-none rounded-[32px] overflow-hidden"
-				style={{
-					backgroundImage:
-						"radial-gradient(circle at 20% 20%, color-mix(in srgb, white 100%, transparent) 0, transparent 30%), radial-gradient(circle at 80% 0%, color-mix(in srgb, white 100%, transparent) 0, transparent 22%), radial-gradient(circle at 100% 100%, color-mix(in srgb, white 65%, transparent) 0, transparent 25%)",
-				}}
+				className="pointer-events-none absolute inset-0 overflow-hidden"
+				style={{}}
 			/>
 			<div className="relative flex flex-col gap-6">
 				{/* Identity row */}
@@ -154,7 +148,7 @@ const ProfileHeroCard = ({
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									exit={{ opacity: 0, y: -6, scale: 0.96 }}
 									transition={{ duration: 0.15 }}
-									className="absolute left-0 top-full mt-2 z-20 w-56 rounded-2xl p-1.5 "
+									className="ink-block absolute left-0 top-full z-20 mt-2 w-56 p-1.5"
 									style={{
 										backgroundColor: "var(--paper-raised)",
 										border: "var(--ink-width) solid var(--ink)",
@@ -239,7 +233,7 @@ const ProfileHeroCard = ({
 						].map(({ label, value, unit }) => (
 							<div
 								key={label}
-								className="rounded-2xl bg-white/14 border border-white/15 px-3 py-3 text-center"
+								className="rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--on-fill)] px-3 py-3 text-center"
 							>
 								<p className="text-[10px] sm:text-[11px] opacity-75 leading-tight">
 									{label}

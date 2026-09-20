@@ -156,7 +156,7 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 			<header className="flex items-center gap-3 mb-3">
 				<div
 					aria-hidden="true"
-					className="w-10 h-10 rounded-full bg-[color:var(--chandra)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0"
+					className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full border-[length:var(--ink-width)] border-[var(--ink)] bg-[var(--paper-raised)]"
 				>
 					{user.profileImageUrl || user.avatar ? (
 						<img
@@ -440,13 +440,11 @@ export default function Admin() {
 							{firstName}
 						</h1>
 						<span
-							className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
+							className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold"
 							style={{
-								backgroundColor:
-									"color-mix(in srgb, var(--chandra) 14%, transparent)",
-								color: "var(--chandra)",
-								border:
-									"1px solid color-mix(in srgb, var(--chandra) 28%, transparent)",
+								color: "var(--ink)",
+								border: "var(--ink-width) solid var(--ink)",
+								borderRadius: "var(--radius-block)",
 							}}
 						>
 							<ShieldCheck size={11} aria-hidden="true" />

@@ -41,7 +41,7 @@ export default function AccountDetailsCard({
 	return (
 		<section
 			aria-label={t("profile.account_details")}
-			className="rounded-3xl p-5 sm:p-6 space-y-5 "
+			className="ink-block space-y-5 p-5 sm:p-6"
 			style={cardStyle}
 		>
 			<SectionTitle>{t("profile.account_details")}</SectionTitle>

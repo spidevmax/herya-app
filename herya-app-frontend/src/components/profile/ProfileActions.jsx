@@ -20,7 +20,7 @@ export default function ProfileActions({
 	return (
 		<section
 			aria-label={t("profile.actions_title")}
-			className="rounded-3xl p-5 space-y-3 "
+			className="ink-block space-y-3 p-5"
 			style={cardStyle}
 		>
 			<SectionTitle>{t("profile.actions_title")}</SectionTitle>

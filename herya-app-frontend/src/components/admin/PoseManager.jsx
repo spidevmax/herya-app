@@ -13,6 +13,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createPose, deletePose, updatePose } from "@/api/admin.api";
 import { getPoses } from "@/api/poses.api";
 import { Badge, Button, ConfirmModal, SkeletonCard } from "@/components/ui";
+import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 
@@ -660,31 +661,31 @@ export default function PoseManager() {
 						<li key={pose._id}>
 							<article
 								aria-labelledby={`pose-card-${pose._id}-name`}
-								className="flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--ink)] bg-[var(--paper-raised)]  transition-shadow hover:shadow-md"
+								className="ink-block flex h-full flex-col overflow-hidden p-0"
 							>
+								{/*
+								 * A pose with an image gives it real room — the picture is
+								 * what makes the posture readable. Without one the slot
+								 * collapses to a single line instead of holding 160px of
+								 * empty space per card across a catalogue of 26.
+								 */}
 								{pose.media?.thumbnail?.url ? (
 									<img
 										src={pose.media.thumbnail.url}
 										alt={pose.name}
-										className="h-40 w-full object-cover"
+										className="h-44 w-full object-cover"
+										style={{
+											borderBottom: "var(--ink-width) solid var(--ink)",
+										}}
 									/>
 								) : (
-									<div
-										className="flex h-40 w-full flex-col items-center justify-center gap-1.5"
-										style={{
-											background:
-												"var(--paper-raised)",
-										}}
+									<p
+										className="m-0 flex items-center gap-1.5 px-5 pt-4 text-xs font-bold"
+										style={{ color: "var(--ink-soft)" }}
 									>
-										<ImageOff
-											size={22}
-											aria-hidden="true"
-											className="text-[var(--ink-soft)] opacity-70"
-										/>
-										<p className="m-0 text-xs font-medium text-[var(--ink-soft)]">
-											{t("admin.pose_manager_no_thumbnail")}
-										</p>
-									</div>
+										<ImageOff size={14} aria-hidden="true" />
+										{t("admin.pose_manager_no_thumbnail")}
+									</p>
 								)}
 								<div className="flex flex-1 flex-col gap-3 p-5">
 									<header className="flex items-start justify-between gap-3">
@@ -699,19 +700,19 @@ export default function PoseManager() {
 												{pose.romanizationName}
 											</p>
 										</div>
-										<Badge color="var(--chandra)">
+										<Badge color={DIFF_ACCENTS[pose.difficulty] ?? "var(--ink)"}>
 											{pose.difficulty}
 										</Badge>
 									</header>
 
 									<ul className="flex flex-wrap gap-2 text-xs text-[var(--ink-soft)] list-none m-0 p-0">
-										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
+										<li className="rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] bg-[var(--paper-raised)] px-2.5 py-1 font-bold text-[var(--ink)]">
 											{humanizeValue(pose.vkCategory?.primary ?? "")}
 										</li>
-										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
+										<li className="rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] bg-[var(--paper-raised)] px-2.5 py-1 font-bold text-[var(--ink)]">
 											{humanizeValue(pose.sidedness?.type ?? "symmetric")}
 										</li>
-										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
+										<li className="rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] bg-[var(--paper-raised)] px-2.5 py-1 font-bold text-[var(--ink)]">
 											{humanizeValue(pose.drishti ?? "none")}
 										</li>
 									</ul>
