@@ -9,8 +9,8 @@ import "@/styles/identity.css";
  * stay a single quiet column — no character, no colour field, nothing that
  * competes with the one thing being asked for.
  *
- * Replaces AuthBrandHeader, whose gradient tile and blurred dots belonged to
- * the previous identity.
+ * Replaces the previous AuthBrandHeader (removed), whose gradient tile and
+ * blurred dots belonged to the old identity.
  */
 export default function AuthShell({ children }) {
 	return (

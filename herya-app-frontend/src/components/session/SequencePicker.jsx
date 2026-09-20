@@ -11,28 +11,19 @@ import {
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
-import { VK_FAMILY_MAP } from "@/utils/constants";
-import { localized, localizedName } from "@/utils/libraryHelpers";
+import { VK_FAMILY_BY_SLUG } from "@/utils/constants";
+import { DIFF_ACCENTS, localized, localizedName } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
 const formatFamily = (family, t) => {
-	const entry = VK_FAMILY_MAP[family];
+	// The API sends a slug ("bow_sequence"); VK_FAMILY_MAP is keyed by numeric
+	// id, so every lookup missed and the raw slug was shown instead.
+	const entry = VK_FAMILY_BY_SLUG[family];
 	if (entry?.labelKey && t) return t(entry.labelKey);
 	return entry?.label || family?.replace(/[_-]/g, " ") || "";
 };
 
-const difficultyColor = (d) => {
-	switch (d) {
-		case "beginner":
-			return "var(--surya)";
-		case "intermediate":
-			return "var(--chandra)";
-		case "advanced":
-			return "var(--ink)";
-		default:
-			return "var(--ink-soft)";
-	}
-};
+
 
 export default function SequencePicker({
 	sequences = [],
@@ -179,10 +170,15 @@ export default function SequencePicker({
 												</p>
 												<div className="flex items-center gap-2 mt-0.5">
 													<span
-														className="text-[10px] font-semibold px-1.5 py-0.5 rounded"
+														className="px-1.5 py-0.5 text-[10px] font-bold"
 														style={{
-															backgroundColor: `${difficultyColor(seq.difficulty)}15`,
-															color: difficultyColor(seq.difficulty),
+															// `${cssVar}15` is invalid CSS; the accent goes on the
+															// outline instead of a fake translucent fill.
+															border: `var(--ink-width) solid ${
+																DIFF_ACCENTS[seq.difficulty] ?? "var(--ink)"
+															}`,
+															borderRadius: "var(--radius-block)",
+															color: DIFF_ACCENTS[seq.difficulty] ?? "var(--ink)",
 														}}
 													>
 														{t(`library.${seq.difficulty}`)}

@@ -14,7 +14,7 @@ import { getSessions } from "@/api/sessions.api";
 import { EmptyState, FilterChips, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
-import { VK_FAMILIES } from "@/utils/constants";
+import { VK_FAMILY_BY_SLUG } from "@/utils/constants";
 import { format } from "@/utils/helpers";
 import { colorMix } from "@/utils/libraryHelpers";
 
@@ -55,8 +55,13 @@ function SessionCard({ session, index, onClick, t, lang }) {
 		TYPE_FILTER_I18N[session.sessionType] ||
 			`practice.type_${session.sessionType}`,
 	);
-	const family = session.vkFamily
-		? VK_FAMILIES.find((f) => f.key === session.vkFamily)
+	/*
+	 * Derived from the populated sequence, not from session.vkFamily: that
+	 * field does not exist on a Session — vkFamily is a query parameter for
+	 * filtering poses — so this branch never produced a family.
+	 */
+	const family = session.vkSequence?.family
+		? (VK_FAMILY_BY_SLUG[session.vkSequence.family] ?? null)
 		: null;
 	return (
 		<motion.button

@@ -13,7 +13,7 @@ import { deleteSession, getSessionById } from "@/api/sessions.api";
 import { Badge, ConfirmModal, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
-import { VK_FAMILIES } from "@/utils/constants";
+import { VK_FAMILY_BY_SLUG } from "@/utils/constants";
 import { format } from "@/utils/helpers";
 import { localizedName } from "@/utils/libraryHelpers";
 
@@ -145,8 +145,13 @@ export default function SessionDetail() {
 		session.sessionType === "vk_sequence" && session.vkSequence
 			? localizedName(session.vkSequence, lang)
 			: sessionTypeLabel;
-	const family = session.vkFamily
-		? VK_FAMILIES.find((f) => f.id === session.vkFamily)
+	/*
+	 * Derived from the populated sequence, not from session.vkFamily: that
+	 * field does not exist on a Session — vkFamily is a query parameter for
+	 * filtering poses — so this branch never produced a family.
+	 */
+	const family = session.vkSequence?.family
+		? (VK_FAMILY_BY_SLUG[session.vkSequence.family] ?? null)
 		: null;
 
 	return (
