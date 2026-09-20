@@ -40,11 +40,19 @@ function interpolate(str, vars) {
 export function LanguageProvider({ children }) {
 	const [lang, setLang] = useState(getInitialLanguage);
 
-	const t = (key, vars) => {
-		const str =
+	/*
+	 * Second argument is interpolation vars, but several call sites pass a
+	 * plain fallback string instead — which used to render the raw key on
+	 * screen. A string is now treated as that fallback, so the intent works
+	 * either way and a missing key never leaks into the UI.
+	 */
+	const t = (key, varsOrFallback) => {
+		const isFallback = typeof varsOrFallback === "string";
+		const vars = isFallback ? undefined : varsOrFallback;
+		const found =
 			getNestedValue(translations[lang], key) ??
-			getNestedValue(translations.es, key) ??
-			key;
+			getNestedValue(translations.es, key);
+		const str = found ?? (isFallback ? varsOrFallback : key);
 		return interpolate(str, vars);
 	};
 
