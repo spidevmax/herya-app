@@ -90,15 +90,8 @@ async function seedSessions() {
 			return;
 		}
 
-		// Get user, sequence and breathing pattern for associations
-		const user = await User.findOne();
 		const sequence = await VKSequence.findOne();
 		const breathingPattern = await BreathingPattern.findOne();
-
-		if (!user) {
-			console.log("⚠️  No users found, skipping session seeding");
-			return;
-		}
 
 		// Read CSV file
 		const csvPath = path.join(__dirname, "data", "sessions.csv");
@@ -115,11 +108,41 @@ async function seedSessions() {
 			throw new Error(`CSV parsing errors: ${errors.map((e) => e.message).join(", ")}`);
 		}
 
+		/*
+		 * Ownership comes from the CSV. It used to come from User.findOne(),
+		 * which returns the admin created first in users.seed — an account the
+		 * router keeps away from /sessions and /journal, so every seeded
+		 * practice was invisible to every account a person can actually use.
+		 */
+		const emails = [...new Set(data.map((row) => row.userEmail).filter(Boolean))];
+		const owners = await User.find({ email: { $in: emails } }, { _id: 1, email: 1 }).lean();
+		const userIdByEmail = new Map(owners.map((u) => [u.email, u._id]));
+
+		// Dates are laid out per owner so each one ends on today and runs back
+		// day by day — otherwise a shared counter leaves gaps and no streak.
+		const rowsByEmail = new Map();
+		for (const row of data) {
+			if (!rowsByEmail.has(row.userEmail)) rowsByEmail.set(row.userEmail, []);
+			rowsByEmail.get(row.userEmail).push(row);
+		}
+		const dayOffset = new Map();
+		for (const rows of rowsByEmail.values()) {
+			for (let index = 0; index < rows.length; index++) {
+				dayOffset.set(rows[index], rows.length - 1 - index);
+			}
+		}
+
 		let count = 0;
 		for (let i = 0; i < data.length; i++) {
 			const row = data[i];
-			const daysAgo = data.length - i;
+			const daysAgo = dayOffset.get(row) ?? 0;
 			const sessionType = row.sessionType;
+
+			const ownerId = userIdByEmail.get(row.userEmail);
+			if (!ownerId) {
+				console.log(`⚠️  Skipping session – user ${row.userEmail} not found`);
+				continue;
+			}
 
 			// Skip vk_sequence / complete_practice if no VKSequence was seeded
 			if (!sequence && (sessionType === "vk_sequence" || sessionType === "complete_practice")) {
@@ -128,7 +151,7 @@ async function seedSessions() {
 			}
 
 			const sessionData = {
-				user: user._id,
+				user: ownerId,
 				sessionType,
 				date: new Date(Date.now() - daysAgo * 24 * 60 * 60 * 1000),
 				duration: parseInt(row.duration, 10) || 30,

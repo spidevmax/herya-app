@@ -2,7 +2,6 @@ const fs = require("node:fs");
 const path = require("node:path");
 const Papa = require("papaparse");
 const JournalEntry = require("../api/models/JournalEntry.model");
-const User = require("../api/models/User.model");
 const Session = require("../api/models/Session.model");
 
 /**
@@ -17,15 +16,12 @@ async function seedJournalEntries() {
 			return;
 		}
 
-		// Get user and sessions for associations
-		const user = await User.findOne();
-
-		if (!user) {
-			console.log("⚠️  No users found, skipping journal seeding");
-			return;
-		}
-
-		const sessions = await Session.find({ user: user._id });
+		/*
+		 * Entries follow their session's owner instead of User.findOne(), so a
+		 * reflection can never end up on a different account than the practice
+		 * it describes — and never on the admin, which cannot open /journal.
+		 */
+		const sessions = await Session.find({}, { _id: 1, user: 1 }).sort({ date: 1 }).lean();
 
 		if (sessions.length === 0) {
 			console.log("⚠️  No sessions found, skipping journal seeding (session is required)");
@@ -112,9 +108,11 @@ async function seedJournalEntries() {
 			const moodBefore = parseMoodsBefore(row.moodBefore);
 			const moodAfter = parseMoodsAfter(row.moodAfter);
 
+			const session = sessions[index % sessions.length];
+
 			return {
-				user: user._id,
-				session: sessions[index % sessions.length]._id,
+				user: session.user,
+				session: session._id,
 				moodBefore: moodBefore.length > 0 ? moodBefore : ["calm"],
 				moodAfter: moodAfter.length > 0 ? moodAfter : ["peaceful"],
 				energyLevel: {
