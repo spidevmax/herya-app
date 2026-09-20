@@ -180,25 +180,67 @@ Both contexts are mounted alongside `AuthContext` in [src/providers/Providers.js
 
 ## Design and styles
 
-### Color theme
+The interface follows a single identity system defined in `src/styles/identity.css`.
+Its tokens live on `:root`, so any component can use them; applying the system's
+typography and ground is opt-in per subtree via `data-identity="next"`.
+
+### Colour — surya and chandra
+
+Brand colour is not an arbitrary pair. Vinyasa Krama organises practice around two
+breath channels, and the app's own data already splits along them: `cooling` and
+`calming` patterns are lunar, `heating` and `energizing` are solar.
 
 | Token | Value | Use |
 |---|---|---|
-| `primary` | `#4A72FF` | Main blue |
-| `secondary` | `#FFB347` | Orange |
-| `accent` | `#5DB075` | Green |
-| `surface` | `#F8F7F4` | Beige background |
-| `text-primary` | `#1A1A2E` | Primary text |
-| `text-muted` | `#9CA3AF` | Secondary text |
+| `--ink` | `#1b1e3c` | Outlines and text. Never pure black |
+| `--ink-soft` | `#4a4f77` | Secondary text |
+| `--paper` | `#e9ebe4` | Page ground |
+| `--paper-raised` | `#f4f5f0` | Cards sitting on the ground |
+| `--surya` | `#f2a03d` | Warming channel — inhalation, effort, primary action |
+| `--chandra` | `#5b8def` | Cooling channel — exhalation, rest |
+| `--alert` | `#c8322b` | The only state colour. Success and info are carried by copy |
+
+Both channel hues stay light in either theme, so text placed **on** them uses
+`--on-fill`, a dark ink that never flips with the theme.
+
+> **Pair every fill with its foreground.** A fill map and a text-colour map must
+> be defined together (`DIFF_COLORS`/`DIFF_FG`, `BLOCK_COLORS`/`BLOCK_FG`). Passing
+> a fill where an outline or label colour is expected renders an invisible chip —
+> this accounted for most of the visual bugs found during the redesign.
 
 ### Typography
 
-- **Headings:** Playfair Display (serif)
-- **Body:** Inter (sans-serif)
+- **Display:** Archivo Black — short headings only
+- **Body:** Atkinson Hyperlegible, designed by the Braille Institute for low
+  vision. Chosen because tutors read this interface while guiding children who
+  may already find reading effortful
+
+### Structure
+
+Depth comes from an ink outline plus a hard offset (`--offset`), never from a
+gradient or a soft drop shadow. The shared primitives are `.ink-block`,
+`.ink-field` and `.section-card`.
+
+The current section is always marked by an **ink fill** — sidebar, bottom nav,
+tabs, role toggles and chips all use the same device, so "where am I" gets one
+answer across the app.
+
+### Quiet mode
+
+Screens that deal with contraindications, known triggers or safety anchors drop
+all colour: ink on paper, no character, no encouragement copy. Anticipation aids
+such as `VisualSchedule` keep their colour, because there it distinguishes blocks
+at a glance rather than decorating.
+
+### Motion
+
+Page transitions are a crossfade with no travel, and are removed entirely when
+the operating system asks for reduced motion.
 
 ### Responsive
 
-The app is optimized for mobile with a max width of **430px** and a bottom navigation with a centered FAB.
+Mobile-first, with a content column capped at **430px** and a bottom navigation
+with a centred FAB. The sidebar replaces it from `lg` up.
 
 ---
 

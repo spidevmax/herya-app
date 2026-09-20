@@ -2,6 +2,12 @@
 
 Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sessions, guided breathwork, meditation, reflective journaling, and role-based workflows for practitioners, tutors, and admins.
 
+**Live app:** https://herya-yoga.vercel.app
+**API:** https://herya-app.onrender.com/api/v1 · [Swagger](https://herya-app.onrender.com/api-docs)
+
+> The API runs on Render's free tier, which suspends the service after a period
+> of inactivity. The first request after a pause can take up to a minute.
+
 ---
 
 ## Repository Structure
@@ -186,9 +192,26 @@ keeps the CSV files readable and diff-friendly.
 
 ---
 
+## Deployment
+
+| | Host | URL |
+|---|---|---|
+| Frontend | Vercel | https://herya-yoga.vercel.app |
+| Backend | Render | https://herya-app.onrender.com |
+| Database | MongoDB Atlas | — |
+
+Production values for `DB_URL`, `FRONTEND_URL`, `JWT_SECRET`, Cloudinary and SMTP
+are set in each platform's dashboard, not in this repo. `FRONTEND_URL` on Render
+must match the Vercel origin or CORS will reject the deployed frontend.
+
+Frontend deploys are configured by `herya-app-frontend/vercel.json`. The backend
+is built from Render's own settings; there is no deployment file in the repo.
+
+---
+
 ## Documentation & API
 
-- Swagger/OpenAPI: http://localhost:3000/api-docs
+- Swagger/OpenAPI (local): http://localhost:3000/api-docs
 - Insomnia request collection: `docs/herya-insomnia.json`
 
 ---
