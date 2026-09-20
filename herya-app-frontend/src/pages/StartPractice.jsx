@@ -1096,6 +1096,78 @@ export default function StartPractice() {
 							exit={{ opacity: 0, x: -20 }}
 							className="flex flex-col gap-4"
 						>
+							{/*
+							 * The recommendation engine reads recent journal entries and
+							 * silently switched the preset. A tutor about to guide a child
+							 * should know the app noticed something and be able to
+							 * disagree, so the reason and the choice are both shown.
+							 */}
+							{isTutorUser && recommendedPreset && (
+								<section
+									aria-labelledby="practice-reco-heading"
+									className="ink-block p-4"
+									style={{
+										borderColor:
+											recommendedPreset === PRACTICE_PRESETS.TUTOR
+												? "var(--surya)"
+												: "var(--ink)",
+									}}
+								>
+									<h2
+										id="practice-reco-heading"
+										className="text-[11px] font-bold"
+										style={{ color: "var(--ink-soft)" }}
+									>
+										{t("practice.reco_title")}
+									</h2>
+									<p className="mt-1 text-sm font-bold">
+										{t(recommendationReasonKey)}
+									</p>
+									{recommendationApplied && (
+										<p className="mt-1 text-xs" style={{ color: "var(--ink-soft)" }}>
+											{t("practice.reco_applied")}
+										</p>
+									)}
+
+									<div className="mt-3 grid grid-cols-2 gap-2">
+										{[PRACTICE_PRESETS.ADULT, PRACTICE_PRESETS.TUTOR].map(
+											(preset) => {
+												const selected = practicePreset === preset;
+												return (
+													<button
+														key={preset}
+														type="button"
+														aria-pressed={selected}
+														onClick={() => {
+															setHasManualPresetChoice(true);
+															applyPracticePreset(preset);
+														}}
+														className="ink-block px-3 py-2.5 text-sm font-bold"
+														style={{
+															background: selected
+																? "var(--ink)"
+																: "var(--paper-raised)",
+															color: selected
+																? "var(--paper)"
+																: "var(--ink)",
+															cursor: "pointer",
+															boxShadow: "none",
+														}}
+													>
+														{t(`practice.preset_${preset}`)}
+													</button>
+												);
+											},
+										)}
+									</div>
+									{isTutorPractice && (
+										<p className="mt-2 text-xs" style={{ color: "var(--ink-soft)" }}>
+											{t("practice.preset_tutor_hint")}
+										</p>
+									)}
+								</section>
+							)}
+
 							{/* Child profile selector — tutor only */}
 							{isTutorUser && (
 								<ChildProfileManager

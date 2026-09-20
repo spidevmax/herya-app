@@ -17,12 +17,6 @@ export default defineConfig({
 		exclude: [
 			"**/node_modules/**",
 			"**/dist/**",
-			// Asserts the tutor-preset picker, which was removed from the product
-			// in da540b7 along with this very file — it came back without the
-			// feature. Two of its three cases now pass vacuously. Delete the
-			// suite, or restore the feature and re-enable it; do not leave it
-			// excluded as a way of keeping the run green.
-			"src/test/StartPractice.roleGate.test.jsx",
 		],
 		coverage: {
 			provider: "v8",
