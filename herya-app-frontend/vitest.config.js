@@ -17,18 +17,12 @@ export default defineConfig({
 		exclude: [
 			"**/node_modules/**",
 			"**/dist/**",
-			// Stale suites — assertions target UI that has been intentionally
-			// removed or refactored in recent product changes. Re-enable after
-			// the tests are updated to match current components.
-			"src/test/HeroCard.test.jsx",
-			"src/test/PostPracticeJournal.test.jsx",
-			"src/test/RecentSessionCard.test.jsx",
-			"src/test/TutorInsightsCard.test.jsx",
+			// Asserts the tutor-preset picker, which was removed from the product
+			// in da540b7 along with this very file — it came back without the
+			// feature. Two of its three cases now pass vacuously. Delete the
+			// suite, or restore the feature and re-enable it; do not leave it
+			// excluded as a way of keeping the run green.
 			"src/test/StartPractice.roleGate.test.jsx",
-			"src/test/Dashboard.tutorVisibility.test.jsx",
-			"src/test/Journal.history.test.jsx",
-			"src/test/Journal.queryParams.test.jsx",
-			"src/test/Library.test.jsx",
 		],
 		coverage: {
 			provider: "v8",

@@ -119,7 +119,12 @@ describe("Dashboard tutor visibility", () => {
 		);
 
 		await waitFor(() => {
-			expect(screen.getByTestId("tutor-insights-card")).toBeInTheDocument();
+			/*
+			 * The dashboard renders the card twice — once in the desktop column
+			 * and once in an lg:hidden block — and jsdom applies no CSS, so both
+			 * are present.
+			 */
+			expect(screen.getAllByTestId("tutor-insights-card")).toHaveLength(2);
 		});
 	});
 });

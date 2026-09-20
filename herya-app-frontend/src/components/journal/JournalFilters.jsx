@@ -81,8 +81,8 @@ export const JournalFilters = ({
 					style={{
 						backgroundColor: hasActiveFilters
 							? "var(--chandra)"
-							: "var(--paper)",
-						color: hasActiveFilters ? "white" : "var(--ink-soft)",
+							: "var(--paper-raised)",
+						color: hasActiveFilters ? "var(--on-fill)" : "var(--ink)",
 						border: "var(--ink-width) solid var(--ink)",
 					}}
 				>

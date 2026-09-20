@@ -1,4 +1,5 @@
 /** @vitest-environment jsdom */
+import { MemoryRouter } from "react-router-dom";
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Library from "../pages/Library";
@@ -15,6 +16,17 @@ vi.mock("react-router-dom", async () => {
 		useNavigate: () => mockNavigate,
 	};
 });
+
+/*
+ * useSearchParams is left unmocked, and it reads useLocation — so the page
+ * needs a real router around it.
+ */
+const renderLibrary = () =>
+	render(
+		<MemoryRouter>
+			<Library />
+		</MemoryRouter>,
+	);
 
 vi.mock("@/api/sequences.api", () => ({
 	getSequences: (...args) => getSequences(...args),
@@ -88,7 +100,7 @@ describe("Library", () => {
 		);
 		getBreathingPatterns.mockRejectedValue(new Error("network"));
 
-		render(<Library />);
+		renderLibrary();
 
 		expect(await screen.findByText("Evening Flow")).toBeInTheDocument();
 		expect(screen.getByText("Tadasana")).toBeInTheDocument();
@@ -121,10 +133,12 @@ describe("Library", () => {
 		getPoses.mockResolvedValue(wrapResponse({ poses: [] }));
 		getBreathingPatterns.mockResolvedValue(wrapResponse({ patterns: [] }));
 
-		render(<Library />);
+		renderLibrary();
 
 		await screen.findByText("Moderate Flow");
-		const sequenceSection = screen.getByText("VK Sequence").closest("div");
+		// The label appears on the section header and again on every card, so
+		// the header is taken explicitly rather than by a unique-text lookup.
+		const sequenceSection = screen.getAllByText("VK Sequence")[0].closest("div");
 		const cards = within(sequenceSection.parentElement).getAllByRole("button");
 		const titles = cards.map((card) => card.textContent);
 

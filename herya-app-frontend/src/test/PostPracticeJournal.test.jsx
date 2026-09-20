@@ -55,14 +55,32 @@ const sanitizeMotionProps = (props) => {
 	return domProps;
 };
 
-vi.mock("framer-motion", () => ({
-	AnimatePresence: ({ children }) => <>{children}</>,
-	motion: {
-		div: ({ children, ...props }) => (
-			<div {...sanitizeMotionProps(props)}>{children}</div>
-		),
-	},
-}));
+/*
+ * The component tree reaches for motion.aside, motion.form and motion.span as
+ * well as motion.div, so the mock is generated per tag rather than listed —
+ * a missing one renders as undefined and fails with "Element type is invalid".
+ */
+vi.mock("framer-motion", () => {
+	// Cached per tag on purpose: returning a fresh component on each property
+	// access gives React a new element type every render, which remounts the
+	// subtree and detaches any node a test already queried.
+	const cache = new Map();
+	const tag = (Tag) => {
+		if (!cache.has(Tag)) {
+			const Component = ({ children, ...props }) => (
+				<Tag {...sanitizeMotionProps(props)}>{children}</Tag>
+			);
+			Component.displayName = `motion.${Tag}`;
+			cache.set(Tag, Component);
+		}
+		return cache.get(Tag);
+	};
+	return {
+		AnimatePresence: ({ children }) => <>{children}</>,
+		useReducedMotion: () => false,
+		motion: new Proxy({}, { get: (_target, prop) => tag(prop) }),
+	};
+});
 
 vi.mock("@/components/ui", () => ({
 	Button: (

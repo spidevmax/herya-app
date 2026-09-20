@@ -133,6 +133,16 @@ const renderJournal = (initialEntry) =>
 		</MemoryRouter>,
 	);
 
+/*
+ * The mood/type selects live inside a collapsed panel, so every case that
+ * touches them has to open it first.
+ */
+const openFilters = async (ui) => {
+	const toggle = await ui.findByRole("button", { name: /filters/i });
+	fireEvent.click(toggle);
+	return ui.getAllByRole("combobox");
+};
+
 describe("Journal query params integration", () => {
 	beforeEach(() => {
 		vi.mocked(getJournalEntries).mockResolvedValue({
@@ -158,7 +168,7 @@ describe("Journal query params integration", () => {
 		const searchInput = ui.getByPlaceholderText("Search insights/reflection");
 		expect(searchInput.value).toBe("clear");
 
-		const [moodSelect, typeSelect] = ui.getAllByRole("combobox");
+		const [moodSelect, typeSelect] = await openFilters(ui);
 		expect(moodSelect.value).toBe("calm");
 		expect(typeSelect.value).toBe("meditation");
 
@@ -176,7 +186,7 @@ describe("Journal query params integration", () => {
 			).toBeTruthy();
 		});
 
-		const [moodSelect] = ui.getAllByRole("combobox");
+		const [moodSelect] = await openFilters(ui);
 		fireEvent.change(moodSelect, { target: { value: "calm" } });
 
 		const searchInput = ui.getByPlaceholderText("Search insights/reflection");

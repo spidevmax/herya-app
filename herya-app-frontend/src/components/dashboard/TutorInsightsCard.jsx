@@ -329,8 +329,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					<span
 						className="text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0"
 						style={{
-							backgroundColor: `color-mix(in srgb, ${confidenceColor} 14%, transparent)`,
-							color: confidenceColor,
+							color: "var(--ink)",
 							border: `var(--ink-width) solid ${confidenceColor}`,
 						}}
 					>

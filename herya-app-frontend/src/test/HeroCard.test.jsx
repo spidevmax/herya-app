@@ -29,6 +29,10 @@ vi.mock("@/context/LanguageContext", () => ({
 				"hero.welcome_hint": "Explore our library to get started",
 				"hero.explore": "Explore Library",
 				"hero.start": "Start Session",
+				"hero.view_details": "View details",
+				"constants.level_1": "Beginner",
+				"library.stat_duration": "Duration",
+				"library.stat_level": "Level",
 			};
 			return dict[key] || key;
 		},
@@ -190,8 +194,8 @@ describe("HeroCard", () => {
 			</BrowserRouter>,
 		);
 
-		const motionDiv = container.querySelector("[data-testid='motion-div']");
-		fireEvent.click(motionDiv);
+		const ui = within(container);
+		fireEvent.click(ui.getByText("View details"));
 
 		await waitFor(() => {
 			expect(mockNavigate).toHaveBeenCalledWith("/library/sequence/seq-123");

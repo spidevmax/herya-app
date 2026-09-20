@@ -41,8 +41,11 @@ vi.mock("@/context/LanguageContext", () => ({
 				"dashboard.tutor_insights_weekly_delta_pauses": `Pause delta: ${params.n ?? 0}`,
 				"dashboard.tutor_insights_reco_title": "Suggested next step",
 				"dashboard.tutor_insights_reco_collect_more_data": "Collect more data",
-				"dashboard.tutor_insights_reco_apply_tutor": "Apply tutor plan",
-				"dashboard.tutor_insights_reco_apply_adult": "Apply adult plan",
+				"dashboard.tutor_insights_reco_maintain_current_plan":
+					"Maintain the current plan",
+				"dashboard.tutor_insights_reco_switch_to_tutor":
+					"Switch to the tutor plan",
+				"dashboard.tutor_insights_confidence_high": "High confidence",
 			};
 			return dict[key] || key;
 		},
@@ -58,7 +61,7 @@ describe("TutorInsightsCard", () => {
 		cleanup();
 	});
 
-	it("navigates to StartPractice with tutor preset when recommendation preset is tutor", async () => {
+	it("renders the tutor recommendation with its confidence", async () => {
 		const tutorInsights = {
 			sessionCount: 4,
 			totalSafePauses: 5,
@@ -89,24 +92,17 @@ describe("TutorInsightsCard", () => {
 		);
 		const ui = within(container);
 
-		fireEvent.click(ui.getByText("Apply tutor plan"));
-
-		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith("/start-practice", {
-				state: {
-					suggestedPreset: "tutor",
-					suggestedRecommendation: {
-						key: "collect_more_data",
-						preset: "tutor",
-						confidence: "low",
-					},
-					fromDashboardTutorInsights: true,
-				},
-			});
-		});
+		/*
+		 * The "apply plan" buttons and their navigation were removed in a30c52a
+		 * ("clean up recommendation handling"); the card now surfaces the
+		 * recommendation as read-only text, which is what this asserts.
+		 */
+		expect(ui.getByText("Suggested next step")).toBeInTheDocument();
+		expect(ui.getByText("Collect more data")).toBeInTheDocument();
+		expect(mockNavigate).not.toHaveBeenCalled();
 	});
 
-	it("navigates to StartPractice with adult preset when recommendation preset is adult", async () => {
+	it("renders the adult recommendation with its confidence", async () => {
 		const tutorInsights = {
 			sessionCount: 4,
 			totalSafePauses: 2,
@@ -137,20 +133,9 @@ describe("TutorInsightsCard", () => {
 		);
 		const ui = within(container);
 
-		fireEvent.click(ui.getByText("Apply adult plan"));
-
-		await waitFor(() => {
-			expect(mockNavigate).toHaveBeenCalledWith("/start-practice", {
-				state: {
-					suggestedPreset: "adult",
-					suggestedRecommendation: {
-						key: "maintain_current_plan",
-						preset: "adult",
-						confidence: "high",
-					},
-					fromDashboardTutorInsights: true,
-				},
-			});
-		});
+		expect(ui.getByText("Suggested next step")).toBeInTheDocument();
+		expect(ui.getByText("Maintain the current plan")).toBeInTheDocument();
+		expect(ui.getByText("High confidence")).toBeInTheDocument();
+		expect(mockNavigate).not.toHaveBeenCalled();
 	});
 });

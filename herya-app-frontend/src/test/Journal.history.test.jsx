@@ -156,6 +156,16 @@ const renderJournalWithNavigation = (initialEntry = "/journal") =>
 		</MemoryRouter>,
 	);
 
+/*
+ * The mood/type selects live inside a collapsed panel, so every case that
+ * touches them has to open it first.
+ */
+const openFilters = async (ui) => {
+	const toggle = await ui.findByRole("button", { name: /filters/i });
+	fireEvent.click(toggle);
+	return ui.getAllByRole("combobox");
+};
+
 describe("Journal browser history navigation", () => {
 	beforeEach(() => {
 		vi.mocked(getJournalEntries).mockResolvedValue({
@@ -178,7 +188,7 @@ describe("Journal browser history navigation", () => {
 			expect(vi.mocked(getJournalEntries)).toHaveBeenCalled();
 		});
 
-		const [moodSelect, typeSelect] = ui.getAllByRole("combobox");
+		const [moodSelect, typeSelect] = await openFilters(ui);
 		expect(moodSelect.value).toBe("calm");
 		expect(typeSelect.value).toBe("meditation");
 
@@ -197,7 +207,7 @@ describe("Journal browser history navigation", () => {
 			).toBeTruthy();
 		});
 
-		const [, typeSelect] = ui.getAllByRole("combobox");
+		const [, typeSelect] = await openFilters(ui);
 		fireEvent.change(typeSelect, { target: { value: "meditation" } });
 
 		await waitFor(() => {
@@ -226,7 +236,7 @@ describe("Journal browser history navigation", () => {
 			expect(searchInput.value).toBe("clear");
 		});
 
-		const [moodSelect, typeSelect] = ui.getAllByRole("combobox");
+		const [moodSelect, typeSelect] = await openFilters(ui);
 		expect(moodSelect.value).toBe("calm");
 		expect(typeSelect.value).toBe("meditation");
 
@@ -249,7 +259,7 @@ describe("Journal browser history navigation", () => {
 		const searchInput = ui.getByPlaceholderText("Search insights/reflection");
 		expect(searchInput.value).toBe("");
 
-		const [moodSelect, typeSelect] = ui.getAllByRole("combobox");
+		const [moodSelect, typeSelect] = await openFilters(ui);
 		expect(moodSelect.value).toBe("all");
 		expect(typeSelect.value).toBe("all");
 	});
