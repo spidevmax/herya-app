@@ -16,8 +16,17 @@ services:
       - "3000:3000"
     volumes:
       - ./herya-app-backend:/app
+      # Keeps the container's node_modules (Linux binaries) from being shadowed
+      # by the host's macOS build.
+      - /app/node_modules
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      # node:22-alpine ships no curl — probe with node's own fetch instead,
+      # matching the HEALTHCHECK defined in the backend Dockerfile.
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
       interval: 30s
       timeout: 5s
       retries: 3
@@ -34,6 +43,7 @@ services:
       - "5173:5173"
     volumes:
       - ./herya-app-frontend:/app
+      - /app/node_modules
     depends_on:
       backend:
         condition: service_healthy

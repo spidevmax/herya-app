@@ -1,0 +1,96 @@
+/*
+ * Identity layer — "surya / chandra"
+ * ----------------------------------
+ * Brand tokens for the rebrand. Scoped under [data-identity="next"] so the
+ * proof screen can be reviewed next to the current design without touching it.
+ *
+ * Grounding: Vinyasa Krama organises practice around two breath channels —
+ * surya (solar, warming, inhalation) and chandra (lunar, cooling, exhalation).
+ * The app already seeds both as pranayama techniques. Brand colour follows
+ * that split instead of an arbitrary primary/secondary pair.
+ *
+ * Deliberately absent: gradients, soft drop shadows, a third accent hue.
+ * Depth comes from ink outlines and hard offsets, the way the reference
+ * material (flat colour blocking, heavy outline) builds it.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap");
+
+[data-identity="next"] {
+	/* ── Core ── */
+	--ink: #1b1e3c; /* outlines + text; never pure black */
+	--ink-soft: #4a4f77; /* secondary text */
+	--paper: #e9ebe4; /* cool mineral chalk ground */
+	--paper-raised: #f4f5f0; /* cards sitting on the ground */
+
+	/* ── Breath channels ── */
+	--surya: #f2a03d; /* warming, inhalation, effort */
+	--chandra: #5b8def; /* cooling, exhalation, rest */
+
+	/* Both channel hues stay light in either theme, so text sitting ON them
+	   is always dark ink. This token must never flip with the theme. */
+	--on-fill: #1b1e3c;
+
+	/* Colour of the hard offset. Separate from --ink so dark mode can use a
+	   deep shade instead of a near-white one, which would read as a glow. */
+	--edge: var(--ink);
+
+	/* ── Quiet mode ── */
+	/* Screens dealing with triggers and contraindications drop all colour. */
+	--hush: var(--paper-raised);
+
+	/* ── Type ── */
+	--font-display: "Archivo Black", system-ui, sans-serif;
+	--font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
+
+	/* ── Structure ── */
+	--ink-width: 2px;
+	--radius-block: 14px;
+	--offset: 4px; /* hard offset replaces drop shadow */
+
+	color-scheme: light;
+	background: var(--paper);
+	color: var(--ink);
+	font-family: var(--font-body);
+}
+
+[data-identity="next"].dark,
+.dark [data-identity="next"] {
+	--ink: #e9ebe4;
+	--ink-soft: #a9aec7;
+	--paper: #14162c;
+	--paper-raised: #1e2142;
+	--surya: #f5b055;
+	--chandra: #7da3f5;
+	--edge: #05060f;
+	color-scheme: dark;
+}
+
+/* ── Primitives ─────────────────────────────────────────────────────────── */
+
+.ink-block {
+	border: var(--ink-width) solid var(--ink);
+	border-radius: var(--radius-block);
+	background: var(--paper-raised);
+	box-shadow: var(--offset) var(--offset) 0 var(--edge);
+}
+
+/* Pressed state consumes the offset rather than animating a shadow blur. */
+.ink-block--press:active {
+	transform: translate(var(--offset), var(--offset));
+	box-shadow: 0 0 0 var(--edge);
+}
+
+.display {
+	font-family: var(--font-display);
+	font-weight: 400; /* Archivo Black has a single weight */
+	letter-spacing: -0.02em;
+	line-height: 0.95;
+	text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ink-block--press:active {
+		transform: none;
+	}
+}

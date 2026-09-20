@@ -11,6 +11,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 
 const Admin = lazy(() => import("@/pages/Admin"));
+const IdentityProof = lazy(() => import("@/pages/IdentityProof"));
 const AuthCallback = lazy(() => import("@/pages/AuthCallback"));
 const Dashboard = lazy(() => import("@/pages/Dashboard"));
 const ForgotPassword = lazy(() => import("@/pages/ForgotPassword"));
@@ -113,6 +114,8 @@ const AppRoutes = () => {
 				}
 			>
 				<Routes>
+					{/* Design proof for the rebrand — not part of the product flow. */}
+					<Route path="/identity-proof" element={<IdentityProof />} />
 					<Route path="/auth/callback" element={<AuthCallback />} />
 					<Route
 						path="/login"
