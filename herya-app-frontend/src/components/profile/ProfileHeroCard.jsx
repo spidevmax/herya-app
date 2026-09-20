@@ -3,6 +3,7 @@ import { Camera, Trash2, Upload, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LoadingSpinner } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const getUserInitials = (name) => {
 	if (!name?.trim()) return "?";
@@ -80,7 +81,7 @@ const ProfileHeroCard = ({
 			aria-label={user?.name || t("profile.title")}
 			initial={{ opacity: 0, y: 16 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="rounded-[32px] p-6 sm:p-8 text-white relative"
+			className="rounded-[32px] p-6 sm:p-8 text-[var(--on-fill)] relative"
 			style={{
 				backgroundImage: "var(--gradient-secondary)",
 				boxShadow: "var(--shadow-card-hover)",
@@ -116,7 +117,7 @@ const ProfileHeroCard = ({
 									: t("profile.change_photo")
 							}
 						>
-							<div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] bg-white/18 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20 shadow-[var(--shadow-card-hover)] relative">
+							<div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] bg-white/18 backdrop-blur-sm flex items-center justify-center overflow-hidden border border-white/20  relative">
 								{hasPhoto ? (
 									<img
 										src={user.profileImageUrl}
@@ -124,14 +125,14 @@ const ProfileHeroCard = ({
 										className={`w-full h-full object-cover transition-opacity duration-200 ${uploadingPhoto ? "opacity-40" : ""}`}
 									/>
 								) : (
-									<span className="text-3xl sm:text-4xl font-bold text-white select-none font-display">
+									<span className="text-3xl sm:text-4xl font-bold text-[var(--on-fill)] select-none font-display">
 										{initials}
 									</span>
 								)}
 								<div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors duration-200 rounded-[28px] flex items-center justify-center">
 									<Camera
 										size={22}
-										className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+										className="text-[var(--on-fill)] opacity-0 group-hover:opacity-100 transition-opacity duration-200"
 										aria-hidden="true"
 									/>
 								</div>
@@ -153,18 +154,18 @@ const ProfileHeroCard = ({
 									animate={{ opacity: 1, y: 0, scale: 1 }}
 									exit={{ opacity: 0, y: -6, scale: 0.96 }}
 									transition={{ duration: 0.15 }}
-									className="absolute left-0 top-full mt-2 z-20 w-56 rounded-2xl p-1.5 shadow-[var(--shadow-card-hover)]"
+									className="absolute left-0 top-full mt-2 z-20 w-56 rounded-2xl p-1.5 "
 									style={{
-										backgroundColor: "var(--color-surface-card)",
-										border: "1px solid var(--color-border-soft)",
+										backgroundColor: "var(--paper-raised)",
+										border: "var(--ink-width) solid var(--ink)",
 									}}
 								>
 									<button
 										type="button"
 										role="menuitem"
 										onClick={handleUpload}
-										className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors hover:bg-[var(--color-surface)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-										style={{ color: "var(--color-text-primary)" }}
+										className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors hover:bg-[var(--paper)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)]"
+										style={{ color: "var(--ink)" }}
 									>
 										<Upload size={16} aria-hidden="true" />
 										{t("profile.photo_actions_upload")}
@@ -173,8 +174,8 @@ const ProfileHeroCard = ({
 										type="button"
 										role="menuitem"
 										onClick={handleRemove}
-										className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)]"
-										style={{ color: "var(--color-danger)" }}
+										className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--alert)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--alert)]"
+										style={{ color: "var(--alert)" }}
 									>
 										<Trash2 size={16} aria-hidden="true" />
 										{t("profile.photo_actions_remove")}
@@ -183,8 +184,8 @@ const ProfileHeroCard = ({
 										type="button"
 										role="menuitem"
 										onClick={() => setMenuOpen(false)}
-										className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors hover:bg-[var(--color-surface)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-										style={{ color: "var(--color-text-secondary)" }}
+										className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors hover:bg-[var(--paper)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)]"
+										style={{ color: "var(--ink-soft)" }}
 									>
 										<X size={16} aria-hidden="true" />
 										{t("profile.photo_actions_cancel")}
@@ -205,7 +206,7 @@ const ProfileHeroCard = ({
 								</span>
 							) : null}
 						</div>
-						<p className="text-white/80 text-sm font-medium break-all">
+						<p className="opacity-80 text-sm font-medium break-all">
 							{user?.email}
 						</p>
 					</div>
@@ -240,7 +241,7 @@ const ProfileHeroCard = ({
 								key={label}
 								className="rounded-2xl bg-white/14 border border-white/15 px-3 py-3 text-center"
 							>
-								<p className="text-[10px] sm:text-[11px] uppercase tracking-[0.13em] text-white/75 leading-tight">
+								<p className="text-[10px] sm:text-[11px] opacity-75 leading-tight">
 									{label}
 								</p>
 								<p className="text-2xl font-bold mt-1 leading-none">

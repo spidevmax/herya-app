@@ -1,4 +1,5 @@
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import SectionTitle from "./SectionTitle";
 
 const GOAL_OPTIONS = [
@@ -12,11 +13,11 @@ const GOAL_OPTIONS = [
 	"breath_awareness",
 ];
 
-const cardStyle = { backgroundColor: "var(--color-surface-card)" };
+const cardStyle = { backgroundColor: "var(--paper-raised)" };
 const inputStyle = {
-	backgroundColor: "var(--color-surface)",
-	borderColor: "var(--color-border)",
-	color: "var(--color-text-primary)",
+	backgroundColor: "var(--paper)",
+	borderColor: "var(--ink)",
+	color: "var(--ink)",
 };
 
 export default function AccountDetailsCard({
@@ -34,13 +35,13 @@ export default function AccountDetailsCard({
 
 	const fieldErrorStyle = (field) =>
 		fieldErrors[field]
-			? { ...inputStyle, borderColor: "var(--color-danger)" }
+			? { ...inputStyle, borderColor: "var(--alert)" }
 			: inputStyle;
 
 	return (
 		<section
 			aria-label={t("profile.account_details")}
-			className="rounded-3xl p-5 sm:p-6 space-y-5 shadow-[var(--shadow-card)]"
+			className="rounded-3xl p-5 sm:p-6 space-y-5 "
 			style={cardStyle}
 		>
 			<SectionTitle>{t("profile.account_details")}</SectionTitle>
@@ -48,7 +49,7 @@ export default function AccountDetailsCard({
 				<label className="space-y-1.5 text-sm">
 					<span
 						className="font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("profile.name")}
 					</span>
@@ -67,7 +68,7 @@ export default function AccountDetailsCard({
 						<p
 							role="alert"
 							className="text-xs mt-0.5"
-							style={{ color: "var(--color-danger)" }}
+							style={{ color: "var(--alert)" }}
 						>
 							{fieldErrors.name}
 						</p>
@@ -76,7 +77,7 @@ export default function AccountDetailsCard({
 				<label className="space-y-1.5 text-sm">
 					<span
 						className="font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("profile.email")}
 					</span>
@@ -95,7 +96,7 @@ export default function AccountDetailsCard({
 						<p
 							role="alert"
 							className="text-xs mt-0.5"
-							style={{ color: "var(--color-danger)" }}
+							style={{ color: "var(--alert)" }}
 						>
 							{fieldErrors.email}
 						</p>
@@ -104,7 +105,7 @@ export default function AccountDetailsCard({
 				<label className="space-y-1.5 text-sm">
 					<span
 						className="font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("profile.pronouns")}
 					</span>
@@ -129,13 +130,13 @@ export default function AccountDetailsCard({
 					<div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mb-3">
 						<p
 							className="text-sm font-semibold"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{t("profile.goals_title")}
 						</p>
 						<span
 							className="text-xs"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("profile.goals_hint")}
 						</span>
@@ -156,10 +157,10 @@ export default function AccountDetailsCard({
 									className="px-3 py-2 rounded-full text-xs font-semibold transition-colors duration-150"
 									style={{
 										backgroundColor: active
-											? "var(--color-primary)"
-											: "var(--color-surface)",
-										color: active ? "white" : "var(--color-text-secondary)",
-										border: "1px solid var(--color-border)",
+											? "var(--chandra)"
+											: "var(--paper)",
+										color: active ? "white" : "var(--ink-soft)",
+										border: "var(--ink-width) solid var(--ink)",
 									}}
 								>
 									{getOptionLabel("goals", goal)}

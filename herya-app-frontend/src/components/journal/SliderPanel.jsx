@@ -1,8 +1,8 @@
 const SOFT_PANEL_STYLE = {
 	border:
-		"1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+		"1px solid color-mix(in srgb, var(--ink) 68%, transparent)",
 	background:
-		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+		"var(--paper-raised)",
 };
 
 const SliderPanel = ({
@@ -10,7 +10,7 @@ const SliderPanel = ({
 	label,
 	value,
 	onChange,
-	accent = "var(--color-primary)",
+	accent = "var(--chandra)",
 	lowLabel,
 	highLabel,
 	min = 1,
@@ -20,7 +20,7 @@ const SliderPanel = ({
 		<div className="mb-3 flex items-center justify-between gap-3">
 			<label
 				htmlFor={id}
-				className="text-sm font-semibold text-[var(--color-text-primary)]"
+				className="text-sm font-semibold text-[var(--ink)]"
 			>
 				{label}
 			</label>
@@ -45,7 +45,7 @@ const SliderPanel = ({
 			className="w-full"
 			style={{ accentColor: accent }}
 		/>
-		<div className="mt-2 flex items-center justify-between text-[11px] font-medium uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
+		<div className="mt-2 flex items-center justify-between text-[11px] font-medium text-[var(--ink-soft)]">
 			<span>{lowLabel}</span>
 			<span>{highLabel}</span>
 		</div>

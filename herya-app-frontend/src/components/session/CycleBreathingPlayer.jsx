@@ -16,6 +16,7 @@ import {
 	PHASE_LABEL_KEYS,
 } from "@/config/techniqueProfiles";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import useBreathingEngine from "@/hooks/useBreathingEngine";
 import usePranayamaAudio from "@/hooks/usePranayamaAudio";
 import { localizedArray } from "@/utils/libraryHelpers";
@@ -28,28 +29,16 @@ const formatTime = (sec) => {
 	return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 
-// Palette tints per profile style
+/*
+ * Breath-channel palette per profile style. `fg` is paired with `bg` so the
+ * two can never drift apart and render unreadable text on a fill.
+ */
 const PALETTE_TINTS = {
-	warm: {
-		bg: "var(--color-prana-warm)",
-		accent: "var(--color-prana-warm-accent)",
-	},
-	calming: {
-		bg: "var(--color-prana-calming)",
-		accent: "var(--color-prana-calming)",
-	},
-	cooling: {
-		bg: "var(--color-prana-cooling)",
-		accent: "var(--color-prana-cooling)",
-	},
-	energizing: {
-		bg: "var(--color-prana-energizing)",
-		accent: "var(--color-prana-energizing-accent)",
-	},
-	balanced: {
-		bg: "var(--color-prana-balanced)",
-		accent: "var(--color-prana-balanced)",
-	},
+	warm: { bg: "var(--surya)", accent: "var(--surya)", fg: "var(--on-fill)" },
+	calming: { bg: "var(--chandra)", accent: "var(--chandra)", fg: "var(--on-fill)" },
+	cooling: { bg: "var(--chandra)", accent: "var(--chandra)", fg: "var(--on-fill)" },
+	energizing: { bg: "var(--surya)", accent: "var(--surya)", fg: "var(--on-fill)" },
+	balanced: { bg: "var(--paper-raised)", accent: "var(--ink)", fg: "var(--ink)" },
 };
 
 export default function CycleBreathingPlayer({
@@ -234,7 +223,7 @@ export default function CycleBreathingPlayer({
 			{/* Header */}
 			<header className="text-center">
 				<h3
-					className="text-xs font-semibold uppercase tracking-widest m-0"
+					className="text-xs font-semibold m-0"
 					style={{ color: paletteTint.accent }}
 				>
 					{pattern.romanizationName}
@@ -243,7 +232,7 @@ export default function CycleBreathingPlayer({
 					<p
 						className="text-xs mt-0.5"
 						style={{
-							color: "var(--color-text-muted)",
+							color: "var(--ink-soft)",
 							fontFamily: "serif",
 						}}
 					>
@@ -261,7 +250,7 @@ export default function CycleBreathingPlayer({
 			>
 				<p
 					className="text-sm font-bold"
-					style={{ color: "var(--color-text-primary)" }}
+					style={{ color: "var(--ink)" }}
 				>
 					{showCompletionState
 						? t("pranayama.cycles_completed", {
@@ -276,7 +265,7 @@ export default function CycleBreathingPlayer({
 				{!engine.isRunning && !showCompletionState && totalEstimatedSec > 0 && (
 					<p
 						className="text-xs mt-0.5"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{formatTime(totalEstimatedSec)}
 					</p>
@@ -352,7 +341,7 @@ export default function CycleBreathingPlayer({
 									<p
 										className="text-sm font-semibold"
 										style={{
-											color: "var(--color-text-muted)",
+											color: "var(--ink-soft)",
 										}}
 									>
 										{t("guided.pause_between")}
@@ -360,7 +349,7 @@ export default function CycleBreathingPlayer({
 									<p
 										className="text-3xl font-bold"
 										style={{
-											color: "var(--color-text-muted)",
+											color: "var(--ink-soft)",
 										}}
 									>
 										{Math.ceil(pauseBetween - engine.pauseElapsed)}
@@ -370,7 +359,7 @@ export default function CycleBreathingPlayer({
 								<p
 									className="text-base font-semibold"
 									style={{
-										color: "var(--color-text-primary)",
+										color: "var(--ink)",
 									}}
 								>
 									{t("pranayama.practice_complete")}
@@ -463,7 +452,7 @@ export default function CycleBreathingPlayer({
 					>
 						<dt
 							className="text-[10px] font-semibold uppercase"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t(PHASE_LABEL_KEYS[phase] || "pranayama.inhale")}
 						</dt>
@@ -497,7 +486,7 @@ export default function CycleBreathingPlayer({
 									backgroundColor:
 										idx < engine.completedCycles
 											? paletteTint.accent
-											: "var(--color-border-soft)",
+											: "var(--ink)",
 									transform:
 										idx === engine.completedCycles && engine.isRunning
 											? "scale(1.3)"
@@ -513,7 +502,7 @@ export default function CycleBreathingPlayer({
 			{ratioStr && (
 				<p
 					className="text-xs font-mono font-bold"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("guided.ratio")}: {ratioStr}
 				</p>
@@ -524,8 +513,8 @@ export default function CycleBreathingPlayer({
 				<div
 					className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
 					style={{
-						backgroundColor: "var(--color-error-bg)",
-						color: "var(--color-error-text)",
+						backgroundColor: "var(--alert-bg)",
+						color: "var(--alert)",
 					}}
 					role="alert"
 				>
@@ -559,9 +548,9 @@ export default function CycleBreathingPlayer({
 					onClick={engine.reset}
 					className="w-10 h-10 rounded-full flex items-center justify-center border transition-colors"
 					style={{
-						backgroundColor: "var(--color-surface-card)",
-						borderColor: "var(--color-border-soft)",
-						color: "var(--color-text-muted)",
+						backgroundColor: "var(--paper-raised)",
+						borderColor: "var(--ink)",
+						color: "var(--ink-soft)",
 					}}
 					aria-label={t("guided.reset")}
 				>
@@ -593,14 +582,11 @@ export default function CycleBreathingPlayer({
 					className="w-10 h-10 rounded-full flex items-center justify-center border transition-colors"
 					style={{
 						backgroundColor: audioEnabled
-							? `${paletteTint.accent}15`
-							: "var(--color-surface-card)",
-						borderColor: audioEnabled
 							? paletteTint.accent
-							: "var(--color-border-soft)",
-						color: audioEnabled
-							? paletteTint.accent
-							: "var(--color-text-muted)",
+							: "var(--paper-raised)",
+						borderColor: "var(--ink)",
+						borderWidth: "var(--ink-width)",
+						color: audioEnabled ? paletteTint.fg : "var(--ink-soft)",
 					}}
 					aria-label={t(
 						audioEnabled ? "pranayama.audio_on" : "pranayama.audio_off",
@@ -625,14 +611,14 @@ export default function CycleBreathingPlayer({
 						className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
 						style={{
 							backgroundColor: hapticEnabled
-								? `${paletteTint.accent}10`
-								: "var(--color-surface-card)",
+								? paletteTint.accent
+								: "var(--paper-raised)",
 							borderColor: hapticEnabled
-								? `${paletteTint.accent}40`
-								: "var(--color-border-soft)",
+								? paletteTint.accent
+								: "var(--ink)",
 							color: hapticEnabled
 								? paletteTint.accent
-								: "var(--color-text-muted)",
+								: "var(--ink-soft)",
 						}}
 						aria-label={t(
 							hapticEnabled
@@ -657,12 +643,12 @@ export default function CycleBreathingPlayer({
 					className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
 					style={{
 						backgroundColor: lowStim
-							? `${paletteTint.accent}10`
-							: "var(--color-surface-card)",
+							? paletteTint.accent
+							: "var(--paper-raised)",
 						borderColor: lowStim
-							? `${paletteTint.accent}40`
-							: "var(--color-border-soft)",
-						color: lowStim ? paletteTint.accent : "var(--color-text-muted)",
+							? paletteTint.accent
+							: "var(--ink)",
+						color: lowStim ? paletteTint.accent : "var(--ink-soft)",
 					}}
 					aria-label={t("pranayama.low_stimulation")}
 					aria-pressed={lowStim}

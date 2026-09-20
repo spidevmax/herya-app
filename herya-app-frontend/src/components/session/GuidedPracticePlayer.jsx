@@ -19,6 +19,7 @@ import {
 	ProgressBar,
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import useSessionTimer from "@/hooks/useSessionTimer";
 import CycleBreathingPlayer from "./CycleBreathingPlayer";
 import PhasedMeditationPlayer from "./PhasedMeditationPlayer";
@@ -33,9 +34,9 @@ const formatTime = (totalSec) => {
 };
 
 const BLOCK_TYPE_COLORS = {
-	vk_sequence: "var(--color-primary)",
-	pranayama: "var(--color-secondary)",
-	meditation: "var(--color-accent)",
+	vk_sequence: "var(--chandra)",
+	pranayama: "var(--surya)",
+	meditation: "var(--ink)",
 };
 
 const BLOCK_TYPE_ICONS = {
@@ -235,7 +236,7 @@ export default function GuidedPracticePlayer({
 	const currentBlock = timer.currentBlock;
 	const nextBlock = blocks[timer.currentBlockIndex + 1] || null;
 	const blockColor =
-		BLOCK_TYPE_COLORS[currentBlock?.blockType] || "var(--color-primary)";
+		BLOCK_TYPE_COLORS[currentBlock?.blockType] || "var(--chandra)";
 	const BlockIcon = BLOCK_TYPE_ICONS[currentBlock?.blockType] || PersonStanding;
 
 	// Check if current block has guided sub-player content
@@ -269,13 +270,13 @@ export default function GuidedPracticePlayer({
 				<header className="flex justify-between items-center mb-1.5">
 					<span
 						className="text-xs font-medium"
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("practice.session_progress")}
 					</span>
 					<span
 						className="text-xs font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{formatTime(timer.globalElapsedSec)} /{" "}
 						{formatTime(timer.totalPlannedSec)}
@@ -284,19 +285,19 @@ export default function GuidedPracticePlayer({
 				<ProgressBar
 					value={timer.globalElapsedSec}
 					max={timer.totalPlannedSec}
-					color="var(--color-primary)"
+					color="var(--chandra)"
 				/>
 				<dl className="flex justify-between mt-1 m-0">
 					<div className="flex gap-1">
 						<dt
 							className="text-[10px]"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("practice.time_elapsed")}:
 						</dt>
 						<dd
 							className="text-[10px] m-0"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{formatTime(timer.globalElapsedSec)}
 						</dd>
@@ -304,13 +305,13 @@ export default function GuidedPracticePlayer({
 					<div className="flex gap-1">
 						<dt
 							className="text-[10px]"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("practice.time_remaining")}:
 						</dt>
 						<dd
 							className="text-[10px] m-0"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{formatTime(timer.globalRemainingSec)}
 						</dd>
@@ -348,7 +349,7 @@ export default function GuidedPracticePlayer({
 											? BLOCK_TYPE_COLORS[block.blockType]
 											: idx === timer.currentBlockIndex
 												? BLOCK_TYPE_COLORS[block.blockType]
-												: "var(--color-border-soft)",
+												: "var(--ink)",
 									opacity: idx <= timer.currentBlockIndex ? 1 : 0.4,
 								}}
 							/>
@@ -423,12 +424,12 @@ export default function GuidedPracticePlayer({
 								aria-labelledby={`block-start-heading-${timer.currentBlockIndex}`}
 								className="rounded-2xl p-6 text-center"
 								style={{
-									backgroundColor: "var(--color-surface-card)",
+									backgroundColor: "var(--paper-raised)",
 									border: `2px solid color-mix(in srgb, ${blockColor} 30%, transparent)`,
 								}}
 							>
 								<p
-									className="text-xs font-semibold uppercase tracking-widest mb-2"
+									className="text-xs font-semibold mb-2"
 									style={{ color: blockColor }}
 								>
 									{t("practice.block_label", {
@@ -445,13 +446,13 @@ export default function GuidedPracticePlayer({
 								</span>
 								<h3
 									id={`block-start-heading-${timer.currentBlockIndex}`}
-									className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]"
+									className="text-xl font-semibold mb-1 text-[var(--ink)]"
 								>
 									{currentBlock.label}
 								</h3>
 								<p
 									className="text-sm mb-5"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t(`practice.type_${currentBlock.blockType}`)} ·{" "}
 									{currentBlock.durationMinutes}m
@@ -468,7 +469,7 @@ export default function GuidedPracticePlayer({
 								</motion.button>
 								<p
 									className="text-xs mt-3"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("practice.tap_to_start")}
 								</p>
@@ -481,12 +482,12 @@ export default function GuidedPracticePlayer({
 								aria-labelledby={`block-timer-heading-${timer.currentBlockIndex}`}
 								className="rounded-2xl p-6 text-center"
 								style={{
-									backgroundColor: "var(--color-surface-card)",
+									backgroundColor: "var(--paper-raised)",
 									border: `2px solid color-mix(in srgb, ${blockColor} 30%, transparent)`,
 								}}
 							>
 								<p
-									className="text-xs font-semibold uppercase tracking-widest mb-2"
+									className="text-xs font-semibold mb-2"
 									style={{ color: blockColor }}
 								>
 									{t("practice.block_label", {
@@ -505,14 +506,14 @@ export default function GuidedPracticePlayer({
 
 								<h3
 									id={`block-timer-heading-${timer.currentBlockIndex}`}
-									className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]"
+									className="text-xl font-semibold mb-1 text-[var(--ink)]"
 								>
 									{currentBlock.label}
 								</h3>
 
 								<p
 									className="text-sm mb-4"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t(`practice.type_${currentBlock.blockType}`)}
 								</p>
@@ -531,7 +532,7 @@ export default function GuidedPracticePlayer({
 										</motion.button>
 										<p
 											className="text-xs mt-3"
-											style={{ color: "var(--color-text-muted)" }}
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{t("practice.tap_to_start")}
 										</p>
@@ -554,13 +555,13 @@ export default function GuidedPracticePlayer({
 											<div className="text-center">
 												<p
 													className="text-2xl font-bold"
-													style={{ color: "var(--color-text-primary)" }}
+													style={{ color: "var(--ink)" }}
 												>
 													{formatTime(timer.blockRemainingSec)}
 												</p>
 												<p
 													className="text-[10px] font-medium"
-													style={{ color: "var(--color-text-muted)" }}
+													style={{ color: "var(--ink-soft)" }}
 												>
 													{t("practice.block_remaining")}
 												</p>
@@ -594,13 +595,13 @@ export default function GuidedPracticePlayer({
 					<div className="flex-1">
 						<p
 							className="text-xs font-medium"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("practice.next_block")}
 						</p>
 						<p
 							className="text-sm font-semibold"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{nextBlock.label} · {nextBlock.durationMinutes}m
 						</p>
@@ -618,9 +619,9 @@ export default function GuidedPracticePlayer({
 						aria-label={t("practice.aria_prev_block")}
 						className="w-11 h-11 rounded-full flex items-center justify-center border disabled:opacity-30 transition"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							borderColor: "var(--color-border-soft)",
-							color: "var(--color-text-secondary)",
+							backgroundColor: "var(--paper-raised)",
+							borderColor: "var(--ink)",
+							color: "var(--ink-soft)",
 						}}
 					>
 						<SkipBack size={18} aria-hidden="true" />
@@ -659,9 +660,9 @@ export default function GuidedPracticePlayer({
 						aria-label={t("practice.aria_next_block")}
 						className="w-11 h-11 rounded-full flex items-center justify-center border disabled:opacity-30 transition"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							borderColor: "var(--color-border-soft)",
-							color: "var(--color-text-secondary)",
+							backgroundColor: "var(--paper-raised)",
+							borderColor: "var(--ink)",
+							color: "var(--ink-soft)",
 						}}
 					>
 						<SkipForward size={18} aria-hidden="true" />
@@ -684,8 +685,8 @@ export default function GuidedPracticePlayer({
 						<section
 							className="rounded-2xl p-4 border flex flex-col gap-3"
 							style={{
-								backgroundColor: "var(--color-surface-card)",
-								borderColor: "var(--color-border-soft)",
+								backgroundColor: "var(--paper-raised)",
+								borderColor: "var(--ink)",
 							}}
 							role="dialog"
 							aria-labelledby="safe-pause-title"
@@ -694,14 +695,14 @@ export default function GuidedPracticePlayer({
 							<h3
 								id="safe-pause-title"
 								className="text-sm font-semibold m-0"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{t("practice.safe_pause_title")}
 							</h3>
 							<p
 								id="safe-pause-subtitle"
 								className="text-xs"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("practice.safe_pause_subtitle")}
 							</p>
@@ -718,20 +719,20 @@ export default function GuidedPracticePlayer({
 									className="w-16 h-16 rounded-full flex items-center justify-center"
 									style={{
 										backgroundColor:
-											"color-mix(in srgb, var(--color-primary) 15%, transparent)",
-										border: "2px solid var(--color-primary)",
+											"color-mix(in srgb, var(--chandra) 15%, transparent)",
+										border: "2px solid var(--chandra)",
 									}}
 									aria-hidden="true"
 								>
 									<Leaf
 										size={24}
 										aria-hidden="true"
-										style={{ color: "var(--color-primary)" }}
+										style={{ color: "var(--chandra)" }}
 									/>
 								</motion.span>
 								<figcaption
 									className="text-[11px] mt-2"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("practice.safe_pause_breathe")}
 								</figcaption>
@@ -739,7 +740,7 @@ export default function GuidedPracticePlayer({
 
 							<ol
 								className="flex flex-col gap-1 list-decimal list-inside text-xs m-0 p-0"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								<li>{t("practice.safe_pause_step_1")}</li>
 								<li>{t("practice.safe_pause_step_2")}</li>
@@ -750,21 +751,21 @@ export default function GuidedPracticePlayer({
 									aria-labelledby="safe-pause-anchor-title"
 									className="rounded-xl p-3 border"
 									style={{
-										backgroundColor: "var(--color-surface)",
-										borderColor: "var(--color-border-soft)",
+										backgroundColor: "var(--paper)",
+										borderColor: "var(--ink)",
 									}}
 								>
 									<h4
 										id="safe-pause-anchor-title"
 										className="text-[11px] font-semibold mb-1 m-0"
-										style={{ color: "var(--color-text-primary)" }}
+										style={{ color: "var(--ink)" }}
 									>
 										{t("practice.safe_pause_anchor_title")}
 									</h4>
 									{anchorPhrase && (
 										<p
 											className="text-xs"
-											style={{ color: "var(--color-text-secondary)" }}
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{t("practice.safe_pause_anchor_phrase_label")}:{" "}
 											{anchorPhrase}
@@ -773,7 +774,7 @@ export default function GuidedPracticePlayer({
 									{anchorBodyCue && (
 										<p
 											className="text-xs"
-											style={{ color: "var(--color-text-secondary)" }}
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{t("practice.safe_pause_anchor_cue_label")}:{" "}
 											{anchorBodyCue}
@@ -800,7 +801,7 @@ export default function GuidedPracticePlayer({
 							{safePauseRemaining > 0 ? (
 								<p
 									className="text-sm font-bold"
-									style={{ color: "var(--color-primary)" }}
+									style={{ color: "var(--chandra)" }}
 									aria-live="polite"
 								>
 									{t("practice.safe_pause_timer", { n: safePauseRemaining })}
@@ -808,7 +809,7 @@ export default function GuidedPracticePlayer({
 							) : (
 								<p
 									className="text-sm font-semibold"
-									style={{ color: "var(--color-text-primary)" }}
+									style={{ color: "var(--ink)" }}
 								>
 									{t("practice.safe_pause_expired")}
 								</p>

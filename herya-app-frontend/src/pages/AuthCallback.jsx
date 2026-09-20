@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 export default function AuthCallback() {
 	const navigate = useNavigate();
@@ -58,20 +59,20 @@ export default function AuthCallback() {
 			<section
 				aria-live="polite"
 				aria-busy={!error}
-				className="w-full max-w-md rounded-3xl bg-[var(--color-surface-card)] p-6 text-center shadow-[var(--shadow-card)]"
+				className="w-full max-w-md rounded-3xl bg-[var(--paper-raised)] p-6 text-center "
 			>
 				{error ? (
 					<>
 						<p
 							role="alert"
-							className="text-[var(--color-error-text)] text-sm font-semibold mb-4"
+							className="text-[var(--alert)] text-sm font-semibold mb-4"
 						>
 							{error}
 						</p>
 						<button
 							type="button"
 							onClick={() => navigate("/login", { replace: true })}
-							className="px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-sm font-semibold"
+							className="px-4 py-2 rounded-xl bg-[var(--chandra)] text-white text-sm font-semibold"
 						>
 							{t("auth_callback.back_to_login")}
 						</button>
@@ -80,9 +81,9 @@ export default function AuthCallback() {
 					<>
 						<div
 							aria-hidden="true"
-							className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin"
+							className="mx-auto mb-4 w-10 h-10 rounded-full border-4 border-[var(--chandra)] border-t-transparent animate-spin"
 						/>
-						<p className="text-[var(--color-text-primary)] text-sm font-semibold">
+						<p className="text-[var(--ink)] text-sm font-semibold">
 							{t("auth_callback.completing")}
 						</p>
 					</>

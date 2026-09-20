@@ -9,6 +9,7 @@ import RetroCard from "@/components/library/RetroCard";
 import { EmptyState, SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	filterByDifficulty,
 	filterByEffect,
@@ -330,12 +331,16 @@ const Library = () => {
 				);
 
 	return (
-		<main className="flex flex-col gap-4 pt-4 pb-6">
+		<main
+			data-identity="next"
+			className="flex flex-col gap-4 pb-6 pt-4"
+			style={{ background: "var(--paper)" }}
+		>
 			<header className="px-4">
-				<h1 className="font-display mb-1 text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">
+				<h1 className="display mb-1 text-[2.4rem]" style={{ color: "var(--ink)" }}>
 					{t("library.title", "Library")}
 				</h1>
-				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+				<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
 					{tr(
 						"library.subtitle",
 						"Explore and study sequences, poses, and pranayama.",
@@ -363,14 +368,14 @@ const Library = () => {
 						style={{
 							backgroundColor:
 								tab === tabItem.key
-									? "var(--color-info)"
-									: "var(--color-surface-card)",
+									? "var(--ink)"
+									: "var(--paper-raised)",
 							color:
-								tab === tabItem.key ? "white" : "var(--color-text-secondary)",
+								tab === tabItem.key ? "var(--paper)" : "var(--ink-soft)",
 							borderColor:
 								tab === tabItem.key
-									? "var(--color-info)"
-									: "var(--color-border)",
+									? "var(--ink)"
+									: "var(--ink)",
 						}}
 					>
 						{tabItem.label}
@@ -384,7 +389,7 @@ const Library = () => {
 						size={18}
 						className="absolute top-1/2 left-4 -translate-y-1/2"
 						aria-hidden="true"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					/>
 					<label htmlFor={`${tabsId}-search`} className="sr-only">
 						{searchLabel}
@@ -400,9 +405,9 @@ const Library = () => {
 						}
 						className="w-full rounded-2xl border-2 py-2.5 pr-11 pl-11 text-sm font-medium transition focus:outline-none"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							borderColor: "var(--color-border)",
-							color: "var(--color-text-primary)",
+							backgroundColor: "var(--paper-raised)",
+							borderColor: "var(--ink)",
+							color: "var(--ink)",
 						}}
 					/>
 					{query ? (
@@ -411,7 +416,7 @@ const Library = () => {
 							onClick={() => setQuery("")}
 							aria-label={tr("library.clear_search", "Clear search")}
 							className="absolute top-1/2 right-3 -translate-y-1/2 rounded-full p-1"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							<X size={16} aria-hidden="true" />
 						</button>
@@ -422,7 +427,7 @@ const Library = () => {
 					<p
 						id={`${tabsId}-search-help`}
 						className="mt-2 text-xs"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{searchHelpText}
 					</p>
@@ -444,16 +449,16 @@ const Library = () => {
 										style={{
 											backgroundColor:
 												difficultyFilter === option
-													? "var(--color-warning)"
-													: "var(--color-surface-card)",
+													? "var(--surya)"
+													: "var(--paper-raised)",
 											color:
 												difficultyFilter === option
 													? "white"
-													: "var(--color-text-secondary)",
+													: "var(--ink-soft)",
 											borderColor:
 												difficultyFilter === option
-													? "var(--color-warning)"
-													: "var(--color-border)",
+													? "var(--surya)"
+													: "var(--ink)",
 										}}
 									>
 										{label}
@@ -478,16 +483,16 @@ const Library = () => {
 										style={{
 											backgroundColor:
 												effectFilter === option
-													? "var(--color-success)"
-													: "var(--color-surface-card)",
+													? "var(--ink)"
+													: "var(--paper-raised)",
 											color:
 												effectFilter === option
 													? "white"
-													: "var(--color-text-secondary)",
+													: "var(--ink-soft)",
 											borderColor:
 												effectFilter === option
-													? "var(--color-success)"
-													: "var(--color-border)",
+													? "var(--ink)"
+													: "var(--ink)",
 										}}
 									>
 										{label}
@@ -506,9 +511,9 @@ const Library = () => {
 							}}
 							className="flex h-8 items-center justify-center gap-1.5 self-start rounded-full border px-3 text-xs font-semibold"
 							style={{
-								backgroundColor: "var(--color-surface-card)",
-								color: "var(--color-text-secondary)",
-								borderColor: "var(--color-border)",
+								backgroundColor: "var(--paper-raised)",
+								color: "var(--ink-soft)",
+								borderColor: "var(--ink)",
 							}}
 						>
 							<X size={14} aria-hidden="true" />
@@ -525,9 +530,9 @@ const Library = () => {
 						className="flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm"
 						role="alert"
 						style={{
-							backgroundColor: "var(--color-warning-bg)",
-							color: "var(--color-warning-text)",
-							borderColor: "var(--color-warning-border)",
+							backgroundColor: "var(--paper-raised)",
+							color: "var(--ink)",
+							borderColor: "var(--surya)",
 						}}
 					>
 						<div>
@@ -541,7 +546,7 @@ const Library = () => {
 								setHasFetched(false);
 							}}
 							className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold text-white"
-							style={{ backgroundColor: "var(--color-warning)" }}
+							style={{ backgroundColor: "var(--surya)" }}
 						>
 							{retryLabel}
 						</button>
@@ -553,7 +558,7 @@ const Library = () => {
 				<div className="px-4">
 					<p
 						className="text-xs font-medium"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{resultCountLabel.replace("{n}", String(resultCount))}
 					</p>
@@ -598,7 +603,7 @@ const Library = () => {
 											setHasFetched(false);
 										}}
 										className="mt-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
-										style={{ backgroundColor: "var(--color-info)" }}
+										style={{ backgroundColor: "var(--ink)" }}
 									>
 										{retryLabel}
 									</button>
@@ -636,15 +641,15 @@ const Library = () => {
 											<header className="flex items-center justify-between px-1">
 												<h2
 													id={`${tabsId}-${group.type}-heading`}
-													className="font-display text-sm font-bold uppercase tracking-widest"
-													style={{ color: "var(--color-text-secondary)" }}
+													className="display text-[1.05rem]"
+													style={{ color: "var(--ink-soft)" }}
 												>
 													{group.label}
 												</h2>
 												<div className="flex items-center gap-2">
 													<span
 														className="text-xs font-medium"
-														style={{ color: "var(--color-text-muted)" }}
+														style={{ color: "var(--ink-soft)" }}
 													>
 														{group.count}
 													</span>
@@ -653,7 +658,7 @@ const Library = () => {
 															type="button"
 															onClick={() => handleTabChange(group.type)}
 															className="text-xs font-semibold"
-															style={{ color: "var(--color-primary)" }}
+															style={{ color: "var(--chandra)" }}
 														>
 															{seeAllLabel}
 														</button>

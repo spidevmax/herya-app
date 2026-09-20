@@ -2,8 +2,8 @@ import { motion } from "framer-motion";
 import { PersonStanding } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import {
-	colorMix,
 	DIFF_COLORS,
+	DIFF_FG,
 	getCardSubtitle,
 	getCardTitle,
 	getMonogram,
@@ -26,7 +26,7 @@ const StatBox = ({ value, label, bg, color }) => (
 			{value}
 		</span>
 		<span
-			className="mt-0.5 block w-full truncate text-center text-[9px] font-black uppercase tracking-[0.12em]"
+			className="mt-0.5 block w-full truncate text-center text-[10px] font-bold"
 			style={{ color }}
 		>
 			{label}
@@ -35,14 +35,16 @@ const StatBox = ({ value, label, bg, color }) => (
 );
 
 const DifficultyBadge = ({ difficulty, label }) => {
-	const tone = DIFF_COLORS[difficulty] || "var(--color-text-muted)";
+	const tone = DIFF_COLORS[difficulty] || "var(--paper-raised)";
+	const toneFg = DIFF_FG[difficulty] || "var(--ink)";
 	return (
 		<span
-			className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.1em]"
+			className="inline-flex items-center px-2 py-0.5 text-[11px] font-bold"
 			style={{
-				backgroundColor: colorMix(tone, 18),
-				color: tone,
-				border: `1px solid ${colorMix(tone, 40)}`,
+				background: tone,
+				color: toneFg,
+				border: "var(--ink-width) solid var(--ink)",
+				borderRadius: "var(--radius-block)",
 			}}
 			aria-hidden="true"
 		>
@@ -57,6 +59,9 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 
 	const palette = getPalette(item, type);
 	const borderColor = palette.border;
+	// Content sits on the card fill, so it takes the palette foreground rather
+	// than the border colour, which flips with the theme.
+	const fg = palette.fg ?? "var(--ink)";
 	const title = getCardTitle(item, fallbackItemLabel, lang);
 	const subtitle = getCardSubtitle(item);
 	const monogram = getMonogram(title) || typeLabel.slice(0, 2).toUpperCase();
@@ -164,15 +169,20 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 			aria-label={ariaLabel}
 			whileHover={{ y: -3, scale: 1.01 }}
 			whileTap={{ scale: 0.985 }}
-			className="group relative flex h-full w-full overflow-hidden rounded-[28px] text-left cursor-pointer transition-shadow duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+			className="group relative flex h-full w-full cursor-pointer overflow-hidden text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
 			style={{
-				boxShadow: "0 14px 0 rgba(0,0,0,0.08)",
-				"--tw-ring-color": borderColor,
+				borderRadius: "var(--radius-block)",
+				boxShadow: "var(--offset) var(--offset) 0 var(--edge)",
+				"--tw-ring-color": "var(--ink)",
 			}}
 		>
 			<div
-				className="flex flex-1 flex-col overflow-hidden rounded-[28px] border-4 transition-shadow duration-200 group-hover:shadow-[0_16px_24px_rgba(0,0,0,0.12)]"
-				style={{ backgroundColor: palette.bg, borderColor }}
+				className="flex flex-1 flex-col overflow-hidden"
+				style={{
+					backgroundColor: palette.bg,
+					border: "var(--ink-width) solid var(--ink)",
+					borderRadius: "var(--radius-block)",
+				}}
 			>
 				<div className="flex flex-1 items-stretch">
 					<figure
@@ -180,8 +190,8 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						style={{
 							width: 88,
 							minHeight: 88,
-							backgroundColor: colorMix(borderColor, 9),
-							borderRight: `3px solid ${borderColor}`,
+							backgroundColor: "var(--paper-raised)",
+							borderRight: "var(--ink-width) solid var(--ink)",
 						}}
 					>
 						{imageSrc ? (
@@ -195,11 +205,11 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						) : (
 							<div
 								className="font-display flex h-full w-full items-center justify-center text-2xl font-black"
-								style={{ color: borderColor }}
+								style={{ color: fg }}
 								aria-hidden="true"
 							>
 								{monogram || (
-									<PersonStanding size={28} style={{ color: borderColor }} />
+									<PersonStanding size={28} style={{ color: fg }} />
 								)}
 							</div>
 						)}
@@ -210,8 +220,8 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center justify-between gap-2 mb-0.5">
 									<span
-										className="truncate text-[10px] font-black uppercase tracking-[0.12em]"
-										style={{ color: borderColor }}
+										className="truncate text-[10px] font-bold"
+										style={{ color: fg }}
 									>
 										{typeLabel}
 									</span>
@@ -224,7 +234,7 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 								</div>
 								<h3
 									className="truncate text-base font-black leading-tight"
-									style={{ color: borderColor }}
+									style={{ color: fg }}
 								>
 									{title}
 								</h3>
@@ -233,7 +243,7 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						{subtitle && subtitle !== title && (
 							<p
 								className="truncate text-xs font-medium italic"
-								style={{ color: colorMix(borderColor, 73) }}
+								style={{ color: fg, opacity: 0.75 }}
 							>
 								{subtitle}
 							</p>
@@ -241,7 +251,7 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						{(localized(item, "description", lang) || item.description) && (
 							<p
 								className="mt-1 line-clamp-2 text-xs leading-snug"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: fg, opacity: 0.75 }}
 							>
 								{localized(item, "description", lang)}
 							</p>
@@ -252,8 +262,8 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 				<footer
 					className="mt-auto flex items-center justify-between gap-2 px-3 py-2"
 					style={{
-						borderTop: `3px solid ${borderColor}`,
-						backgroundColor: colorMix(borderColor, 7),
+						borderTop: "var(--ink-width) solid var(--ink)",
+						backgroundColor: palette.statBg,
 					}}
 				>
 					<ul className="flex flex-nowrap items-stretch gap-1.5 list-none m-0 p-0 overflow-hidden w-full">

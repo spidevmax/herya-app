@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Card, LoadingSpinner, SurfaceCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { format } from "@/utils/helpers";
 import {
 	getMoodColorStyle,
@@ -47,14 +48,14 @@ const EntryCard = ({ entry, onSelect }) => {
 				<div className="min-w-0">
 					<p
 						className="font-display text-lg font-semibold leading-tight"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{created}
 					</p>
 					{practiceType && (
 						<p
 							className="text-sm mt-0.5 truncate"
-							style={{ color: "var(--color-text-secondary)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{translateWithFallback(
 								t,
@@ -77,7 +78,7 @@ const EntryCard = ({ entry, onSelect }) => {
 								</span>
 							))}
 							{moods.length > 2 && (
-								<span className="text-xs text-[var(--color-text-secondary)]">
+								<span className="text-xs text-[var(--ink-soft)]">
 									+{moods.length - 2}
 								</span>
 							)}
@@ -88,7 +89,7 @@ const EntryCard = ({ entry, onSelect }) => {
 			{entry.reflection && (
 				<p
 					className="text-sm line-clamp-2"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{entry.reflection}
 				</p>
@@ -148,7 +149,7 @@ export const EntryList = ({
 			)}
 
 			{!hasMore && entries.length > 0 && (
-				<p className="text-center text-xs py-2 text-[var(--color-text-muted)]">
+				<p className="text-center text-xs py-2 text-[var(--ink-soft)]">
 					{t("journal.all_loaded")}
 				</p>
 			)}

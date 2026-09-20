@@ -1,9 +1,10 @@
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import SectionTitle from "./SectionTitle";
 
-const cardStyle = { backgroundColor: "var(--color-surface-card)" };
+const cardStyle = { backgroundColor: "var(--paper-raised)" };
 
 export default function ProfileActions({
 	savingProfile,
@@ -19,7 +20,7 @@ export default function ProfileActions({
 	return (
 		<section
 			aria-label={t("profile.actions_title")}
-			className="rounded-3xl p-5 space-y-3 shadow-[var(--shadow-card)]"
+			className="rounded-3xl p-5 space-y-3 "
 			style={cardStyle}
 		>
 			<SectionTitle>{t("profile.actions_title")}</SectionTitle>
@@ -29,9 +30,9 @@ export default function ProfileActions({
 					role="alert"
 					className="rounded-xl px-4 py-2.5 text-center text-sm font-semibold"
 					style={{
-						backgroundColor: "var(--color-warning-bg)",
-						border: "1px solid var(--color-warning-border)",
-						color: "var(--color-text-primary)",
+						backgroundColor: "var(--paper-raised)",
+						border: "var(--ink-width) solid var(--surya)",
+						color: "var(--ink)",
 					}}
 				>
 					{saveError}
@@ -47,7 +48,7 @@ export default function ProfileActions({
 				style={
 					saveSuccess
 						? {
-								backgroundColor: "var(--color-success)",
+								backgroundColor: "var(--ink)",
 								boxShadow: "none",
 							}
 						: {}
@@ -64,7 +65,7 @@ export default function ProfileActions({
 				variant="ghost"
 				onClick={onLogout}
 				className="flex items-center justify-center gap-2 w-full"
-				style={{ color: "var(--color-text-secondary)" }}
+				style={{ color: "var(--ink-soft)" }}
 			>
 				<LogOut size={16} />
 				{t("profile.logout")}
@@ -73,15 +74,15 @@ export default function ProfileActions({
 			{/* Separator + destructive delete */}
 			<div
 				className="pt-4 mt-1 border-t"
-				style={{ borderColor: "var(--color-border)" }}
+				style={{ borderColor: "var(--ink)" }}
 			>
 				<button
 					type="button"
 					onClick={onDeleteClick}
 					className="w-full text-sm py-1.5 transition-opacity hover:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 rounded"
 					style={{
-						color: "var(--color-danger)",
-						outlineColor: "var(--color-danger)",
+						color: "var(--alert)",
+						outlineColor: "var(--alert)",
 					}}
 				>
 					{t("profile.delete_account")}

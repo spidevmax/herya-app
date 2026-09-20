@@ -8,6 +8,7 @@ import { TutorJournalSummary } from "@/components/journal/TutorJournalSummary";
 import { EmptyState } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { useJournalEntries } from "@/hooks/useJournalEntries";
 import { useJournalFilters } from "@/hooks/useJournalFilters";
 
@@ -53,7 +54,11 @@ const Journal = () => {
 	}, [loading, selected, selectedEntryId, setSelectedEntryId]);
 
 	return (
-		<main className="flex flex-col gap-6 pt-4 pb-6">
+		<main
+			data-identity="next"
+			className="flex flex-col gap-6 pb-6 pt-4"
+			style={{ background: "var(--paper)" }}
+		>
 			<JournalHeader entryCount={entries.length} />
 
 			{loading ? (

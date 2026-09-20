@@ -3,6 +3,7 @@ import { Pause, Play, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PHASE_COLORS, PHASE_LABEL_KEYS } from "@/config/techniqueProfiles";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import useBreathingEngine from "@/hooks/useBreathingEngine";
 import { PRANAYAMA_PATTERNS } from "@/utils/constants";
 
@@ -79,14 +80,14 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 							style={
 								selectedKey === key
 									? {
-											backgroundColor: "var(--color-primary)",
+											backgroundColor: "var(--chandra)",
 											color: "white",
 											boxShadow: "var(--shadow-button)",
 										}
 									: {
-											backgroundColor: "var(--color-surface-card)",
-											color: "var(--color-text-secondary)",
-											border: "1px solid var(--color-border-soft)",
+											backgroundColor: "var(--paper-raised)",
+											color: "var(--ink-soft)",
+											border: "var(--ink-width) solid var(--ink)",
 										}
 							}
 						>
@@ -163,7 +164,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 			{/* Cycle count */}
 			<p
 				className="text-sm font-medium"
-				style={{ color: "var(--color-text-secondary)" }}
+				style={{ color: "var(--ink-soft)" }}
 			>
 				{engine.completedCycles}{" "}
 				{engine.completedCycles === 1
@@ -180,9 +181,9 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					}}
 					className="w-11 h-11 rounded-full flex items-center justify-center border"
 					style={{
-						backgroundColor: "var(--color-surface-card)",
-						borderColor: "var(--color-border-soft)",
-						color: "var(--color-text-muted)",
+						backgroundColor: "var(--paper-raised)",
+						borderColor: "var(--ink)",
+						color: "var(--ink-soft)",
 					}}
 					aria-label={t("guided.reset")}
 				>
@@ -220,7 +221,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 					>
 						<dt
 							className="text-[10px] font-semibold uppercase"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t(PHASE_LABEL_KEYS[phase] || "pranayama.inhale")}
 						</dt>

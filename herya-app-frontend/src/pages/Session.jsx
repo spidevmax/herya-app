@@ -22,6 +22,7 @@ import PostPracticeNudge from "@/components/session/PostPracticeNudge";
 import { Button, StickyHeader } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { SESSION_TYPES } from "@/utils/constants";
 
 const MOOD_OPTIONS = [
@@ -158,7 +159,7 @@ export default function Session() {
 	const sessionType = SESSION_TYPES.find((s) => s.value === type) || {
 		label: tr("session.practice_fallback_label", "Practice"),
 		icon: null,
-		color: "var(--color-primary)",
+		color: "var(--chandra)",
 	};
 	const SESSION_TYPE_ICON_MAP = {
 		vk_sequence: PersonStanding,
@@ -380,19 +381,23 @@ export default function Session() {
 
 	if (step === "done") {
 		return (
-			<main className="min-h-dvh flex flex-col items-center justify-center gap-6 px-6">
+			<main
+				data-identity="next"
+				className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6"
+				style={{ background: "var(--paper)" }}
+			>
 				<motion.div
 					aria-hidden="true"
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}
 					transition={{ type: "spring", stiffness: 260, damping: 20 }}
 				>
-					<CheckCircle size={72} style={{ color: "var(--color-primary)" }} />
+					<CheckCircle size={72} style={{ color: "var(--chandra)" }} />
 				</motion.div>
-				<h1 className="text-2xl font-semibold text-[var(--color-text-primary)]">
+				<h1 className="text-2xl font-semibold text-[var(--ink)]">
 					{t("session.done_title")}
 				</h1>
-				<p className="text-[var(--color-text-muted)] text-center text-sm font-medium">
+				<p className="text-[var(--ink-soft)] text-center text-sm font-medium">
 					{t("session.done_subtitle")}
 				</p>
 				<Button onClick={() => navigate("/")}>{t("session.back_home")}</Button>
@@ -401,7 +406,11 @@ export default function Session() {
 	}
 
 	return (
-		<main className="flex flex-col min-h-dvh">
+		<main
+			data-identity="next"
+			className="flex min-h-dvh flex-col"
+			style={{ background: "var(--paper)" }}
+		>
 			<StickyHeader onBack={() => navigate(-1)} title={sessionTypeLabel} />
 
 			<div className="flex-1 px-4 pb-28 overflow-y-auto">
@@ -417,12 +426,12 @@ export default function Session() {
 						>
 							<h2
 								id="session-pre-heading"
-								className="text-xl font-semibold text-[var(--color-text-primary)]"
+								className="text-xl font-semibold text-[var(--ink)]"
 							>
 								{t("session.pre_title")}
 							</h2>
-							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
+							<div className="bg-[var(--paper-raised)] rounded-2xl p-5">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3">
 									{t("session.pre_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
@@ -432,10 +441,10 @@ export default function Session() {
 											key={m}
 											onClick={() => toggleMood(setMoodBefore, m)}
 											className={
-												"px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition " +
+												"px-3 py-1.5 rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] text-xs font-bold capitalize " +
 												(moodBefore.includes(m)
-													? "bg-[var(--color-primary)] text-white"
-													: "bg-[var(--color-surface)] text-[var(--color-text-muted)]")
+													? "bg-[var(--chandra)] text-[var(--on-fill)]"
+													: "bg-[var(--paper-raised)] text-[var(--ink)]")
 											}
 										>
 											{t(`session.moods.${m}`)}
@@ -443,8 +452,8 @@ export default function Session() {
 									))}
 								</div>
 							</div>
-							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
+							<div className="bg-[var(--paper-raised)] rounded-2xl p-5">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3">
 									{t("session.pre_energy", { n: energyBefore })}
 								</p>
 								<input
@@ -453,11 +462,11 @@ export default function Session() {
 									max={10}
 									value={energyBefore}
 									onChange={(e) => setEnergyBefore(+e.target.value)}
-									className="w-full accent-[var(--color-primary)]"
+									className="w-full accent-[var(--chandra)]"
 								/>
 							</div>
-							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3 flex items-center gap-2">
+							<div className="bg-[var(--paper-raised)] rounded-2xl p-5">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3 flex items-center gap-2">
 									<Clock size={16} />{" "}
 									{t("session.pre_duration", { n: duration })}
 								</p>
@@ -471,10 +480,10 @@ export default function Session() {
 												setDuration(d);
 											}}
 											className={
-												"px-4 py-2 rounded-xl text-sm font-semibold transition " +
+												"px-4 py-2 rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] text-sm font-bold " +
 												(duration === d
-													? "bg-[var(--color-primary)] text-white"
-													: "bg-[var(--color-surface)] text-[var(--color-text-muted)]")
+													? "bg-[var(--chandra)] text-[var(--on-fill)]"
+													: "bg-[var(--paper-raised)] text-[var(--ink)]")
 											}
 										>
 											{d}m
@@ -517,7 +526,7 @@ export default function Session() {
 									</div>
 								) : (
 									<div className="w-full text-center py-16">
-										<p className="text-[var(--color-text-muted)] text-sm font-medium">
+										<p className="text-[var(--ink-soft)] text-sm font-medium">
 											{tr(
 												"session.complete_loading_catalog",
 												"Loading sequences and pranayama...",
@@ -527,11 +536,11 @@ export default function Session() {
 								)
 							) : isCompletePractice ? (
 								<div className="w-full flex flex-col gap-4">
-									<div className="rounded-2xl bg-[var(--color-surface-card)] p-5 text-center">
-										<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">
+									<div className="rounded-2xl bg-[var(--paper-raised)] p-5 text-center">
+										<p className="text-xs font-semibold text-[var(--ink-soft)] mb-2">
 											{t("fab.complete_practice")}
 										</p>
-										<h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
+										<h3 className="text-xl font-semibold text-[var(--ink)] mb-2">
 											{completeSelectedMain.length > 0
 												? tr(
 														"session.complete_ready_title",
@@ -542,7 +551,7 @@ export default function Session() {
 														"Choose at least one main sequence",
 													)}
 										</h3>
-										<p className="text-sm text-[var(--color-text-muted)]">
+										<p className="text-sm text-[var(--ink-soft)]">
 											{completeSelectedMain.length > 0
 												? tr(
 														"session.complete_ready_hint",
@@ -556,19 +565,19 @@ export default function Session() {
 									</div>
 
 									{completeSelectedWarmup && (
-										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
+										<div className="rounded-2xl bg-[var(--paper-raised)] p-4">
+											<p className="text-xs font-semibold text-[var(--ink-soft)] mb-1">
 												{tr("session.complete_warmup", "Warmup")}
 											</p>
-											<p className="text-sm font-medium text-[var(--color-text-primary)]">
+											<p className="text-sm font-medium text-[var(--ink)]">
 												{completeSelectedWarmup.englishName}
 											</p>
 										</div>
 									)}
 
 									{completeSelectedMain.length > 0 && (
-										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-2">
+										<div className="rounded-2xl bg-[var(--paper-raised)] p-4">
+											<p className="text-xs font-semibold text-[var(--ink-soft)] mb-2">
 												{tr(
 													"session.complete_main_sequences",
 													"Main sequences",
@@ -578,7 +587,7 @@ export default function Session() {
 												{completeSelectedMain.map((item) => (
 													<span
 														key={item._id}
-														className="px-3 py-1.5 rounded-xl bg-[var(--color-surface)] text-sm font-medium text-[var(--color-text-primary)] border border-[var(--color-border)]"
+														className="px-3 py-1.5 rounded-xl bg-[var(--paper)] text-sm font-medium text-[var(--ink)] border border-[var(--ink)]"
 													>
 														{item.englishName}
 													</span>
@@ -588,32 +597,32 @@ export default function Session() {
 									)}
 
 									{completeSelectedCooldown && (
-										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
+										<div className="rounded-2xl bg-[var(--paper-raised)] p-4">
+											<p className="text-xs font-semibold text-[var(--ink-soft)] mb-1">
 												{tr("session.complete_cooldown", "Cooldown")}
 											</p>
-											<p className="text-sm font-medium text-[var(--color-text-primary)]">
+											<p className="text-sm font-medium text-[var(--ink)]">
 												{completeSelectedCooldown.englishName}
 											</p>
 										</div>
 									)}
 
 									{completeSelectedPranayama && (
-										<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
+										<div className="rounded-2xl bg-[var(--paper-raised)] p-4">
+											<p className="text-xs font-semibold text-[var(--ink-soft)] mb-1">
 												{t("fab.pranayama")}
 											</p>
-											<p className="text-sm font-medium text-[var(--color-text-primary)]">
+											<p className="text-sm font-medium text-[var(--ink)]">
 												{completeSelectedPranayama.romanizationName}
 											</p>
 										</div>
 									)}
 
-									<div className="rounded-2xl bg-[var(--color-surface-card)] p-4">
-										<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)] mb-1">
+									<div className="rounded-2xl bg-[var(--paper-raised)] p-4">
+										<p className="text-xs font-semibold text-[var(--ink-soft)] mb-1">
 											{t("fab.meditation")}
 										</p>
-										<p className="text-sm font-medium text-[var(--color-text-primary)]">
+										<p className="text-sm font-medium text-[var(--ink)]">
 											{getMeditationLabel(completeSelectedMeditation)} ·{" "}
 											{completeMeditationDuration} min
 										</p>
@@ -624,17 +633,17 @@ export default function Session() {
 									<div className="mb-4 flex justify-center">
 										<Hourglass
 											size={56}
-											style={{ color: "var(--color-primary)" }}
+											style={{ color: "var(--chandra)" }}
 										/>
 									</div>
-									<p className="text-xl font-semibold text-[var(--color-text-primary)]">
+									<p className="text-xl font-semibold text-[var(--ink)]">
 										{tr("session.loading_sequence", "Loading sequence...")}
 									</p>
 								</div>
 							) : seqId && sequence && practicePoses.length > 0 ? (
 								<>
 									<div className="w-full">
-										<p className="text-xs font-medium text-[var(--color-text-muted)] uppercase tracking-widest text-center mb-3">
+										<p className="text-xs font-medium text-[var(--ink-soft)] text-center mb-3">
 											{tr(
 												"session.pose_progress",
 												"Pose {current} of {total}",
@@ -649,24 +658,24 @@ export default function Session() {
 											initial={{ opacity: 0, y: 10 }}
 											animate={{ opacity: 1, y: 0 }}
 											transition={{ duration: 0.3 }}
-											className="bg-[var(--color-surface-card)] rounded-2xl p-6 text-center"
+											className="bg-[var(--paper-raised)] rounded-2xl p-6 text-center"
 										>
 											<div className="text-6xl mb-4">
 												<PersonStanding
 													size={56}
-													style={{ color: "var(--color-primary)" }}
+													style={{ color: "var(--chandra)" }}
 												/>
 											</div>
-											<h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
+											<h3 className="text-xl font-semibold text-[var(--ink)] mb-2">
 												{currentPoseName}
 											</h3>
 											{currentPoseSanskrit && (
-												<p className="text-sm italic text-[var(--color-text-muted)] mb-4">
+												<p className="text-sm italic text-[var(--ink-soft)] mb-4">
 													{currentPoseSanskrit}
 												</p>
 											)}
 											{currentPoseDescription && (
-												<p className="text-sm text-[var(--color-text-muted)] mt-4">
+												<p className="text-sm text-[var(--ink-soft)] mt-4">
 													{currentPoseDescription}
 												</p>
 											)}
@@ -679,7 +688,7 @@ export default function Session() {
 													setCurrentPoseIndex(Math.max(0, currentPoseIndex - 1))
 												}
 												disabled={currentPoseIndex === 0}
-												className="w-10 h-10 rounded-full bg-[var(--color-surface)] flex items-center justify-center disabled:opacity-30"
+												className="w-10 h-10 rounded-full bg-[var(--paper)] flex items-center justify-center disabled:opacity-30"
 											>
 												<ChevronLeft size={20} />
 											</button>
@@ -692,8 +701,8 @@ export default function Session() {
 														className={
 															"w-2 h-2 rounded-full transition " +
 															(idx === currentPoseIndex
-																? "bg-[var(--color-primary)] w-6"
-																: "bg-[var(--color-border)]")
+																? "bg-[var(--chandra)] w-6"
+																: "bg-[var(--ink)]")
 														}
 													/>
 												))}
@@ -709,7 +718,7 @@ export default function Session() {
 													)
 												}
 												disabled={currentPoseIndex === practicePoses.length - 1}
-												className="w-10 h-10 rounded-full bg-[var(--color-surface)] flex items-center justify-center disabled:opacity-30"
+												className="w-10 h-10 rounded-full bg-[var(--paper)] flex items-center justify-center disabled:opacity-30"
 											>
 												<ChevronRight size={20} />
 											</button>
@@ -721,10 +730,10 @@ export default function Session() {
 									<div className="mb-4 flex justify-center">
 										<ClipboardList
 											size={56}
-											style={{ color: "var(--color-primary)" }}
+											style={{ color: "var(--chandra)" }}
 										/>
 									</div>
-									<p className="text-xl font-semibold text-[var(--color-text-primary)]">
+									<p className="text-xl font-semibold text-[var(--ink)]">
 										{tr(
 											"session.no_poses_in_sequence",
 											"No poses found in this sequence",
@@ -736,13 +745,13 @@ export default function Session() {
 									<div className="mb-4 flex justify-center">
 										<SessionTypeIcon
 											size={64}
-											style={{ color: "var(--color-primary)" }}
+											style={{ color: "var(--chandra)" }}
 										/>
 									</div>
-									<p className="text-xl font-semibold text-[var(--color-text-primary)]">
+									<p className="text-xl font-semibold text-[var(--ink)]">
 										{t("session.active_title")}
 									</p>
-									<p className="text-[var(--color-text-muted)] text-sm font-medium mt-2">
+									<p className="text-[var(--ink-soft)] text-sm font-medium mt-2">
 										{tr("session.active_minutes", "{n} minutes", {
 											n: duration,
 										})}
@@ -756,16 +765,16 @@ export default function Session() {
 					)}
 
 					{isCompletePractice && (
-						<div className="bg-[var(--color-surface-card)] rounded-2xl p-5 flex flex-col gap-4">
+						<div className="bg-[var(--paper-raised)] rounded-2xl p-5 flex flex-col gap-4">
 							<div>
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3">
 									{tr(
 										"session.complete_builder_title",
 										"Build your complete practice",
 									)}
 								</p>
 								{completeCatalogLoading ? (
-									<p className="text-sm text-[var(--color-text-muted)]">
+									<p className="text-sm text-[var(--ink-soft)]">
 										{tr(
 											"session.complete_loading_catalog",
 											"Loading sequences and pranayama...",
@@ -774,7 +783,7 @@ export default function Session() {
 								) : (
 									<div className="flex flex-col gap-4">
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
+											<p className="text-xs font-semibold text-[var(--ink-soft)]">
 												{tr(
 													"session.complete_warmup_sequence",
 													"Warmup sequence",
@@ -783,7 +792,7 @@ export default function Session() {
 											<select
 												value={completeWarmupId}
 												onChange={(e) => setCompleteWarmupId(e.target.value)}
-												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-sm"
 											>
 												<option value="">
 													{tr(
@@ -801,23 +810,23 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
+											<p className="text-xs font-semibold text-[var(--ink-soft)]">
 												{tr(
 													"session.complete_main_sequences",
 													"Main sequences",
 												)}
 											</p>
-											<div className="max-h-44 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3 flex flex-col gap-2">
+											<div className="max-h-44 overflow-y-auto rounded-2xl border border-[var(--ink)] bg-[var(--paper)] p-3 flex flex-col gap-2">
 												{completeSequences.map((item) => (
 													<button
 														type="button"
 														key={item._id}
 														onClick={() => toggleMainSequence(item._id)}
 														className={
-															"w-full rounded-xl px-3 py-2 text-left text-sm font-medium transition " +
+															"w-full rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] px-3 py-2 text-left text-sm font-bold " +
 															(completeMainIds.includes(item._id)
-																? "bg-[var(--color-primary)] text-white"
-																: "bg-[var(--color-surface-card)] text-[var(--color-text-primary)]")
+																? "bg-[var(--chandra)] text-[var(--on-fill)]"
+																: "bg-[var(--paper-raised)] text-[var(--ink)]")
 														}
 													>
 														{item.englishName} · {item.family}
@@ -827,7 +836,7 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
+											<p className="text-xs font-semibold text-[var(--ink-soft)]">
 												{tr(
 													"session.complete_cooldown_sequence",
 													"Cooldown sequence",
@@ -836,7 +845,7 @@ export default function Session() {
 											<select
 												value={completeCooldownId}
 												onChange={(e) => setCompleteCooldownId(e.target.value)}
-												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-sm"
 											>
 												<option value="">
 													{tr(
@@ -854,13 +863,13 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
+											<p className="text-xs font-semibold text-[var(--ink-soft)]">
 												{t("fab.pranayama")}
 											</p>
 											<select
 												value={completePranayamaId}
 												onChange={(e) => setCompletePranayamaId(e.target.value)}
-												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-sm"
 											>
 												<option value="">
 													{tr("session.complete_no_pranayama", "No pranayama")}
@@ -874,7 +883,7 @@ export default function Session() {
 										</div>
 
 										<div className="space-y-2">
-											<p className="text-xs font-semibold uppercase tracking-widest text-[var(--color-text-muted)]">
+											<p className="text-xs font-semibold text-[var(--ink-soft)]">
 												{t("fab.meditation")}
 											</p>
 											<select
@@ -882,7 +891,7 @@ export default function Session() {
 												onChange={(e) =>
 													setCompleteMeditationType(e.target.value)
 												}
-												className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm"
+												className="w-full rounded-xl border border-[var(--ink)] bg-[var(--paper)] px-3 py-2 text-sm"
 											>
 												{MEDITATION_OPTIONS.map((option) => (
 													<option key={option.value} value={option.value}>
@@ -891,7 +900,7 @@ export default function Session() {
 												))}
 											</select>
 											<div>
-												<p className="text-sm font-medium text-[var(--color-text-primary)] mb-2">
+												<p className="text-sm font-medium text-[var(--ink)] mb-2">
 													{tr(
 														"session.complete_meditation_duration",
 														"Meditation duration",
@@ -907,7 +916,7 @@ export default function Session() {
 													onChange={(e) =>
 														setCompleteMeditationDuration(+e.target.value)
 													}
-													className="w-full accent-[var(--color-secondary)]"
+													className="w-full accent-[var(--surya)]"
 												/>
 											</div>
 										</div>
@@ -916,7 +925,7 @@ export default function Session() {
 							</div>
 
 							{completeMainIds.length > 0 && (
-								<div className="rounded-2xl bg-[var(--color-surface)] p-4 text-sm text-[var(--color-text-primary)]">
+								<div className="rounded-2xl bg-[var(--paper)] p-4 text-sm text-[var(--ink)]">
 									<p className="font-semibold mb-2">
 										{tr("session.complete_plan_title", "Your plan")}
 									</p>
@@ -961,13 +970,13 @@ export default function Session() {
 						>
 							<h2
 								id="session-post-heading"
-								className="text-xl font-semibold text-[var(--color-text-primary)]"
+								className="text-xl font-semibold text-[var(--ink)]"
 							>
 								{t("session.post_title")}
 							</h2>
 							<PostPracticeNudge durationMinutes={duration} />
-							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
+							<div className="bg-[var(--paper-raised)] rounded-2xl p-5">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3">
 									{t("session.post_mood")}
 								</p>
 								<div className="flex flex-wrap gap-2">
@@ -977,10 +986,10 @@ export default function Session() {
 											key={m}
 											onClick={() => toggleMood(setMoodAfter, m)}
 											className={
-												"px-3 py-1.5 rounded-xl text-xs font-semibold capitalize transition " +
+												"px-3 py-1.5 rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--ink)] text-xs font-bold capitalize " +
 												(moodAfter.includes(m)
-													? "bg-[var(--color-secondary)] text-white"
-													: "bg-[var(--color-surface)] text-[var(--color-text-muted)]")
+													? "bg-[var(--surya)] text-[var(--on-fill)]"
+													: "bg-[var(--paper-raised)] text-[var(--ink)]")
 											}
 										>
 											{t(`session.moods.${m}`)}
@@ -988,8 +997,8 @@ export default function Session() {
 									))}
 								</div>
 							</div>
-							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
+							<div className="bg-[var(--paper-raised)] rounded-2xl p-5">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3">
 									{t("session.post_energy", { n: energyAfter })}
 								</p>
 								<input
@@ -998,11 +1007,11 @@ export default function Session() {
 									max={10}
 									value={energyAfter}
 									onChange={(e) => setEnergyAfter(+e.target.value)}
-									className="w-full accent-[var(--color-secondary)]"
+									className="w-full accent-[var(--surya)]"
 								/>
 							</div>
-							<div className="bg-[var(--color-surface-card)] rounded-2xl p-5">
-								<p className="text-sm font-medium text-[var(--color-text-primary)] mb-3">
+							<div className="bg-[var(--paper-raised)] rounded-2xl p-5">
+								<p className="text-sm font-medium text-[var(--ink)] mb-3">
 									{t("session.post_notes")}
 								</p>
 								<textarea
@@ -1010,7 +1019,7 @@ export default function Session() {
 									onChange={(e) => setNotes(e.target.value)}
 									rows={3}
 									placeholder={t("session.post_notes_placeholder")}
-									className="w-full text-sm text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] bg-[var(--color-surface)] rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[var(--color-secondary)] resize-none"
+									className="w-full text-sm text-[var(--ink)] placeholder-[var(--ink-soft)] bg-[var(--paper)] rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-[var(--surya)] resize-none"
 								/>
 							</div>
 							<Button onClick={handleComplete} disabled={saving}>

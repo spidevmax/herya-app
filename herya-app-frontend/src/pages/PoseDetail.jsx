@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getPoseById, getRelatedPoses } from "@/api/poses.api";
 import { Badge, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	localized,
 	localizedArray,
@@ -25,9 +26,9 @@ import {
 } from "@/utils/libraryHelpers";
 
 const DIFF_COLORS = {
-	beginner: "var(--color-info)",
-	intermediate: "var(--color-warning)",
-	advanced: "var(--color-danger)",
+	beginner: "var(--chandra)",
+	intermediate: "var(--surya)",
+	advanced: "var(--alert)",
 };
 const normalizeList = (value) => {
 	if (Array.isArray(value)) return value.filter(Boolean);
@@ -58,10 +59,10 @@ const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
 						delay: Math.min(order * 0.06, 0.32),
 					}
 		}
-		className="rounded-2xl p-4 shadow-[var(--shadow-card)]"
-		style={{ backgroundColor: "var(--color-surface-card)" }}
+		className="ink-block p-4"
+		style={{ backgroundColor: "var(--paper-raised)" }}
 	>
-		<h2 className="font-display font-bold text-[var(--color-text-primary)] mb-3">
+		<h2 className="font-display font-bold text-[var(--ink)] mb-3">
 			{title}
 		</h2>
 		{children}
@@ -79,7 +80,7 @@ function RelatedPoseChip({ pose, onClick, lang }) {
 			onClick={onClick}
 			className="flex-shrink-0 flex flex-col items-center gap-1.5 w-20"
 		>
-			<div className="w-16 h-16 rounded-2xl bg-[var(--color-tone-info-bg)] flex items-center justify-center overflow-hidden">
+			<div className="w-16 h-16 rounded-2xl bg-[var(--paper-raised)] flex items-center justify-center overflow-hidden">
 				{relatedImage ? (
 					<img
 						src={relatedImage}
@@ -87,10 +88,10 @@ function RelatedPoseChip({ pose, onClick, lang }) {
 						className="w-full h-full object-cover"
 					/>
 				) : (
-					<PersonStanding size={24} style={{ color: "var(--color-primary)" }} />
+					<PersonStanding size={24} style={{ color: "var(--chandra)" }} />
 				)}
 			</div>
-			<p className="text-[10px] text-center text-[var(--color-text-secondary)] font-medium leading-tight line-clamp-2">
+			<p className="text-[10px] text-center text-[var(--ink-soft)] font-medium leading-tight line-clamp-2">
 				{displayName}
 			</p>
 		</button>
@@ -138,12 +139,14 @@ export default function PoseDetail() {
 	if (loading) {
 		return (
 			<main
-				className="px-4 pt-4 flex flex-col gap-4"
+				data-identity="next"
+				className="flex flex-col gap-4 px-4 pt-4"
+				style={{ background: "var(--paper)" }}
 				aria-busy="true"
 				aria-live="polite"
 			>
 				<div
-					className="h-56 rounded-3xl bg-[var(--color-surface-card)] animate-pulse"
+					className="h-56 rounded-3xl bg-[var(--paper-raised)] animate-pulse"
 					aria-hidden="true"
 				/>
 				<SkeletonCard lines={4} />
@@ -154,20 +157,24 @@ export default function PoseDetail() {
 
 	if (!pose) {
 		return (
-			<main className="flex flex-col items-center justify-center py-20 px-4 text-center">
+			<main
+				data-identity="next"
+				className="flex flex-col items-center justify-center px-4 py-20 text-center"
+				style={{ background: "var(--paper)" }}
+			>
 				<Frown
 					size={52}
 					aria-hidden="true"
 					className="mb-3"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				/>
-				<p className="font-display text-lg font-bold text-[var(--color-text-primary)]">
+				<p className="font-display text-lg font-bold text-[var(--ink)]">
 					{t("pose_detail.not_found")}
 				</p>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
-					className="mt-4 text-[var(--color-info)] text-sm font-semibold"
+					className="mt-4 text-[var(--chandra)] text-sm font-semibold"
 				>
 					{t("pose_detail.back")}
 				</button>
@@ -224,11 +231,15 @@ export default function PoseDetail() {
 	const counterposes = related?.counterposes ?? [];
 
 	return (
-		<main className="flex flex-col pb-10">
+		<main
+			data-identity="next"
+			className="flex flex-col pb-10"
+			style={{ background: "var(--paper)" }}
+		>
 			{/* Hero image */}
 			<figure
 				ref={heroRef}
-				className="relative h-64 bg-[var(--color-tone-info-bg)] overflow-hidden m-0"
+				className="relative h-64 bg-[var(--paper-raised)] overflow-hidden m-0"
 			>
 				{poseImage ? (
 					<motion.img
@@ -245,13 +256,13 @@ export default function PoseDetail() {
 					>
 						<PersonStanding
 							size={84}
-							style={{ color: "var(--color-primary)" }}
+							style={{ color: "var(--chandra)" }}
 						/>
 					</motion.div>
 				)}
 				<div
 					aria-hidden="true"
-					className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/18 via-transparent to-transparent"
+					className="pointer-events-none absolute inset-0"
 				/>
 				<button
 					type="button"
@@ -262,7 +273,7 @@ export default function PoseDetail() {
 					<ChevronLeft
 						size={20}
 						aria-hidden="true"
-						className="text-[var(--color-text-primary)]"
+						className="text-[var(--ink)]"
 					/>
 				</button>
 			</figure>
@@ -274,42 +285,38 @@ export default function PoseDetail() {
 					initial={{ opacity: 0, y: 16, scale: 0.985 }}
 					animate={{ opacity: 1, y: 0, scale: 1 }}
 					transition={{ type: "spring", stiffness: 230, damping: 22 }}
-					className="relative overflow-hidden rounded-[28px] p-[1px]"
-					style={{
-						background:
-							"linear-gradient(130deg, color-mix(in srgb, var(--color-primary) 36%, transparent), color-mix(in srgb, var(--color-info) 34%, transparent), color-mix(in srgb, var(--color-secondary) 30%, transparent))",
-					}}
+					className="ink-block relative overflow-hidden"
 				>
 					<div
-						className="relative rounded-[27px] px-5 py-5 overflow-hidden"
-						style={{ backgroundColor: "var(--color-surface-card)" }}
+						className="relative overflow-hidden px-5 py-5"
+						style={{ backgroundColor: "var(--paper-raised)" }}
 					>
 						<div
 							aria-hidden="true"
 							className="absolute -right-8 -top-8 w-28 h-28 rounded-full blur-2xl opacity-35"
-							style={{ backgroundColor: "var(--color-primary-light)" }}
+							style={{ backgroundColor: "var(--chandra)" }}
 						/>
 						<div
 							aria-hidden="true"
 							className="absolute -left-10 -bottom-10 w-28 h-28 rounded-full blur-2xl opacity-25"
-							style={{ backgroundColor: "var(--color-info)" }}
+							style={{ backgroundColor: "var(--chandra)" }}
 						/>
 
 						<div className="relative flex items-start justify-between gap-3">
 							<div className="min-w-0">
 								<h1
 									id="pose-title"
-									className="font-display text-2xl font-bold leading-tight text-[var(--color-text-primary)]"
+									className="font-display text-2xl font-bold leading-tight text-[var(--ink)]"
 								>
 									{poseDisplayName}
 								</h1>
 								{poseDisplayRomanized && (
-									<p className="text-[var(--color-text-secondary)] text-sm mt-0.5 truncate">
+									<p className="text-[var(--ink-soft)] text-sm mt-0.5 truncate">
 										{poseDisplayRomanized}
 									</p>
 								)}
 								{poseDisplaySanskrit && (
-									<p className="text-[var(--color-text-muted)] text-xs italic truncate">
+									<p className="text-[var(--ink-soft)] text-xs italic truncate">
 										{poseDisplaySanskrit}
 									</p>
 								)}
@@ -318,8 +325,8 @@ export default function PoseDetail() {
 								className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0"
 								style={{
 									backgroundColor:
-										"color-mix(in srgb, var(--color-primary) 12%, transparent)",
-									color: "var(--color-primary)",
+										"var(--paper-raised)",
+									color: "var(--chandra)",
 								}}
 							>
 								<Sparkles size={12} aria-hidden="true" />
@@ -335,25 +342,25 @@ export default function PoseDetail() {
 							{pose.difficulty && (
 								<Badge
 									color={
-										DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"
+										DIFF_COLORS[pose.difficulty] ?? "var(--ink-soft)"
 									}
 								>
 									{diffLabels[pose.difficulty] ?? pose.difficulty}
 								</Badge>
 							)}
 							{poseDisplayCategory && (
-								<Badge color="var(--color-info)">{poseDisplayCategory}</Badge>
+								<Badge color="var(--chandra)">{poseDisplayCategory}</Badge>
 							)}
 							{poseDisplayFamily && (
-								<Badge color="var(--color-lavender)">{poseDisplayFamily}</Badge>
+								<Badge color="var(--chandra)">{poseDisplayFamily}</Badge>
 							)}
 							{pose.drishti && (
-								<Badge color="var(--color-warning)">
+								<Badge color="var(--surya)">
 									{t("pose_detail.drishti")}: {formatValue(pose.drishti)}
 								</Badge>
 							)}
 							{pose.energyEffect && (
-								<Badge color="var(--color-success)">
+								<Badge color="var(--ink)">
 									{formatValue(pose.energyEffect)}
 								</Badge>
 							)}
@@ -365,18 +372,17 @@ export default function PoseDetail() {
 							<div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-4">
 								{recommendedBreaths && (
 									<div
-										className="rounded-xl px-3 py-2.5 border"
+										className="px-3 py-2.5"
 										style={{
-											backgroundColor: "var(--color-tone-info-bg)",
-											borderColor:
-												"color-mix(in srgb, var(--color-info) 24%, transparent)",
+											backgroundColor: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
 										}}
 									>
-										<p className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] inline-flex items-center gap-1">
+										<p className="text-[11px] font-bold text-[var(--ink-soft)] inline-flex items-center gap-1">
 											<Wind size={11} />
 											{t("pose_detail.breathing")}
 										</p>
-										<p className="text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
+										<p className="text-sm font-semibold text-[var(--ink)] mt-0.5">
 											{recommendedBreaths.min}-{recommendedBreaths.max}{" "}
 											{t("pose_detail.breaths")}
 										</p>
@@ -384,18 +390,17 @@ export default function PoseDetail() {
 								)}
 								{pose.sidedness?.type && (
 									<div
-										className="rounded-xl px-3 py-2.5 border"
+										className="px-3 py-2.5"
 										style={{
-											backgroundColor: "var(--color-tone-warning-bg)",
-											borderColor:
-												"color-mix(in srgb, var(--color-warning) 24%, transparent)",
+											backgroundColor: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
 										}}
 									>
-										<p className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] inline-flex items-center gap-1">
+										<p className="text-[11px] font-bold text-[var(--ink-soft)] inline-flex items-center gap-1">
 											<Target size={11} />
 											{t("pose_detail.sidedness")}
 										</p>
-										<p className="text-sm font-semibold text-[var(--color-text-primary)] mt-0.5">
+										<p className="text-sm font-semibold text-[var(--ink)] mt-0.5">
 											{formatValue(pose.sidedness.type)}
 										</p>
 									</div>
@@ -403,18 +408,17 @@ export default function PoseDetail() {
 								{(localized(pose, "breathingCue", lang) ||
 									pose.breathingCue) && (
 									<div
-										className="rounded-xl px-3 py-2.5 border"
+										className="px-3 py-2.5"
 										style={{
-											backgroundColor: "var(--color-tone-success-bg)",
-											borderColor:
-												"color-mix(in srgb, var(--color-success) 24%, transparent)",
+											backgroundColor: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
 										}}
 									>
-										<p className="text-[10px] uppercase font-bold tracking-wider text-[var(--color-text-muted)] inline-flex items-center gap-1">
+										<p className="text-[11px] font-bold text-[var(--ink-soft)] inline-flex items-center gap-1">
 											<Wind size={11} />
 											{t("pose_detail.breathe")}
 										</p>
-										<p className="text-sm font-semibold text-[var(--color-text-primary)] line-clamp-1 mt-0.5">
+										<p className="text-sm font-semibold text-[var(--ink)] line-clamp-1 mt-0.5">
 											{formatValue(localized(pose, "breathingCue", lang))}
 										</p>
 									</div>
@@ -424,10 +428,10 @@ export default function PoseDetail() {
 
 						{(localized(pose, "description", lang) || pose.description) && (
 							<p
-								className="mt-4 text-[var(--color-text-secondary)] text-sm leading-relaxed border-l-2 pl-3"
+								className="mt-4 text-[var(--ink-soft)] text-sm leading-relaxed border-l-2 pl-3"
 								style={{
 									borderColor:
-										"color-mix(in srgb, var(--color-primary) 28%, transparent)",
+										"var(--paper-raised)",
 								}}
 							>
 								{localized(pose, "description", lang)}
@@ -444,19 +448,19 @@ export default function PoseDetail() {
 					{(pose.chakraRelated || pose.transitionType) && (
 						<div className="flex flex-wrap gap-2 mb-4">
 							{pose.chakraRelated && (
-								<Badge color="var(--color-danger)">{pose.chakraRelated}</Badge>
+								<Badge color="var(--alert)">{pose.chakraRelated}</Badge>
 							)}
 							{pose.transitionType && (
-								<Badge color="var(--color-primary)">
+								<Badge color="var(--chandra)">
 									{formatValue(pose.transitionType)}
 								</Badge>
 							)}
 						</div>
 					)}
-					<div className="grid grid-cols-1 gap-3 text-sm text-[var(--color-text-secondary)]">
+					<div className="grid grid-cols-1 gap-3 text-sm text-[var(--ink-soft)]">
 						{recommendedBreaths && (
 							<p>
-								<b className="text-[var(--color-text-primary)]">
+								<b className="text-[var(--ink)]">
 									{t("pose_detail.breathing")}:
 								</b>{" "}
 								{recommendedBreaths.min} - {recommendedBreaths.max}{" "}
@@ -465,7 +469,7 @@ export default function PoseDetail() {
 						)}
 						{pose.sidedness?.type && (
 							<p>
-								<b className="text-[var(--color-text-primary)]">
+								<b className="text-[var(--ink)]">
 									{t("pose_detail.sidedness")}:
 								</b>{" "}
 								{formatValue(pose.sidedness.type)}
@@ -478,7 +482,7 @@ export default function PoseDetail() {
 							localized(pose, "breathingCue", lang) || pose.breathingCue,
 						) && (
 							<p>
-								<b className="text-[var(--color-text-primary)]">
+								<b className="text-[var(--ink)]">
 									{t("pose_detail.breathe")}
 								</b>{" "}
 								{formatValue(localized(pose, "breathingCue", lang))}
@@ -493,7 +497,7 @@ export default function PoseDetail() {
 						order={1}
 						reduceMotion={prefersReducedMotion}
 					>
-						<p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+						<p className="text-sm text-[var(--ink-soft)] leading-relaxed">
 							{aliases.join(", ")}
 						</p>
 					</DetailBlock>
@@ -507,7 +511,7 @@ export default function PoseDetail() {
 					>
 						<div className="flex flex-wrap gap-2">
 							{targetMuscles.map((muscle) => (
-								<Badge key={`muscle-${muscle}`} color="var(--color-success)">
+								<Badge key={`muscle-${muscle}`} color="var(--ink)">
 									{translateWithFallback(t, `anatomy.${muscle}`, muscle)}
 								</Badge>
 							))}
@@ -523,7 +527,7 @@ export default function PoseDetail() {
 					>
 						<div className="flex flex-wrap gap-2">
 							{jointFocus.map((joint) => (
-								<Badge key={`joint-${joint}`} color="var(--color-warning)">
+								<Badge key={`joint-${joint}`} color="var(--surya)">
 									{translateWithFallback(t, `anatomy.${joint}`, joint)}
 								</Badge>
 							))}
@@ -541,9 +545,9 @@ export default function PoseDetail() {
 							{benefits.map((b) => (
 								<li
 									key={`benefit-${b}`}
-									className="flex items-start gap-2 text-sm text-[var(--color-text-secondary)]"
+									className="flex items-start gap-2 text-sm text-[var(--ink-soft)]"
 								>
-									<span className="text-[var(--color-info)] mt-0.5 flex-shrink-0">
+									<span className="text-[var(--chandra)] mt-0.5 flex-shrink-0">
 										✓
 									</span>
 									{b}
@@ -568,7 +572,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="instructions-setup-heading">
 									<h3
 										id="instructions-setup-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.setup")}
 									</h3>
@@ -580,11 +584,11 @@ export default function PoseDetail() {
 											>
 												<span
 													aria-hidden="true"
-													className="w-6 h-6 rounded-full bg-[var(--color-info)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+													className="w-6 h-6 rounded-full bg-[var(--chandra)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
 												>
 													{i + 1}
 												</span>
-												<p className="text-[var(--color-text-secondary)] text-sm leading-relaxed flex-1">
+												<p className="text-[var(--ink-soft)] text-sm leading-relaxed flex-1">
 													{step}
 												</p>
 											</li>
@@ -596,7 +600,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="instructions-alignment-heading">
 									<h3
 										id="instructions-alignment-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.alignment")}
 									</h3>
@@ -604,11 +608,11 @@ export default function PoseDetail() {
 										{alignmentSteps.map((step) => (
 											<li
 												key={`alignment-${step}`}
-												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+												className="text-sm text-[var(--ink-soft)] leading-relaxed flex items-start gap-2"
 											>
 												<span
 													aria-hidden="true"
-													className="text-[var(--color-success)] mt-0.5 flex-shrink-0"
+													className="text-[var(--ink)] mt-0.5 flex-shrink-0"
 												>
 													•
 												</span>
@@ -622,7 +626,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="instructions-modifications-heading">
 									<h3
 										id="instructions-modifications-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.modifications")}
 									</h3>
@@ -630,11 +634,11 @@ export default function PoseDetail() {
 										{modificationSteps.map((step) => (
 											<li
 												key={`mod-${step}`}
-												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+												className="text-sm text-[var(--ink-soft)] leading-relaxed flex items-start gap-2"
 											>
 												<span
 													aria-hidden="true"
-													className="text-[var(--color-warning)] mt-0.5 flex-shrink-0"
+													className="text-[var(--surya)] mt-0.5 flex-shrink-0"
 												>
 													•
 												</span>
@@ -648,7 +652,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="instructions-exit-heading">
 									<h3
 										id="instructions-exit-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.exit")}
 									</h3>
@@ -656,11 +660,11 @@ export default function PoseDetail() {
 										{exitSteps.map((step) => (
 											<li
 												key={`exit-${step}`}
-												className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+												className="text-sm text-[var(--ink-soft)] leading-relaxed flex items-start gap-2"
 											>
 												<span
 													aria-hidden="true"
-													className="text-[var(--color-danger)] mt-0.5 flex-shrink-0"
+													className="text-[var(--alert)] mt-0.5 flex-shrink-0"
 												>
 													•
 												</span>
@@ -674,7 +678,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="instructions-keypoints-heading">
 									<h3
 										id="instructions-keypoints-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.alignment_details")}
 									</h3>
@@ -682,7 +686,7 @@ export default function PoseDetail() {
 										{keyPoints.map((point) => (
 											<li
 												key={`key-point-${point?.area || point?.instruction || String(point)}`}
-												className="text-sm text-[var(--color-text-secondary)] leading-relaxed"
+												className="text-sm text-[var(--ink-soft)] leading-relaxed"
 											>
 												{formatValue(point?.area)}
 												{point?.instruction ? `: ${point.instruction}` : ""}
@@ -705,9 +709,9 @@ export default function PoseDetail() {
 							{contraindications.map((item) => (
 								<li
 									key={`contra-${item}`}
-									className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+									className="text-sm text-[var(--ink-soft)] leading-relaxed flex items-start gap-2"
 								>
-									<span className="text-[var(--color-danger)] mt-0.5 flex-shrink-0">
+									<span className="text-[var(--alert)] mt-0.5 flex-shrink-0">
 										•
 									</span>
 									<span>{item}</span>
@@ -727,9 +731,9 @@ export default function PoseDetail() {
 							{commonMistakes.map((item) => (
 								<li
 									key={`mistake-${item}`}
-									className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex items-start gap-2"
+									className="text-sm text-[var(--ink-soft)] leading-relaxed flex items-start gap-2"
 								>
-									<span className="text-[var(--color-warning)] mt-0.5 flex-shrink-0">
+									<span className="text-[var(--surya)] mt-0.5 flex-shrink-0">
 										•
 									</span>
 									<span>{item}</span>
@@ -747,7 +751,7 @@ export default function PoseDetail() {
 					>
 						<div className="flex flex-wrap gap-2">
 							{props.map((item) => (
-								<Badge key={`prop-${item}`} color="var(--color-primary)">
+								<Badge key={`prop-${item}`} color="var(--chandra)">
 									{item}
 								</Badge>
 							))}
@@ -779,7 +783,7 @@ export default function PoseDetail() {
 					>
 						<h2
 							id="related-poses-heading"
-							className="font-display font-bold text-[var(--color-text-primary)] mb-3"
+							className="font-display font-bold text-[var(--ink)] mb-3"
 						>
 							{t("pose_detail.related_poses")}
 						</h2>
@@ -788,7 +792,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="related-preparation-heading">
 									<h3
 										id="related-preparation-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.preparation")}
 									</h3>
@@ -809,7 +813,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="related-continuation-heading">
 									<h3
 										id="related-continuation-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.continuation")}
 									</h3>
@@ -830,7 +834,7 @@ export default function PoseDetail() {
 								<section aria-labelledby="related-counterposes-heading">
 									<h3
 										id="related-counterposes-heading"
-										className="text-xs font-semibold text-[var(--color-text-muted)] uppercase tracking-wide mb-2"
+										className="text-xs font-semibold text-[var(--ink-soft)] mb-2"
 									>
 										{t("pose_detail.counterposes")}
 									</h3>

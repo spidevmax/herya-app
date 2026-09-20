@@ -11,12 +11,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getSequenceById } from "@/api/sequences.api";
 import { Badge, SkeletonCard, StickyHeader } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	LEVEL_LABEL_KEYS,
 	LEVEL_LABELS,
-	VK_FAMILY_MAP,
+	VK_FAMILY_BY_SLUG,
 } from "@/utils/constants";
-import { colorMix, localized, localizedName } from "@/utils/libraryHelpers";
+import { localized, localizedName } from "@/utils/libraryHelpers";
 
 export default function SequenceDetail() {
 	const { id } = useParams();
@@ -37,8 +38,8 @@ export default function SequenceDetail() {
 	}, [id]);
 
 	const family = seq
-		? VK_FAMILY_MAP[seq.family] || {
-				color: "var(--color-primary)",
+		? VK_FAMILY_BY_SLUG[seq.family] || {
+				color: "var(--chandra)",
 				emoji: null,
 				label: seq.family,
 			}
@@ -169,7 +170,7 @@ export default function SequenceDetail() {
 	const viewPoseLabel = tr("sequence_detail.view_pose", "View pose");
 
 	return (
-		<main className="pb-6">
+		<main data-identity="next" className="pb-6" style={{ background: "var(--paper)" }}>
 			<StickyHeader
 				onBack={() => navigate(-1)}
 				title={
@@ -197,14 +198,12 @@ export default function SequenceDetail() {
 						aria-labelledby="sequence-title"
 						initial={{ opacity: 0, scale: 0.96 }}
 						animate={{ opacity: 1, scale: 1 }}
-						className="rounded-3xl p-6 relative overflow-hidden"
-						style={{
-							background: `linear-gradient(135deg, ${family.color}, ${colorMix(family.color, 67)})`,
-						}}
+						className="ink-block relative overflow-hidden p-6"
+						style={{ background: "var(--surya)", color: "var(--on-fill)" }}
 					>
 						<div
 							aria-hidden="true"
-							className="absolute right-4 bottom-4 opacity-20 float select-none"
+							className="absolute bottom-4 right-4 select-none opacity-60"
 						>
 							{family.emoji ? (
 								<span className="text-8xl">{family.emoji}</span>
@@ -212,26 +211,26 @@ export default function SequenceDetail() {
 								<PersonStanding
 									size={88}
 									strokeWidth={1.8}
-									className="text-white"
+									style={{ color: "var(--on-fill)" }}
 								/>
 							)}
 						</div>
-						<p className="text-white/80 text-xs font-bold uppercase tracking-widest">
+						<p className="text-xs font-bold" style={{ opacity: 0.8 }}>
 							{family.labelKey ? t(family.labelKey) : family.label}
 						</p>
 						<h1
 							id="sequence-title"
-							className="font-display text-2xl font-bold text-white mt-1 mb-1"
+							className="font-display text-2xl font-bold  mt-1 mb-1"
 						>
 							{localizedName(seq, lang)}
 						</h1>
-						<p className="text-white/70 text-sm italic mb-4">
+						<p className="mb-4 text-sm italic" style={{ opacity: 0.75 }}>
 							{seq.sanskritName}
 						</p>
 						<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
 							{seq.estimatedDuration?.recommended && (
 								<li>
-									<Badge className="text-white bg-white/20 border-0">
+									<Badge className=" bg-white/20 border-0">
 										<Clock size={12} aria-hidden="true" />
 										{seq.estimatedDuration.recommended}{" "}
 										{t("sequence_detail.minutes")}
@@ -240,7 +239,7 @@ export default function SequenceDetail() {
 							)}
 							{seq.level && (
 								<li>
-									<Badge className="text-white bg-white/20 border-0">
+									<Badge className=" bg-white/20 border-0">
 										<Dumbbell size={12} aria-hidden="true" />
 										{LEVEL_LABEL_KEYS[seq.level]
 											? t(LEVEL_LABEL_KEYS[seq.level])
@@ -250,7 +249,7 @@ export default function SequenceDetail() {
 							)}
 							{seq.difficulty && (
 								<li>
-									<Badge className="text-white bg-white/20 border-0 capitalize">
+									<Badge className=" bg-white/20 border-0 capitalize">
 										{tr(`library.${seq.difficulty}`, seq.difficulty)}
 									</Badge>
 								</li>
@@ -261,19 +260,18 @@ export default function SequenceDetail() {
 					{(localized(seq, "description", lang) || seq.description) && (
 						<section
 							aria-labelledby="sequence-about-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="sequence-about-heading"
 								className="font-semibold mb-2"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{t("sequence_detail.about")}
 							</h2>
 							<p
 								className="text-sm leading-relaxed"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{localized(seq, "description", lang)}
 							</p>
@@ -287,31 +285,34 @@ export default function SequenceDetail() {
 						seq.difficulty) && (
 						<section
 							aria-labelledby="sequence-details-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="sequence-details-heading"
 								className="font-semibold mb-3"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{tr("sequence_detail.details", "Details")}
 							</h2>
 							<dl className="grid grid-cols-2 gap-2">
 								{seq.level ? (
 									<div
-										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
+										className="px-3 py-2"
+										style={{
+											background: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
+											borderRadius: "var(--radius-block)",
+										}}
 									>
 										<dt
-											className="text-[10px] font-bold uppercase tracking-widest"
-											style={{ color: family.color }}
+											className="text-[10px] font-bold"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{tr("library.filter_level", "Level")}
 										</dt>
 										<dd
 											className="text-sm font-semibold mt-0.5"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{LEVEL_LABEL_KEYS[seq.level]
 												? t(LEVEL_LABEL_KEYS[seq.level])
@@ -321,18 +322,22 @@ export default function SequenceDetail() {
 								) : null}
 								{seq.difficulty ? (
 									<div
-										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
+										className="px-3 py-2"
+										style={{
+											background: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
+											borderRadius: "var(--radius-block)",
+										}}
 									>
 										<dt
-											className="text-[10px] font-bold uppercase tracking-widest"
-											style={{ color: family.color }}
+											className="text-[10px] font-bold"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{tr("library.filter_difficulty", "Difficulty")}
 										</dt>
 										<dd
 											className="text-sm font-semibold mt-0.5 capitalize"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{tr(`library.${seq.difficulty}`, seq.difficulty)}
 										</dd>
@@ -342,12 +347,16 @@ export default function SequenceDetail() {
 								estimatedDuration.min ||
 								estimatedDuration.max ? (
 									<div
-										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
+										className="px-3 py-2"
+										style={{
+											background: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
+											borderRadius: "var(--radius-block)",
+										}}
 									>
 										<dt
-											className="text-[10px] font-bold uppercase tracking-widest"
-											style={{ color: family.color }}
+											className="text-[10px] font-bold"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{tr(
 												"sequence_detail.estimated_duration",
@@ -356,7 +365,7 @@ export default function SequenceDetail() {
 										</dt>
 										<dd
 											className="text-sm font-semibold mt-0.5"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{estimatedDuration.recommended ??
 												estimatedDuration.min ??
@@ -368,18 +377,22 @@ export default function SequenceDetail() {
 								) : null}
 								{seq.family ? (
 									<div
-										className="rounded-xl px-3 py-2"
-										style={{ backgroundColor: `${colorMix(family.color, 7)}` }}
+										className="px-3 py-2"
+										style={{
+											background: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
+											borderRadius: "var(--radius-block)",
+										}}
 									>
 										<dt
-											className="text-[10px] font-bold uppercase tracking-widest"
-											style={{ color: family.color }}
+											className="text-[10px] font-bold"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{tr("library.filter_family", "Family")}
 										</dt>
 										<dd
 											className="text-sm font-semibold mt-0.5 capitalize"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{seq.family.replace(/_/g, " ")}
 										</dd>
@@ -392,13 +405,12 @@ export default function SequenceDetail() {
 					{therapeuticFocus && (
 						<section
 							aria-labelledby="therapeutic-focus-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="therapeutic-focus-heading"
 								className="font-semibold mb-3"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{tr("sequence_detail.therapeutic_focus", "Therapeutic focus")}
 							</h2>
@@ -406,11 +418,11 @@ export default function SequenceDetail() {
 							therapeuticFocus.primaryBenefit ? (
 								<p
 									className="text-sm leading-relaxed"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									<span
 										className="font-semibold"
-										style={{ color: family.color }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{tr("sequence_detail.primary_benefit", "Primary benefit")}:
 									</span>
@@ -425,8 +437,8 @@ export default function SequenceDetail() {
 								>
 									<h3
 										id="target-conditions-heading"
-										className="text-xs font-bold uppercase tracking-widest mb-2"
-										style={{ color: "var(--color-text-secondary)" }}
+										className="text-xs font-bold mb-2"
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{tr(
 											"sequence_detail.target_conditions",
@@ -436,7 +448,7 @@ export default function SequenceDetail() {
 									<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
 										{therapeuticFocus.targetConditions.map((condition) => (
 											<li key={condition}>
-												<Badge className="text-xs" color={family.color}>
+												<Badge className="text-xs" color="var(--ink)">
 													{condition}
 												</Badge>
 											</li>
@@ -452,8 +464,8 @@ export default function SequenceDetail() {
 								>
 									<h3
 										id="contraindications-heading"
-										className="text-xs font-bold uppercase tracking-widest mb-2"
-										style={{ color: "var(--color-text-secondary)" }}
+										className="text-xs font-bold mb-2"
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{tr(
 											"sequence_detail.contraindications",
@@ -465,7 +477,7 @@ export default function SequenceDetail() {
 											<li
 												key={item}
 												className="text-sm"
-												style={{ color: "var(--color-text-secondary)" }}
+												style={{ color: "var(--ink-soft)" }}
 											>
 												<span aria-hidden="true">• </span>
 												{item}
@@ -480,13 +492,12 @@ export default function SequenceDetail() {
 					{recommendedPranayama && (
 						<section
 							aria-labelledby="recommended-pranayama-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="recommended-pranayama-heading"
 								className="font-semibold mb-3"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{tr(
 									"sequence_detail.recommended_pranayama",
@@ -495,7 +506,7 @@ export default function SequenceDetail() {
 							</h2>
 							<p
 								className="text-sm leading-relaxed"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{getItemName(
 									recommendedPranayama,
@@ -508,20 +519,19 @@ export default function SequenceDetail() {
 					{prerequisites.length > 0 && (
 						<section
 							aria-labelledby="prerequisites-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="prerequisites-heading"
 								className="font-semibold mb-3"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{tr("sequence_detail.prerequisites", "Prerequisites")}
 							</h2>
 							<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
 								{prerequisites.map((item) => (
 									<li key={item._id || item.englishName || item.name}>
-										<Badge color={family.color}>
+										<Badge color="var(--ink)">
 											{getItemName(item, t("library.card_default_item"))}
 										</Badge>
 									</li>
@@ -533,13 +543,12 @@ export default function SequenceDetail() {
 					{nextSteps.length > 0 && (
 						<section
 							aria-labelledby="next-steps-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="next-steps-heading"
 								className="font-semibold mb-3"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{tr("sequence_detail.next_steps", "Next steps")}
 							</h2>
@@ -554,11 +563,11 @@ export default function SequenceDetail() {
 												nextSequence.name
 											}
 											className="rounded-xl px-3 py-2 border"
-											style={{ borderColor: `${colorMix(family.color, 20)}` }}
+											style={{ borderColor: "var(--ink)" }}
 										>
 											<p
 												className="text-sm font-semibold"
-												style={{ color: "var(--color-text-primary)" }}
+												style={{ color: "var(--ink)" }}
 											>
 												{getItemName(
 													nextSequence,
@@ -568,7 +577,7 @@ export default function SequenceDetail() {
 											{step?.whenToUse ? (
 												<p
 													className="text-xs mt-1"
-													style={{ color: "var(--color-text-secondary)" }}
+													style={{ color: "var(--ink-soft)" }}
 												>
 													{step.whenToUse}
 												</p>
@@ -583,20 +592,19 @@ export default function SequenceDetail() {
 					{hasAssignedPoses ? (
 						<section
 							aria-labelledby="full-sequence-heading"
-							className="rounded-2xl p-5"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="ink-block p-5"
 						>
 							<h2
 								id="full-sequence-heading"
 								className="font-semibold mb-3 flex items-center gap-2"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								<BookOpen size={16} aria-hidden="true" />{" "}
 								{t("sequence_detail.full_sequence")}
 							</h2>
 							<p
 								className="text-xs font-medium mb-4"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("sequence_detail.postures_count", {
 									n: sequenceSections.reduce(
@@ -614,8 +622,8 @@ export default function SequenceDetail() {
 									>
 										<h3
 											id={`sequence-section-${section.key}`}
-											className="text-xs font-bold uppercase tracking-widest"
-											style={{ color: "var(--color-text-secondary)" }}
+											className="text-xs font-bold"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{section.label}
 										</h3>
@@ -625,7 +633,7 @@ export default function SequenceDetail() {
 													key={pose.id}
 													className="rounded-xl border"
 													style={{
-														borderColor: `${colorMix(family.color, 20)}`,
+														borderColor: "var(--ink)",
 													}}
 												>
 													{pose.poseId ? (
@@ -637,13 +645,13 @@ export default function SequenceDetail() {
 															aria-label={`${viewPoseLabel}: ${pose.name}`}
 															className="group w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left transition hover:brightness-95 hover:-translate-y-[1px] cursor-pointer"
 															style={{
-																backgroundColor: `${colorMix(family.color, 6)}`,
+																backgroundColor: "var(--paper-raised)",
 															}}
 														>
 															<div className="min-w-0">
 																<p
 																	className="text-sm font-semibold truncate"
-																	style={{ color: "var(--color-text-primary)" }}
+																	style={{ color: "var(--ink)" }}
 																>
 																	{pose.order}. {pose.name}
 																</p>
@@ -652,7 +660,7 @@ export default function SequenceDetail() {
 																	<p
 																		className="text-xs truncate"
 																		style={{
-																			color: "var(--color-text-secondary)",
+																			color: "var(--ink-soft)",
 																		}}
 																	>
 																		{pose.subtitle}
@@ -661,7 +669,7 @@ export default function SequenceDetail() {
 																{pose.instruction ? (
 																	<p
 																		className="text-xs mt-1"
-																		style={{ color: "var(--color-text-muted)" }}
+																		style={{ color: "var(--ink-soft)" }}
 																	>
 																		{pose.instruction}
 																	</p>
@@ -672,8 +680,8 @@ export default function SequenceDetail() {
 																	<span
 																		className="text-xs font-semibold px-2 py-1 rounded-lg"
 																		style={{
-																			backgroundColor: `${colorMix(family.color, 13)}`,
-																			color: family.color,
+																			backgroundColor: "var(--paper-raised)",
+																			color: "var(--ink)",
 																		}}
 																	>
 																		{t("sequence_detail.breaths", {
@@ -683,7 +691,7 @@ export default function SequenceDetail() {
 																) : null}
 																<span
 																	className="text-[11px] font-semibold inline-flex items-center gap-1"
-																	style={{ color: family.color }}
+																	style={{ color: "var(--ink-soft)" }}
 																>
 																	{viewPoseLabel}
 																	<ChevronRight
@@ -697,13 +705,13 @@ export default function SequenceDetail() {
 														<div
 															className="w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3"
 															style={{
-																backgroundColor: `${colorMix(family.color, 6)}`,
+																backgroundColor: "var(--paper-raised)",
 															}}
 														>
 															<div className="min-w-0">
 																<p
 																	className="text-sm font-semibold truncate"
-																	style={{ color: "var(--color-text-primary)" }}
+																	style={{ color: "var(--ink)" }}
 																>
 																	{pose.order}. {pose.name}
 																</p>
@@ -712,7 +720,7 @@ export default function SequenceDetail() {
 																	<p
 																		className="text-xs truncate"
 																		style={{
-																			color: "var(--color-text-secondary)",
+																			color: "var(--ink-soft)",
 																		}}
 																	>
 																		{pose.subtitle}
@@ -721,7 +729,7 @@ export default function SequenceDetail() {
 																{pose.instruction ? (
 																	<p
 																		className="text-xs mt-1"
-																		style={{ color: "var(--color-text-muted)" }}
+																		style={{ color: "var(--ink-soft)" }}
 																	>
 																		{pose.instruction}
 																	</p>
@@ -731,8 +739,8 @@ export default function SequenceDetail() {
 																<span
 																	className="text-xs font-semibold px-2 py-1 rounded-lg"
 																	style={{
-																		backgroundColor: `${colorMix(family.color, 13)}`,
-																		color: family.color,
+																		backgroundColor: "var(--paper-raised)",
+																		color: "var(--ink)",
 																	}}
 																>
 																	{t("sequence_detail.breaths", {
@@ -752,23 +760,19 @@ export default function SequenceDetail() {
 					) : (
 						<section
 							aria-labelledby="full-sequence-empty-heading"
-							className="rounded-2xl p-5 border"
-							style={{
-								backgroundColor: "var(--color-surface-card)",
-								borderColor: `${colorMix(family.color, 20)}`,
-							}}
+							className="ink-block p-5"
 						>
 							<h2
 								id="full-sequence-empty-heading"
 								className="font-semibold mb-2 flex items-center gap-2"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								<BookOpen size={16} aria-hidden="true" />
 								{t("sequence_detail.full_sequence")}
 							</h2>
 							<p
 								className="text-sm leading-relaxed"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{tr(
 									"sequence_detail.no_poses_assigned",

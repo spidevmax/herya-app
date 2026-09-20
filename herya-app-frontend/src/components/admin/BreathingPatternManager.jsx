@@ -8,6 +8,7 @@ import {
 import { getBreathingPatterns } from "@/api/breathing.api";
 import { Button, ConfirmModal, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const DIFFICULTIES = ["beginner", "intermediate", "advanced"];
 const EFFECTS = ["calming", "energizing", "balancing", "cooling", "heating"];
@@ -134,21 +135,21 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 		>
 			<section
 				aria-labelledby="breathing-modal-title"
-				className="relative w-full max-w-2xl rounded-3xl p-5 shadow-[var(--shadow-card-hover)] sm:p-6"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
+				className="relative w-full max-w-2xl rounded-3xl p-5  sm:p-6"
+				style={{ backgroundColor: "var(--paper-raised)" }}
 			>
 				<button
 					type="button"
 					onClick={onClose}
 					aria-label={t("admin.breathing_manager_cancel")}
-					className="absolute right-4 top-4 rounded-full p-2 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
+					className="absolute right-4 top-4 rounded-full p-2 text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)]"
 				>
 					<X size={18} aria-hidden="true" />
 				</button>
 
 				<h2
 					id="breathing-modal-title"
-					className="pr-10 font-display text-2xl font-bold text-[var(--color-text-primary)]"
+					className="pr-10 font-display text-2xl font-bold text-[var(--ink)]"
 				>
 					{isEditing
 						? t("admin.breathing_manager_edit")
@@ -158,7 +159,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 				{error && (
 					<p
 						role="alert"
-						className="mt-4 rounded-2xl border border-[var(--color-danger)] bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-danger)]"
+						className="mt-4 rounded-2xl border border-[var(--alert)] bg-[var(--alert-bg)] px-4 py-3 text-sm text-[var(--alert)]"
 					>
 						{error}
 					</p>
@@ -167,7 +168,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 				<form onSubmit={handleSubmit} className="mt-5 space-y-4">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_romanization")}
 							</span>
 							<input
@@ -180,11 +181,11 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 									}))
 								}
 								required
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_iast")}
 							</span>
 							<input
@@ -194,14 +195,14 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 									setForm((prev) => ({ ...prev, iastName: event.target.value }))
 								}
 								required
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_sanskrit")}
 							</span>
 							<input
@@ -214,11 +215,11 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 									}))
 								}
 								required
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_base_duration")}
 							</span>
 							<input
@@ -233,13 +234,13 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 									}))
 								}
 								required
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 					</div>
 
 					<label className="space-y-1.5 text-sm">
-						<span className="font-semibold text-[var(--color-text-primary)]">
+						<span className="font-semibold text-[var(--ink)]">
 							{t("admin.breathing_manager_description")}
 						</span>
 						<textarea
@@ -252,13 +253,13 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 							}
 							required
 							rows={3}
-							className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+							className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 						/>
 					</label>
 
 					<div className="grid gap-4 sm:grid-cols-2">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_difficulty")}
 							</span>
 							<select
@@ -269,7 +270,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										difficulty: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								{DIFFICULTIES.map((difficulty) => (
 									<option key={difficulty} value={difficulty}>
@@ -280,7 +281,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 						</label>
 
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_energy_effect")}
 							</span>
 							<select
@@ -291,7 +292,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										energyEffect: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								{EFFECTS.map((effect) => (
 									<option key={effect} value={effect}>
@@ -304,7 +305,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 
 					<div className="grid gap-4 sm:grid-cols-3">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Technique Key
 							</span>
 							<select
@@ -315,7 +316,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										techniqueKey: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								<option value="">Auto infer</option>
 								{TECHNIQUE_KEYS.map((value) => (
@@ -327,7 +328,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 						</label>
 
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Variant Of
 							</span>
 							<select
@@ -338,7 +339,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										variantOf: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								<option value="">None</option>
 								{TECHNIQUE_KEYS.map((value) => (
@@ -350,7 +351,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 						</label>
 
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Technique Family
 							</span>
 							<select
@@ -361,7 +362,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										techniqueFamily: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								<option value="">Auto infer</option>
 								{TECHNIQUE_FAMILIES.map((value) => (
@@ -373,7 +374,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 						</label>
 
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.breathing_manager_pattern_type")}
 							</span>
 							<select
@@ -384,7 +385,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										patternType: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								{PATTERN_TYPES.map((type) => (
 									<option key={type} value={type}>
@@ -397,7 +398,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 
 					<div className="grid gap-4 sm:grid-cols-4">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Inhale
 							</span>
 							<input
@@ -408,11 +409,11 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 								onChange={(event) =>
 									setForm((prev) => ({ ...prev, inhale: event.target.value }))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Hold
 							</span>
 							<input
@@ -423,11 +424,11 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 								onChange={(event) =>
 									setForm((prev) => ({ ...prev, hold: event.target.value }))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Exhale
 							</span>
 							<input
@@ -438,11 +439,11 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 								onChange={(event) =>
 									setForm((prev) => ({ ...prev, exhale: event.target.value }))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								Hold After
 							</span>
 							<input
@@ -456,7 +457,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 										holdAfterExhale: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 					</div>
@@ -559,12 +560,12 @@ export default function BreathingPatternManager() {
 			aria-label={t("admin.tab_breathing") || "Breathing patterns"}
 			className="flex flex-col gap-4"
 		>
-			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
+			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--paper-raised)] p-4  sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search
 						size={16}
 						aria-hidden="true"
-						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]"
 					/>
 					<label htmlFor="breathing-manager-search" className="sr-only">
 						{t("admin.breathing_manager_search")}
@@ -575,7 +576,7 @@ export default function BreathingPatternManager() {
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
 						placeholder={t("admin.breathing_manager_search")}
-						className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] py-3 pl-10 pr-4 text-sm text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
+						className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] py-3 pl-10 pr-4 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--ink-soft)] focus:border-[var(--chandra)]"
 					/>
 				</div>
 				<Button onClick={() => setShowModal(true)} className="shrink-0">
@@ -587,7 +588,7 @@ export default function BreathingPatternManager() {
 			{error && (
 				<p
 					role="alert"
-					className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]"
+					className="flex items-center gap-2 rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--surya)] bg-[var(--paper-raised)] px-4 py-3 text-sm font-bold text-[var(--ink)]"
 				>
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.breathing_manager_load_error")}</span>
@@ -609,17 +610,17 @@ export default function BreathingPatternManager() {
 						<li key={item._id}>
 							<article
 								aria-labelledby={`breathing-card-${item._id}-title`}
-								className="flex h-full flex-col rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)] transition-shadow hover:shadow-md"
+								className="flex h-full flex-col rounded-3xl border border-[var(--ink)] bg-[var(--paper-raised)] p-5  transition-shadow hover:shadow-md"
 							>
 								<header className="flex items-start justify-between gap-3">
 									<div className="min-w-0">
 										<h3
 											id={`breathing-card-${item._id}-title`}
-											className="truncate text-base font-semibold text-[var(--color-text-primary)]"
+											className="truncate text-base font-semibold text-[var(--ink)]"
 										>
 											{item.romanizationName}
 										</h3>
-										<p className="truncate text-sm text-[var(--color-text-secondary)]">
+										<p className="truncate text-sm text-[var(--ink-soft)]">
 											{item.iastName}
 										</p>
 									</div>
@@ -627,8 +628,8 @@ export default function BreathingPatternManager() {
 										className="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold tabular-nums"
 										style={{
 											backgroundColor:
-												"color-mix(in srgb, var(--color-primary) 12%, transparent)",
-											color: "var(--color-primary)",
+												"color-mix(in srgb, var(--chandra) 12%, transparent)",
+											color: "var(--chandra)",
 										}}
 										title="Inhale : Hold : Exhale : Hold (after exhale)"
 									>
@@ -639,37 +640,37 @@ export default function BreathingPatternManager() {
 									</span>
 								</header>
 
-								<ul className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
-									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+								<ul className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)] list-none m-0 p-0">
+									<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 										{humanize(item.difficulty || "beginner")}
 									</li>
-									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+									<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 										{humanize(item.energyEffect || "calming")}
 									</li>
 									{item.techniqueKey && (
-										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 											{humanize(item.techniqueKey)}
 										</li>
 									)}
 									{item.techniqueFamily && (
-										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 											{humanize(item.techniqueFamily)}
 										</li>
 									)}
 									{item.variantOf && (
-										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 											Variant of {humanize(item.variantOf)}
 										</li>
 									)}
 								</ul>
 
-								<p className="mt-3 line-clamp-2 text-xs text-[var(--color-text-muted)]">
+								<p className="mt-3 line-clamp-2 text-xs text-[var(--ink-soft)]">
 									{item.description || "—"}
 								</p>
 
 								<div
 									className="mt-4 flex items-center justify-between gap-2 border-t pt-3"
-									style={{ borderColor: "var(--color-border-soft)" }}
+									style={{ borderColor: "var(--ink)" }}
 								>
 									<Button
 										variant="outline"
@@ -686,8 +687,8 @@ export default function BreathingPatternManager() {
 									<button
 										type="button"
 										onClick={() => setDeleteTarget(item)}
-										className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1"
-										style={{ color: "var(--color-danger)" }}
+										className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--alert)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--alert)] focus-visible:ring-offset-1"
+										style={{ color: "var(--alert)" }}
 									>
 										<Trash2 size={14} aria-hidden="true" />
 										{t("admin.breathing_manager_delete")}
@@ -698,7 +699,7 @@ export default function BreathingPatternManager() {
 					))}
 				</ul>
 			) : (
-				<p className="rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)] m-0">
+				<p className="rounded-3xl bg-[var(--paper-raised)] p-8 text-center text-sm text-[var(--ink-soft)]  m-0">
 					{t("admin.breathing_manager_empty")}
 				</p>
 			)}

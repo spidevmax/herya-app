@@ -2,6 +2,7 @@ import { Compass, House, LibraryBig, TriangleAlert } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 export default function NotFound() {
 	const navigate = useNavigate();
@@ -12,8 +13,8 @@ export default function NotFound() {
 			<article
 				className="w-full max-w-xl rounded-3xl p-7 sm:p-9"
 				style={{
-					backgroundColor: "var(--color-surface-card)",
-					border: "1px solid var(--color-border-soft)",
+					backgroundColor: "var(--paper-raised)",
+					border: "var(--ink-width) solid var(--ink)",
 					boxShadow: "var(--shadow-card)",
 				}}
 			>
@@ -22,27 +23,27 @@ export default function NotFound() {
 						className="w-12 h-12 rounded-2xl flex items-center justify-center"
 						style={{
 							backgroundColor:
-								"color-mix(in srgb, var(--color-warning) 16%, transparent)",
-							color: "var(--color-warning)",
+								"color-mix(in srgb, var(--surya) 16%, transparent)",
+							color: "var(--surya)",
 						}}
 					>
 						<TriangleAlert size={24} />
 					</div>
 					<span
-						className="text-xs font-bold uppercase tracking-[0.14em]"
-						style={{ color: "var(--color-text-muted)" }}
+						className="text-xs font-bold"
+						style={{ color: "var(--ink-soft)" }}
 					>
 						404
 					</span>
 				</div>
 
-				<h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-3 text-[var(--color-text-primary)]">
+				<h1 className="text-3xl sm:text-4xl font-bold leading-tight mb-3 text-[var(--ink)]">
 					{t("not_found.title")}
 				</h1>
 
 				<p
 					className="text-sm sm:text-base mb-6"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("not_found.description")}
 				</p>
@@ -66,7 +67,7 @@ export default function NotFound() {
 					type="button"
 					onClick={() => navigate(-1)}
 					className="w-full inline-flex items-center justify-center gap-2 text-sm font-semibold"
-					style={{ color: "var(--color-primary)" }}
+					style={{ color: "var(--chandra)" }}
 				>
 					<Compass size={14} />
 					{t("not_found.go_back")}

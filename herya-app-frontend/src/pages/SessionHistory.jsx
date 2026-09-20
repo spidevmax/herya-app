@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { getSessions } from "@/api/sessions.api";
 import { EmptyState, FilterChips, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { VK_FAMILIES } from "@/utils/constants";
 import { format } from "@/utils/helpers";
 import { colorMix } from "@/utils/libraryHelpers";
@@ -25,10 +26,10 @@ const TYPE_ICONS = {
 };
 
 const TYPE_COLORS = {
-	vk_sequence: "var(--color-primary)",
-	pranayama: "var(--color-primary)",
-	meditation: "var(--color-info)",
-	complete_practice: "var(--color-warning)",
+	vk_sequence: "var(--chandra)",
+	pranayama: "var(--chandra)",
+	meditation: "var(--chandra)",
+	complete_practice: "var(--surya)",
 };
 
 const TYPE_FILTER_KEYS = [
@@ -48,7 +49,7 @@ const TYPE_FILTER_I18N = {
 };
 
 function SessionCard({ session, index, onClick, t, lang }) {
-	const color = TYPE_COLORS[session.sessionType] || "var(--color-primary)";
+	const color = TYPE_COLORS[session.sessionType] || "var(--chandra)";
 	const TypeIcon = TYPE_ICONS[session.sessionType] || PersonStanding;
 	const label = t(
 		TYPE_FILTER_I18N[session.sessionType] ||
@@ -64,7 +65,7 @@ function SessionCard({ session, index, onClick, t, lang }) {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: Math.min(index * 0.04, 0.3) }}
 			onClick={onClick}
-			className="bg-[var(--color-surface-card)] rounded-2xl p-4 flex items-center gap-4 shadow-[var(--shadow-soft)] w-full text-left"
+			className="ink-block p-4 flex items-center gap-4 w-full text-left"
 		>
 			<div
 				className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
@@ -77,23 +78,23 @@ function SessionCard({ session, index, onClick, t, lang }) {
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
-				<p className="font-semibold text-[var(--color-text-primary)] text-sm truncate">
+				<p className="font-semibold text-[var(--ink)] text-sm truncate">
 					{label}
 				</p>
-				<p className="text-[var(--color-text-muted)] text-xs mt-0.5">
+				<p className="text-[var(--ink-soft)] text-xs mt-0.5">
 					{format.date(session.date || session.createdAt, lang)}
 				</p>
 				{session.duration && (
-					<p className="text-[var(--color-text-secondary)] text-xs">
+					<p className="text-[var(--ink-soft)] text-xs">
 						{format.duration(session.duration)}
 					</p>
 				)}
 			</div>
 			<div className="flex items-center gap-2 flex-shrink-0">
 				{session.completed && (
-					<span className="w-2 h-2 rounded-full bg-[var(--color-primary)]" />
+					<span className="w-2 h-2 rounded-full bg-[var(--chandra)]" />
 				)}
-				<ChevronRight size={16} className="text-[var(--color-text-muted)]" />
+				<ChevronRight size={16} className="text-[var(--ink-soft)]" />
 			</div>
 		</motion.button>
 	);
@@ -129,22 +130,26 @@ export default function SessionHistory() {
 	}, [fetchSessions]);
 
 	return (
-		<main className="flex flex-col pt-4 pb-6 min-h-0">
+		<main
+			data-identity="next"
+			className="flex min-h-0 flex-col pb-6 pt-4"
+			style={{ background: "var(--paper)" }}
+		>
 			<header className="px-4 mb-4">
 				<div className="flex items-center gap-3 mb-4">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
 						aria-label={t("session.back_home")}
-						className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] flex items-center justify-center shadow-sm"
+						className="w-9 h-9 rounded-full bg-[var(--paper-raised)] flex items-center justify-center shadow-sm"
 					>
 						<ChevronLeft
 							size={20}
 							aria-hidden="true"
-							className="text-[var(--color-text-secondary)]"
+							className="text-[var(--ink-soft)]"
 						/>
 					</button>
-					<h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+					<h1 className="font-display text-2xl font-bold text-[var(--ink)]">
 						{t("session_history.title")}
 					</h1>
 				</div>
@@ -152,7 +157,7 @@ export default function SessionHistory() {
 					options={TYPE_FILTER_KEYS.map((key) => ({
 						key,
 						label: t(TYPE_FILTER_I18N[key]),
-						color: TYPE_COLORS[key] || "var(--color-primary)",
+						color: TYPE_COLORS[key] || "var(--chandra)",
 					}))}
 					selected={type}
 					onSelect={(nextType) => {
@@ -178,7 +183,7 @@ export default function SessionHistory() {
 						icon={
 							<ClipboardList
 								size={52}
-								style={{ color: "var(--color-primary)" }}
+								style={{ color: "var(--chandra)" }}
 							/>
 						}
 						title={t("session_history.empty_title")}
@@ -206,7 +211,7 @@ export default function SessionHistory() {
 					<button
 						type="button"
 						onClick={() => setPage((p) => p + 1)}
-						className="w-full py-3 rounded-2xl border border-[var(--color-border-soft)] text-[var(--color-primary)] text-sm font-semibold"
+						className="w-full py-3 rounded-2xl border border-[var(--ink)] text-[var(--chandra)] text-sm font-semibold"
 					>
 						{t("session_history.load_more")}
 					</button>

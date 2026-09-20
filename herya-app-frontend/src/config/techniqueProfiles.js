@@ -33,11 +33,13 @@ export const PHASE_KEYS = ["inhale", "hold", "exhale", "holdAfterExhale"];
 
 // ── Colour palette ──────────────────────────────────────────────────────────
 export const PHASE_COLORS = {
-	inhale: "var(--color-pranayama-inhale, #4A90D9)",
-	hold: "var(--color-pranayama-hold, #E8A838)",
-	exhale: "var(--color-pranayama-exhale, #5DB075)",
-	holdAfterExhale: "var(--color-pranayama-hold2, #9B7ECF)",
-	rest: "var(--color-text-muted, #9CA3AF)",
+	// Inhale draws on the cooling channel, exhale on the warming one; the two
+	// retentions are ink, the pause that belongs to the cycle.
+	inhale: "var(--chandra)",
+	hold: "var(--ink)",
+	exhale: "var(--surya)",
+	holdAfterExhale: "var(--ink)",
+	rest: "var(--ink-soft)",
 };
 
 // ── Translation keys per phase ──────────────────────────────────────────────

@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Eye, EyeOff, Leaf, Pause, Play } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const DEFAULT_PHASES = [
 	{ type: "intro", pct: 15, key: "guided.meditation_intro" },
@@ -134,12 +135,12 @@ export default function PhasedMeditationPlayer({
 		MEDITATION_INSTRUCTIONS[meditationType] || MEDITATION_INSTRUCTIONS.guided;
 
 	const phaseColors = {
-		intro: "var(--color-accent)",
-		main: "var(--color-primary)",
-		close: "var(--color-secondary)",
+		intro: "var(--ink)",
+		main: "var(--chandra)",
+		close: "var(--surya)",
 	};
 	const currentColor =
-		phaseColors[currentPhase.phase.type] || "var(--color-accent)";
+		phaseColors[currentPhase.phase.type] || "var(--ink)";
 
 	return (
 		<section
@@ -149,8 +150,8 @@ export default function PhasedMeditationPlayer({
 			{/* Header */}
 			<header className="text-center">
 				<p
-					className="text-xs font-semibold uppercase tracking-widest"
-					style={{ color: "var(--color-accent)" }}
+					className="text-xs font-semibold"
+					style={{ color: "var(--ink)" }}
 				>
 					{t(`session.meditation_types.${meditationType}`)}
 				</p>
@@ -197,7 +198,7 @@ export default function PhasedMeditationPlayer({
 								style={{
 									color: isActive
 										? phaseColors[phase.type]
-										: "var(--color-text-muted)",
+										: "var(--ink-soft)",
 								}}
 							>
 								{t(`guided.phase_${phase.type}`)}
@@ -238,13 +239,13 @@ export default function PhasedMeditationPlayer({
 					/>
 					<p
 						className="text-2xl font-bold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{formatTime(remaining)}
 					</p>
 					<p
 						className="text-[10px] font-medium mt-0.5"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("practice.remaining")}
 					</p>
@@ -262,21 +263,21 @@ export default function PhasedMeditationPlayer({
 						exit={{ opacity: 0, y: -8 }}
 						className="max-w-xs text-center px-4 py-3 rounded-xl"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
+							backgroundColor: "var(--paper-raised)",
 							border: `1px solid ${currentColor}20`,
 						}}
 					>
 						{instructions[currentPhase.phase.type] ? (
 							<p
 								className="text-sm leading-relaxed"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t(instructions[currentPhase.phase.type])}
 							</p>
 						) : (
 							<p
 								className="text-sm italic"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.meditation_silence")}
 							</p>
@@ -292,7 +293,7 @@ export default function PhasedMeditationPlayer({
 					onClick={() => setShowGuide((g) => !g)}
 					aria-pressed={showGuide}
 					className="flex items-center gap-1.5 text-xs font-medium"
-					style={{ color: "var(--color-accent)" }}
+					style={{ color: "var(--ink)" }}
 				>
 					{showGuide ? (
 						<EyeOff size={12} aria-hidden="true" />

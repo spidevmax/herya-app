@@ -14,6 +14,7 @@ import { createPose, deletePose, updatePose } from "@/api/admin.api";
 import { getPoses } from "@/api/poses.api";
 import { Badge, Button, ConfirmModal, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const PRIMARY_CATEGORIES = [
 	"standing_mountain",
@@ -146,25 +147,25 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 				initial={{ opacity: 0, y: 14, scale: 0.98 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				exit={{ opacity: 0, y: 10, scale: 0.98 }}
-				className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl p-5 sm:p-6 shadow-[var(--shadow-card-hover)]"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
+				className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl p-5 sm:p-6 "
+				style={{ backgroundColor: "var(--paper-raised)" }}
 			>
 				<button
 					type="button"
 					onClick={onClose}
 					aria-label={t("admin.pose_manager_cancel")}
-					className="absolute right-4 top-4 rounded-full p-2 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
+					className="absolute right-4 top-4 rounded-full p-2 text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)]"
 				>
 					<X size={18} aria-hidden="true" />
 				</button>
 
 				<header className="pr-10">
-					<p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--color-text-muted)]">
+					<p className="text-xs font-semibold text-[var(--ink-soft)]">
 						{t("admin.tab_poses")}
 					</p>
 					<h2
 						id="pose-form-title"
-						className="mt-1 font-display text-2xl font-bold text-[var(--color-text-primary)]"
+						className="mt-1 font-display text-2xl font-bold text-[var(--ink)]"
 					>
 						{isEditing
 							? t("admin.pose_manager_edit")
@@ -172,7 +173,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 					</h2>
 					<p
 						id="pose-form-subtitle"
-						className="mt-2 text-sm text-[var(--color-text-secondary)]"
+						className="mt-2 text-sm text-[var(--ink-soft)]"
 					>
 						{t("admin.pose_manager_subtitle")}
 					</p>
@@ -183,9 +184,9 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 						role="alert"
 						className="mt-4 flex items-start gap-2 rounded-2xl border px-4 py-3 text-sm"
 						style={{
-							backgroundColor: "var(--color-error-bg)",
-							borderColor: "var(--color-danger)",
-							color: "var(--color-danger)",
+							backgroundColor: "var(--alert-bg)",
+							borderColor: "var(--alert)",
+							color: "var(--alert)",
 						}}
 					>
 						<AlertTriangle
@@ -200,7 +201,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 				<form className="mt-5 space-y-5" onSubmit={handleSubmit}>
 					<div className="grid gap-4 md:grid-cols-2">
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_name")}
 							</span>
 							<input
@@ -208,16 +209,16 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 								value={form.name}
 								onChange={(event) => updateField("name", event.target.value)}
 								required
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							/>
 						</label>
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_romanization")}
 							</span>
 							<input
@@ -227,11 +228,11 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 									updateField("romanizationName", event.target.value)
 								}
 								required
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							/>
 						</label>
@@ -239,7 +240,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 
 					<div className="grid gap-4 md:grid-cols-2">
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_iast")}
 							</span>
 							<input
@@ -249,16 +250,16 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 									updateField("iastName", event.target.value)
 								}
 								required
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							/>
 						</label>
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_sanskrit")}
 							</span>
 							<input
@@ -268,11 +269,11 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 									updateField("sanskritName", event.target.value)
 								}
 								required
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							/>
 						</label>
@@ -280,7 +281,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 
 					<div className="grid gap-4 md:grid-cols-4">
 						<label className="space-y-2 text-sm md:col-span-2">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_primary_category")}
 							</span>
 							<select
@@ -288,11 +289,11 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 								onChange={(event) =>
 									updateField("primaryCategory", event.target.value)
 								}
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							>
 								{PRIMARY_CATEGORIES.map((category) => (
@@ -303,7 +304,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 							</select>
 						</label>
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_difficulty")}
 							</span>
 							<select
@@ -311,11 +312,11 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 								onChange={(event) =>
 									updateField("difficulty", event.target.value)
 								}
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							>
 								{DIFFICULTIES.map((difficulty) => (
@@ -326,17 +327,17 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 							</select>
 						</label>
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_drishti")}
 							</span>
 							<select
 								value={form.drishti}
 								onChange={(event) => updateField("drishti", event.target.value)}
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							>
 								{DRISHTIS.map((drishti) => (
@@ -350,7 +351,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 
 					<div className="grid gap-4 md:grid-cols-3">
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_sidedness")}
 							</span>
 							<select
@@ -358,11 +359,11 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 								onChange={(event) =>
 									updateField("sidednessType", event.target.value)
 								}
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							>
 								{SIDEDNESS.map((option) => (
@@ -373,7 +374,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 							</select>
 						</label>
 						<label className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_breaths_per_side")}
 							</span>
 							<input
@@ -384,27 +385,27 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 								onChange={(event) =>
 									updateField("sidednessBreathsPerSide", event.target.value)
 								}
-								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border px-4 py-3 text-sm outline-none transition-colors focus:border-[var(--chandra)]"
 								style={{
-									backgroundColor: "var(--color-surface)",
-									borderColor: "var(--color-border-soft)",
-									color: "var(--color-text-primary)",
+									backgroundColor: "var(--paper)",
+									borderColor: "var(--ink)",
+									color: "var(--ink)",
 								}}
 							/>
 						</label>
 						<div className="space-y-2 text-sm">
-							<span className="block font-semibold text-[var(--color-text-primary)]">
+							<span className="block font-semibold text-[var(--ink)]">
 								{t("admin.pose_manager_thumbnail")}
 							</span>
 							<label
-								className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-5 text-center transition-colors hover:border-[var(--color-primary)]"
+								className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-5 text-center transition-colors hover:border-[var(--chandra)]"
 								style={{
-									borderColor: "var(--color-border-soft)",
-									backgroundColor: "var(--color-surface)",
+									borderColor: "var(--ink)",
+									backgroundColor: "var(--paper)",
 								}}
 							>
-								<Upload size={18} className="text-[var(--color-primary)]" />
-								<span className="text-xs text-[var(--color-text-secondary)]">
+								<Upload size={18} className="text-[var(--chandra)]" />
+								<span className="text-xs text-[var(--ink-soft)]">
 									{thumbnailFile
 										? thumbnailFile.name
 										: isEditing && pose?.media?.thumbnail?.url
@@ -424,18 +425,18 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 					</div>
 
 					<div className="space-y-2 text-sm">
-						<span className="block font-semibold text-[var(--color-text-primary)]">
+						<span className="block font-semibold text-[var(--ink)]">
 							{t("admin.pose_manager_images")}
 						</span>
 						<label
-							className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-5 text-center transition-colors hover:border-[var(--color-primary)]"
+							className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed px-4 py-5 text-center transition-colors hover:border-[var(--chandra)]"
 							style={{
-								borderColor: "var(--color-border-soft)",
-								backgroundColor: "var(--color-surface)",
+								borderColor: "var(--ink)",
+								backgroundColor: "var(--paper)",
 							}}
 						>
-							<Upload size={18} className="text-[var(--color-primary)]" />
-							<span className="text-xs text-[var(--color-text-secondary)]">
+							<Upload size={18} className="text-[var(--chandra)]" />
+							<span className="text-xs text-[var(--ink-soft)]">
 								{imageFiles.length > 0
 									? `${imageFiles.length} ${t("admin.pose_manager_images")}`
 									: t("admin.pose_manager_upload_images")}
@@ -455,7 +456,7 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 								{pose.media.images.slice(0, 6).map((image, index) => (
 									<div
 										key={image.cloudinaryId ?? image.url ?? index}
-										className="overflow-hidden rounded-2xl border border-[var(--color-border-soft)]"
+										className="overflow-hidden rounded-2xl border border-[var(--ink)]"
 									>
 										<img
 											src={image.url}
@@ -572,12 +573,12 @@ export default function PoseManager() {
 
 	return (
 		<section aria-label={t("admin.tab_poses")} className="flex flex-col gap-4">
-			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
+			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--paper-raised)] p-4  sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search
 						size={16}
 						aria-hidden="true"
-						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]"
 					/>
 					<label htmlFor="pose-manager-search" className="sr-only">
 						{t("admin.pose_manager_search")}
@@ -588,7 +589,7 @@ export default function PoseManager() {
 						value={search}
 						onChange={(event) => setSearch(event.target.value)}
 						placeholder={t("admin.pose_manager_search")}
-						className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] py-3 pl-10 pr-4 text-sm text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
+						className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] py-3 pl-10 pr-4 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--ink-soft)] focus:border-[var(--chandra)]"
 					/>
 				</div>
 
@@ -599,7 +600,7 @@ export default function PoseManager() {
 					id="pose-manager-difficulty"
 					value={difficulty}
 					onChange={(event) => setDifficulty(event.target.value)}
-					className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+					className="rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 				>
 					<option value="all">{t("admin.pose_manager_filter_all")}</option>
 					<option value="beginner">
@@ -622,7 +623,7 @@ export default function PoseManager() {
 			{error && (
 				<p
 					role="alert"
-					className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]"
+					className="flex items-center gap-2 rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--surya)] bg-[var(--paper-raised)] px-4 py-3 text-sm font-bold text-[var(--ink)]"
 				>
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.pose_manager_load_error")}</span>
@@ -634,9 +635,9 @@ export default function PoseManager() {
 					role="alert"
 					className="flex items-center gap-2 rounded-2xl border px-4 py-3 text-sm"
 					style={{
-						backgroundColor: "var(--color-error-bg)",
-						borderColor: "var(--color-danger)",
-						color: "var(--color-danger)",
+						backgroundColor: "var(--alert-bg)",
+						borderColor: "var(--alert)",
+						color: "var(--alert)",
 					}}
 				>
 					<AlertTriangle size={16} aria-hidden="true" />
@@ -659,7 +660,7 @@ export default function PoseManager() {
 						<li key={pose._id}>
 							<article
 								aria-labelledby={`pose-card-${pose._id}-name`}
-								className="flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] shadow-[var(--shadow-card)] transition-shadow hover:shadow-md"
+								className="flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--ink)] bg-[var(--paper-raised)]  transition-shadow hover:shadow-md"
 							>
 								{pose.media?.thumbnail?.url ? (
 									<img
@@ -672,15 +673,15 @@ export default function PoseManager() {
 										className="flex h-40 w-full flex-col items-center justify-center gap-1.5"
 										style={{
 											background:
-												"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+												"var(--paper-raised)",
 										}}
 									>
 										<ImageOff
 											size={22}
 											aria-hidden="true"
-											className="text-[var(--color-text-muted)] opacity-70"
+											className="text-[var(--ink-soft)] opacity-70"
 										/>
-										<p className="m-0 text-xs font-medium text-[var(--color-text-muted)]">
+										<p className="m-0 text-xs font-medium text-[var(--ink-soft)]">
 											{t("admin.pose_manager_no_thumbnail")}
 										</p>
 									</div>
@@ -690,33 +691,33 @@ export default function PoseManager() {
 										<div className="min-w-0">
 											<h3
 												id={`pose-card-${pose._id}-name`}
-												className="truncate text-base font-semibold text-[var(--color-text-primary)]"
+												className="truncate text-base font-semibold text-[var(--ink)]"
 											>
 												{pose.name}
 											</h3>
-											<p className="truncate text-sm text-[var(--color-text-secondary)]">
+											<p className="truncate text-sm text-[var(--ink-soft)]">
 												{pose.romanizationName}
 											</p>
 										</div>
-										<Badge color="var(--color-primary)">
+										<Badge color="var(--chandra)">
 											{pose.difficulty}
 										</Badge>
 									</header>
 
-									<ul className="flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
-										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+									<ul className="flex flex-wrap gap-2 text-xs text-[var(--ink-soft)] list-none m-0 p-0">
+										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 											{humanizeValue(pose.vkCategory?.primary ?? "")}
 										</li>
-										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 											{humanizeValue(pose.sidedness?.type ?? "symmetric")}
 										</li>
-										<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+										<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 											{humanizeValue(pose.drishti ?? "none")}
 										</li>
 									</ul>
 
 									{pose.media?.images?.length > 0 && (
-										<p className="m-0 text-xs text-[var(--color-text-muted)]">
+										<p className="m-0 text-xs text-[var(--ink-soft)]">
 											{pose.media.images.length}{" "}
 											{t("admin.pose_manager_images")}
 										</p>
@@ -724,7 +725,7 @@ export default function PoseManager() {
 
 									<div
 										className="mt-auto flex items-center justify-between gap-2 border-t pt-3"
-										style={{ borderColor: "var(--color-border-soft)" }}
+										style={{ borderColor: "var(--ink)" }}
 									>
 										<Button
 											variant="outline"
@@ -741,8 +742,8 @@ export default function PoseManager() {
 										<button
 											type="button"
 											onClick={() => setDeleteTarget(pose)}
-											className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1"
-											style={{ color: "var(--color-danger)" }}
+											className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--alert)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--alert)] focus-visible:ring-offset-1"
+											style={{ color: "var(--alert)" }}
 										>
 											<Trash2 size={14} aria-hidden="true" />
 											{t("admin.pose_manager_delete")}
@@ -754,7 +755,7 @@ export default function PoseManager() {
 					))}
 				</ul>
 			) : (
-				<p className="rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)] m-0">
+				<p className="rounded-3xl bg-[var(--paper-raised)] p-8 text-center text-sm text-[var(--ink-soft)]  m-0">
 					{t("admin.pose_manager_empty")}
 				</p>
 			)}

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { VK_FAMILY_MAP } from "@/utils/constants";
 import { localized, localizedName } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
@@ -23,13 +24,13 @@ const formatFamily = (family, t) => {
 const difficultyColor = (d) => {
 	switch (d) {
 		case "beginner":
-			return "var(--color-secondary)";
+			return "var(--surya)";
 		case "intermediate":
-			return "var(--color-primary)";
+			return "var(--chandra)";
 		case "advanced":
-			return "var(--color-accent)";
+			return "var(--ink)";
 		default:
-			return "var(--color-text-muted)";
+			return "var(--ink-soft)";
 	}
 };
 
@@ -72,21 +73,21 @@ export default function SequencePicker({
 				onClick={() => setOpen((o) => !o)}
 				className="w-full rounded-xl border px-3 py-2.5 text-left flex items-center gap-2 transition"
 				style={{
-					backgroundColor: "var(--color-surface)",
+					backgroundColor: "var(--paper)",
 					borderColor: selected
-						? "var(--color-primary)"
-						: "var(--color-border-soft)",
+						? "var(--chandra)"
+						: "var(--ink)",
 				}}
 			>
 				{selected ? (
 					<div className="flex-1 min-w-0">
 						<p
 							className="text-sm font-semibold truncate"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{localizedName(selected, lang)}
 						</p>
-						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+						<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 							{formatFamily(selected.family, t)} ·{" "}
 							{t(`library.${selected.difficulty}`)} ·{" "}
 							{selected.structure?.corePoses?.length || 0}{" "}
@@ -96,15 +97,15 @@ export default function SequencePicker({
 				) : (
 					<span
 						className="text-sm flex-1"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("practice.select_sequence")}
 					</span>
 				)}
 				{open ? (
-					<ChevronUp size={16} style={{ color: "var(--color-text-muted)" }} />
+					<ChevronUp size={16} style={{ color: "var(--ink-soft)" }} />
 				) : (
-					<ChevronDown size={16} style={{ color: "var(--color-text-muted)" }} />
+					<ChevronDown size={16} style={{ color: "var(--ink-soft)" }} />
 				)}
 			</button>
 
@@ -117,19 +118,19 @@ export default function SequencePicker({
 						exit={{ opacity: 0, y: -8 }}
 						className="rounded-xl border shadow-lg overflow-hidden"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							borderColor: "var(--color-border-soft)",
+							backgroundColor: "var(--paper-raised)",
+							borderColor: "var(--ink)",
 						}}
 					>
 						{/* Search */}
 						<label
 							className="flex items-center gap-2 px-3 py-2 border-b"
-							style={{ borderColor: "var(--color-border-soft)" }}
+							style={{ borderColor: "var(--ink)" }}
 						>
 							<Search
 								size={14}
 								aria-hidden="true"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							/>
 							<input
 								type="text"
@@ -137,11 +138,11 @@ export default function SequencePicker({
 								onChange={(e) => setSearch(e.target.value)}
 								placeholder={t("guided.search_sequences")}
 								className="flex-1 text-sm bg-transparent outline-none"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							/>
 							{search && (
 								<button type="button" onClick={() => setSearch("")}>
-									<X size={14} style={{ color: "var(--color-text-muted)" }} />
+									<X size={14} style={{ color: "var(--ink-soft)" }} />
 								</button>
 							)}
 						</label>
@@ -151,7 +152,7 @@ export default function SequencePicker({
 							{filtered.length === 0 ? (
 								<p
 									className="text-sm text-center py-6"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("library.no_results")}
 								</p>
@@ -160,7 +161,7 @@ export default function SequencePicker({
 									<div
 										key={seq._id}
 										className="border-b last:border-b-0"
-										style={{ borderColor: "var(--color-border-soft)" }}
+										style={{ borderColor: "var(--ink)" }}
 									>
 										<button
 											type="button"
@@ -171,7 +172,7 @@ export default function SequencePicker({
 												<p
 													className="text-sm font-medium truncate"
 													style={{
-														color: "var(--color-text-primary)",
+														color: "var(--ink)",
 													}}
 												>
 													{localizedName(seq, lang)}
@@ -189,7 +190,7 @@ export default function SequencePicker({
 													<span
 														className="text-[10px]"
 														style={{
-															color: "var(--color-text-muted)",
+															color: "var(--ink-soft)",
 														}}
 													>
 														{formatFamily(seq.family, t)}
@@ -197,7 +198,7 @@ export default function SequencePicker({
 													<span
 														className="text-[10px]"
 														style={{
-															color: "var(--color-text-muted)",
+															color: "var(--ink-soft)",
 														}}
 													>
 														{seq.structure?.corePoses?.length || 0}{" "}
@@ -207,7 +208,7 @@ export default function SequencePicker({
 														<span
 															className="text-[10px]"
 															style={{
-																color: "var(--color-text-muted)",
+																color: "var(--ink-soft)",
 															}}
 														>
 															~{seq.estimatedDuration.recommended}m
@@ -232,9 +233,9 @@ export default function SequencePicker({
 														);
 													}
 												}}
-												className="p-1.5 rounded-lg shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+												className="p-1.5 rounded-lg shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)]"
 												style={{
-													color: "var(--color-text-muted)",
+													color: "var(--ink-soft)",
 												}}
 												aria-label={t("guided.preview_sequence")}
 											>
@@ -246,7 +247,7 @@ export default function SequencePicker({
 													size={16}
 													className="shrink-0"
 													style={{
-														color: "var(--color-primary)",
+														color: "var(--chandra)",
 													}}
 												/>
 											)}
@@ -290,14 +291,14 @@ function SequencePreview({ sequence }) {
 	return (
 		<div
 			className="px-3 pb-3 border-t"
-			style={{ borderColor: "var(--color-border-soft)" }}
+			style={{ borderColor: "var(--ink)" }}
 		>
 			{/* Therapeutic focus */}
 			{(localized(sequence.therapeuticFocus, "primaryBenefit", lang) ||
 				sequence.therapeuticFocus?.primaryBenefit) && (
 				<p
 					className="text-xs mt-2 mb-2 italic"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{localized(sequence.therapeuticFocus, "primaryBenefit", lang)}
 				</p>
@@ -319,8 +320,8 @@ function SequencePreview({ sequence }) {
 								<span
 									className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
 									style={{
-										backgroundColor: "var(--color-primary-light, #EEF2FF)",
-										color: "var(--color-primary)",
+										backgroundColor: "var(--paper-raised)",
+										color: "var(--chandra)",
 									}}
 								>
 									{cp.order || i + 1}
@@ -336,19 +337,19 @@ function SequencePreview({ sequence }) {
 									<div
 										className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
 										style={{
-											backgroundColor: "var(--color-primary-light, #EEF2FF)",
+											backgroundColor: "var(--paper-raised)",
 										}}
 									>
 										<PersonStanding
 											size={14}
-											style={{ color: "var(--color-primary)" }}
+											style={{ color: "var(--chandra)" }}
 										/>
 									</div>
 								)}
 								<div className="flex-1 min-w-0">
 									<p
 										className="text-xs font-medium truncate"
-										style={{ color: "var(--color-text-primary)" }}
+										style={{ color: "var(--ink)" }}
 									>
 										{name}
 									</p>
@@ -356,7 +357,7 @@ function SequencePreview({ sequence }) {
 										<p
 											className="text-[10px] truncate"
 											style={{
-												color: "var(--color-text-muted)",
+												color: "var(--ink-soft)",
 											}}
 										>
 											{pose.sanskritName}
@@ -365,7 +366,7 @@ function SequencePreview({ sequence }) {
 								</div>
 								<span
 									className="text-[10px] shrink-0"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{cp.breaths || 5}b
 								</span>
@@ -376,7 +377,7 @@ function SequencePreview({ sequence }) {
 			) : (
 				<p
 					className="text-xs text-center py-3"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("guided.no_poses_data")}
 				</p>

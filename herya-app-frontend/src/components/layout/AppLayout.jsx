@@ -91,7 +91,7 @@ export const DesktopSidebar = () => {
 const AppLayout = () => {
 	const location = useLocation();
 	return (
-		<div className="min-h-dvh" style={{ backgroundColor: "var(--color-surface)" }}>
+		<div className="min-h-dvh" style={{ backgroundColor: "var(--paper)" }}>
 			<DesktopSidebar />
 
 			{/* Content keeps the previous tokens until each page is migrated, so
@@ -99,7 +99,7 @@ const AppLayout = () => {
 			<div className="flex justify-center lg:ml-56">
 				<div
 					className="flex min-h-dvh w-full max-w-[430px] flex-col sm:max-w-[540px] lg:max-w-[680px] xl:max-w-[900px]"
-					style={{ backgroundColor: "var(--color-surface)" }}
+					style={{ backgroundColor: "var(--paper)" }}
 				>
 					<AnimatePresence mode="wait">
 						<PageTransition key={location.pathname}>

@@ -30,6 +30,7 @@ import {
 } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 function AdminDashboard({ stats, loading, t }) {
 	if (loading)
@@ -49,7 +50,7 @@ function AdminDashboard({ stats, loading, t }) {
 						icon={<Users size={18} aria-hidden="true" />}
 						label={t("admin.dashboard_total_users")}
 						value={stats.totalUsers ?? 0}
-						color="var(--color-primary)"
+						color="var(--chandra)"
 					/>
 				</li>
 				<li>
@@ -57,7 +58,7 @@ function AdminDashboard({ stats, loading, t }) {
 						icon={<List size={18} aria-hidden="true" />}
 						label={t("admin.dashboard_total_sessions")}
 						value={stats.totalSessions ?? 0}
-						color="var(--color-primary)"
+						color="var(--chandra)"
 					/>
 				</li>
 				<li>
@@ -65,7 +66,7 @@ function AdminDashboard({ stats, loading, t }) {
 						icon={<BookOpen size={18} aria-hidden="true" />}
 						label={t("admin.dashboard_journal_entries")}
 						value={stats.totalJournalEntries ?? 0}
-						color="var(--color-info)"
+						color="var(--chandra)"
 					/>
 				</li>
 				<li>
@@ -73,7 +74,7 @@ function AdminDashboard({ stats, loading, t }) {
 						icon={<BarChart2 size={18} aria-hidden="true" />}
 						label={t("admin.dashboard_active_users")}
 						value={stats.activeUsers ?? 0}
-						color="var(--color-warning)"
+						color="var(--surya)"
 					/>
 				</li>
 			</ul>
@@ -81,11 +82,11 @@ function AdminDashboard({ stats, loading, t }) {
 			{stats.popularSequences?.length > 0 && (
 				<section
 					aria-labelledby="admin-popular-sequences-heading"
-					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+					className="ink-block p-4"
 				>
 					<h2
 						id="admin-popular-sequences-heading"
-						className="font-semibold text-[var(--color-text-primary)] text-sm mb-3"
+						className="font-semibold text-[var(--ink)] text-sm mb-3"
 					>
 						{t("admin.dashboard_popular_sequences")}
 					</h2>
@@ -93,12 +94,12 @@ function AdminDashboard({ stats, loading, t }) {
 						{stats.popularSequences.map((s, i) => (
 							<li
 								key={s._id ?? `seq-${i}`}
-								className="flex items-center justify-between py-2 border-b border-[var(--color-border-soft)] last:border-0"
+								className="flex items-center justify-between py-2 border-b border-[var(--ink)] last:border-0"
 							>
-								<p className="text-sm text-[var(--color-text-secondary)] truncate flex-1">
+								<p className="text-sm text-[var(--ink-soft)] truncate flex-1">
 									{s.name ?? s.englishName}
 								</p>
-								<span className="text-xs font-bold text-[var(--color-primary)] ml-2">
+								<span className="text-xs font-bold text-[var(--chandra)] ml-2">
 									{s.count ?? 0} sesiones
 								</span>
 							</li>
@@ -110,11 +111,11 @@ function AdminDashboard({ stats, loading, t }) {
 			{stats.sessionsByType && (
 				<section
 					aria-labelledby="admin-sessions-by-type-heading"
-					className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+					className="ink-block p-4"
 				>
 					<h2
 						id="admin-sessions-by-type-heading"
-						className="font-semibold text-[var(--color-text-primary)] text-sm mb-3"
+						className="font-semibold text-[var(--ink)] text-sm mb-3"
 					>
 						{t("admin.dashboard_sessions_by_type")}
 					</h2>
@@ -122,12 +123,12 @@ function AdminDashboard({ stats, loading, t }) {
 						{Object.entries(stats.sessionsByType).map(([type, count]) => (
 							<div
 								key={type}
-								className="flex items-center justify-between py-2 border-b border-[var(--color-border-soft)] last:border-0"
+								className="flex items-center justify-between py-2 border-b border-[var(--ink)] last:border-0"
 							>
-								<dt className="text-sm text-[var(--color-text-secondary)] capitalize">
+								<dt className="text-sm text-[var(--ink-soft)] capitalize">
 									{type.replace(/_/g, " ")}
 								</dt>
-								<dd className="text-xs font-bold text-[var(--color-text-primary)]">
+								<dd className="text-xs font-bold text-[var(--ink)]">
 									{count}
 								</dd>
 							</div>
@@ -150,12 +151,12 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 	return (
 		<article
 			aria-label={user.name}
-			className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+			className="ink-block p-4"
 		>
 			<header className="flex items-center gap-3 mb-3">
 				<div
 					aria-hidden="true"
-					className="w-10 h-10 rounded-full bg-[color:var(--color-primary)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0"
+					className="w-10 h-10 rounded-full bg-[color:var(--chandra)/0.12] flex items-center justify-center overflow-hidden flex-shrink-0"
 				>
 					{user.profileImageUrl || user.avatar ? (
 						<img
@@ -164,24 +165,24 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 							className="w-full h-full object-cover"
 						/>
 					) : (
-						<UserRound size={18} style={{ color: "var(--color-primary)" }} />
+						<UserRound size={18} style={{ color: "var(--chandra)" }} />
 					)}
 				</div>
 				<div className="flex-1 min-w-0">
-					<p className="font-semibold text-[var(--color-text-primary)] text-sm truncate">
+					<p className="font-semibold text-[var(--ink)] text-sm truncate">
 						{user.name}
 					</p>
-					<p className="text-[var(--color-text-muted)] text-xs truncate">
+					<p className="text-[var(--ink-soft)] text-xs truncate">
 						{user.email}
 					</p>
 				</div>
 				<Badge
 					color={
 						user.role === "admin"
-							? "var(--color-info)"
+							? "var(--chandra)"
 							: user.role === "tutor"
-								? "var(--color-warning)"
-								: "var(--color-text-secondary)"
+								? "var(--surya)"
+								: "var(--ink-soft)"
 					}
 				>
 					{user.role}
@@ -195,7 +196,7 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 					id={selectId}
 					value={nextRole}
 					onChange={(e) => setNextRole(e.target.value)}
-					className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] bg-[var(--color-surface)] text-[var(--color-text-primary)]"
+					className="flex-1 py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--ink)] bg-[var(--paper)] text-[var(--ink)]"
 				>
 					<option value="user">{t("admin.users_role_standard")}</option>
 					<option value="tutor">{t("admin.users_role_tutor")}</option>
@@ -205,14 +206,14 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 					type="button"
 					disabled={nextRole === user.role}
 					onClick={() => onChangeRole(user._id, nextRole)}
-					className="py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--color-border-soft)] text-[var(--color-primary)] disabled:opacity-50"
+					className="py-2 px-3 rounded-xl text-xs font-semibold border border-[var(--ink)] text-[var(--chandra)] disabled:opacity-50"
 				>
 					{t("admin.users_save_role")}
 				</button>
 				<button
 					type="button"
 					onClick={() => onDelete(user)}
-					className="py-2 px-3 rounded-xl text-xs font-semibold bg-[var(--color-error-bg)] text-[var(--color-danger)]"
+					className="py-2 px-3 rounded-xl text-xs font-semibold bg-[var(--alert-bg)] text-[var(--alert)]"
 				>
 					{t("admin.users_delete")}
 				</button>
@@ -227,14 +228,14 @@ function ContentSection({ title, items, loading, color }) {
 	return (
 		<section
 			aria-labelledby={headingId}
-			className="bg-[var(--color-surface-card)] rounded-2xl p-4 shadow-[var(--shadow-card)]"
+			className="ink-block p-4"
 		>
 			<h2
 				id={headingId}
-				className="font-semibold text-[var(--color-text-primary)] text-sm mb-2"
+				className="font-semibold text-[var(--ink)] text-sm mb-2"
 			>
 				{title}{" "}
-				<span className="text-[var(--color-text-muted)] font-normal">
+				<span className="text-[var(--ink-soft)] font-normal">
 					({items.length})
 				</span>
 			</h2>
@@ -242,18 +243,18 @@ function ContentSection({ title, items, loading, color }) {
 				{items.slice(0, 20).map((item) => (
 					<li
 						key={item._id}
-						className="flex items-center gap-2 py-1.5 border-b border-[var(--color-surface)] last:border-0"
+						className="flex items-center gap-2 py-1.5 border-b border-[var(--paper)] last:border-0"
 					>
 						<span
 							aria-hidden="true"
 							className="w-1.5 h-1.5 rounded-full flex-shrink-0"
 							style={{ backgroundColor: color }}
 						/>
-						<p className="text-xs text-[var(--color-text-secondary)] truncate flex-1">
+						<p className="text-xs text-[var(--ink-soft)] truncate flex-1">
 							{item.englishName ?? item.name}
 						</p>
 						{item.difficulty && (
-							<span className="text-[10px] text-[var(--color-text-muted)]">
+							<span className="text-[10px] text-[var(--ink-soft)]">
 								{item.difficulty}
 							</span>
 						)}
@@ -395,7 +396,11 @@ export default function Admin() {
 	const initial = (firstName?.[0] || "·").toUpperCase();
 
 	return (
-		<main className="flex flex-col pt-4 pb-6">
+		<main
+			data-identity="next"
+			className="flex flex-col pb-6 pt-4"
+			style={{ background: "var(--paper)" }}
+		>
 			<motion.header
 				initial={{ opacity: 0, y: -8 }}
 				animate={{ opacity: 1, y: 0 }}
@@ -407,10 +412,10 @@ export default function Admin() {
 					className="w-11 h-11 rounded-full flex items-center justify-center font-display text-lg font-bold shrink-0 overflow-hidden"
 					style={{
 						backgroundColor:
-							"color-mix(in srgb, var(--color-primary) 14%, transparent)",
-						color: "var(--color-primary)",
+							"color-mix(in srgb, var(--chandra) 14%, transparent)",
+						color: "var(--chandra)",
 						border:
-							"2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+							"2px solid color-mix(in srgb, var(--chandra) 22%, transparent)",
 					}}
 				>
 					{user?.profileImageUrl || user?.avatar ? (
@@ -426,22 +431,22 @@ export default function Admin() {
 				<div className="min-w-0">
 					<p
 						className="text-sm font-medium"
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t(greetingKey)},
 					</p>
 					<div className="flex items-center gap-2 flex-wrap">
-						<h1 className="font-display text-2xl font-bold tracking-tight text-[var(--color-primary)] truncate">
+						<h1 className="font-display text-2xl font-bold tracking-tight text-[var(--chandra)] truncate">
 							{firstName}
 						</h1>
 						<span
-							className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full"
+							className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full"
 							style={{
 								backgroundColor:
-									"color-mix(in srgb, var(--color-info) 14%, transparent)",
-								color: "var(--color-info)",
+									"color-mix(in srgb, var(--chandra) 14%, transparent)",
+								color: "var(--chandra)",
 								border:
-									"1px solid color-mix(in srgb, var(--color-info) 28%, transparent)",
+									"1px solid color-mix(in srgb, var(--chandra) 28%, transparent)",
 							}}
 						>
 							<ShieldCheck size={11} aria-hidden="true" />

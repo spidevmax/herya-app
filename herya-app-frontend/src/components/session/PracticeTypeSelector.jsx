@@ -1,31 +1,32 @@
 import { motion } from "framer-motion";
 import { Brain, Sparkles, Star, Wind } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const PRACTICE_TYPES = [
 	{
 		value: "vk_sequence",
 		icon: Sparkles,
-		color: "var(--color-primary)",
-		bgColor: "var(--color-primary)",
+		color: "var(--chandra)",
+		bgColor: "var(--chandra)",
 	},
 	{
 		value: "pranayama",
 		icon: Wind,
-		color: "var(--color-secondary)",
-		bgColor: "var(--color-secondary)",
+		color: "var(--surya)",
+		bgColor: "var(--surya)",
 	},
 	{
 		value: "meditation",
 		icon: Brain,
-		color: "var(--color-accent)",
-		bgColor: "var(--color-accent)",
+		color: "var(--ink)",
+		bgColor: "var(--ink)",
 	},
 	{
 		value: "complete_practice",
 		icon: Star,
-		color: "var(--color-warning)",
-		bgColor: "var(--color-warning)",
+		color: "var(--surya)",
+		bgColor: "var(--surya)",
 	},
 ];
 
@@ -38,10 +39,10 @@ export default function PracticeTypeSelector({ onSelect }) {
 			className="flex flex-col gap-6 pt-4"
 		>
 			<header className="text-center">
-				<h2 className="text-2xl font-semibold mb-2 text-[var(--color-text-primary)]">
+				<h2 className="text-2xl font-semibold mb-2 text-[var(--ink)]">
 					{t("practice.select_type_title")}
 				</h2>
-				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+				<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
 					{t("practice.select_type_subtitle")}
 				</p>
 			</header>
@@ -60,8 +61,8 @@ export default function PracticeTypeSelector({ onSelect }) {
 							onClick={() => onSelect(type.value)}
 							className="flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all"
 							style={{
-								backgroundColor: "var(--color-surface-card)",
-								borderColor: "var(--color-border-soft)",
+								backgroundColor: "var(--paper-raised)",
+								borderColor: "var(--ink)",
 							}}
 						>
 							<div
@@ -73,13 +74,13 @@ export default function PracticeTypeSelector({ onSelect }) {
 							<div className="text-center">
 								<p
 									className="text-sm font-semibold"
-									style={{ color: "var(--color-text-primary)" }}
+									style={{ color: "var(--ink)" }}
 								>
 									{t(`practice.type_${type.value}`)}
 								</p>
 								<p
 									className="text-xs mt-1"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t(`practice.type_${type.value}_desc`)}
 								</p>

@@ -18,6 +18,7 @@ import { getBreathingPatterns } from "@/api/breathing.api";
 import { getSequences } from "@/api/sequences.api";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	distributePoseTime,
 	formatPoseDuration,
@@ -306,16 +307,21 @@ export default function SessionBuilder({
 
 	const blockTypeLabel = (bt) => t(`practice.type_${bt}`);
 
+	// Paired with blockTypeColor: meditation fills with ink, so its text must
+	// be paper. Keeping fill and foreground together stops them drifting apart
+	// and rendering a blank chip.
+	const blockTypeFg = (bt) => (bt === "meditation" ? "var(--paper)" : "var(--on-fill)");
+
 	const blockTypeColor = (bt) => {
 		switch (bt) {
 			case "vk_sequence":
-				return "var(--color-primary)";
+				return "var(--chandra)";
 			case "pranayama":
-				return "var(--color-secondary)";
+				return "var(--surya)";
 			case "meditation":
-				return "var(--color-accent)";
+				return "var(--ink)";
 			default:
-				return "var(--color-primary)";
+				return "var(--chandra)";
 		}
 	};
 
@@ -326,11 +332,11 @@ export default function SessionBuilder({
 					<div className="mb-3 flex justify-center">
 						<PersonStanding
 							size={38}
-							style={{ color: "var(--color-primary)" }}
+							style={{ color: "var(--chandra)" }}
 						/>
 					</div>
 					<p
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 						className="text-sm"
 					>
 						{t("practice.loading_catalog")}
@@ -348,12 +354,12 @@ export default function SessionBuilder({
 			{/* Header with total time */}
 			<header className="flex items-center justify-end">
 				<div
-					className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold shadow"
+					className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold"
 					style={{
-						backgroundColor: "rgba(67, 56, 202, 0.85)", // fallback for var
-						background:
-							"linear-gradient(90deg, var(--color-primary) 80%, var(--color-primary-light, #818CF8) 100%)",
-						color: "#fff",
+						background: "var(--chandra)",
+						color: "var(--on-fill)",
+						border: "var(--ink-width) solid var(--ink)",
+						borderRadius: "var(--radius-block)",
 					}}
 				>
 					<Clock size={14} />
@@ -361,7 +367,7 @@ export default function SessionBuilder({
 				</div>
 			</header>
 
-			<h2 className="text-xl font-semibold text-[var(--color-text-primary)]">
+			<h2 className="text-xl font-semibold text-[var(--ink)]">
 				{t("practice.build_session_title")}
 			</h2>
 
@@ -383,6 +389,7 @@ export default function SessionBuilder({
 								onUpdate={(updates) => updateBlock(block.id, updates)}
 								onRemove={() => removeBlock(block.id)}
 								blockTypeColor={blockTypeColor}
+								blockTypeFg={blockTypeFg}
 								blockTypeLabel={blockTypeLabel}
 								t={t}
 							/>
@@ -394,15 +401,15 @@ export default function SessionBuilder({
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					className="rounded-2xl border-2 border-dashed p-8 text-center"
-					style={{ borderColor: "var(--color-border)" }}
+					style={{ borderColor: "var(--ink)" }}
 				>
 					<p
 						className="text-sm mb-1"
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("practice.empty_blocks")}
 					</p>
-					<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+					<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 						{t("practice.empty_blocks_hint")}
 					</p>
 				</motion.div>
@@ -427,8 +434,8 @@ export default function SessionBuilder({
 							exit={{ opacity: 0, y: -8 }}
 							className="absolute top-full left-0 right-0 mt-2 rounded-xl shadow-lg z-10 overflow-hidden border"
 							style={{
-								backgroundColor: "var(--color-surface-card)",
-								borderColor: "var(--color-border-soft)",
+								backgroundColor: "var(--paper-raised)",
+								borderColor: "var(--ink)",
 							}}
 						>
 							{allowedBlockTypes.map((bt) => (
@@ -437,7 +444,7 @@ export default function SessionBuilder({
 									key={bt}
 									onClick={() => addBlock(bt)}
 									className="w-full px-4 py-3 text-left text-sm font-medium flex items-center gap-3 hover:brightness-95 transition"
-									style={{ color: "var(--color-text-primary)" }}
+									style={{ color: "var(--ink)" }}
 								>
 									<div
 										className="w-3 h-3 rounded-full"
@@ -472,6 +479,7 @@ function BlockCard({
 	onUpdate,
 	onRemove,
 	blockTypeColor,
+	blockTypeFg,
 	blockTypeLabel,
 	t,
 }) {
@@ -518,8 +526,8 @@ function BlockCard({
 			exit={{ opacity: 0, x: -20 }}
 			className="rounded-2xl overflow-hidden border"
 			style={{
-				backgroundColor: "var(--color-surface-card)",
-				borderColor: "var(--color-border-soft)",
+				backgroundColor: "var(--paper-raised)",
+				borderColor: "var(--ink)",
 				borderLeft: `3px solid ${color}`,
 			}}
 		>
@@ -528,10 +536,10 @@ function BlockCard({
 				<GripVertical
 					size={16}
 					className="cursor-grab"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				/>
 				<span
-					className="text-[11px] font-semibold uppercase tracking-[0.18em]"
+					className="text-[11px] font-semibold"
 					style={{ color }}
 				>
 					{index + 1}. {blockTypeLabel(block.blockType)}
@@ -539,11 +547,12 @@ function BlockCard({
 
 				{/* Siempre guiado */}
 				<span
-					className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold"
+					className="flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold"
 					style={{
-						backgroundColor: `${color}15`,
-						color,
-						border: `1px solid ${color}`,
+						backgroundColor: color,
+						color: blockTypeFg(block.blockType),
+						border: "var(--ink-width) solid var(--ink)",
+						borderRadius: "var(--radius-block)",
 					}}
 					title={t("guided.mode_guided")}
 				>
@@ -553,7 +562,7 @@ function BlockCard({
 
 				<span
 					className="ml-auto text-xs font-medium"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{estimatedFromCycles
 						? `${estimatedFromCycles}m`
@@ -565,7 +574,7 @@ function BlockCard({
 					type="button"
 					onClick={() => setExpanded((e) => !e)}
 					className="p-1 rounded-lg"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
 				</button>
@@ -573,7 +582,7 @@ function BlockCard({
 					type="button"
 					onClick={onRemove}
 					className="p-1 rounded-lg"
-					style={{ color: "var(--color-danger, #EF4444)" }}
+					style={{ color: "var(--alert)" }}
 				>
 					<X size={14} />
 				</button>
@@ -667,13 +676,13 @@ function BlockCard({
 										<div
 											className="rounded-xl p-2.5 flex flex-col gap-1.5"
 											style={{
-												backgroundColor: "var(--color-surface)",
-												border: "1px solid var(--color-border-soft)",
+												backgroundColor: "var(--paper)",
+												border: "var(--ink-width) solid var(--ink)",
 											}}
 										>
 											<p
 												className="text-xs font-semibold"
-												style={{ color: "var(--color-text-secondary)" }}
+												style={{ color: "var(--ink-soft)" }}
 											>
 												{t("guided.cycle_config")}
 											</p>
@@ -682,7 +691,7 @@ function BlockCard({
 											<div className="flex items-center justify-between">
 												<span
 													className="text-xs"
-													style={{ color: "var(--color-text-secondary)" }}
+													style={{ color: "var(--ink-soft)" }}
 												>
 													{t("guided.cycles")}
 												</span>
@@ -702,15 +711,15 @@ function BlockCard({
 														}
 														className="w-6 h-6 rounded-lg flex items-center justify-center border"
 														style={{
-															borderColor: "var(--color-border-soft)",
-															color: "var(--color-text-secondary)",
+															borderColor: "var(--ink)",
+															color: "var(--ink-soft)",
 														}}
 													>
 														<Minus size={12} />
 													</button>
 													<span
 														className="text-xs font-bold w-7 text-center"
-														style={{ color: "var(--color-text-primary)" }}
+														style={{ color: "var(--ink)" }}
 													>
 														{block.config?.cycles || 10}
 													</span>
@@ -726,8 +735,8 @@ function BlockCard({
 														}
 														className="w-6 h-6 rounded-lg flex items-center justify-center border"
 														style={{
-															borderColor: "var(--color-border-soft)",
-															color: "var(--color-text-secondary)",
+															borderColor: "var(--ink)",
+															color: "var(--ink-soft)",
 														}}
 													>
 														<Plus size={12} />
@@ -739,7 +748,7 @@ function BlockCard({
 											{estimatedFromCycles && (
 												<p
 													className="text-[10px]"
-													style={{ color: "var(--color-text-muted)" }}
+													style={{ color: "var(--ink-soft)" }}
 												>
 													{t("guided.estimated_duration")}:{estimatedFromCycles}{" "}
 													min
@@ -750,7 +759,7 @@ function BlockCard({
 											<div className="flex items-center gap-1">
 												<span
 													className="text-xs"
-													style={{ color: "var(--color-text-secondary)" }}
+													style={{ color: "var(--ink-soft)" }}
 												>
 													{t("guided.ratio")}:
 												</span>
@@ -784,9 +793,9 @@ function BlockCard({
 										}
 										className="w-full rounded-xl border px-3 py-2 text-sm"
 										style={{
-											backgroundColor: "var(--color-surface)",
-											borderColor: "var(--color-border-soft)",
-											color: "var(--color-text-primary)",
+											backgroundColor: "var(--paper)",
+											borderColor: "var(--ink)",
+											color: "var(--ink)",
 										}}
 									>
 										{MEDITATION_STYLES.map((style) => (
@@ -804,7 +813,7 @@ function BlockCard({
 								<div>
 									<p
 										className="text-xs font-medium mb-2"
-										style={{ color: "var(--color-text-secondary)" }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{t("practice.block_duration")}
 									</p>
@@ -814,16 +823,18 @@ function BlockCard({
 												type="button"
 												key={d}
 												onClick={() => onUpdate({ durationMinutes: d })}
-												className="px-3 py-1.5 rounded-lg text-xs font-semibold transition"
+												className="px-3 py-1.5 text-xs font-bold"
 												style={{
 													backgroundColor:
 														block.durationMinutes === d
 															? color
-															: "var(--color-surface)",
+															: "var(--paper-raised)",
 													color:
 														block.durationMinutes === d
-															? "white"
-															: "var(--color-text-secondary)",
+															? blockTypeFg(block.blockType)
+															: "var(--ink)",
+													border: "var(--ink-width) solid var(--ink)",
+													borderRadius: "var(--radius-block)",
 												}}
 											>
 												{d}m
@@ -857,15 +868,15 @@ function VKPoseBreakdown({
 		<div
 			className="rounded-xl p-2.5 flex flex-col gap-2"
 			style={{
-				backgroundColor: "var(--color-surface)",
-				border: "1px solid var(--color-border-soft)",
+				backgroundColor: "var(--paper)",
+				border: "var(--ink-width) solid var(--ink)",
 			}}
 		>
 			{/* Header with advanced toggle */}
 			<div className="flex items-center justify-between">
 				<p
 					className="text-xs font-semibold"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("practice.time_distribution")}
 				</p>
@@ -873,7 +884,7 @@ function VKPoseBreakdown({
 					type="button"
 					onClick={() => setShowAdvanced((v) => !v)}
 					className="flex items-center gap-1 text-[10px] font-medium transition"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("practice.advanced_timing")}
 					{showAdvanced ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
@@ -902,7 +913,7 @@ function VKPoseBreakdown({
 										color:
 											distributionMode === mode
 												? "white"
-												: "var(--color-text-muted)",
+												: "var(--ink-soft)",
 									}}
 								>
 									{t(`practice.dist_${mode}`)}
@@ -918,8 +929,9 @@ function VKPoseBreakdown({
 				<div
 					className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium"
 					style={{
-						backgroundColor: "var(--color-warning-bg, #FEF3C7)",
-						color: "var(--color-warning-text, #92400E)",
+						backgroundColor: "var(--paper-raised)",
+						border: "var(--ink-width) solid var(--surya)",
+						color: "var(--ink)",
 					}}
 				>
 					<AlertTriangle size={12} />
@@ -944,7 +956,7 @@ function VKPoseBreakdown({
 						{/* Pose name */}
 						<span
 							className="text-xs flex-1 truncate"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{p.poseName}
 						</span>
@@ -973,9 +985,9 @@ function VKPoseBreakdown({
 									}
 									className="w-5 h-5 rounded flex items-center justify-center"
 									style={{
-										backgroundColor: "var(--color-surface-card)",
-										color: "var(--color-text-muted)",
-										border: "1px solid var(--color-border-soft)",
+										backgroundColor: "var(--paper-raised)",
+										color: "var(--ink-soft)",
+										border: "var(--ink-width) solid var(--ink)",
 									}}
 								>
 									<Minus size={10} />
@@ -991,9 +1003,9 @@ function VKPoseBreakdown({
 									onClick={() => onManualOverride(p.index, p.totalSec + 5)}
 									className="w-5 h-5 rounded flex items-center justify-center"
 									style={{
-										backgroundColor: "var(--color-surface-card)",
-										color: "var(--color-text-muted)",
-										border: "1px solid var(--color-border-soft)",
+										backgroundColor: "var(--paper-raised)",
+										color: "var(--ink-soft)",
+										border: "var(--ink-width) solid var(--ink)",
 									}}
 								>
 									<Plus size={10} />
@@ -1008,7 +1020,7 @@ function VKPoseBreakdown({
 						{/* Breaths */}
 						<span
 							className="text-[10px]"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{p.breaths}b
 						</span>
@@ -1019,17 +1031,17 @@ function VKPoseBreakdown({
 			{/* Footer: natural vs allocated */}
 			<div
 				className="flex items-center justify-between pt-1 border-t"
-				style={{ borderColor: "var(--color-border-soft)" }}
+				style={{ borderColor: "var(--ink)" }}
 			>
 				<span
 					className="text-[10px]"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("practice.natural_duration")}: {formatPoseDuration(naturalSec)}
 				</span>
 				<span
 					className="text-[10px] font-semibold"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("practice.total")}: {formatPoseDuration(totalSec)}
 				</span>

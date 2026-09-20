@@ -8,7 +8,7 @@ const FullPageSpinner = () => (
 		aria-live="polite"
 		className="min-h-dvh flex items-center justify-center"
 	>
-		<LoadingSpinner size={40} color="var(--color-primary)" />
+		<LoadingSpinner size={40} color="var(--chandra)" />
 	</div>
 );
 

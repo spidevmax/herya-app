@@ -1,8 +1,8 @@
 export default function SectionTitle({ children }) {
 	return (
 		<h2
-			className="text-[11px] font-bold uppercase tracking-[0.12em]"
-			style={{ color: "var(--color-text-muted)" }}
+			className="text-[11px] font-bold"
+			style={{ color: "var(--ink-soft)" }}
 		>
 			{children}
 		</h2>

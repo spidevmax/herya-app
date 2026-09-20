@@ -48,14 +48,14 @@ export const getMoodColorStyle = (mood) => {
 	const raw = MOOD_COLORS[mood];
 	if (!raw) {
 		return {
-			backgroundColor: "var(--color-surface)",
-			color: "var(--color-text-secondary)",
-			borderColor: "var(--color-border-soft)",
+			backgroundColor: "var(--paper-raised)",
+			color: "var(--ink)",
+			borderColor: "var(--ink)",
 		};
 	}
 	return {
 		backgroundColor: `color-mix(in srgb, ${raw} 10%, transparent)`,
 		color: raw,
-		borderColor: `color-mix(in srgb, ${raw} 22%, var(--color-border-soft))`,
+		borderColor: "var(--ink)",
 	};
 };

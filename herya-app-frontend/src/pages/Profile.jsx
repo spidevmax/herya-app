@@ -12,6 +12,7 @@ import ProfileHeroCard from "@/components/profile/ProfileHeroCard";
 import { ConfirmModal } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_PHOTO_TYPES = [
@@ -250,7 +251,11 @@ export default function Profile() {
 	};
 
 	return (
-		<main className="flex flex-col gap-6 pt-4 pb-8 px-4 sm:px-6 max-w-7xl mx-auto w-full">
+		<main
+			data-identity="next"
+			className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pb-8 pt-4 sm:px-6"
+			style={{ background: "var(--paper)" }}
+		>
 			<input
 				ref={fileInputRef}
 				type="file"
@@ -266,9 +271,9 @@ export default function Profile() {
 					aria-live="assertive"
 					className="rounded-xl px-4 py-2.5 text-center text-sm font-semibold"
 					style={{
-						backgroundColor: "var(--color-warning-bg)",
-						border: "1px solid var(--color-warning-border)",
-						color: "var(--color-text-primary)",
+						backgroundColor: "var(--paper-raised)",
+						border: "var(--ink-width) solid var(--surya)",
+						color: "var(--ink)",
 					}}
 				>
 					{photoError}

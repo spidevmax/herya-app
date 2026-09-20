@@ -2,6 +2,7 @@ import { ShieldCheck } from "lucide-react";
 import { useMemo } from "react";
 import { SurfaceCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const SIGNAL_SCORE = {
 	red: 0,
@@ -91,14 +92,14 @@ export const TutorJournalSummary = ({ entries }) => {
 				<div>
 					<h2
 						id="tutor-summary-heading"
-						className="text-[11px] font-bold uppercase tracking-[0.1em]"
-						style={{ color: "var(--color-text-muted)" }}
+						className="text-[11px] font-bold"
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("journal.tutor_summary_title")}
 					</h2>
 					<p
 						className="text-sm"
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("journal.tutor_summary_subtitle")}
 					</p>
@@ -106,67 +107,67 @@ export const TutorJournalSummary = ({ entries }) => {
 				<div
 					aria-hidden="true"
 					className="w-8 h-8 rounded-xl flex items-center justify-center"
-					style={{ backgroundColor: "var(--color-surface)" }}
+					style={{ backgroundColor: "var(--paper)" }}
 				>
-					<ShieldCheck size={16} style={{ color: "var(--color-info)" }} />
+					<ShieldCheck size={16} style={{ color: "var(--chandra)" }} />
 				</div>
 			</header>
 
 			<dl className="grid grid-cols-2 gap-2 mb-3">
-				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
+				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
 					<dt
 						className="text-[10px]"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("journal.tutor_summary_current_signal")}
 					</dt>
 					<dd
 						className="text-xs font-semibold mt-0.5"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{latestSignalLabel}
 					</dd>
 				</div>
-				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
+				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
 					<dt
 						className="text-[10px]"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("journal.tutor_summary_safe_pauses")}
 					</dt>
 					<dd
 						className="text-xs font-semibold mt-0.5"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{summary.safePauseCount}
 					</dd>
 				</div>
-				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
+				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
 					<dt
 						className="text-[10px]"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("journal.tutor_summary_improved")}
 					</dt>
 					<dd
 						className="text-xs font-semibold mt-0.5"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{summary.improvedRate === null
 							? t("journal.tutor_summary_no_data")
 							: formatPercent(summary.improvedRate)}
 					</dd>
 				</div>
-				<div className="rounded-xl p-2.5 bg-[var(--color-surface)]">
+				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
 					<dt
 						className="text-[10px]"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("journal.tutor_summary_anchor_usage")}
 					</dt>
 					<dd
 						className="text-xs font-semibold mt-0.5"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{summary.anchorUseRate === null
 							? t("journal.tutor_summary_no_data")
@@ -175,7 +176,7 @@ export const TutorJournalSummary = ({ entries }) => {
 				</div>
 			</dl>
 
-			<p className="text-xs" style={{ color: "var(--color-text-secondary)" }}>
+			<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 				{t("journal.tutor_summary_signal_transitions", {
 					n: summary.transitionCount,
 				})}

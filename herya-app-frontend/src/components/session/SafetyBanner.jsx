@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 export default function SafetyBanner({
 	contraindications = [],
@@ -19,8 +20,9 @@ export default function SafetyBanner({
 			animate={{ opacity: 1, y: 0 }}
 			className="rounded-xl p-3 border"
 			style={{
-				backgroundColor: "var(--color-warning-bg, #FEF3C7)",
-				borderColor: "var(--color-warning-border, #F59E0B30)",
+				backgroundColor: "var(--paper-raised)",
+				borderColor: "var(--ink)",
+				borderWidth: "var(--ink-width)",
 			}}
 			role="alert"
 		>
@@ -35,18 +37,18 @@ export default function SafetyBanner({
 					size={16}
 					aria-hidden="true"
 					className="shrink-0"
-					style={{ color: "var(--color-warning-text, #92400E)" }}
+					style={{ color: "var(--ink)" }}
 				/>
 				<span
 					className="text-xs font-semibold flex-1"
-					style={{ color: "var(--color-warning-text, #92400E)" }}
+					style={{ color: "var(--ink)" }}
 				>
 					{t("guided.safety_warning")} ({items.length})
 				</span>
 				{items.length > 0 && (
 					<span
 						aria-hidden="true"
-						style={{ color: "var(--color-warning-text, #92400E)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
 					</span>
@@ -66,7 +68,7 @@ export default function SafetyBanner({
 							<li
 								key={item}
 								className="text-xs pl-6"
-								style={{ color: "var(--color-warning-text, #92400E)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								<span aria-hidden="true">• </span>
 								{item}
@@ -75,7 +77,7 @@ export default function SafetyBanner({
 						{warnings && (
 							<li
 								className="text-xs pl-6 font-medium mt-1"
-								style={{ color: "var(--color-warning-text, #92400E)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{warnings}
 							</li>

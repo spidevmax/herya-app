@@ -11,11 +11,12 @@ import {
 	SkeletonCard,
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const DIFF_COLORS = {
-	beginner: "var(--color-success)",
-	intermediate: "var(--color-warning)",
-	advanced: "var(--color-danger)",
+	beginner: "var(--ink)",
+	intermediate: "var(--surya)",
+	advanced: "var(--alert)",
 };
 
 const normalizeList = (value) => {
@@ -107,14 +108,14 @@ function PoseCard({ pose, index, onClick, t }) {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: Math.min(index * 0.03, 0.3) }}
 			onClick={onClick}
-			className="group bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] rounded-2xl p-4 flex items-start gap-4 shadow-[var(--shadow-card)] w-full text-left transition-all duration-200 hover:shadow-[var(--shadow-card-hover)] hover:-translate-y-[1px] active:scale-[0.995] cursor-pointer"
+			className="group bg-[var(--paper-raised)] border border-[var(--ink)] rounded-2xl p-4 flex items-start gap-4  w-full text-left transition-all duration-200 hover: hover:-translate-y-[1px] active:scale-[0.995] cursor-pointer"
 		>
 			<div
-				className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 overflow-hidden mt-0.5 border"
+				className="mt-0.5 flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden"
 				style={{
-					background:
-						"linear-gradient(135deg, color-mix(in srgb, var(--color-info) 14%, transparent), color-mix(in srgb, var(--color-success) 14%, transparent))",
-					borderColor: "var(--color-border-soft)",
+					background: "var(--paper-raised)",
+					border: "var(--ink-width) solid var(--ink)",
+					borderRadius: "var(--radius-block)",
 				}}
 			>
 				{poseImage ? (
@@ -124,24 +125,24 @@ function PoseCard({ pose, index, onClick, t }) {
 						className="w-full h-full object-cover rounded-xl"
 					/>
 				) : (
-					<PersonStanding size={30} style={{ color: "var(--color-primary)" }} />
+					<PersonStanding size={30} style={{ color: "var(--chandra)" }} />
 				)}
 			</div>
 			<div className="flex-1 min-w-0">
 				<div className="flex items-start justify-between gap-3">
 					<div className="min-w-0">
-						<p className="font-semibold text-[var(--color-text-primary)] text-base leading-snug truncate">
+						<p className="font-semibold text-[var(--ink)] text-base leading-snug truncate">
 							{poseName}
 						</p>
 						{poseSubtitle ? (
-							<p className="text-[var(--color-text-muted)] text-xs italic mt-0.5 truncate">
+							<p className="text-[var(--ink-soft)] text-xs italic mt-0.5 truncate">
 								{poseSubtitle}
 							</p>
 						) : null}
 					</div>
 					<div
 						className="inline-flex items-center gap-1 text-[11px] font-semibold shrink-0"
-						style={{ color: "var(--color-primary)" }}
+						style={{ color: "var(--chandra)" }}
 					>
 						{tr("library.view_details", "View details")}
 						<ChevronRight
@@ -153,18 +154,18 @@ function PoseCard({ pose, index, onClick, t }) {
 				<div className="flex gap-1.5 mt-2.5 flex-wrap">
 					{pose.difficulty && (
 						<Badge
-							color={DIFF_COLORS[pose.difficulty] ?? "var(--color-text-muted)"}
+							color={DIFF_COLORS[pose.difficulty] ?? "var(--ink-soft)"}
 						>
 							{diffLabels[pose.difficulty] ?? pose.difficulty}
 						</Badge>
 					)}
-					{category && <Badge color="var(--color-info)">{category}</Badge>}
-					{family && <Badge color="var(--color-lavender)">{family}</Badge>}
+					{category && <Badge color="var(--chandra)">{category}</Badge>}
+					{family && <Badge color="var(--chandra)">{family}</Badge>}
 				</div>
-				<div className="mt-3 flex flex-col gap-1.5 text-[11px] leading-relaxed text-[var(--color-text-secondary)]">
+				<div className="mt-3 flex flex-col gap-1.5 text-[11px] leading-relaxed text-[var(--ink-soft)]">
 					{summaryDetails.map((detail) => (
 						<p key={`${pose._id}-${detail.label}`} className="line-clamp-1">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{detail.label}
 							</span>{" "}
 							{detail.value}
@@ -172,7 +173,7 @@ function PoseCard({ pose, index, onClick, t }) {
 					))}
 					{secondary.length > 0 && (
 						<p>
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("library.poses_type")}
 							</span>{" "}
 							{secondary.join(", ")}
@@ -180,7 +181,7 @@ function PoseCard({ pose, index, onClick, t }) {
 					)}
 					{contraindications.length > 0 && (
 						<p className="line-clamp-1">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("library.poses_cautions")}
 							</span>{" "}
 							{contraindications.join(" · ")}
@@ -188,7 +189,7 @@ function PoseCard({ pose, index, onClick, t }) {
 					)}
 				</div>
 				{description && (
-					<p className="mt-3 text-xs leading-relaxed text-[var(--color-text-secondary)] line-clamp-2">
+					<p className="mt-3 text-xs leading-relaxed text-[var(--ink-soft)] line-clamp-2">
 						{description}
 					</p>
 				)}
@@ -200,8 +201,8 @@ function PoseCard({ pose, index, onClick, t }) {
 								className="text-[10px] px-2 py-1 rounded-full"
 								style={{
 									backgroundColor:
-										"color-mix(in srgb, var(--color-primary) 12%, transparent)",
-									color: "var(--color-text-secondary)",
+										"color-mix(in srgb, var(--chandra) 12%, transparent)",
+									color: "var(--ink-soft)",
 								}}
 							>
 								{benefit}
@@ -227,22 +228,22 @@ export default function Poses() {
 		{
 			key: "",
 			label: t("library.poses_all_difficulties"),
-			color: "var(--color-info)",
+			color: "var(--chandra)",
 		},
 		{
 			key: "beginner",
 			label: t("library.beginner"),
-			color: "var(--color-success)",
+			color: "var(--ink)",
 		},
 		{
 			key: "intermediate",
 			label: t("library.intermediate"),
-			color: "var(--color-warning)",
+			color: "var(--surya)",
 		},
 		{
 			key: "advanced",
 			label: t("library.advanced"),
-			color: "var(--color-danger)",
+			color: "var(--alert)",
 		},
 	];
 
@@ -284,22 +285,26 @@ export default function Poses() {
 	}, [query, difficulty, fetchPoses]);
 
 	return (
-		<main className="flex flex-col pt-4 pb-6 min-h-0">
+		<main
+			data-identity="next"
+			className="flex min-h-0 flex-col pb-6 pt-4"
+			style={{ background: "var(--paper)" }}
+		>
 			<header className="px-4 mb-4">
 				<div className="flex items-center gap-3 mb-4">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
 						aria-label={t("session.back_home")}
-						className="w-9 h-9 rounded-full bg-[var(--color-surface-card)] border border-[var(--color-border-soft)] flex items-center justify-center shadow-sm"
+						className="w-9 h-9 rounded-full bg-[var(--paper-raised)] border border-[var(--ink)] flex items-center justify-center shadow-sm"
 					>
 						<ChevronLeft
 							size={20}
 							aria-hidden="true"
-							className="text-[var(--color-text-secondary)]"
+							className="text-[var(--ink-soft)]"
 						/>
 					</button>
-					<h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+					<h1 className="font-display text-2xl font-bold text-[var(--ink)]">
 						{t("library.tabs_poses")}
 					</h1>
 				</div>
@@ -334,7 +339,7 @@ export default function Poses() {
 						icon={
 							<PersonStanding
 								size={56}
-								style={{ color: "var(--color-primary)" }}
+								style={{ color: "var(--chandra)" }}
 							/>
 						}
 						title={t("library.empty_poses")}

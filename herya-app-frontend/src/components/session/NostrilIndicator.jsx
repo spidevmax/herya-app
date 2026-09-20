@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 /**
  * Visual indicator for alternate-nostril breathing (Nadi Shodhana / Surya Bhedana).
@@ -12,7 +13,7 @@ import { useLanguage } from "@/context/LanguageContext";
 export default function NostrilIndicator({
 	nostrilFlow = "left",
 	phaseKey,
-	color = "var(--color-secondary)",
+	color = "var(--surya)",
 }) {
 	const { t } = useLanguage();
 	const isLeft = nostrilFlow === "left";
@@ -41,8 +42,8 @@ export default function NostrilIndicator({
 				{/* Nose bridge */}
 				<path
 					d="M24 4 C24 4, 20 20, 16 36 C14 42, 16 48, 20 50 C22 51, 26 51, 28 50 C32 48, 34 42, 32 36 C28 20, 24 4, 24 4Z"
-					fill="var(--color-surface-card)"
-					stroke="var(--color-border-soft)"
+					fill="var(--paper-raised)"
+					stroke="var(--ink)"
 					strokeWidth="1.5"
 				/>
 
@@ -53,12 +54,12 @@ export default function NostrilIndicator({
 					rx="5"
 					ry="4"
 					animate={{
-						fill: leftActive ? color : "var(--color-border-soft)",
+						fill: leftActive ? color : "var(--ink)",
 						opacity: leftActive ? 1 : 0.3,
 						scale: leftActive && phaseKey === "inhale" ? 1.15 : 1,
 					}}
 					transition={{ duration: 0.4, ease: "easeInOut" }}
-					stroke="var(--color-border)"
+					stroke="var(--ink)"
 					strokeWidth="1"
 				/>
 
@@ -69,12 +70,12 @@ export default function NostrilIndicator({
 					rx="5"
 					ry="4"
 					animate={{
-						fill: rightActive ? color : "var(--color-border-soft)",
+						fill: rightActive ? color : "var(--ink)",
 						opacity: rightActive ? 1 : 0.3,
 						scale: rightActive && phaseKey === "inhale" ? 1.15 : 1,
 					}}
 					transition={{ duration: 0.4, ease: "easeInOut" }}
-					stroke="var(--color-border)"
+					stroke="var(--ink)"
 					strokeWidth="1"
 				/>
 

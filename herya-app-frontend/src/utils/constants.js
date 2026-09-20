@@ -103,6 +103,16 @@ const VK_FAMILIES = [
 
 const VK_FAMILY_MAP = Object.fromEntries(VK_FAMILIES.map((f) => [f.id, f]));
 
+/*
+ * The API identifies a family by slug ("bow_sequence"), not by the numeric id
+ * VK_FAMILY_MAP is keyed on, so every slug lookup missed and the UI fell back
+ * to printing the raw slug. The slug is already encoded in labelKey, so the
+ * map is derived rather than duplicated by hand.
+ */
+const VK_FAMILY_BY_SLUG = Object.fromEntries(
+	VK_FAMILIES.map((f) => [f.labelKey.replace("constants.family_", ""), f]),
+);
+
 const LEVEL_LABELS = { 1: "Beginner", 2: "Intermediate", 3: "Advanced" };
 
 const LEVEL_LABEL_KEYS = {
@@ -269,4 +279,5 @@ export {
 	SESSION_TYPES,
 	VK_FAMILIES,
 	VK_FAMILY_MAP,
+	VK_FAMILY_BY_SLUG,
 };

@@ -37,6 +37,7 @@ import {
 } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import useSessionPersistence from "@/hooks/useSessionPersistence";
 import { MOOD_OPTIONS } from "@/utils/constants";
 
@@ -61,19 +62,19 @@ const SIGNAL_SCORES = {
 const SIGNAL_META = {
 	green: {
 		Icon: CircleCheck,
-		colorVar: "var(--color-signal-green)",
+		colorVar: "var(--ink)",
 		titleKey: "practice.signal_green",
 		hintKey: "practice.signal_green_hint",
 	},
 	yellow: {
 		Icon: CircleHelp,
-		colorVar: "var(--color-signal-yellow)",
+		colorVar: "var(--surya)",
 		titleKey: "practice.signal_yellow",
 		hintKey: "practice.signal_yellow_hint",
 	},
 	red: {
 		Icon: CircleAlert,
-		colorVar: "var(--color-signal-red)",
+		colorVar: "var(--alert)",
 		titleKey: "practice.signal_red",
 		hintKey: "practice.signal_red_hint",
 	},
@@ -909,7 +910,11 @@ export default function StartPractice() {
 	// Done screen
 	if (phase === "done") {
 		return (
-			<main className="min-h-dvh flex flex-col items-center justify-center gap-6 px-6">
+			<main
+				data-identity="next"
+				className="flex min-h-dvh flex-col items-center justify-center gap-6 px-6"
+				style={{ background: "var(--paper)" }}
+			>
 				<motion.div
 					initial={{ scale: 0 }}
 					animate={{ scale: 1 }}
@@ -920,18 +925,18 @@ export default function StartPractice() {
 					<Leaf
 						size={64}
 						strokeWidth={2.2}
-						style={{ color: "var(--color-primary)" }}
+						style={{ color: "var(--chandra)" }}
 					/>
 				</motion.div>
 				<h1
 					className="text-2xl font-semibold"
-					style={{ color: "var(--color-text-primary)" }}
+					style={{ color: "var(--ink)" }}
 				>
 					{t("practice.done_title")}
 				</h1>
 				<p
 					className="text-sm text-center"
-					style={{ color: "var(--color-text-secondary)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("practice.done_subtitle")}
 				</p>
@@ -949,7 +954,11 @@ export default function StartPractice() {
 	}
 
 	return (
-		<main className="flex flex-col min-h-dvh">
+		<main
+			data-identity="next"
+			className="flex min-h-dvh flex-col"
+			style={{ background: "var(--paper)" }}
+		>
 			{/* Header */}
 			<StickyHeader
 				onBack={() => {
@@ -983,10 +992,10 @@ export default function StartPractice() {
 						className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition"
 						style={{
 							backgroundColor: checkInEnabled
-								? "var(--color-primary)"
-								: "var(--color-surface-card)",
-							color: checkInEnabled ? "white" : "var(--color-text-secondary)",
-							border: `1px solid ${checkInEnabled ? "var(--color-primary)" : "var(--color-border-soft)"}`,
+								? "var(--chandra)"
+								: "var(--paper-raised)",
+							color: checkInEnabled ? "white" : "var(--ink-soft)",
+							border: `1px solid ${checkInEnabled ? "var(--chandra)" : "var(--ink)"}`,
 						}}
 					>
 						<Settings2 size={12} />
@@ -1003,8 +1012,8 @@ export default function StartPractice() {
 					aria-label={t("practice.recovery_title")}
 					className="mx-4 mb-3 rounded-xl p-4 flex items-center gap-3"
 					style={{
-						backgroundColor: "var(--color-warning-bg)",
-						border: "1px solid var(--color-warning-border)",
+						backgroundColor: "var(--paper-raised)",
+						border: "var(--ink-width) solid var(--surya)",
 					}}
 				>
 					<div
@@ -1049,8 +1058,8 @@ export default function StartPractice() {
 					role="alert"
 					className="mx-4 mb-3 rounded-xl p-3 text-sm"
 					style={{
-						backgroundColor: "var(--color-error-bg)",
-						color: "var(--color-error-text)",
+						backgroundColor: "var(--alert-bg)",
+						color: "var(--alert)",
 					}}
 				>
 					{error}
@@ -1134,7 +1143,7 @@ export default function StartPractice() {
 								<div id="checkin-heading" className="flex flex-col gap-6">
 									{isTutorPractice ? (
 										<fieldset className="m-0 p-0 border-0">
-											<legend className="mb-3 text-sm font-semibold text-[var(--color-text-primary)]">
+											<legend className="mb-3 text-sm font-semibold text-[var(--ink)]">
 												{t("practice.checkin_signal")}
 											</legend>
 											<div
@@ -1149,17 +1158,21 @@ export default function StartPractice() {
 													return (
 														<label
 															key={signal}
-															className={`relative rounded-2xl px-3.5 py-3.5 cursor-pointer min-h-[104px] flex flex-col items-start gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-[transform,box-shadow,background-color,border-color] duration-200 ease-out will-change-transform ${selected ? "-translate-y-0.5" : "hover:-translate-y-0.5"}`}
+															className="ink-block relative flex min-h-[104px] cursor-pointer flex-col items-start gap-2 px-3.5 py-3.5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
 															style={{
+																// Selected fills with the signal colour; unselected
+																// stays on paper. The icon and title carry the same
+																// meaning, so colour is never the only signal.
 																backgroundColor: selected
-																	? `color-mix(in srgb, ${colorVar} 12%, var(--color-surface-card))`
-																	: "var(--color-surface)",
-																color: "var(--color-text-primary)",
-																border: `2px solid ${selected ? colorVar : "var(--color-border-soft)"}`,
+																	? colorVar
+																	: "var(--paper-raised)",
+																color: selected
+																	? "var(--on-fill)"
+																	: "var(--ink)",
 																boxShadow: selected
-																	? `0 6px 16px -6px color-mix(in srgb, ${colorVar} 55%, transparent), inset 0 0 0 1px color-mix(in srgb, ${colorVar} 30%, transparent)`
-																	: "var(--shadow-card)",
-																"--tw-ring-color": colorVar,
+																	? "none"
+																	: "var(--offset) var(--offset) 0 var(--edge)",
+																"--tw-ring-color": "var(--ink)",
 															}}
 														>
 															<input
@@ -1175,13 +1188,10 @@ export default function StartPractice() {
 																aria-hidden="true"
 																className="absolute top-3 right-3 w-2 h-2 rounded-full transition-transform duration-200"
 																style={{
-																	backgroundColor: colorVar,
-																	boxShadow: selected
-																		? `0 0 0 4px color-mix(in srgb, ${colorVar} 22%, transparent)`
-																		: "none",
-																	transform: selected
-																		? "scale(1.25)"
-																		: "scale(1)",
+																	backgroundColor: selected
+																		? "var(--on-fill)"
+																		: colorVar,
+																	transform: selected ? "scale(1.25)" : "scale(1)",
 																}}
 															/>
 															<div className="flex items-center gap-2 w-full">
@@ -1189,9 +1199,11 @@ export default function StartPractice() {
 																	aria-hidden="true"
 																	className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors"
 																	style={{
-																		backgroundColor: selected
-																			? colorVar
-																			: `color-mix(in srgb, ${colorVar} 14%, transparent)`,
+																		background: selected
+																			? "var(--paper-raised)"
+																			: colorVar,
+																		border: "var(--ink-width) solid var(--ink)",
+																		borderRadius: "var(--radius-block)",
 																	}}
 																>
 																	<Icon
@@ -1203,14 +1215,14 @@ export default function StartPractice() {
 																</span>
 																<span
 																	className="text-sm font-semibold leading-snug tracking-tight"
-																	style={{ color: "var(--color-text-primary)" }}
+																	style={{ color: "var(--ink)" }}
 																>
 																	{t(titleKey)}
 																</span>
 															</div>
 															<span
 																className="text-xs leading-snug"
-																style={{ color: "var(--color-text-muted)" }}
+																style={{ color: "var(--ink-soft)" }}
 															>
 																{t(hintKey)}
 															</span>
@@ -1235,7 +1247,7 @@ export default function StartPractice() {
 													label={t("journal_form.energy")}
 													value={checkInEnergy}
 													onChange={(e) => setCheckInEnergy(+e.target.value)}
-													accent="var(--color-primary)"
+													accent="var(--chandra)"
 													lowLabel={t("journal_form.slider_low_energy")}
 													highLabel={t("journal_form.slider_high_energy")}
 												/>
@@ -1244,7 +1256,7 @@ export default function StartPractice() {
 													label={t("journal_form.stress")}
 													value={checkInStress}
 													onChange={(e) => setCheckInStress(+e.target.value)}
-													accent="var(--color-danger)"
+													accent="var(--alert)"
 													lowLabel={t("journal_form.slider_low_stress")}
 													highLabel={t("journal_form.slider_high_stress")}
 												/>
@@ -1253,7 +1265,7 @@ export default function StartPractice() {
 											<div>
 												<label
 													htmlFor="checkin-intention"
-													className="mb-2 block text-sm font-semibold text-[var(--color-text-primary)]"
+													className="mb-2 block text-sm font-semibold text-[var(--ink)]"
 												>
 													{t("practice.checkin_intention")}
 												</label>
@@ -1266,12 +1278,12 @@ export default function StartPractice() {
 														"practice.checkin_intention_placeholder",
 													)}
 													maxLength={200}
-													className="w-full rounded-2xl border p-3 text-sm outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+													className="w-full rounded-2xl border p-3 text-sm outline-none focus:ring-1 focus:ring-[var(--chandra)]"
 													style={{
-														backgroundColor: "var(--color-surface)",
-														color: "var(--color-text-primary)",
+														backgroundColor: "var(--paper)",
+														color: "var(--ink)",
 														borderColor:
-															"color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+															"var(--ink-soft)",
 													}}
 												/>
 											</div>

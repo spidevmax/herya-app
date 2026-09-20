@@ -8,6 +8,7 @@ import {
 	SurfaceCard,
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	translateMoodLabel,
 	translateWithFallback,
@@ -60,13 +61,13 @@ export const JournalFilters = ({
 						onChange={onSearchChange}
 						placeholder={t("journal.search_placeholder")}
 						label={t("journal.search_placeholder")}
-						className="[&_.input-base]:h-10 [&_.input-base]:rounded-xl [&_.input-base]:bg-[var(--color-surface)] [&_.input-base]:px-3 [&_.input-base]:pl-4 [&_.input-base]:pr-8"
+						className="[&_.input-base]:h-10 [&_.input-base]:rounded-xl [&_.input-base]:bg-[var(--paper)] [&_.input-base]:px-3 [&_.input-base]:pl-4 [&_.input-base]:pr-8"
 					/>
 					{isSearching && (
 						<Loader2
 							size={14}
 							aria-hidden="true"
-							className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-[var(--color-text-muted)]"
+							className="absolute right-3 top-1/2 -translate-y-1/2 animate-spin text-[var(--ink-soft)]"
 						/>
 					)}
 				</div>
@@ -79,10 +80,10 @@ export const JournalFilters = ({
 					className="flex h-10 items-center gap-1.5 rounded-xl px-3 text-xs font-semibold transition"
 					style={{
 						backgroundColor: hasActiveFilters
-							? "var(--color-primary)"
-							: "var(--color-surface)",
-						color: hasActiveFilters ? "white" : "var(--color-text-secondary)",
-						border: "1px solid var(--color-border-soft)",
+							? "var(--chandra)"
+							: "var(--paper)",
+						color: hasActiveFilters ? "white" : "var(--ink-soft)",
+						border: "var(--ink-width) solid var(--ink)",
 					}}
 				>
 					{t("journal.filters_label")}
@@ -92,8 +93,8 @@ export const JournalFilters = ({
 							style={{
 								backgroundColor: hasActiveFilters
 									? "white"
-									: "var(--color-primary)",
-								color: hasActiveFilters ? "var(--color-primary)" : "white",
+									: "var(--chandra)",
+								color: hasActiveFilters ? "var(--chandra)" : "white",
 							}}
 						>
 							{activeFilterCount}
@@ -123,7 +124,7 @@ export const JournalFilters = ({
 						<div className="flex flex-col gap-3 pt-1">
 							{/* Clear filters */}
 							<div className="flex items-center justify-between">
-								<p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
+								<p className="text-xs font-semibold text-[var(--ink-soft)]">
 									{t("journal.filters_label")}
 								</p>
 								{hasActiveFilters && (
@@ -131,7 +132,7 @@ export const JournalFilters = ({
 										type="button"
 										onClick={onClearFilters}
 										className="text-[11px] font-semibold"
-										style={{ color: "var(--color-primary)" }}
+										style={{ color: "var(--chandra)" }}
 									>
 										{t("journal.clear_filters")}
 									</button>
@@ -149,7 +150,7 @@ export const JournalFilters = ({
 										label={t("journal.all_moods")}
 										value={selectedMood}
 										onChange={(e) => onMoodChange(e.target.value)}
-										className="[&_.select-base]:h-10 [&_.select-base]:w-full [&_.select-base]:rounded-xl [&_.select-base]:bg-[var(--color-surface)] [&_.select-base]:px-3 [&_.select-base]:text-sm"
+										className="[&_.select-base]:h-10 [&_.select-base]:w-full [&_.select-base]:rounded-xl [&_.select-base]:bg-[var(--paper)] [&_.select-base]:px-3 [&_.select-base]:text-sm"
 									>
 										<option value="all">{t("journal.all_moods")}</option>
 										{moodOptions.map((mood) => (
@@ -169,7 +170,7 @@ export const JournalFilters = ({
 										label={t("journal.all_types")}
 										value={selectedType}
 										onChange={(e) => onTypeChange(e.target.value)}
-										className="[&_.select-base]:h-10 [&_.select-base]:w-full [&_.select-base]:rounded-xl [&_.select-base]:bg-[var(--color-surface)] [&_.select-base]:px-3 [&_.select-base]:text-sm"
+										className="[&_.select-base]:h-10 [&_.select-base]:w-full [&_.select-base]:rounded-xl [&_.select-base]:bg-[var(--paper)] [&_.select-base]:px-3 [&_.select-base]:text-sm"
 									>
 										<option value="all">{t("journal.all_types")}</option>
 										{typeOptions.map((type) => (
@@ -195,9 +196,9 @@ export const JournalFilters = ({
 										onChange={(e) => onDateFromChange(e.target.value)}
 										max={dateTo || undefined}
 										aria-label={t("journal.date_from")}
-										className="select-base h-10 w-full rounded-xl bg-[var(--color-surface)] px-3 text-sm"
+										className="select-base h-10 w-full rounded-xl bg-[var(--paper)] px-3 text-sm"
 										style={{
-											color: "var(--color-text-primary)",
+											color: "var(--ink)",
 										}}
 									/>
 								</div>
@@ -213,9 +214,9 @@ export const JournalFilters = ({
 										onChange={(e) => onDateToChange(e.target.value)}
 										min={dateFrom || undefined}
 										aria-label={t("journal.date_to")}
-										className="select-base h-10 w-full rounded-xl bg-[var(--color-surface)] px-3 text-sm"
+										className="select-base h-10 w-full rounded-xl bg-[var(--paper)] px-3 text-sm"
 										style={{
-											color: "var(--color-text-primary)",
+											color: "var(--ink)",
 										}}
 									/>
 								</div>
@@ -241,7 +242,7 @@ export const JournalFilters = ({
 			</AnimatePresence>
 
 			{/* Summary */}
-			<p className="text-xs text-[var(--color-text-secondary)]">
+			<p className="text-xs text-[var(--ink-soft)]">
 				{t("journal.showing_summary", {
 					shown: filteredCount,
 					total: totalCount,

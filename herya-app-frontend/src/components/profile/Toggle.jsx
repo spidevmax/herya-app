@@ -17,8 +17,8 @@ export default function Toggle({ id, label, checked, onChange }) {
 				className="w-11 h-6 rounded-full transition-colors duration-200 relative inline-block"
 				style={{
 					backgroundColor: checked
-						? "var(--color-primary)"
-						: "var(--color-border)",
+						? "var(--chandra)"
+						: "var(--ink)",
 				}}
 			>
 				<span

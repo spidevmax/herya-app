@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronUp, Search, Wind, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { localizedArray } from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
@@ -12,20 +13,20 @@ const formatHuman = (v) =>
 				.replace(/\b\w/g, (c) => c.toUpperCase())
 		: "";
 
+// Same mapping the library cards use: the app's own vocabulary already
+// splits along the two breath channels.
 const effectColor = (e) => {
 	switch (e) {
 		case "calming":
-			return "var(--color-prana-balanced)";
-		case "energizing":
-			return "var(--color-prana-warm-accent)";
-		case "balancing":
-			return "var(--color-primary)";
 		case "cooling":
-			return "var(--color-prana-cooling)";
+			return "var(--chandra)";
+		case "energizing":
 		case "heating":
-			return "var(--color-prana-energizing)";
+			return "var(--surya)";
+		case "balancing":
+			return "var(--ink)";
 		default:
-			return "var(--color-text-muted)";
+			return "var(--ink-soft)";
 	}
 };
 
@@ -75,21 +76,21 @@ export default function BreathingPatternPicker({
 				onClick={() => setOpen((o) => !o)}
 				className="w-full rounded-xl border px-3 py-2.5 text-left flex items-center gap-2 transition"
 				style={{
-					backgroundColor: "var(--color-surface)",
+					backgroundColor: "var(--paper)",
 					borderColor: selected
-						? "var(--color-secondary)"
-						: "var(--color-border-soft)",
+						? "var(--surya)"
+						: "var(--ink)",
 				}}
 			>
 				{selected ? (
 					<div className="flex-1 min-w-0">
 						<p
 							className="text-sm font-semibold truncate"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{selected.romanizationName}
 						</p>
-						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+						<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 							{getRatioDisplay(selected)} · {formatHuman(selected.energyEffect)}{" "}
 							· {t(`library.${selected.difficulty}`)}
 							{selected.techniqueFamily
@@ -100,15 +101,15 @@ export default function BreathingPatternPicker({
 				) : (
 					<span
 						className="text-sm flex-1"
-						style={{ color: "var(--color-text-muted)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("practice.select_breathing")}
 					</span>
 				)}
 				{open ? (
-					<ChevronUp size={16} style={{ color: "var(--color-text-muted)" }} />
+					<ChevronUp size={16} style={{ color: "var(--ink-soft)" }} />
 				) : (
-					<ChevronDown size={16} style={{ color: "var(--color-text-muted)" }} />
+					<ChevronDown size={16} style={{ color: "var(--ink-soft)" }} />
 				)}
 			</button>
 
@@ -121,19 +122,19 @@ export default function BreathingPatternPicker({
 						exit={{ opacity: 0, y: -8 }}
 						className="rounded-xl border shadow-lg overflow-hidden"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							borderColor: "var(--color-border-soft)",
+							backgroundColor: "var(--paper-raised)",
+							borderColor: "var(--ink)",
 						}}
 					>
 						{/* Search */}
 						<label
 							className="flex items-center gap-2 px-3 py-2 border-b"
-							style={{ borderColor: "var(--color-border-soft)" }}
+							style={{ borderColor: "var(--ink)" }}
 						>
 							<Search
 								size={14}
 								aria-hidden="true"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							/>
 							<input
 								type="text"
@@ -141,11 +142,11 @@ export default function BreathingPatternPicker({
 								onChange={(e) => setSearch(e.target.value)}
 								placeholder={t("guided.search_patterns")}
 								className="flex-1 text-sm bg-transparent outline-none"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							/>
 							{search && (
 								<button type="button" onClick={() => setSearch("")}>
-									<X size={14} style={{ color: "var(--color-text-muted)" }} />
+									<X size={14} style={{ color: "var(--ink-soft)" }} />
 								</button>
 							)}
 						</label>
@@ -155,7 +156,7 @@ export default function BreathingPatternPicker({
 							{filtered.length === 0 ? (
 								<p
 									className="text-sm text-center py-6"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("library.no_results")}
 								</p>
@@ -167,7 +168,7 @@ export default function BreathingPatternPicker({
 										onClick={() => handleSelect(pat)}
 										className="w-full px-3 py-2.5 text-left flex items-center gap-2 border-b last:border-b-0 hover:brightness-95 transition"
 										style={{
-											borderColor: "var(--color-border-soft)",
+											borderColor: "var(--ink)",
 										}}
 									>
 										<div
@@ -187,7 +188,7 @@ export default function BreathingPatternPicker({
 											<p
 												className="text-sm font-medium truncate"
 												style={{
-													color: "var(--color-text-primary)",
+													color: "var(--ink)",
 												}}
 											>
 												{pat.romanizationName}
@@ -213,7 +214,7 @@ export default function BreathingPatternPicker({
 												<span
 													className="text-[10px]"
 													style={{
-														color: "var(--color-text-muted)",
+														color: "var(--ink-soft)",
 													}}
 												>
 													{t(`library.${pat.difficulty}`)}
@@ -222,7 +223,7 @@ export default function BreathingPatternPicker({
 													<span
 														className="text-[10px]"
 														style={{
-															color: "var(--color-text-muted)",
+															color: "var(--ink-soft)",
 														}}
 													>
 														{formatHuman(pat.techniqueFamily)}
@@ -232,7 +233,7 @@ export default function BreathingPatternPicker({
 													<span
 														className="text-[10px]"
 														style={{
-															color: "var(--color-text-muted)",
+															color: "var(--ink-soft)",
 														}}
 													>
 														~{pat.recommendedPractice.cycles.default}{" "}
@@ -245,7 +246,7 @@ export default function BreathingPatternPicker({
 											<Check
 												size={16}
 												className="shrink-0"
-												style={{ color: "var(--color-secondary)" }}
+												style={{ color: "var(--surya)" }}
 											/>
 										)}
 									</button>

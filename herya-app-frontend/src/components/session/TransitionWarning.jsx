@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Leaf, PersonStanding, Wind } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const BLOCK_ICONS = {
 	vk_sequence: PersonStanding,
@@ -10,9 +11,16 @@ const BLOCK_ICONS = {
 };
 
 const BLOCK_COLORS = {
-	vk_sequence: "var(--color-primary)",
-	pranayama: "var(--color-secondary)",
-	meditation: "var(--color-accent)",
+	vk_sequence: "var(--chandra)",
+	pranayama: "var(--surya)",
+	meditation: "var(--ink)",
+};
+
+// Paired with BLOCK_COLORS so a fill and its text can never drift apart.
+const BLOCK_FG = {
+	vk_sequence: "var(--on-fill)",
+	pranayama: "var(--on-fill)",
+	meditation: "var(--paper)",
 };
 
 const COUNTDOWN_SEC = 5;
@@ -57,7 +65,7 @@ export default function TransitionWarning({
 	if (!nextBlock) return null;
 
 	const Icon = BLOCK_ICONS[nextBlock.blockType] || Leaf;
-	const color = BLOCK_COLORS[nextBlock.blockType] || "var(--color-primary)";
+	const color = BLOCK_COLORS[nextBlock.blockType] || "var(--chandra)";
 
 	return (
 		<AnimatePresence>
@@ -77,7 +85,7 @@ export default function TransitionWarning({
 						aria-labelledby="transition-warning-title"
 						className="rounded-3xl p-6 text-center max-w-xs w-full"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
+							backgroundColor: "var(--paper-raised)",
 							border: `3px solid ${color}`,
 						}}
 					>
@@ -92,8 +100,8 @@ export default function TransitionWarning({
 						</span>
 
 						<p
-							className="text-xs font-bold uppercase tracking-widest mb-1"
-							style={{ color: "var(--color-text-muted)" }}
+							className="text-xs font-bold mb-1"
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("practice.transition_next")}
 						</p>
@@ -101,7 +109,7 @@ export default function TransitionWarning({
 						<h3
 							id="transition-warning-title"
 							className="text-lg font-semibold mb-1"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{nextBlock.label}
 						</h3>
@@ -109,7 +117,7 @@ export default function TransitionWarning({
 						<p
 							id="transition-warning-desc"
 							className="text-sm mb-4"
-							style={{ color: "var(--color-text-secondary)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t(`practice.type_${nextBlock.blockType}`)} ·{" "}
 							{nextBlock.durationMinutes}m
@@ -129,7 +137,7 @@ export default function TransitionWarning({
 
 						<p
 							className="text-xs mt-2"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("practice.transition_countdown")}
 						</p>

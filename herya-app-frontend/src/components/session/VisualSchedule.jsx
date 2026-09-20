@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Check, Leaf, PersonStanding, Wind } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const BLOCK_ICONS = {
 	vk_sequence: PersonStanding,
@@ -9,9 +10,16 @@ const BLOCK_ICONS = {
 };
 
 const BLOCK_COLORS = {
-	vk_sequence: "var(--color-primary)",
-	pranayama: "var(--color-secondary)",
-	meditation: "var(--color-accent)",
+	vk_sequence: "var(--chandra)",
+	pranayama: "var(--surya)",
+	meditation: "var(--ink)",
+};
+
+// Paired with BLOCK_COLORS so a fill and its text can never drift apart.
+const BLOCK_FG = {
+	vk_sequence: "var(--on-fill)",
+	pranayama: "var(--on-fill)",
+	meditation: "var(--paper)",
 };
 
 /**
@@ -38,14 +46,14 @@ export default function VisualSchedule({
 		<section
 			className={`rounded-2xl ${compact ? "p-3" : "p-4"}`}
 			style={{
-				backgroundColor: "var(--color-surface-card)",
-				border: "1px solid var(--color-border-soft)",
+				backgroundColor: "var(--paper-raised)",
+				border: "var(--ink-width) solid var(--ink)",
 			}}
 			aria-label={t("practice.visual_schedule_label")}
 		>
 			<h3
-				className="text-[10px] font-bold uppercase tracking-[0.1em] mb-3"
-				style={{ color: "var(--color-text-muted)" }}
+				className="text-[10px] font-bold mb-3"
+				style={{ color: "var(--ink-soft)" }}
 			>
 				{t("practice.visual_schedule_title")}
 			</h3>
@@ -53,7 +61,8 @@ export default function VisualSchedule({
 			<ol className="flex flex-col gap-2 list-none m-0 p-0">
 				{blocks.map((block, idx) => {
 					const Icon = BLOCK_ICONS[block.blockType] || Leaf;
-					const color = BLOCK_COLORS[block.blockType] || "var(--color-primary)";
+					const color = BLOCK_COLORS[block.blockType] || "var(--chandra)";
+					const fg = BLOCK_FG[block.blockType] || "var(--on-fill)";
 					const isDone = idx < currentBlockIndex;
 					const isCurrent = idx === currentBlockIndex;
 					const isFuture = idx > currentBlockIndex;
@@ -85,17 +94,17 @@ export default function VisualSchedule({
 										? color
 										: isCurrent
 											? color
-											: "var(--color-surface)",
-									border: `2px solid ${isDone || isCurrent ? color : "var(--color-border-soft)"}`,
+											: "var(--paper)",
+									border: "var(--ink-width) solid var(--ink)",
 								}}
 							>
 								{isDone ? (
-									<Check size={16} className="text-white" strokeWidth={3} />
+									<Check size={16} strokeWidth={3} style={{ color: fg }} />
 								) : (
 									<Icon
 										size={compact ? 14 : 16}
 										style={{
-											color: isCurrent ? "white" : "var(--color-text-muted)",
+											color: isCurrent ? fg : "var(--ink-soft)",
 										}}
 									/>
 								)}
@@ -107,8 +116,8 @@ export default function VisualSchedule({
 									className={`${compact ? "text-xs" : "text-sm"} font-semibold truncate`}
 									style={{
 										color: isDone
-											? "var(--color-text-muted)"
-											: "var(--color-text-primary)",
+											? "var(--ink-soft)"
+											: "var(--ink)",
 										textDecoration: isDone ? "line-through" : "none",
 									}}
 								>
@@ -116,7 +125,7 @@ export default function VisualSchedule({
 								</p>
 								<p
 									className="text-[10px]"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t(`practice.type_${block.blockType}`)} ·{" "}
 									{block.durationMinutes}m

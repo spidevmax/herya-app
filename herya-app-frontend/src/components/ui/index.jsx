@@ -108,7 +108,7 @@ export const Input = ({
 		{label ? (
 			<label
 				htmlFor={id}
-				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink-soft)]"
+				className="mb-1.5 block text-xs font-bold text-[var(--ink-soft)]"
 			>
 				{label}
 			</label>
@@ -133,7 +133,7 @@ export const SelectField = ({
 		{label ? (
 			<label
 				htmlFor={id}
-				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink-soft)]"
+				className="mb-1.5 block text-xs font-bold text-[var(--ink-soft)]"
 			>
 				{label}
 			</label>
@@ -395,8 +395,8 @@ export const MoodSelector = ({
 								className="w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[22px] transition-all text-sm font-medium min-h-[120px]"
 								style={{
 									background: isSelected
-										? "linear-gradient(135deg, var(--chandra) 0%, color-mix(in srgb, var(--chandra) 84%, black 16%) 100%)"
-										: "linear-gradient(180deg, color-mix(in srgb, var(--paper-raised) 92%, white 8%) 0%, var(--paper-raised) 100%)",
+										? "var(--chandra)"
+										: "var(--paper-raised)",
 									color: isSelected
 										? "white"
 										: isDisabled

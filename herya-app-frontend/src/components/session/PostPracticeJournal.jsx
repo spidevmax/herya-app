@@ -6,6 +6,7 @@ import SensationChips from "@/components/journal/SensationChips";
 import SliderPanel from "@/components/journal/SliderPanel";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	MOOD_AFTER_OPTIONS,
 	MOOD_COLORS,
@@ -13,7 +14,7 @@ import {
 } from "@/utils/constants";
 import PostPracticeNudge from "./PostPracticeNudge";
 
-const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--color-secondary)";
+const getMoodColor = (mood) => MOOD_COLORS[mood] || "var(--surya)";
 const TUTOR_SIGNAL_AFTER_MAP = {
 	green: { mood: ["calm"], energy: 4, stress: 3 },
 	yellow: { mood: ["focused"], energy: 5, stress: 5 },
@@ -178,7 +179,7 @@ export default function PostPracticeJournal({
 			<section
 				aria-labelledby="post-practice-heading"
 				className="rounded-2xl p-5 text-center"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
+				style={{ backgroundColor: "var(--paper-raised)" }}
 			>
 				<motion.span
 					aria-hidden="true"
@@ -189,13 +190,13 @@ export default function PostPracticeJournal({
 				>
 					<CheckCircle
 						size={48}
-						style={{ color: "var(--color-primary)" }}
+						style={{ color: "var(--chandra)" }}
 						className="mx-auto mb-3"
 					/>
 				</motion.span>
 				<h2
 					id="post-practice-heading"
-					className="text-xl font-semibold mb-1 text-[var(--color-text-primary)]"
+					className="text-xl font-semibold mb-1 text-[var(--ink)]"
 				>
 					{t("practice.journal_title")}
 				</h2>
@@ -204,13 +205,13 @@ export default function PostPracticeJournal({
 						<div className="text-center">
 							<dd
 								className="text-lg font-bold"
-								style={{ color: "var(--color-primary)" }}
+								style={{ color: "var(--chandra)" }}
 							>
 								{formatTime(sessionSummary.globalElapsedSec || 0)}
 							</dd>
 							<dt
-								className="text-[10px] uppercase tracking-wider"
-								style={{ color: "var(--color-text-muted)" }}
+								className="text-[10px]"
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("practice.duration")}
 							</dt>
@@ -218,13 +219,13 @@ export default function PostPracticeJournal({
 						<div className="text-center">
 							<dd
 								className="text-lg font-bold"
-								style={{ color: "var(--color-secondary)" }}
+								style={{ color: "var(--surya)" }}
 							>
 								{sessionSummary.blocksCompleted || 0}
 							</dd>
 							<dt
-								className="text-[10px] uppercase tracking-wider"
-								style={{ color: "var(--color-text-muted)" }}
+								className="text-[10px]"
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("practice.blocks_completed")}
 							</dt>
@@ -234,7 +235,7 @@ export default function PostPracticeJournal({
 				{isTutorMode && tutorSummaryKey && (
 					<p
 						className="text-xs mt-3"
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t(tutorSummaryKey)}
 					</p>
@@ -243,12 +244,12 @@ export default function PostPracticeJournal({
 					<section
 						aria-labelledby="post-practice-micro-heading"
 						className="mt-4 rounded-xl px-3 py-2 text-left"
-						style={{ backgroundColor: "var(--color-surface)" }}
+						style={{ backgroundColor: "var(--paper)" }}
 					>
 						<h3
 							id="post-practice-micro-heading"
 							className="text-[11px] font-semibold mb-1"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{t("practice.micro_title")}
 						</h3>
@@ -257,7 +258,7 @@ export default function PostPracticeJournal({
 								<li
 									key={item}
 									className="text-[11px]"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									<span aria-hidden="true">• </span>
 									{item}
@@ -288,10 +289,10 @@ export default function PostPracticeJournal({
 							const selected = signalAfter === signal;
 							const signalColor =
 								signal === "green"
-									? "var(--color-signal-green)"
+									? "var(--ink)"
 									: signal === "yellow"
-										? "var(--color-signal-yellow)"
-										: "var(--color-signal-red)";
+										? "var(--surya)"
+										: "var(--alert)";
 							const SignalIcon =
 								signal === "green" ? Check : signal === "yellow" ? Minus : X;
 							return (
@@ -304,9 +305,9 @@ export default function PostPracticeJournal({
 									style={{
 										backgroundColor: selected
 											? signalColor
-											: "var(--color-surface)",
-										color: selected ? "white" : "var(--color-text-secondary)",
-										border: `2px solid ${selected ? signalColor : "var(--color-border-soft)"}`,
+											: "var(--paper)",
+										color: selected ? "white" : "var(--ink-soft)",
+										border: `2px solid ${selected ? signalColor : "var(--ink)"}`,
 									}}
 									aria-label={t(`practice.signal_${signal}`)}
 								>
@@ -329,10 +330,10 @@ export default function PostPracticeJournal({
 									className="px-4 py-2 rounded-full text-sm font-semibold capitalize transition-transform duration-200 hover:-translate-y-0.5"
 									style={{
 										background: selected
-											? `linear-gradient(135deg, ${color} 0%, color-mix(in srgb, ${color} 82%, black 18%) 100%)`
-											: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
-										color: selected ? "white" : "var(--color-text-secondary)",
-										border: `1px solid ${selected ? color : "color-mix(in srgb, var(--color-border-soft) 75%, transparent)"}`,
+											? color
+											: "var(--paper-raised)",
+										color: selected ? "white" : "var(--ink-soft)",
+										border: `1px solid ${selected ? color : "color-mix(in srgb, var(--ink) 75%, transparent)"}`,
 										boxShadow: selected
 											? "0 10px 24px rgba(25, 40, 72, 0.12)"
 											: "none",
@@ -361,7 +362,7 @@ export default function PostPracticeJournal({
 							label={t("practice.journal_energy_after", { n: energyAfter })}
 							value={energyAfter}
 							onChange={(e) => setEnergyAfter(+e.target.value)}
-							accent="var(--color-primary)"
+							accent="var(--chandra)"
 							lowLabel={t("journal_form.slider_low_energy")}
 							highLabel={t("journal_form.slider_high_energy")}
 						/>
@@ -370,7 +371,7 @@ export default function PostPracticeJournal({
 							label={t("practice.journal_stress_after", { n: stressAfter })}
 							value={stressAfter}
 							onChange={(e) => setStressAfter(+e.target.value)}
-							accent="var(--color-danger)"
+							accent="var(--alert)"
 							lowLabel={t("journal_form.slider_low_stress")}
 							highLabel={t("journal_form.slider_high_stress")}
 						/>
@@ -396,13 +397,13 @@ export default function PostPracticeJournal({
 			<section
 				aria-label={t("practice.journal_emotional_notes")}
 				className="rounded-2xl p-5 flex flex-col gap-4"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
+				style={{ backgroundColor: "var(--paper-raised)" }}
 			>
 				<div>
 					<label
 						htmlFor="post-practice-notes"
 						className="text-sm font-medium mb-2 block"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{isTutorMode
 							? t("practice.tutor_notes")
@@ -416,9 +417,9 @@ export default function PostPracticeJournal({
 						placeholder={t("practice.journal_emotional_placeholder")}
 						className="w-full text-sm rounded-xl p-3 resize-none outline-none focus:ring-1"
 						style={{
-							backgroundColor: "var(--color-surface)",
-							color: "var(--color-text-primary)",
-							"--tw-ring-color": "var(--color-secondary)",
+							backgroundColor: "var(--paper)",
+							color: "var(--ink)",
+							"--tw-ring-color": "var(--surya)",
 						}}
 					/>
 				</div>
@@ -426,7 +427,7 @@ export default function PostPracticeJournal({
 					<label
 						htmlFor="post-practice-gratitude"
 						className="text-sm font-medium mb-2 block"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("practice.journal_gratitude")}
 					</label>
@@ -438,9 +439,9 @@ export default function PostPracticeJournal({
 						placeholder={t("practice.journal_gratitude_placeholder")}
 						className="w-full text-sm rounded-xl p-3 resize-none outline-none focus:ring-1"
 						style={{
-							backgroundColor: "var(--color-surface)",
-							color: "var(--color-text-primary)",
-							"--tw-ring-color": "var(--color-secondary)",
+							backgroundColor: "var(--paper)",
+							color: "var(--ink)",
+							"--tw-ring-color": "var(--surya)",
 						}}
 					/>
 				</div>
@@ -448,7 +449,7 @@ export default function PostPracticeJournal({
 					<label
 						htmlFor="post-practice-learnings"
 						className="text-sm font-medium mb-2 block"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("practice.journal_learnings")}
 					</label>
@@ -460,9 +461,9 @@ export default function PostPracticeJournal({
 						placeholder={t("practice.journal_learnings_placeholder")}
 						className="w-full text-sm rounded-xl p-3 resize-none outline-none focus:ring-1"
 						style={{
-							backgroundColor: "var(--color-surface)",
-							color: "var(--color-text-primary)",
-							"--tw-ring-color": "var(--color-secondary)",
+							backgroundColor: "var(--paper)",
+							color: "var(--ink)",
+							"--tw-ring-color": "var(--surya)",
 						}}
 					/>
 				</div>
@@ -476,13 +477,13 @@ export default function PostPracticeJournal({
 					animate={{ opacity: 1, y: 0 }}
 					className="rounded-xl p-3 flex items-center justify-between"
 					style={{
-						backgroundColor: "var(--color-warning-bg)",
-						border: "1px solid var(--color-warning-border)",
+						backgroundColor: "var(--paper-raised)",
+						border: "var(--ink-width) solid var(--surya)",
 					}}
 				>
 					<p
 						className="text-sm font-medium"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{error}
 					</p>
@@ -492,7 +493,7 @@ export default function PostPracticeJournal({
 							onClick={onDismissError}
 							aria-label={t("ui.close_modal")}
 							className="ml-2 text-xs font-bold"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							<span aria-hidden="true">✕</span>
 						</button>

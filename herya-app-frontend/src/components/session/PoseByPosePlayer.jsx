@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import {
 	distributePoseTime,
 	formatPoseDuration,
@@ -158,10 +159,10 @@ export default function PoseByPosePlayer({
 				<PersonStanding
 					size={32}
 					aria-hidden="true"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 					className="mx-auto mb-2"
 				/>
-				<p className="text-sm" style={{ color: "var(--color-text-muted)" }}>
+				<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
 					{t("guided.no_poses_data")}
 				</p>
 			</section>
@@ -198,10 +199,10 @@ export default function PoseByPosePlayer({
 							height: 8,
 							backgroundColor:
 								idx < poseIndex
-									? "var(--color-primary)"
+									? "var(--chandra)"
 									: idx === poseIndex
-										? "var(--color-primary)"
-										: "var(--color-border-soft)",
+										? "var(--chandra)"
+										: "var(--ink)",
 							opacity: idx <= poseIndex ? 1 : 0.4,
 						}}
 					/>
@@ -219,14 +220,14 @@ export default function PoseByPosePlayer({
 					transition={{ duration: lowStimMode ? 0.15 : 0.25 }}
 					className="rounded-2xl overflow-hidden"
 					style={{
-						backgroundColor: "var(--color-surface-card)",
-						border: "1px solid var(--color-border-soft)",
+						backgroundColor: "var(--paper-raised)",
+						border: "var(--ink-width) solid var(--ink)",
 					}}
 				>
 					{/* Media */}
 					<figure
 						className="relative aspect-square max-h-56 w-full flex items-center justify-center m-0"
-						style={{ backgroundColor: "var(--color-primary-light, #EEF2FF)" }}
+						style={{ backgroundColor: "var(--paper-raised)" }}
 					>
 						{pose.media?.thumbnail?.url ? (
 							<img
@@ -239,7 +240,7 @@ export default function PoseByPosePlayer({
 							<PersonStanding
 								size={72}
 								strokeWidth={1.5}
-								style={{ color: "var(--color-primary)", opacity: 0.4 }}
+								style={{ color: "var(--chandra)", opacity: 0.4 }}
 							/>
 						)}
 
@@ -248,7 +249,7 @@ export default function PoseByPosePlayer({
 							<span
 								className="absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full"
 								style={{
-									backgroundColor: "var(--color-primary)",
+									backgroundColor: "var(--chandra)",
 									color: "white",
 								}}
 							>
@@ -262,7 +263,7 @@ export default function PoseByPosePlayer({
 						<span
 							className="absolute top-3 left-3 text-[10px] font-bold px-2 py-1 rounded-full"
 							style={{
-								backgroundColor: "var(--color-overlay)",
+								backgroundColor: "rgba(27, 30, 60, 0.72)",
 								color: "white",
 							}}
 						>
@@ -276,20 +277,20 @@ export default function PoseByPosePlayer({
 							<p
 								className="text-sm"
 								style={{
-									color: "var(--color-text-muted)",
+									color: "var(--ink-soft)",
 									fontFamily: "serif",
 								}}
 							>
 								{pose.sanskritName}
 							</p>
 						)}
-						<h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+						<h3 className="text-lg font-semibold text-[var(--ink)]">
 							{poseName}
 						</h3>
 						{pose.name && pose.name !== poseName && (
 							<p
 								className="text-xs"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{pose.name}
 							</p>
@@ -299,7 +300,7 @@ export default function PoseByPosePlayer({
 						{pose.drishti && pose.drishti !== "none" && (
 							<p
 								className="text-xs mt-1"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.drishti")}: {pose.drishti.replace(/_/g, " ")}
 							</p>
@@ -311,7 +312,7 @@ export default function PoseByPosePlayer({
 						<div className="flex items-center justify-between mb-1">
 							<span
 								className="text-xs font-medium"
-								style={{ color: "var(--color-text-secondary)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{localized(pose, "breathingCue", lang) ||
 									t("guided.breathe_steadily")}
@@ -321,8 +322,8 @@ export default function PoseByPosePlayer({
 									<span
 										className="flex items-center gap-0.5 text-[9px] font-medium px-1.5 py-0.5 rounded-full"
 										style={{
-											backgroundColor: "var(--color-primary-light, #EEF2FF)",
-											color: "var(--color-primary)",
+											backgroundColor: "var(--paper-raised)",
+											color: "var(--chandra)",
 										}}
 									>
 										<ArrowLeftRight size={9} />
@@ -333,7 +334,7 @@ export default function PoseByPosePlayer({
 								)}
 								<span
 									className="text-xs font-bold tabular-nums"
-									style={{ color: "var(--color-primary)" }}
+									style={{ color: "var(--chandra)" }}
 								>
 									{formatPoseDuration(remainingSec)}
 								</span>
@@ -341,7 +342,7 @@ export default function PoseByPosePlayer({
 						</div>
 						<div
 							className="w-full h-2 rounded-full overflow-hidden"
-							style={{ backgroundColor: "var(--color-border-soft)" }}
+							style={{ backgroundColor: "var(--ink)" }}
 							role="progressbar"
 							aria-valuenow={Math.round(elapsedSec)}
 							aria-valuemax={targetSec}
@@ -349,7 +350,7 @@ export default function PoseByPosePlayer({
 						>
 							<motion.div
 								className="h-full rounded-full"
-								style={{ backgroundColor: "var(--color-primary)" }}
+								style={{ backgroundColor: "var(--chandra)" }}
 								animate={{ width: `${timeProgress * 100}%` }}
 								transition={{ duration: 0.3 }}
 							/>
@@ -357,13 +358,13 @@ export default function PoseByPosePlayer({
 						<div className="flex items-center justify-between mt-1">
 							<span
 								className="text-[10px]"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.breaths")}: ~{targetBreaths}
 							</span>
 							<span
 								className="text-[10px]"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{formatPoseDuration(Math.round(elapsedSec))} /{" "}
 								{formatPoseDuration(targetSec)}
@@ -378,7 +379,7 @@ export default function PoseByPosePlayer({
 								type="button"
 								onClick={() => setShowGuide((g) => !g)}
 								className="flex items-center gap-1.5 text-xs font-medium"
-								style={{ color: "var(--color-primary)" }}
+								style={{ color: "var(--chandra)" }}
 							>
 								{showGuide ? <EyeOff size={12} /> : <Eye size={12} />}
 								{showGuide
@@ -419,9 +420,9 @@ export default function PoseByPosePlayer({
 					disabled={poseIndex === 0 && side !== "right"}
 					className="w-11 h-11 rounded-full flex items-center justify-center border disabled:opacity-30 transition"
 					style={{
-						backgroundColor: "var(--color-surface-card)",
-						borderColor: "var(--color-border-soft)",
-						color: "var(--color-text-secondary)",
+						backgroundColor: "var(--paper-raised)",
+						borderColor: "var(--ink)",
+						color: "var(--ink-soft)",
 					}}
 					aria-label={t("guided.prev_pose")}
 				>
@@ -434,7 +435,7 @@ export default function PoseByPosePlayer({
 					onClick={isRunning ? () => setIsRunning(false) : handleStart}
 					aria-pressed={isRunning}
 					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
-					style={{ backgroundColor: "var(--color-primary)" }}
+					style={{ backgroundColor: "var(--chandra)" }}
 					aria-label={isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{isRunning ? (
@@ -457,9 +458,9 @@ export default function PoseByPosePlayer({
 					disabled={poseIndex >= corePoses.length - 1 && !needsSecondSide}
 					className="w-11 h-11 rounded-full flex items-center justify-center border disabled:opacity-30 transition"
 					style={{
-						backgroundColor: "var(--color-surface-card)",
-						borderColor: "var(--color-border-soft)",
-						color: "var(--color-text-secondary)",
+						backgroundColor: "var(--paper-raised)",
+						borderColor: "var(--ink)",
+						color: "var(--ink-soft)",
 					}}
 					aria-label={t("guided.next_pose")}
 				>
@@ -474,8 +475,8 @@ export default function PoseByPosePlayer({
 					onClick={() => setElapsedSec(0)}
 					className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg"
 					style={{
-						color: "var(--color-text-secondary)",
-						backgroundColor: "var(--color-surface)",
+						color: "var(--ink-soft)",
+						backgroundColor: "var(--paper)",
 					}}
 				>
 					<RotateCcw size={12} aria-hidden="true" />
@@ -507,7 +508,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 		<section
 			aria-label={t("guided.tab_alignment")}
 			className="border-t"
-			style={{ borderColor: "var(--color-border-soft)" }}
+			style={{ borderColor: "var(--ink)" }}
 		>
 			{/* Tabs */}
 			<div className="flex gap-0.5 px-3 pt-2 overflow-x-auto" role="tablist">
@@ -520,11 +521,11 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						aria-controls={`pose-tabpanel-${tab}`}
 						aria-selected={activeTab === tab}
 						onClick={() => setActiveTab(tab)}
-						className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider whitespace-nowrap transition"
+						className="px-2.5 py-1.5 rounded-lg text-[10px] font-semibold whitespace-nowrap transition"
 						style={{
 							backgroundColor:
-								activeTab === tab ? "var(--color-primary)" : "transparent",
-							color: activeTab === tab ? "white" : "var(--color-text-muted)",
+								activeTab === tab ? "var(--chandra)" : "transparent",
+							color: activeTab === tab ? "white" : "var(--ink-soft)",
 						}}
 					>
 						{t(`guided.tab_${tab}`)}
@@ -546,20 +547,20 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 								<div key={kp.area || kp.instruction}>
 									<p
 										className="text-xs font-semibold capitalize"
-										style={{ color: "var(--color-text-primary)" }}
+										style={{ color: "var(--ink)" }}
 									>
 										{kp.area}
 									</p>
 									<p
 										className="text-xs"
-										style={{ color: "var(--color-text-secondary)" }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{kp.instruction}
 									</p>
 									{kp.commonMistake && (
 										<p
 											className="text-[10px] mt-0.5 flex items-center gap-1"
-											style={{ color: "var(--color-danger, #EF4444)" }}
+											style={{ color: "var(--alert)" }}
 										>
 											<AlertTriangle size={10} />
 											{kp.commonMistake}
@@ -572,7 +573,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 								<p
 									key={inst}
 									className="text-xs"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									• {inst}
 								</p>
@@ -580,7 +581,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						) : (
 							<p
 								className="text-xs"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.no_alignment_data")}
 							</p>
@@ -588,11 +589,11 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						{cues.length > 0 && (
 							<div
 								className="mt-2 pt-2 border-t"
-								style={{ borderColor: "var(--color-border-soft)" }}
+								style={{ borderColor: "var(--ink)" }}
 							>
 								<p
 									className="text-[10px] font-semibold uppercase mb-1"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("guided.teaching_cues")}
 								</p>
@@ -600,7 +601,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 									<p
 										key={c}
 										className="text-xs"
-										style={{ color: "var(--color-text-secondary)" }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										• {c}
 									</p>
@@ -610,7 +611,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						{pose.alignmentDetails?.activeBandhas?.length > 0 && (
 							<p
 								className="text-xs mt-1"
-								style={{ color: "var(--color-primary)" }}
+								style={{ color: "var(--chandra)" }}
 							>
 								Bandhas: {pose.alignmentDetails.activeBandhas.join(", ")}
 							</p>
@@ -622,7 +623,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 					<div className="flex flex-col gap-2">
 						<p
 							className="text-sm font-medium"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{localized(pose, "breathingCue", lang) ||
 								t("guided.breathe_steadily")}
@@ -631,7 +632,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 							<div>
 								<p
 									className="text-[10px] font-semibold uppercase mb-1"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("guided.setup")}
 								</p>
@@ -639,7 +640,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 									<p
 										key={s}
 										className="text-xs"
-										style={{ color: "var(--color-text-secondary)" }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{idx + 1}. {s}
 									</p>
@@ -650,7 +651,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 							<div>
 								<p
 									className="text-[10px] font-semibold uppercase mb-1"
-									style={{ color: "var(--color-text-muted)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("guided.exit_pose")}
 								</p>
@@ -658,7 +659,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 									<p
 										key={s}
 										className="text-xs"
-										style={{ color: "var(--color-text-secondary)" }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{idx + 1}. {s}
 									</p>
@@ -676,11 +677,11 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 									<AlertTriangle
 										size={12}
 										className="shrink-0 mt-0.5"
-										style={{ color: "var(--color-danger, #EF4444)" }}
+										style={{ color: "var(--alert)" }}
 									/>
 									<p
 										className="text-xs"
-										style={{ color: "var(--color-text-secondary)" }}
+										style={{ color: "var(--ink-soft)" }}
 									>
 										{m}
 									</p>
@@ -689,7 +690,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						) : (
 							<p
 								className="text-xs"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.no_mistakes_data")}
 							</p>
@@ -697,11 +698,11 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						{contraindications.length > 0 && (
 							<div
 								className="mt-2 pt-2 border-t"
-								style={{ borderColor: "var(--color-border-soft)" }}
+								style={{ borderColor: "var(--ink)" }}
 							>
 								<p
 									className="text-[10px] font-semibold uppercase mb-1"
-									style={{ color: "var(--color-warning-text, #92400E)" }}
+									style={{ color: "var(--ink)" }}
 								>
 									{t("guided.contraindications")}
 								</p>
@@ -709,7 +710,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 									<p
 										key={c}
 										className="text-xs"
-										style={{ color: "var(--color-warning-text, #92400E)" }}
+										style={{ color: "var(--ink)" }}
 									>
 										• {c}
 									</p>
@@ -726,7 +727,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 								<p
 									key={b}
 									className="text-xs"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									• {b}
 								</p>
@@ -734,7 +735,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						) : (
 							<p
 								className="text-xs"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.no_benefits_data")}
 							</p>
@@ -742,7 +743,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 						{pose.targetMuscles?.length > 0 && (
 							<p
 								className="text-xs mt-1"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("guided.target_muscles")}: {pose.targetMuscles.join(", ")}
 							</p>

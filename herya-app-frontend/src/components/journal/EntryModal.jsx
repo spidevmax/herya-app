@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { InlineLink } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { format } from "@/utils/helpers";
 import {
 	getMoodColorStyle,
@@ -108,13 +109,13 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 						transition={{ type: "spring", damping: 28, stiffness: 300 }}
 						className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] rounded-t-3xl z-50 max-h-[78vh] overflow-y-auto"
 						style={{
-							backgroundColor: "var(--color-surface-card)",
-							border: "1px solid var(--color-border-soft)",
+							backgroundColor: "var(--paper-raised)",
+							border: "var(--ink-width) solid var(--ink)",
 						}}
 					>
 						<div className="px-6 pt-3 pb-6">
 							{/* Drag handle */}
-							<div className="w-10 h-1.5 rounded-full mx-auto mb-4 bg-[var(--color-border-soft)]" />
+							<div className="w-10 h-1.5 rounded-full mx-auto mb-4 bg-[var(--ink)]" />
 
 							{/* Header */}
 							<div className="flex items-start justify-between mb-4 gap-3">
@@ -122,7 +123,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 									<h2
 										id={titleId}
 										className="font-display text-lg font-semibold leading-tight"
-										style={{ color: "var(--color-text-primary)" }}
+										style={{ color: "var(--ink)" }}
 									>
 										{created}
 									</h2>
@@ -137,7 +138,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 									) : (
 										<p
 											className="text-xs mt-1"
-											style={{ color: "var(--color-text-secondary)" }}
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{translateWithFallback(
 												t,
@@ -152,9 +153,9 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 									onClick={onClose}
 									aria-label={t("ui.close_modal")}
 									className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-									style={{ backgroundColor: "var(--color-surface)" }}
+									style={{ backgroundColor: "var(--paper)" }}
 								>
-									<X size={18} className="text-[var(--color-text-muted)]" />
+									<X size={18} className="text-[var(--ink-soft)]" />
 								</button>
 							</div>
 
@@ -179,13 +180,13 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 									<div
 										className="rounded-2xl p-3"
 										style={{
-											backgroundColor: "var(--color-surface)",
-											border: "1px solid var(--color-border-soft)",
+											backgroundColor: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
 										}}
 									>
 										<p
-											className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-											style={{ color: "var(--color-text-muted)" }}
+											className="text-[10px] font-semibold mb-1"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{translateWithFallback(
 												t,
@@ -195,7 +196,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 										</p>
 										<p
 											className="text-sm"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{translateWithFallback(
 												t,
@@ -210,13 +211,13 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 									<div
 										className="rounded-2xl p-3"
 										style={{
-											backgroundColor: "var(--color-surface)",
-											border: "1px solid var(--color-border-soft)",
+											backgroundColor: "var(--paper)",
+											border: "var(--ink-width) solid var(--ink)",
 										}}
 									>
 										<p
-											className="text-[10px] font-semibold uppercase tracking-wider mb-1"
-											style={{ color: "var(--color-text-muted)" }}
+											className="text-[10px] font-semibold mb-1"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{translateWithFallback(
 												t,
@@ -226,7 +227,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 										</p>
 										<p
 											className="text-sm"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{durationMinutes}{" "}
 											{translateWithFallback(
@@ -244,8 +245,8 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 								{entry.reflection && (
 									<div>
 										<p
-											className="text-xs font-semibold uppercase tracking-wider mb-2"
-											style={{ color: "var(--color-text-muted)" }}
+											className="text-xs font-semibold mb-2"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{translateWithFallback(
 												t,
@@ -256,9 +257,9 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 										<p
 											className="text-sm leading-relaxed rounded-2xl p-4"
 											style={{
-												backgroundColor: "var(--color-surface)",
-												border: "1px solid var(--color-border-soft)",
-												color: "var(--color-text-secondary)",
+												backgroundColor: "var(--paper)",
+												border: "var(--ink-width) solid var(--ink)",
+												color: "var(--ink-soft)",
 											}}
 										>
 											{entry.reflection}
@@ -269,8 +270,8 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 								{entry.insights && (
 									<div>
 										<p
-											className="text-xs font-semibold uppercase tracking-wider mb-2"
-											style={{ color: "var(--color-text-muted)" }}
+											className="text-xs font-semibold mb-2"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{translateWithFallback(
 												t,
@@ -281,9 +282,9 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 										<p
 											className="text-sm leading-relaxed rounded-2xl p-4"
 											style={{
-												backgroundColor: "var(--color-surface)",
-												border: "1px solid var(--color-border-soft)",
-												color: "var(--color-text-secondary)",
+												backgroundColor: "var(--paper)",
+												border: "var(--ink-width) solid var(--ink)",
+												color: "var(--ink-soft)",
 											}}
 										>
 											{entry.insights}

@@ -8,6 +8,7 @@ import {
 } from "@/api/childProfiles.api";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const AVATAR_COLORS = [
 	"#7C6FD4",
@@ -136,15 +137,15 @@ export default function ChildProfileManager({
 			aria-labelledby="child-profiles-heading"
 			className={`rounded-2xl ${compact ? "p-3" : "p-4"}`}
 			style={{
-				backgroundColor: "var(--color-surface-card)",
-				border: "1px solid var(--color-border-soft)",
+				backgroundColor: "var(--paper-raised)",
+				border: "var(--ink-width) solid var(--ink)",
 			}}
 		>
 			<header className="flex items-center justify-between mb-3">
 				<h2
 					id="child-profiles-heading"
-					className="text-[10px] font-bold uppercase tracking-[0.1em]"
-					style={{ color: "var(--color-text-muted)" }}
+					className="text-[10px] font-bold"
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("tutor.child_profiles_title")}
 				</h2>
@@ -155,10 +156,12 @@ export default function ChildProfileManager({
 						setForm(defaultForm());
 						setShowForm(true);
 					}}
-					className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+					className="flex cursor-pointer items-center gap-1 px-2 py-1 text-xs font-bold focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)]"
 					style={{
-						backgroundColor: "var(--color-surface)",
-						color: "var(--color-primary)",
+						background: "var(--paper-raised)",
+						color: "var(--ink)",
+						border: "var(--ink-width) solid var(--ink)",
+						borderRadius: "var(--radius-block)",
 					}}
 					aria-label={t("tutor.add_child")}
 				>
@@ -173,12 +176,12 @@ export default function ChildProfileManager({
 					className="text-xs"
 					role="status"
 					aria-live="polite"
-					style={{ color: "var(--color-text-muted)" }}
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("ui.loading")}...
 				</p>
 			) : profiles.length === 0 && !showForm ? (
-				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+				<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 					{t("tutor.no_children")}
 				</p>
 			) : (
@@ -191,38 +194,42 @@ export default function ChildProfileManager({
 								className="flex items-center gap-2 rounded-xl transition-all"
 								style={{
 									backgroundColor: isSelected
-										? `color-mix(in srgb, ${profile.avatarColor} 12%, transparent)`
-										: "var(--color-surface)",
+										? profile.avatarColor
+										: "var(--paper)",
 									border: isSelected
 										? `2px solid ${profile.avatarColor}`
-										: "2px solid var(--color-border-soft)",
+										: "var(--ink-width) solid var(--ink)",
 								}}
 							>
 								<button
 									type="button"
 									onClick={() => onSelectChild?.(profile)}
-									className="flex flex-1 items-center gap-3 px-3 py-2.5 rounded-xl text-left min-h-[48px] cursor-pointer transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_6%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
+									className="flex flex-1 items-center gap-3 px-3 py-2.5 rounded-xl text-left min-h-[48px] cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)]"
 									aria-pressed={isSelected}
 									aria-label={profile.name}
 								>
 									<span
 										aria-hidden="true"
-										className="w-9 h-9 min-w-[2.25rem] rounded-full flex items-center justify-center text-white text-sm font-bold"
-										style={{ backgroundColor: profile.avatarColor }}
+										className="flex h-9 w-9 min-w-[2.25rem] items-center justify-center rounded-full text-sm font-bold"
+										style={{
+											backgroundColor: profile.avatarColor,
+											color: "var(--on-fill)",
+											border: "var(--ink-width) solid var(--ink)",
+										}}
 									>
 										{profile.name.charAt(0).toUpperCase()}
 									</span>
 									<span className="flex-1 min-w-0">
 										<span
 											className="block text-sm font-semibold truncate"
-											style={{ color: "var(--color-text-primary)" }}
+											style={{ color: "var(--ink)" }}
 										>
 											{profile.name}
 										</span>
 										{profile.age && (
 											<span
 												className="block text-[10px]"
-												style={{ color: "var(--color-text-muted)" }}
+												style={{ color: "var(--ink-soft)" }}
 											>
 												{t("tutor.child_age", { n: profile.age })}
 											</span>
@@ -239,8 +246,8 @@ export default function ChildProfileManager({
 								<button
 									type="button"
 									onClick={() => openEdit(profile)}
-									className="w-8 h-8 mr-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors hover:bg-[var(--color-surface-card)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-									style={{ color: "var(--color-text-muted)" }}
+									className="w-8 h-8 mr-2 rounded-lg flex items-center justify-center cursor-pointer transition-colors hover:bg-[var(--paper-raised)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)]"
+									style={{ color: "var(--ink-soft)" }}
 									aria-label={t("tutor.edit_child")}
 								>
 									<Pencil size={14} aria-hidden="true" />
@@ -268,15 +275,15 @@ export default function ChildProfileManager({
 							}}
 							className="rounded-xl p-4 flex flex-col gap-3"
 							style={{
-								backgroundColor: "var(--color-surface)",
-								border: "1px solid var(--color-border-soft)",
+								backgroundColor: "var(--paper)",
+								border: "var(--ink-width) solid var(--ink)",
 							}}
 						>
 							<header className="flex justify-between items-center">
 								<h3
 									id="child-profile-form-heading"
 									className="text-sm font-semibold"
-									style={{ color: "var(--color-text-primary)" }}
+									style={{ color: "var(--ink)" }}
 								>
 									{editingProfile
 										? t("tutor.edit_child_title")
@@ -293,7 +300,7 @@ export default function ChildProfileManager({
 									<X
 										size={16}
 										aria-hidden="true"
-										style={{ color: "var(--color-text-muted)" }}
+										style={{ color: "var(--ink-soft)" }}
 									/>
 								</button>
 							</header>
@@ -311,9 +318,9 @@ export default function ChildProfileManager({
 								maxLength={60}
 								className="text-sm rounded-xl px-3 py-2 outline-none focus:ring-1"
 								style={{
-									backgroundColor: "var(--color-surface-card)",
-									color: "var(--color-text-primary)",
-									"--tw-ring-color": "var(--color-secondary)",
+									backgroundColor: "var(--paper-raised)",
+									color: "var(--ink)",
+									"--tw-ring-color": "var(--surya)",
 								}}
 							/>
 
@@ -331,9 +338,9 @@ export default function ChildProfileManager({
 								max={18}
 								className="text-sm rounded-xl px-3 py-2 outline-none focus:ring-1"
 								style={{
-									backgroundColor: "var(--color-surface-card)",
-									color: "var(--color-text-primary)",
-									"--tw-ring-color": "var(--color-secondary)",
+									backgroundColor: "var(--paper-raised)",
+									color: "var(--ink)",
+									"--tw-ring-color": "var(--surya)",
 								}}
 							/>
 
@@ -341,7 +348,7 @@ export default function ChildProfileManager({
 							<fieldset className="border-0 p-0 m-0">
 								<legend
 									className="text-xs font-medium mb-1"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("tutor.avatar_color")}
 								</legend>
@@ -357,7 +364,7 @@ export default function ChildProfileManager({
 												backgroundColor: c,
 												border:
 													form.avatarColor === c
-														? "3px solid var(--color-text-primary)"
+														? "3px solid var(--ink)"
 														: "3px solid transparent",
 											}}
 											aria-label={c}
@@ -370,7 +377,7 @@ export default function ChildProfileManager({
 							<fieldset className="border-0 p-0 m-0">
 								<legend
 									className="text-xs font-medium mb-1"
-									style={{ color: "var(--color-text-secondary)" }}
+									style={{ color: "var(--ink-soft)" }}
 								>
 									{t("tutor.safety_anchors")}
 								</legend>
@@ -388,9 +395,9 @@ export default function ChildProfileManager({
 									maxLength={120}
 									className="w-full text-sm rounded-xl px-3 py-2 mb-2 outline-none focus:ring-1"
 									style={{
-										backgroundColor: "var(--color-surface-card)",
-										color: "var(--color-text-primary)",
-										"--tw-ring-color": "var(--color-secondary)",
+										backgroundColor: "var(--paper-raised)",
+										color: "var(--ink)",
+										"--tw-ring-color": "var(--surya)",
 									}}
 								/>
 								<label htmlFor="child-anchor-bodycue" className="sr-only">
@@ -407,9 +414,9 @@ export default function ChildProfileManager({
 									maxLength={120}
 									className="w-full text-sm rounded-xl px-3 py-2 outline-none focus:ring-1"
 									style={{
-										backgroundColor: "var(--color-surface-card)",
-										color: "var(--color-text-primary)",
-										"--tw-ring-color": "var(--color-secondary)",
+										backgroundColor: "var(--paper-raised)",
+										color: "var(--ink)",
+										"--tw-ring-color": "var(--surya)",
 									}}
 								/>
 							</fieldset>
@@ -427,9 +434,9 @@ export default function ChildProfileManager({
 								maxLength={2000}
 								className="w-full text-sm rounded-xl p-3 resize-none outline-none focus:ring-1"
 								style={{
-									backgroundColor: "var(--color-surface-card)",
-									color: "var(--color-text-primary)",
-									"--tw-ring-color": "var(--color-secondary)",
+									backgroundColor: "var(--paper-raised)",
+									color: "var(--ink)",
+									"--tw-ring-color": "var(--surya)",
 								}}
 							/>
 

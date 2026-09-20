@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Droplets, Sparkles, Wind, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 export default function PostPracticeNudge({
 	durationMinutes = 0,
@@ -15,8 +16,8 @@ export default function PostPracticeNudge({
 			return {
 				icon: Wind,
 				message: t("practice.post_nudge_breathe"),
-				accent: "var(--color-secondary)",
-				bg: "linear-gradient(135deg, var(--color-secondary)12, var(--color-accent)12)",
+				accent: "var(--surya)",
+				bg: "var(--surya)",
 			};
 		}
 
@@ -24,16 +25,16 @@ export default function PostPracticeNudge({
 			return {
 				icon: Droplets,
 				message: t("practice.post_nudge_hydrate"),
-				accent: "var(--color-primary)",
-				bg: "linear-gradient(135deg, var(--color-primary)12, var(--color-primary-light)18)",
+				accent: "var(--chandra)",
+				bg: "var(--chandra)",
 			};
 		}
 
 		return {
 			icon: Sparkles,
 			message: t("practice.post_nudge_return"),
-			accent: "var(--color-secondary)",
-			bg: "linear-gradient(135deg, var(--color-secondary)12, var(--color-primary)10)",
+			accent: "var(--surya)",
+			bg: "var(--surya)",
 		};
 	}, [durationMinutes, stressAfter, t]);
 
@@ -50,27 +51,27 @@ export default function PostPracticeNudge({
 				className="rounded-2xl p-4 border"
 				style={{
 					background: nudge.bg,
-					borderColor: "var(--color-border-soft)",
+					borderColor: "var(--ink)",
 				}}
 				aria-label={t("practice.post_nudge_label")}
 			>
 				<div className="flex items-start gap-3">
 					<div
 						className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-						style={{ backgroundColor: "var(--color-surface-card)" }}
+						style={{ backgroundColor: "var(--paper-raised)" }}
 					>
 						<Icon size={16} style={{ color: nudge.accent }} />
 					</div>
 					<div className="flex-1">
 						<p
-							className="text-[10px] font-bold uppercase tracking-[0.14em] mb-1"
-							style={{ color: "var(--color-text-muted)" }}
+							className="text-[10px] font-bold mb-1"
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("practice.post_nudge_label")}
 						</p>
 						<p
 							className="text-sm font-semibold"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{nudge.message}
 						</p>
@@ -81,7 +82,7 @@ export default function PostPracticeNudge({
 						className="w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-black/5"
 						aria-label={t("practice.dismiss_nudge")}
 					>
-						<X size={14} style={{ color: "var(--color-text-muted)" }} />
+						<X size={14} style={{ color: "var(--ink-soft)" }} />
 					</button>
 				</div>
 			</motion.aside>

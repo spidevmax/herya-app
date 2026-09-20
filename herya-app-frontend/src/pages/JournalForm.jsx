@@ -15,15 +15,16 @@ import SensationChips, {
 import SliderPanel from "@/components/journal/SliderPanel";
 import { Button, MoodSelector } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
 
 const AUTO_NAVIGATE_DELAY = 2500;
 
 const SOFT_PANEL_STYLE = {
 	border:
-		"1px solid color-mix(in srgb, var(--color-border-soft) 68%, transparent)",
+		"1px solid color-mix(in srgb, var(--ink) 68%, transparent)",
 	background:
-		"linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 92%, white 8%) 0%, var(--color-surface) 100%)",
+		"var(--paper-raised)",
 };
 
 const SuccessOverlay = ({ onDone, t }) => {
@@ -36,7 +37,8 @@ const SuccessOverlay = ({ onDone, t }) => {
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-primary)] text-white cursor-pointer"
+			data-identity="next"
+			className="fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center bg-[var(--chandra)] text-[var(--on-fill)]"
 			onClick={onDone}
 			role="status"
 			aria-live="polite"
@@ -47,19 +49,19 @@ const SuccessOverlay = ({ onDone, t }) => {
 				transition={{ type: "spring", delay: 0.1 }}
 			>
 				<div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center mb-6">
-					<Check size={48} className="text-white" />
+					<Check size={48} className="text-[var(--on-fill)]" />
 				</div>
 			</motion.div>
 			<h2 className="font-display text-2xl font-bold mb-2">
 				{t("journal_form.success_title")}
 			</h2>
-			<p className="text-white/80 text-sm mb-8">
+			<p className="opacity-80 text-sm mb-8">
 				{t("journal_form.success_hint")}
 			</p>
 			<button
 				type="button"
 				onClick={onDone}
-				className="px-8 py-3 rounded-2xl bg-[var(--color-surface-card)] text-[var(--color-primary)] font-bold text-sm"
+				className="px-8 py-3 rounded-2xl bg-[var(--paper-raised)] text-[var(--chandra)] font-bold text-sm"
 			>
 				{t("journal_form.success_action")}
 			</button>
@@ -242,7 +244,7 @@ const JournalForm = () => {
 	if (fetching) {
 		return (
 			<div className="flex items-center justify-center py-20">
-				<div className="w-8 h-8 rounded-full border-4 border-[var(--color-primary)] border-t-transparent animate-spin" />
+				<div className="w-8 h-8 rounded-full border-4 border-[var(--chandra)] border-t-transparent animate-spin" />
 			</div>
 		);
 	}
@@ -250,14 +252,14 @@ const JournalForm = () => {
 	if (fetchError) {
 		return (
 			<div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-				<p className="text-lg font-bold font-display text-[var(--color-text-primary)]">
+				<p className="text-lg font-bold font-display text-[var(--ink)]">
 					{t("journal_form.fetch_error")}
 				</p>
 				<button
 					type="button"
 					onClick={() => navigate(-1)}
 					className="mt-4 text-sm font-semibold"
-					style={{ color: "var(--color-primary)" }}
+					style={{ color: "var(--chandra)" }}
 				>
 					← {t("ui.go_back")}
 				</button>
@@ -273,27 +275,31 @@ const JournalForm = () => {
 				)}
 			</AnimatePresence>
 
-			<div className="flex flex-col pt-4 pb-36">
+			<div
+				data-identity="next"
+				className="flex flex-col pb-36 pt-4"
+				style={{ background: "var(--paper)" }}
+			>
 				<div className="flex items-center gap-4 px-4 mb-6">
 					<button
 						type="button"
 						onClick={() => navigate(-1)}
 						aria-label={t("ui.go_back")}
-						className="flex h-12 w-12 items-center justify-center rounded-full shadow-[var(--shadow-card)]"
+						className="flex h-12 w-12 items-center justify-center rounded-full "
 						style={SOFT_PANEL_STYLE}
 					>
 						<ChevronLeft
 							size={24}
-							className="text-[var(--color-text-secondary)]"
+							className="text-[var(--ink-soft)]"
 						/>
 					</button>
 					<div>
-						<h1 className="font-display text-2xl font-bold text-[var(--color-text-primary)]">
+						<h1 className="font-display text-2xl font-bold text-[var(--ink)]">
 							{isEdit
 								? t("journal_form.edit_title")
 								: t("journal_form.new_title")}
 						</h1>
-						<p className="m-0 text-sm text-[var(--color-text-muted)]">
+						<p className="m-0 text-sm text-[var(--ink-soft)]">
 							{t("journal_form.header_subtitle")}
 						</p>
 					</div>
@@ -321,7 +327,7 @@ const JournalForm = () => {
 										energyBefore: Number(e.target.value),
 									}))
 								}
-								accent="var(--color-primary)"
+								accent="var(--chandra)"
 								lowLabel={t("journal_form.slider_low_energy")}
 								highLabel={t("journal_form.slider_high_energy")}
 							/>
@@ -335,7 +341,7 @@ const JournalForm = () => {
 										stressBefore: Number(e.target.value),
 									}))
 								}
-								accent="var(--color-danger)"
+								accent="var(--alert)"
 								lowLabel={t("journal_form.slider_low_stress")}
 								highLabel={t("journal_form.slider_high_stress")}
 							/>
@@ -371,7 +377,7 @@ const JournalForm = () => {
 							}
 							placeholder={t("journal_form.reflection_placeholder")}
 							rows={4}
-							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--chandra)]"
 							style={SOFT_PANEL_STYLE}
 						/>
 					</JournalCard>
@@ -392,7 +398,7 @@ const JournalForm = () => {
 							}
 							placeholder={t("journal_form.insights_placeholder")}
 							rows={3}
-							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--chandra)]"
 							style={SOFT_PANEL_STYLE}
 						/>
 					</JournalCard>
@@ -413,7 +419,7 @@ const JournalForm = () => {
 							}
 							placeholder={t("journal_form.gratitude_placeholder")}
 							rows={3}
-							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]"
+							className="w-full resize-none rounded-[22px] p-4 text-sm text-[var(--ink)] focus:outline-none focus:ring-1 focus:ring-[var(--chandra)]"
 							style={SOFT_PANEL_STYLE}
 						/>
 					</JournalCard>
@@ -440,7 +446,7 @@ const JournalForm = () => {
 										energyAfter: Number(e.target.value),
 									}))
 								}
-								accent="var(--color-primary)"
+								accent="var(--chandra)"
 								lowLabel={t("journal_form.slider_low_energy")}
 								highLabel={t("journal_form.slider_high_energy")}
 							/>
@@ -454,7 +460,7 @@ const JournalForm = () => {
 										stressAfter: Number(e.target.value),
 									}))
 								}
-								accent="var(--color-danger)"
+								accent="var(--alert)"
 								lowLabel={t("journal_form.slider_low_stress")}
 								highLabel={t("journal_form.slider_high_stress")}
 							/>
@@ -467,15 +473,15 @@ const JournalForm = () => {
 						subtitle={t("journal_form.photos_subtitle")}
 					>
 						<label
-							className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[24px] p-6 transition hover:border-[var(--color-primary)]"
+							className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[24px] p-6 transition hover:border-[var(--chandra)]"
 							style={{
 								...SOFT_PANEL_STYLE,
 								borderStyle: "dashed",
 								borderWidth: "2px",
 							}}
 						>
-							<Camera size={32} style={{ color: "var(--color-primary)" }} />
-							<p className="text-sm text-[var(--color-text-secondary)]">
+							<Camera size={32} style={{ color: "var(--chandra)" }} />
+							<p className="text-sm text-[var(--ink-soft)]">
 								{t("journal_form.photos_hint")}
 							</p>
 							<input
@@ -516,7 +522,7 @@ const JournalForm = () => {
 												type="button"
 												onClick={() => removePhoto(i)}
 												aria-label={t("journal_form.remove_photo")}
-												className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--color-danger)] text-white flex items-center justify-center shadow-sm"
+												className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[var(--alert)] text-[var(--on-fill)] flex items-center justify-center shadow-sm"
 											>
 												<X size={12} />
 											</button>
@@ -542,9 +548,9 @@ const JournalForm = () => {
 							className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
 							role="alert"
 							style={{
-								backgroundColor: "var(--color-error-bg)",
-								border: "1px solid var(--color-danger)",
-								color: "var(--color-error-text)",
+								backgroundColor: "var(--alert-bg)",
+								border: "1px solid var(--alert)",
+								color: "var(--alert)",
 							}}
 						>
 							{validationErrors[0]}
@@ -566,9 +572,9 @@ const JournalForm = () => {
 							className="rounded-2xl px-4 py-3 text-center text-sm font-semibold"
 							role="alert"
 							style={{
-								backgroundColor: "var(--color-warning-bg)",
-								border: "1px solid var(--color-warning-border)",
-								color: "var(--color-text-primary)",
+								backgroundColor: "var(--paper-raised)",
+								border: "var(--ink-width) solid var(--surya)",
+								color: "var(--ink)",
 							}}
 						>
 							{saveError}
@@ -586,9 +592,9 @@ const JournalForm = () => {
 					className="rounded-[28px] p-3 shadow-[0_18px_44px_rgba(20,38,74,0.16)] backdrop-blur-sm"
 					style={{
 						background:
-							"linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 90%, white 10%) 0%, color-mix(in srgb, var(--color-surface-card) 96%, transparent) 100%)",
+							"var(--paper-raised)",
 						border:
-							"1px solid color-mix(in srgb, var(--color-border-soft) 72%, transparent)",
+							"1px solid color-mix(in srgb, var(--ink) 72%, transparent)",
 					}}
 				>
 					<Button

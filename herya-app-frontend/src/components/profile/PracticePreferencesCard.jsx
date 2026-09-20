@@ -1,15 +1,16 @@
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import SectionTitle from "./SectionTitle";
 import Toggle from "./Toggle";
 
 const PRACTICE_INTENSITIES = ["gentle", "moderate", "vigorous"];
 const TIME_OF_DAY_OPTIONS = ["morning", "afternoon", "evening", "anytime"];
 
-const cardStyle = { backgroundColor: "var(--color-surface-card)" };
+const cardStyle = { backgroundColor: "var(--paper-raised)" };
 const inputStyle = {
-	backgroundColor: "var(--color-surface)",
-	borderColor: "var(--color-border)",
-	color: "var(--color-text-primary)",
+	backgroundColor: "var(--paper)",
+	borderColor: "var(--ink)",
+	color: "var(--ink)",
 };
 
 export default function PracticePreferencesCard({
@@ -25,13 +26,13 @@ export default function PracticePreferencesCard({
 
 	const fieldErrorStyle = (field) =>
 		fieldErrors[field]
-			? { ...inputStyle, borderColor: "var(--color-danger)" }
+			? { ...inputStyle, borderColor: "var(--alert)" }
 			: inputStyle;
 
 	return (
 		<section
 			aria-label={t("profile.practice_preferences")}
-			className="rounded-3xl p-5 sm:p-6 space-y-5 shadow-[var(--shadow-card)]"
+			className="rounded-3xl p-5 sm:p-6 space-y-5 "
 			style={cardStyle}
 		>
 			<SectionTitle>{t("profile.practice_preferences")}</SectionTitle>
@@ -39,7 +40,7 @@ export default function PracticePreferencesCard({
 				<label className="space-y-1.5 text-sm">
 					<span
 						className="font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("profile.intensity")}
 					</span>
@@ -61,7 +62,7 @@ export default function PracticePreferencesCard({
 				<label className="space-y-1.5 text-sm">
 					<span
 						className="font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("profile.session_duration")}
 					</span>
@@ -82,7 +83,7 @@ export default function PracticePreferencesCard({
 						<p
 							role="alert"
 							className="text-xs mt-0.5"
-							style={{ color: "var(--color-danger)" }}
+							style={{ color: "var(--alert)" }}
 						>
 							{fieldErrors.sessionDuration}
 						</p>
@@ -91,7 +92,7 @@ export default function PracticePreferencesCard({
 				<label className="space-y-1.5 text-sm">
 					<span
 						className="font-semibold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("profile.time_of_day")}
 					</span>
@@ -115,19 +116,19 @@ export default function PracticePreferencesCard({
 			{isTutor && (
 				<div
 					className="pt-4 border-t"
-					style={{ borderColor: "var(--color-border-soft)" }}
+					style={{ borderColor: "var(--ink)" }}
 				>
 					<div className="flex items-center justify-between gap-4">
 						<div>
 							<p
 								className="text-sm font-semibold"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{t("profile.low_stim_mode")}
 							</p>
 							<p
 								className="text-xs mt-1"
-								style={{ color: "var(--color-text-muted)" }}
+								style={{ color: "var(--ink-soft)" }}
 							>
 								{t("profile.low_stim_mode_hint")}
 							</p>
@@ -145,7 +146,7 @@ export default function PracticePreferencesCard({
 						<label className="space-y-1.5 text-sm">
 							<span
 								className="font-semibold"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{t("profile.safety_anchor_phrase")}
 							</span>
@@ -166,7 +167,7 @@ export default function PracticePreferencesCard({
 						<label className="space-y-1.5 text-sm">
 							<span
 								className="font-semibold"
-								style={{ color: "var(--color-text-primary)" }}
+								style={{ color: "var(--ink)" }}
 							>
 								{t("profile.safety_anchor_body_cue")}
 							</span>
@@ -191,14 +192,14 @@ export default function PracticePreferencesCard({
 			{/* Interface subsection */}
 			<div
 				className="pt-4 border-t space-y-3"
-				style={{ borderColor: "var(--color-border)" }}
+				style={{ borderColor: "var(--ink)" }}
 			>
 				<SectionTitle>{t("profile.interface_title")}</SectionTitle>
 				<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 					<label className="space-y-1.5 text-sm">
 						<span
 							className="font-semibold"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{t("profile.language")}
 						</span>
@@ -217,7 +218,7 @@ export default function PracticePreferencesCard({
 					<label className="space-y-1.5 text-sm">
 						<span
 							className="font-semibold"
-							style={{ color: "var(--color-text-primary)" }}
+							style={{ color: "var(--ink)" }}
 						>
 							{t("profile.theme")}
 						</span>

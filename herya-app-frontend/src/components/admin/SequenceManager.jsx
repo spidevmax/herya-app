@@ -8,6 +8,7 @@ import {
 import { getSequences } from "@/api/sequences.api";
 import { Button, ConfirmModal, SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const FAMILIES = [
 	"tadasana",
@@ -102,21 +103,21 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 		>
 			<section
 				aria-labelledby="sequence-modal-title"
-				className="relative w-full max-w-2xl rounded-3xl p-5 shadow-[var(--shadow-card-hover)] sm:p-6"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
+				className="relative w-full max-w-2xl rounded-3xl p-5  sm:p-6"
+				style={{ backgroundColor: "var(--paper-raised)" }}
 			>
 				<button
 					type="button"
 					onClick={onClose}
 					aria-label={t("admin.sequence_manager_cancel")}
-					className="absolute right-4 top-4 rounded-full p-2 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
+					className="absolute right-4 top-4 rounded-full p-2 text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)]"
 				>
 					<X size={18} aria-hidden="true" />
 				</button>
 
 				<h2
 					id="sequence-modal-title"
-					className="pr-10 font-display text-2xl font-bold text-[var(--color-text-primary)]"
+					className="pr-10 font-display text-2xl font-bold text-[var(--ink)]"
 				>
 					{isEditing
 						? t("admin.sequence_manager_edit")
@@ -126,7 +127,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 				{error && (
 					<p
 						role="alert"
-						className="mt-4 rounded-2xl border border-[var(--color-danger)] bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-danger)]"
+						className="mt-4 rounded-2xl border border-[var(--alert)] bg-[var(--alert-bg)] px-4 py-3 text-sm text-[var(--alert)]"
 					>
 						{error}
 					</p>
@@ -135,7 +136,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 				<form onSubmit={handleSubmit} className="mt-5 space-y-4">
 					<div className="grid gap-4 sm:grid-cols-2">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.sequence_manager_english_name")}
 							</span>
 							<input
@@ -148,11 +149,11 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 									}))
 								}
 								required
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.sequence_manager_sanskrit_name")}
 							</span>
 							<input
@@ -165,14 +166,14 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 									}))
 								}
 								required
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							/>
 						</label>
 					</div>
 
 					<div className="grid gap-4 sm:grid-cols-3">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.sequence_manager_family")}
 							</span>
 							<select
@@ -180,7 +181,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 								onChange={(event) =>
 									setForm((prev) => ({ ...prev, family: event.target.value }))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								{FAMILIES.map((family) => (
 									<option key={family} value={family}>
@@ -191,7 +192,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 						</label>
 
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.sequence_manager_level")}
 							</span>
 							<select
@@ -199,7 +200,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 								onChange={(event) =>
 									setForm((prev) => ({ ...prev, level: event.target.value }))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								{LEVELS.map((level) => (
 									<option key={level} value={String(level)}>
@@ -210,7 +211,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 						</label>
 
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--color-text-primary)]">
+							<span className="font-semibold text-[var(--ink)]">
 								{t("admin.sequence_manager_difficulty")}
 							</span>
 							<select
@@ -221,7 +222,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 										difficulty: event.target.value,
 									}))
 								}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+								className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 							>
 								{DIFFICULTIES.map((difficulty) => (
 									<option key={difficulty} value={difficulty}>
@@ -233,7 +234,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 					</div>
 
 					<label className="space-y-1.5 text-sm">
-						<span className="font-semibold text-[var(--color-text-primary)]">
+						<span className="font-semibold text-[var(--ink)]">
 							{t("admin.sequence_manager_primary_benefit")}
 						</span>
 						<textarea
@@ -246,7 +247,7 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 							}
 							required
 							rows={3}
-							className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none transition-colors focus:border-[var(--color-primary)]"
+							className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] px-4 py-3 text-sm text-[var(--ink)] outline-none transition-colors focus:border-[var(--chandra)]"
 						/>
 					</label>
 
@@ -343,12 +344,12 @@ export default function SequenceManager() {
 			aria-label={t("admin.tab_sequences") || "Sequences"}
 			className="flex flex-col gap-4"
 		>
-			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--color-surface-card)] p-4 shadow-[var(--shadow-card)] sm:flex-row sm:items-center">
+			<search className="flex flex-col gap-3 rounded-3xl bg-[var(--paper-raised)] p-4  sm:flex-row sm:items-center">
 				<div className="relative flex-1">
 					<Search
 						size={16}
 						aria-hidden="true"
-						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+						className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]"
 					/>
 					<label htmlFor="sequence-manager-search" className="sr-only">
 						{t("admin.sequence_manager_search")}
@@ -359,7 +360,7 @@ export default function SequenceManager() {
 						value={query}
 						onChange={(event) => setQuery(event.target.value)}
 						placeholder={t("admin.sequence_manager_search")}
-						className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface)] py-3 pl-10 pr-4 text-sm text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-muted)] focus:border-[var(--color-primary)]"
+						className="w-full rounded-2xl border border-[var(--ink)] bg-[var(--paper)] py-3 pl-10 pr-4 text-sm text-[var(--ink)] outline-none transition-colors placeholder:text-[var(--ink-soft)] focus:border-[var(--chandra)]"
 					/>
 				</div>
 				<Button onClick={() => setShowModal(true)} className="shrink-0">
@@ -371,7 +372,7 @@ export default function SequenceManager() {
 			{error && (
 				<p
 					role="alert"
-					className="flex items-center gap-2 rounded-2xl border border-[var(--color-warning-border)] bg-[var(--color-warning-bg)] px-4 py-3 text-sm text-[var(--color-warning)]"
+					className="flex items-center gap-2 rounded-[var(--radius-block)] border-[length:var(--ink-width)] border-[var(--surya)] bg-[var(--paper-raised)] px-4 py-3 text-sm font-bold text-[var(--ink)]"
 				>
 					<AlertTriangle size={16} aria-hidden="true" />
 					<span>{t("admin.sequence_manager_load_error")}</span>
@@ -393,17 +394,17 @@ export default function SequenceManager() {
 						<li key={item._id}>
 							<article
 								aria-labelledby={`sequence-card-${item._id}-title`}
-								className="flex h-full flex-col rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-5 shadow-[var(--shadow-card)] transition-shadow hover:shadow-md"
+								className="flex h-full flex-col rounded-3xl border border-[var(--ink)] bg-[var(--paper-raised)] p-5  transition-shadow hover:shadow-md"
 							>
 								<header className="flex items-start justify-between gap-3">
 									<div className="min-w-0">
 										<h3
 											id={`sequence-card-${item._id}-title`}
-											className="truncate text-base font-semibold text-[var(--color-text-primary)]"
+											className="truncate text-base font-semibold text-[var(--ink)]"
 										>
 											{item.englishName}
 										</h3>
-										<p className="truncate text-sm text-[var(--color-text-secondary)]">
+										<p className="truncate text-sm text-[var(--ink-soft)]">
 											{item.sanskritName}
 										</p>
 									</div>
@@ -411,30 +412,30 @@ export default function SequenceManager() {
 										className="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
 										style={{
 											backgroundColor:
-												"color-mix(in srgb, var(--color-primary) 12%, transparent)",
-											color: "var(--color-primary)",
+												"color-mix(in srgb, var(--chandra) 12%, transparent)",
+											color: "var(--chandra)",
 										}}
 									>
 										L{item.level}
 									</span>
 								</header>
 
-								<ul className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--color-text-secondary)] list-none m-0 p-0">
-									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+								<ul className="mt-3 flex flex-wrap gap-2 text-xs text-[var(--ink-soft)] list-none m-0 p-0">
+									<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 										{humanize(item.family)}
 									</li>
-									<li className="rounded-full bg-[var(--color-surface)] px-2.5 py-1">
+									<li className="rounded-full bg-[var(--paper)] px-2.5 py-1">
 										{humanize(item.difficulty || "beginner")}
 									</li>
 								</ul>
 
-								<p className="mt-3 text-xs text-[var(--color-text-muted)] line-clamp-2">
+								<p className="mt-3 text-xs text-[var(--ink-soft)] line-clamp-2">
 									{item.therapeuticFocus?.primaryBenefit || "—"}
 								</p>
 
 								<div
 									className="mt-4 flex items-center justify-between gap-2 border-t pt-3"
-									style={{ borderColor: "var(--color-border-soft)" }}
+									style={{ borderColor: "var(--ink)" }}
 								>
 									<Button
 										variant="outline"
@@ -451,8 +452,8 @@ export default function SequenceManager() {
 									<button
 										type="button"
 										onClick={() => setDeleteTarget(item)}
-										className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--color-danger)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-danger)] focus-visible:ring-offset-1"
-										style={{ color: "var(--color-danger)" }}
+										className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--alert)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--alert)] focus-visible:ring-offset-1"
+										style={{ color: "var(--alert)" }}
 									>
 										<Trash2 size={14} aria-hidden="true" />
 										{t("admin.sequence_manager_delete")}
@@ -463,7 +464,7 @@ export default function SequenceManager() {
 					))}
 				</ul>
 			) : (
-				<p className="rounded-3xl bg-[var(--color-surface-card)] p-8 text-center text-sm text-[var(--color-text-muted)] shadow-[var(--shadow-card)] m-0">
+				<p className="rounded-3xl bg-[var(--paper-raised)] p-8 text-center text-sm text-[var(--ink-soft)]  m-0">
 					{t("admin.sequence_manager_empty")}
 				</p>
 			)}
