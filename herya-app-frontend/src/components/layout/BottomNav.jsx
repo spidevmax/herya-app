@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
 import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const BottomNav = () => {
 	const navigate = useNavigate();
@@ -20,65 +20,67 @@ const BottomNav = () => {
 
 	return (
 		<nav
-			aria-label={t("nav.home")}
-			className="lg:hidden fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] sm:max-w-[540px] border-t z-40 backdrop-blur-xl pb-[env(safe-area-inset-bottom)]"
+			data-identity="next"
+			aria-label={t("nav.main")}
+			className="fixed bottom-0 left-1/2 z-40 w-full max-w-[430px] -translate-x-1/2 pb-[env(safe-area-inset-bottom)] sm:max-w-[540px] lg:hidden"
 			style={{
-				backgroundColor:
-					"color-mix(in srgb, var(--color-surface-card) 90%, transparent)",
-				borderColor: "var(--color-border)",
+				background: "var(--paper-raised)",
+				borderTop: "var(--ink-width) solid var(--ink)",
 			}}
 		>
-			<ul className="relative flex items-center justify-around list-none m-0 px-2 pt-2 pb-3">
+			<ul className="relative m-0 flex list-none items-end justify-around px-2 pt-2 pb-3">
 				{NAV_ITEMS.map((item) => {
 					if (item.fab) {
 						return (
 							<li key="fab" className="relative z-50">
-								<motion.button
+								<button
 									type="button"
 									onClick={() => navigate("/start-practice")}
-									whileTap={{ scale: 0.9 }}
 									aria-label={t("fab.vk_sequence")}
-									className="relative flex items-center justify-center w-14 h-14 rounded-full text-white -mt-8"
+									className="ink-block ink-block--press -mt-9 flex h-14 w-14 items-center justify-center"
 									style={{
-										backgroundColor: "var(--color-primary)",
-										boxShadow: "var(--shadow-fab)",
+										background: "var(--surya)",
+										color: "var(--on-fill)",
+										borderRadius: "999px",
+										cursor: "pointer",
 									}}
 								>
 									<Plus size={26} strokeWidth={2.5} aria-hidden="true" />
-								</motion.button>
+								</button>
 							</li>
 						);
 					}
+
 					const Icon = item.icon;
 					return (
 						<li key={item.to}>
 							<NavLink
 								to={item.to}
 								end={item.to === "/"}
-								className="flex flex-col items-center gap-0.5 px-3 py-1 rounded-2xl transition-all duration-200"
-								style={({ isActive }) => ({
-									color: isActive
-										? "var(--color-primary)"
-										: "var(--color-text-muted)",
-								})}
+								className="flex flex-col items-center gap-1 px-2 py-1"
 							>
 								{({ isActive }) => (
 									<>
-										<motion.span
-											aria-hidden="true"
-											className="inline-flex"
-											animate={{ scale: isActive ? 1.1 : 1 }}
-											transition={{ type: "spring", stiffness: 400 }}
-										>
-											<Icon size={22} strokeWidth={isActive ? 2.5 : 1.8} />
-										</motion.span>
+										{/* The active item fills with ink rather than tinting,
+										    so the current section survives a glance and does not
+										    rely on colour alone. */}
 										<span
-											className="text-[10px] font-semibold tracking-wide"
+											aria-hidden="true"
+											className="inline-flex h-9 w-11 items-center justify-center"
 											style={{
-												color: isActive
-													? "var(--color-primary)"
-													: "var(--color-text-muted)",
+												background: isActive ? "var(--ink)" : "transparent",
+												color: isActive ? "var(--paper)" : "var(--ink-soft)",
+												border: isActive
+													? "var(--ink-width) solid var(--ink)"
+													: "var(--ink-width) solid transparent",
+												borderRadius: "var(--radius-block)",
 											}}
+										>
+											<Icon size={20} strokeWidth={isActive ? 2.4 : 1.9} />
+										</span>
+										<span
+											className="text-[10px] font-bold"
+											style={{ color: isActive ? "var(--ink)" : "var(--ink-soft)" }}
 										>
 											{item.label}
 										</span>

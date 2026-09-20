@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { AlertTriangle, RotateCcw, ShieldCheck } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -14,10 +13,11 @@ import TutorInsightsCard from "@/components/dashboard/TutorInsightsCard";
 import { Button, SkeletonCard } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const ROLE_TONE = {
-	admin: { label: "Admin", color: "var(--color-info)", icon: ShieldCheck },
-	tutor: { label: "Tutor", color: "var(--color-warning)", icon: ShieldCheck },
+	admin: { label: "Admin", icon: ShieldCheck },
+	tutor: { label: "Tutor", color: "var(--alert)", icon: ShieldCheck },
 };
 
 const getGreetingKey = (hour) => {
@@ -103,24 +103,24 @@ export default function Dashboard() {
 	const initial = (firstName?.[0] || "·").toUpperCase();
 
 	return (
-		<main className="flex flex-col gap-6 pt-4 pb-6 max-w-7xl mx-auto px-4 lg:px-6">
+		<main
+			data-identity="next"
+			className="mx-auto flex max-w-7xl flex-col gap-6 px-4 pb-6 pt-4 lg:px-6"
+			style={{ background: "var(--paper)" }}
+		>
 			{/* ── Header ────────────────────────────────────────────────────── */}
-			<motion.header
-				initial={{ opacity: 0, y: -8 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.3 }}
+			<header
 				className="flex items-center justify-between gap-3"
 			>
 				<div className="flex items-center gap-3 min-w-0">
 					<span
 						aria-hidden="true"
-						className="w-11 h-11 rounded-full flex items-center justify-center font-display text-lg font-bold shrink-0 overflow-hidden"
+						className="display flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden text-lg"
 						style={{
-							backgroundColor:
-								"color-mix(in srgb, var(--color-primary) 14%, transparent)",
-							color: "var(--color-primary)",
-							border:
-								"2px solid color-mix(in srgb, var(--color-primary) 22%, transparent)",
+							background: "var(--chandra)",
+							color: "var(--on-fill)",
+							border: "var(--ink-width) solid var(--ink)",
+							borderRadius: "999px",
 						}}
 					>
 						{user?.profileImageUrl || user?.avatar ? (
@@ -135,22 +135,22 @@ export default function Dashboard() {
 					</span>
 					<div className="min-w-0">
 						<p
-							className="text-sm font-medium"
-							style={{ color: "var(--color-text-secondary)" }}
+							className="text-sm font-bold"
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t(greetingKey)},
 						</p>
 						<div className="flex items-center gap-2 flex-wrap">
-							<h1 className="font-display text-2xl font-bold tracking-tight text-[var(--color-primary)] truncate">
+							<h1 className="display truncate text-[1.9rem]" style={{ color: "var(--ink)" }}>
 								{firstName}
 							</h1>
 							{roleTone && (
 								<span
-									className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em] px-2 py-0.5 rounded-full"
+									className="inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-bold"
 									style={{
-										backgroundColor: `color-mix(in srgb, ${roleTone.color} 14%, transparent)`,
-										color: roleTone.color,
-										border: `1px solid color-mix(in srgb, ${roleTone.color} 28%, transparent)`,
+										color: "var(--ink)",
+										border: "var(--ink-width) solid var(--ink)",
+										borderRadius: "var(--radius-block)",
 									}}
 								>
 									<roleTone.icon size={11} aria-hidden="true" />
@@ -160,29 +160,27 @@ export default function Dashboard() {
 						</div>
 					</div>
 				</div>
-			</motion.header>
+			</header>
 
 			{error && (
-				<motion.section
+				<section
 					role="alert"
-					initial={{ opacity: 0, y: 8 }}
-					animate={{ opacity: 1, y: 0 }}
-					className="w-full rounded-2xl p-4 flex items-center gap-3"
+					className="w-full ink-block p-4 flex items-center gap-3"
 					style={{
-						backgroundColor: "var(--color-warning-bg)",
-						border: "1px solid var(--color-warning-border)",
+						backgroundColor: "var(--paper-raised)",
+						border: "1px solid var(--alert)",
 					}}
 				>
 					<AlertTriangle
 						size={20}
 						aria-hidden="true"
-						style={{ color: "var(--color-warning)" }}
+						style={{ color: "var(--alert)" }}
 					/>
 					<div className="flex-1 min-w-0">
-						<p className="text-sm font-semibold text-[var(--color-text-primary)]">
+						<p className="text-sm font-semibold text-[var(--ink)]">
 							{t("dashboard.error_title")}
 						</p>
-						<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+						<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 							{t("dashboard.error_hint")}
 						</p>
 					</div>
@@ -191,37 +189,29 @@ export default function Dashboard() {
 						onClick={loadDashboard}
 						className="shrink-0 px-3 py-2 rounded-xl text-xs font-semibold"
 						style={{
-							backgroundColor: "var(--color-warning)",
+							backgroundColor: "var(--alert)",
 							color: "white",
 						}}
 					>
 						{t("dashboard.error_retry", "Retry")}
 					</button>
-				</motion.section>
+				</section>
 			)}
 
 			{!isAdminUser && (
-				<motion.div
-					initial={{ opacity: 0, y: 8 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.3, delay: 0.05 }}
-				>
+				<div>
 					<SoftReminderCard
 						user={user}
 						sessions={sessions}
 						streak={stats?.currentStreak ?? 0}
 					/>
-				</motion.div>
+				</div>
 			)}
 
 			{isAdminUser && (
-				<motion.div
-					initial={{ opacity: 0, y: 8 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.3, delay: 0.05 }}
-				>
+				<div>
 					<AdminQuickCard />
-				</motion.div>
+				</div>
 			)}
 
 			{/* ── Responsive layout ─────────────────────────────────────────
@@ -230,10 +220,7 @@ export default function Dashboard() {
 			────────────────────────────────────────────────────────────────── */}
 			<div className="flex flex-col lg:grid lg:grid-cols-[55%_45%] lg:gap-5">
 				{/* Mobile-only calendar (shown first on small screens) */}
-				<motion.div
-					initial={{ opacity: 0, y: 12 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.35, delay: 0.1 }}
+				<div
 					className="mb-5 lg:hidden"
 				>
 					<CalendarStrip
@@ -242,28 +229,22 @@ export default function Dashboard() {
 						weekSessions={weekSessions}
 						loading={loading}
 					/>
-				</motion.div>
+				</div>
 
 				{/* Left column (desktop): Hero + Recent */}
 				<div className="flex flex-col gap-5 lg:col-start-1">
 					{!isAdminUser && (
-						<motion.div
-							initial={{ opacity: 0, y: 12 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.35, delay: 0.15 }}
+						<div
 						>
 							<HeroCard
 								sequence={recommended}
 								reason={recommendReason}
 								loading={loading}
 							/>
-						</motion.div>
+						</div>
 					)}
 
-					<motion.div
-						initial={{ opacity: 0, y: 12 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35, delay: 0.25 }}
+					<div
 						className="flex flex-col gap-3"
 					>
 						{loading ? (
@@ -277,28 +258,28 @@ export default function Dashboard() {
 							<>
 								{pendingSession && (
 									<article
-										className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex items-center justify-between gap-3"
+										className="ink-block p-4 flex items-center justify-between gap-3"
 										style={{
-											backgroundColor: "var(--color-surface-card)",
-											border: "1px solid var(--color-border-soft)",
+											backgroundColor: "var(--paper-raised)",
+											border: "1px solid var(--ink)",
 										}}
 									>
 										<div className="min-w-0">
 											<p
-												className="text-[11px] font-bold uppercase tracking-[0.1em] mb-1"
-												style={{ color: "var(--color-text-muted)" }}
+												className="mb-1 text-[11px] font-bold"
+												style={{ color: "var(--ink-soft)" }}
 											>
 												{t("dashboard.resume_practice")}
 											</p>
 											<p
 												className="text-sm font-semibold truncate"
-												style={{ color: "var(--color-text-primary)" }}
+												style={{ color: "var(--ink)" }}
 											>
 												{t(`dashboard.${pendingSession.sessionType}`)}
 											</p>
 											<p
 												className="text-xs"
-												style={{ color: "var(--color-text-secondary)" }}
+												style={{ color: "var(--ink-soft)" }}
 											>
 												{t("session_detail.in_progress")} ·{" "}
 												{pendingSession.duration} min
@@ -342,8 +323,8 @@ export default function Dashboard() {
 									>
 										<h2
 											id="recent-practice-heading"
-											className="font-display text-[11px] font-bold uppercase tracking-[0.1em]"
-											style={{ color: "var(--color-text-muted)" }}
+											className="text-[11px] font-bold"
+											style={{ color: "var(--ink-soft)" }}
 										>
 											{t("dashboard.recent_practice")}
 										</h2>
@@ -359,18 +340,16 @@ export default function Dashboard() {
 									!pendingSession && (
 										<section
 											aria-label={t("dashboard.no_sessions_title")}
-											className="rounded-3xl p-6 text-center shadow-[var(--shadow-card)]"
-											style={{ backgroundColor: "var(--color-surface-card)" }}
+											className="ink-block p-6 text-center"
 										>
 											<p
-												className="text-sm font-semibold mb-1"
-												style={{ color: "var(--color-text-primary)" }}
+												className="mb-1 text-sm font-bold"
 											>
 												{t("dashboard.no_sessions_title")}
 											</p>
 											<p
 												className="text-xs"
-												style={{ color: "var(--color-text-muted)" }}
+												style={{ color: "var(--ink-soft)" }}
 											>
 												{t("dashboard.no_sessions_hint")}
 											</p>
@@ -379,15 +358,12 @@ export default function Dashboard() {
 								)}
 							</>
 						)}
-					</motion.div>
+					</div>
 				</div>
 
 				{/* Right column (desktop): Calendar + Snapshot + Tutor */}
 				<div className="hidden lg:flex lg:flex-col gap-5 lg:col-start-2">
-					<motion.div
-						initial={{ opacity: 0, y: 12 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35, delay: 0.1 }}
+					<div
 					>
 						<CalendarStrip
 							sessionDates={sessionDates}
@@ -395,12 +371,9 @@ export default function Dashboard() {
 							weekSessions={weekSessions}
 							loading={loading}
 						/>
-					</motion.div>
+					</div>
 
-					<motion.div
-						initial={{ opacity: 0, y: 12 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35, delay: 0.2 }}
+					<div
 					>
 						<PracticeSnapshotCard
 							streak={stats?.currentStreak ?? 0}
@@ -409,24 +382,18 @@ export default function Dashboard() {
 							pendingSession={pendingSession}
 							loading={loading}
 						/>
-					</motion.div>
+					</div>
 
 					{isTutorUser && (
-						<motion.div
-							initial={{ opacity: 0, y: 12 }}
-							animate={{ opacity: 1, y: 0 }}
-							transition={{ duration: 0.35, delay: 0.25 }}
+						<div
 						>
 							<TutorInsightsCard tutorInsights={stats?.tutorInsights} />
-						</motion.div>
+						</div>
 					)}
 				</div>
 
 				{/* Mobile-only: Snapshot + Tutor after Recent */}
-				<motion.div
-					initial={{ opacity: 0, y: 12 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 0.35, delay: 0.2 }}
+				<div
 					className="mt-5 lg:hidden"
 				>
 					<PracticeSnapshotCard
@@ -436,17 +403,14 @@ export default function Dashboard() {
 						pendingSession={pendingSession}
 						loading={loading}
 					/>
-				</motion.div>
+				</div>
 
 				{isTutorUser && (
-					<motion.div
-						initial={{ opacity: 0, y: 12 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35, delay: 0.25 }}
+					<div
 						className="mt-5 lg:hidden"
 					>
 						<TutorInsightsCard tutorInsights={stats?.tutorInsights} />
-					</motion.div>
+					</div>
 				)}
 			</div>
 		</main>

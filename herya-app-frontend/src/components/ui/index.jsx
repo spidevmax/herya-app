@@ -71,7 +71,7 @@ export const SearchBar = ({
 			{label ? <label className="sr-only">{label}</label> : null}
 			<Search
 				size={18}
-				className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
+				className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]"
 				aria-hidden="true"
 			/>
 			<input
@@ -80,14 +80,14 @@ export const SearchBar = ({
 				onChange={(e) => onChange(e.target.value)}
 				placeholder={placeholder}
 				aria-label={label || placeholder}
-				className="input-base bg-[var(--color-surface-card)] pr-11"
+				className="input-base bg-[var(--paper-raised)] pr-11"
 			/>
 			{value ? (
 				<button
 					type="button"
 					onClick={() => onChange("")}
 					aria-label={clearLabel}
-					className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--color-text-muted)] transition-colors hover:text-[var(--color-text-primary)]"
+					className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[var(--ink-soft)] transition-colors hover:text-[var(--ink)]"
 				>
 					<X size={16} aria-hidden="true" />
 				</button>
@@ -108,7 +108,7 @@ export const Input = ({
 		{label ? (
 			<label
 				htmlFor={id}
-				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)]"
+				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink-soft)]"
 			>
 				{label}
 			</label>
@@ -133,7 +133,7 @@ export const SelectField = ({
 		{label ? (
 			<label
 				htmlFor={id}
-				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)]"
+				className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.08em] text-[var(--ink-soft)]"
 			>
 				{label}
 			</label>
@@ -152,7 +152,7 @@ export const ChipButton = ({
 }) => (
 	<button
 		type="button"
-		className={`chip cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 ${active ? "chip-active" : "chip-inactive"} border border-[var(--color-border-soft)] ${className}`}
+		className={`chip cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)] focus-visible:ring-offset-1 ${active ? "chip-active" : "chip-inactive"} border border-[var(--ink)] ${className}`}
 		{...props}
 	>
 		{children}
@@ -169,33 +169,33 @@ export const Button = ({
 	loading = false,
 	...props
 }) => {
+	// Same API as before — only the rendering changed. Every filled variant is
+	// an ink block: outline plus a hard offset, no drop shadow, no gradient.
 	const variants = {
-		primary:
-			"bg-[var(--color-primary)] text-white shadow-[var(--shadow-button)] hover:brightness-95 active:scale-95",
-		secondary:
-			"bg-[var(--color-secondary)] text-white shadow-[var(--shadow-secondary)] hover:brightness-95 active:scale-95",
-		accent:
-			"bg-[var(--color-accent)] text-white shadow-[var(--shadow-accent)] hover:brightness-95 active:scale-95",
-		ghost:
-			"bg-transparent text-[var(--color-primary)] hover:bg-[color:var(--color-primary)/0.1] active:scale-95",
-		outline:
-			"border-2 border-[var(--color-border)] bg-[var(--color-surface-card)] text-[var(--color-primary)] hover:border-[var(--color-primary)] hover:text-[var(--color-primary)] active:scale-95",
+		primary: { background: "var(--surya)", color: "var(--on-fill)" },
+		secondary: { background: "var(--chandra)", color: "var(--on-fill)" },
+		accent: { background: "var(--ink)", color: "var(--paper)" },
+		ghost: { background: "transparent", color: "var(--ink)" },
+		outline: { background: "var(--paper-raised)", color: "var(--ink)" },
 	};
 	const sizes = {
-		sm: "px-3 py-1.5 text-sm rounded-lg",
-		md: "px-5 py-2.5 text-sm rounded-xl",
-		lg: "px-6 py-3.5 text-base rounded-xl",
-		xl: "px-8 py-4 text-lg rounded-xl",
+		sm: "px-3 py-1.5 text-sm",
+		md: "px-5 py-2.5 text-sm",
+		lg: "px-6 py-3.5 text-base",
+		xl: "px-8 py-4 text-lg",
 	};
-	const weightClass =
-		variant === "primary" || variant === "accent"
-			? "font-semibold"
-			: "font-medium";
+	const isGhost = variant === "ghost";
 	return (
 		<button
 			type={props.type || "button"}
 			disabled={disabled || loading}
-			className={`inline-flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${weightClass} transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`}
+			className={`inline-flex cursor-pointer items-center justify-center gap-2 font-bold disabled:cursor-not-allowed disabled:opacity-50 ${
+				isGhost ? "" : "ink-block ink-block--press"
+			} ${sizes[size]} ${className}`}
+			style={{
+				...variants[variant],
+				...(isGhost ? { borderRadius: "var(--radius-block)" } : {}),
+			}}
 			{...props}
 		>
 			{loading ? <LoadingSpinner size={16} /> : children}
@@ -207,7 +207,7 @@ export const Button = ({
 export const InlineLink = ({ children, className = "", ...props }) => (
 	<button
 		type="button"
-		className={`inline text-xs font-medium underline underline-offset-2 cursor-pointer text-[var(--color-text-secondary)] transition-colors hover:text-[var(--color-primary)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-1 rounded-sm ${className}`}
+		className={`inline text-xs font-medium underline underline-offset-2 cursor-pointer text-[var(--ink-soft)] transition-colors hover:text-[var(--chandra)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)] focus-visible:ring-offset-1 rounded-sm ${className}`}
 		{...props}
 	>
 		{children}
@@ -219,25 +219,22 @@ export const StatCard = ({
 	icon,
 	label,
 	value,
-	color = "var(--color-primary)",
+	color = "var(--chandra)",
 }) => {
 	return (
 		<article
-			className="rounded-xl p-3 flex flex-col gap-2"
-			style={{
-				backgroundColor: `color-mix(in srgb, ${color} 8%, transparent)`,
-				borderLeft: `3px solid ${color}`,
-			}}
+			className="ink-block flex flex-col gap-2 p-3"
+			style={{ borderTopColor: color, borderTopWidth: "6px" }}
 		>
-			<header className="flex items-center gap-2" style={{ color }}>
+			<header className="flex items-center gap-2" style={{ color: "var(--ink)" }}>
 				<span aria-hidden="true">{icon}</span>
-				<p className="text-xs font-medium text-[var(--color-text-secondary)]">
+				<p className="text-xs font-bold" style={{ color: "var(--ink-soft)" }}>
 					{label}
 				</p>
 			</header>
 			<p
 				className="text-xl font-bold"
-				style={{ color: "var(--color-text-primary)" }}
+				style={{ color: "var(--ink)" }}
 			>
 				{value}
 			</p>
@@ -258,7 +255,7 @@ export const TabBar = ({
 		<div
 			role="tablist"
 			aria-label={ariaLabel}
-			className={`flex gap-2 border-b border-[var(--color-border)] ${className}`}
+			className={`flex gap-2 border-b border-[var(--ink)] ${className}`}
 		>
 			{tabs.map((tab, index) => {
 				const tabId = tab.id ?? tab.key;
@@ -284,8 +281,8 @@ export const TabBar = ({
 						}}
 						className={`px-4 py-2 text-sm font-medium transition-all border-b-2 ${
 							active === tabId
-								? "border-[var(--color-primary)] text-[var(--color-primary)]"
-								: "border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+								? "border-[var(--chandra)] text-[var(--chandra)]"
+								: "border-transparent text-[var(--ink-soft)] hover:text-[var(--ink)]"
 						}`}
 					>
 						{tab.label}
@@ -363,17 +360,17 @@ export const MoodSelector = ({
 		<fieldset className="flex flex-col gap-3 m-0 p-0 border-0">
 			{label && (
 				<header className="flex items-center justify-between">
-					<legend className="text-base font-semibold text-[var(--color-text-primary)] p-0 tracking-[-0.01em]">
+					<legend className="text-base font-semibold text-[var(--ink)] p-0 tracking-[-0.01em]">
 						{label}
 					</legend>
 					<p
 						className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
 						style={{
-							color: "var(--color-text-muted)",
+							color: "var(--ink-soft)",
 							backgroundColor:
-								"color-mix(in srgb, var(--color-surface) 88%, white 12%)",
+								"color-mix(in srgb, var(--paper) 88%, white 12%)",
 							border:
-								"1px solid color-mix(in srgb, var(--color-border-soft) 70%, transparent)",
+								"1px solid color-mix(in srgb, var(--ink) 70%, transparent)",
 						}}
 						aria-live="polite"
 					>
@@ -398,17 +395,17 @@ export const MoodSelector = ({
 								className="w-full flex flex-col items-center justify-center gap-2 py-4 px-3 rounded-[22px] transition-all text-sm font-medium min-h-[120px]"
 								style={{
 									background: isSelected
-										? "linear-gradient(135deg, var(--color-primary) 0%, color-mix(in srgb, var(--color-primary) 84%, black 16%) 100%)"
-										: "linear-gradient(180deg, color-mix(in srgb, var(--color-surface-card) 92%, white 8%) 0%, var(--color-surface-card) 100%)",
+										? "linear-gradient(135deg, var(--chandra) 0%, color-mix(in srgb, var(--chandra) 84%, black 16%) 100%)"
+										: "linear-gradient(180deg, color-mix(in srgb, var(--paper-raised) 92%, white 8%) 0%, var(--paper-raised) 100%)",
 									color: isSelected
 										? "white"
 										: isDisabled
-											? "var(--color-text-muted)"
-											: "var(--color-text-secondary)",
+											? "var(--ink-soft)"
+											: "var(--ink-soft)",
 									border: `1px solid ${
 										isSelected
-											? "color-mix(in srgb, var(--color-primary) 80%, black 20%)"
-											: "color-mix(in srgb, var(--color-border-soft) 72%, transparent)"
+											? "color-mix(in srgb, var(--chandra) 80%, black 20%)"
+											: "color-mix(in srgb, var(--ink) 72%, transparent)"
 									}`,
 									boxShadow: isSelected
 										? "0 16px 36px rgba(32, 73, 158, 0.18)"
@@ -423,7 +420,7 @@ export const MoodSelector = ({
 									style={{
 										backgroundColor: isSelected
 											? "rgba(255,255,255,0.16)"
-											: "color-mix(in srgb, var(--color-primary) 6%, white 94%)",
+											: "color-mix(in srgb, var(--chandra) 6%, white 94%)",
 									}}
 								>
 									<MoodIcon size={22} strokeWidth={2.2} />
@@ -454,8 +451,8 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 						whileTap={{ scale: 0.95 }}
 						className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
 							selected === option.key
-								? "text-white shadow-[var(--shadow-card)]"
-								: "bg-[var(--color-surface-card)] text-[var(--color-text-secondary)] border border-[var(--color-border-soft)]"
+								? "text-white "
+								: "bg-[var(--paper-raised)] text-[var(--ink-soft)] border border-[var(--ink)]"
 						}`}
 						style={
 							selected === option.key ? { backgroundColor: option.color } : {}
@@ -470,16 +467,13 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 };
 
 // ── Badge ─────────────────────────────────────────────────────────────────────
-export const Badge = ({
-	children,
-	color = "var(--color-secondary)",
-	className = "",
-}) => {
+export const Badge = ({ children, color = "var(--ink)", className = "" }) => {
 	return (
 		<span
-			className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}
+			className={`inline-flex items-center px-2.5 py-0.5 text-xs font-bold ${className}`}
 			style={{
-				backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`,
+				border: `var(--ink-width) solid ${color}`,
+				borderRadius: "var(--radius-block)",
 				color,
 			}}
 		>
@@ -493,8 +487,7 @@ export const SkeletonCard = ({ lines = 3, className = "" }) => {
 	return (
 		<div
 			aria-hidden="true"
-			className={`rounded-2xl p-4 space-y-3 shadow-[var(--shadow-card)] ${className}`}
-			style={{ backgroundColor: "var(--color-surface-card)" }}
+			className={`ink-block space-y-3 p-4 ${className}`}
 		>
 			<span className="skeleton h-5 w-3/4 rounded-lg block" />
 			{Array.from({ length: lines - 1 }, (_, idx) => idx + 1).map((lineNo) => (
@@ -568,11 +561,11 @@ export const EmptyState = ({
 					{illustration}
 				</motion.span>
 			) : null}
-			<h3 className="font-display text-xl font-semibold mb-2 text-[var(--color-text-primary)]">
+			<h3 className="font-display text-xl font-semibold mb-2 text-[var(--ink)]">
 				{title}
 			</h3>
 			{description && (
-				<p className="text-[var(--color-text-secondary)] text-sm max-w-xs mb-6">
+				<p className="text-[var(--ink-soft)] text-sm max-w-xs mb-6">
 					{description}
 				</p>
 			)}
@@ -585,7 +578,7 @@ export const EmptyState = ({
 export const ProgressBar = ({
 	value,
 	max,
-	color = "var(--color-secondary)",
+	color = "var(--surya)",
 	className = "",
 }) => {
 	const pct = Math.min(100, Math.round((value / max) * 100));
@@ -596,7 +589,7 @@ export const ProgressBar = ({
 			aria-valuemin={0}
 			aria-valuemax={100}
 			className={`w-full h-2 rounded-full overflow-hidden ${className}`}
-			style={{ backgroundColor: "var(--color-border-soft)" }}
+			style={{ backgroundColor: "var(--ink)" }}
 		>
 			<motion.span
 				aria-hidden="true"
@@ -616,7 +609,7 @@ export const CircleProgress = ({
 	max,
 	size = 64,
 	stroke = 6,
-	color = "var(--color-secondary)",
+	color = "var(--surya)",
 	children,
 }) => {
 	const { t } = useLanguage();
@@ -635,7 +628,7 @@ export const CircleProgress = ({
 					cy={size / 2}
 					r={r}
 					fill="none"
-					stroke="var(--color-border-soft)"
+					stroke="var(--ink)"
 					strokeWidth={stroke}
 				/>
 				<motion.circle
@@ -737,19 +730,19 @@ export const ConfirmModal = ({
 				initial={{ opacity: 0, y: 12, scale: 0.98 }}
 				animate={{ opacity: 1, y: 0, scale: 1 }}
 				transition={{ duration: 0.2, ease: "easeOut" }}
-				className="relative w-full max-w-md rounded-2xl p-6 shadow-[var(--shadow-card-hover)]"
-				style={{ backgroundColor: "var(--color-surface-card)" }}
+				className="relative w-full max-w-md rounded-2xl p-6 "
+				style={{ backgroundColor: "var(--paper-raised)" }}
 			>
 				<h3
 					id={titleId}
-					className="font-display text-lg font-semibold text-[var(--color-text-primary)]"
+					className="font-display text-lg font-semibold text-[var(--ink)]"
 				>
 					{title}
 				</h3>
 				{description ? (
 					<p
 						id={descId}
-						className="mt-2 text-sm text-[var(--color-text-secondary)]"
+						className="mt-2 text-sm text-[var(--ink-soft)]"
 					>
 						{description}
 					</p>
@@ -759,7 +752,7 @@ export const ConfirmModal = ({
 					<div className="mt-4 space-y-1.5">
 						<p
 							className="text-xs font-medium"
-							style={{ color: "var(--color-text-muted)" }}
+							style={{ color: "var(--ink-soft)" }}
 						>
 							{t("ui.type_to_confirm", { phrase: confirmPhrase })}
 						</p>
@@ -770,11 +763,11 @@ export const ConfirmModal = ({
 							placeholder={confirmPhrase}
 							className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
 							style={{
-								backgroundColor: "var(--color-surface)",
+								backgroundColor: "var(--paper)",
 								borderColor: confirmBlocked
-									? "var(--color-border)"
-									: "var(--color-danger)",
-								color: "var(--color-text-primary)",
+									? "var(--ink)"
+									: "var(--alert)",
+								color: "var(--ink)",
 							}}
 						/>
 					</div>
@@ -791,7 +784,7 @@ export const ConfirmModal = ({
 						loading={loading}
 						style={
 							danger
-								? { backgroundColor: "var(--color-danger)", boxShadow: "none" }
+								? { backgroundColor: "var(--alert)", boxShadow: "none" }
 								: {}
 						}
 					>
@@ -818,12 +811,12 @@ export const PageHeader = ({
 }) => (
 	<header className={`page-header ${className}`}>
 		<h1
-			className={`text-display-md text-[var(--color-text-primary)] ${titleClassName}`}
+			className={`text-display-md text-[var(--ink)] ${titleClassName}`}
 		>
 			{title}
 		</h1>
 		{description ? (
-			<p className="text-body-sm text-[var(--color-text-secondary)]">
+			<p className="text-body-sm text-[var(--ink-soft)]">
 				{description}
 			</p>
 		) : null}
@@ -839,17 +832,17 @@ export const StickyHeader = ({ onBack, title, children }) => {
 					onClick={onBack}
 					aria-label="Back"
 					className="w-10 h-10 rounded-full flex items-center justify-center shadow-sm"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
+					style={{ backgroundColor: "var(--paper-raised)" }}
 				>
 					<ArrowLeft
 						size={20}
 						aria-hidden="true"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					/>
 				</button>
 			)}
 			{title && (
-				<h1 className="text-title-md text-[var(--color-text-primary)]">
+				<h1 className="text-title-md text-[var(--ink)]">
 					{title}
 				</h1>
 			)}

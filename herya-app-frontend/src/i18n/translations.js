@@ -46,6 +46,7 @@ export const translations = {
 			pranayama_relaxing: "Relaxing",
 		},
 		nav: {
+			main: "Main navigation",
 			home: "Home",
 			library: "Library",
 			journal: "Journal",
@@ -243,6 +244,9 @@ export const translations = {
 			dismiss_reminder: "Not now",
 			quick_garden: "Journal",
 			quick_start: "Practice",
+			admin_overview_label: "Admin",
+			admin_overview_title: "Platform at a glance",
+			admin_open_panel: "Open admin panel",
 			no_sessions_title: "No practice yet",
 			no_sessions_hint:
 				"Start your first session to begin tracking your progress.",
@@ -1355,6 +1359,7 @@ export const translations = {
 			pranayama_relaxing: "Relajante",
 		},
 		nav: {
+			main: "Navegación principal",
 			home: "Inicio",
 			library: "Biblioteca",
 			journal: "Diario",
@@ -1553,6 +1558,9 @@ export const translations = {
 			dismiss_reminder: "Ahora no",
 			quick_garden: "Diario",
 			quick_start: "Práctica",
+			admin_overview_label: "Administración",
+			admin_overview_title: "La plataforma de un vistazo",
+			admin_open_panel: "Abrir panel de administración",
 			no_sessions_title: "Todavía sin práctica",
 			no_sessions_hint: "Empieza tu primera sesión para ver tu progreso.",
 			error_title: "No se pudieron cargar los datos",

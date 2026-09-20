@@ -16,7 +16,7 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap");
 
-[data-identity="next"] {
+:root {
 	/* ── Core ── */
 	--ink: #1b1e3c; /* outlines + text; never pure black */
 	--ink-soft: #4a4f77; /* secondary text */
@@ -35,6 +35,12 @@
 	   deep shade instead of a near-white one, which would read as a glow. */
 	--edge: var(--ink);
 
+	/* ── Alert ── */
+	/* One state colour only. Success and info are carried by copy and
+	   placement, not by a colour each, so the palette stays short. */
+	--alert: #c8322b;
+	--alert-bg: #f7dedc;
+
 	/* ── Quiet mode ── */
 	/* Screens dealing with triggers and contraindications drop all colour. */
 	--hush: var(--paper-raised);
@@ -48,14 +54,17 @@
 	--radius-block: 14px;
 	--offset: 4px; /* hard offset replaces drop shadow */
 
-	color-scheme: light;
+}
+
+/* Applying the system — typography and ground — stays opt-in per subtree so
+   unmigrated pages keep their current metrics until each one is moved. */
+[data-identity="next"] {
 	background: var(--paper);
 	color: var(--ink);
 	font-family: var(--font-body);
 }
 
-[data-identity="next"].dark,
-.dark [data-identity="next"] {
+html.dark {
 	--ink: #e9ebe4;
 	--ink-soft: #a9aec7;
 	--paper: #14162c;
@@ -63,7 +72,8 @@
 	--surya: #f5b055;
 	--chandra: #7da3f5;
 	--edge: #05060f;
-	color-scheme: dark;
+	--alert: #ff8a80;
+	--alert-bg: #3d1512;
 }
 
 /* ── Primitives ─────────────────────────────────────────────────────────── */
@@ -93,4 +103,42 @@
 	.ink-block--press:active {
 		transform: none;
 	}
+}
+
+/* ── Form field ──────────────────────────────────────────────────────────
+ * Same ink outline as every other block, so inputs read as part of the
+ * system rather than as browser chrome. No inner shadow, no soft border.
+ */
+.ink-field {
+	width: 100%;
+	font-family: var(--font-body);
+	font-size: 1rem;
+	color: var(--ink);
+	background: var(--paper-raised);
+	border: var(--ink-width) solid var(--ink);
+	border-radius: var(--radius-block);
+	padding: 0.75rem 1rem;
+}
+
+.ink-field::placeholder {
+	color: var(--ink-soft);
+}
+
+.ink-field:focus-visible {
+	outline: none;
+	box-shadow: var(--offset) var(--offset) 0 var(--chandra);
+}
+
+.ink-field[aria-invalid="true"] {
+	border-color: var(--alert);
+}
+
+.ink-field[aria-invalid="true"]:focus-visible {
+	box-shadow: var(--offset) var(--offset) 0 var(--alert);
+}
+
+/* Keyboard focus is visible on every interactive element, not just fields. */
+[data-identity="next"] :is(button, a):focus-visible {
+	outline: var(--ink-width) solid var(--chandra);
+	outline-offset: 3px;
 }

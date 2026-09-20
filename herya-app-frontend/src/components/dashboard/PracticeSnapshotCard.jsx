@@ -1,27 +1,27 @@
 import { motion } from "framer-motion";
 import { BookOpen, PlayCircle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 import { format } from "@/utils/helpers";
 
 const Stat = ({ label, value }) => (
 	<div
-		className="rounded-2xl p-3"
+		className="ink-block p-3"
 		style={{
-			backgroundColor: "var(--color-surface)",
-			border: "1px solid var(--color-border-soft)",
+			backgroundColor: "var(--paper)",
+			border: "var(--ink-width) solid var(--ink)",
 		}}
 	>
 		<p
-			className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1"
-			style={{ color: "var(--color-text-muted)" }}
+			className="text-[11px] font-bold mb-1"
+			style={{ color: "var(--ink-soft)" }}
 		>
 			{label}
 		</p>
 		<p
 			className="text-lg font-bold"
-			style={{ color: "var(--color-text-primary)" }}
+			style={{ color: "var(--ink)" }}
 		>
 			{value}
 		</p>
@@ -42,12 +42,13 @@ export default function PracticeSnapshotCard({
 	if (loading) {
 		return (
 			<section
+				data-identity="next"
 				aria-busy="true"
 				aria-label={t("dashboard.quick_snapshot_title")}
-				className="rounded-3xl p-4 shadow-[var(--shadow-card)] flex flex-col gap-3"
+				className="ink-block p-4 flex flex-col gap-3"
 				style={{
-					backgroundColor: "var(--color-surface-card)",
-					border: "1px solid var(--color-border-soft)",
+					backgroundColor: "var(--paper-raised)",
+					border: "var(--ink-width) solid var(--ink)",
 				}}
 			>
 				<div className="flex items-start justify-between gap-3">
@@ -107,34 +108,31 @@ export default function PracticeSnapshotCard({
 	};
 
 	return (
-		<motion.section
+		<section
+			data-identity="next"
 			aria-label={t("dashboard.quick_snapshot_title")}
-			className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
-			style={{
-				backgroundColor: "var(--color-surface-card)",
-				border: "1px solid var(--color-border-soft)",
-			}}
+			className="ink-block p-4"
 		>
 			<div className="flex items-start justify-between gap-3 mb-3">
 				<div>
 					<p
-						className="text-[11px] font-bold uppercase tracking-[0.1em]"
-						style={{ color: "var(--color-text-muted)" }}
+						className="text-[11px] font-bold"
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("dashboard.quick_snapshot_title")}
 					</p>
 					<p
 						className="text-sm"
-						style={{ color: "var(--color-text-secondary)" }}
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("dashboard.quick_snapshot_subtitle")}
 					</p>
 				</div>
 				<div
 					className="w-8 h-8 rounded-xl flex items-center justify-center"
-					style={{ backgroundColor: "var(--color-surface)" }}
+					style={{ backgroundColor: "var(--paper)" }}
 				>
-					<Sparkles size={16} style={{ color: "var(--color-primary)" }} />
+					<Sparkles size={16} aria-hidden="true" style={{ color: "var(--ink)" }} />
 				</div>
 			</div>
 
@@ -148,19 +146,19 @@ export default function PracticeSnapshotCard({
 			</div>
 
 			<div
-				className="rounded-2xl p-3 mb-3"
+				className="ink-block p-3 mb-3"
 				style={{
-					backgroundColor: "var(--color-surface)",
-					border: "1px solid var(--color-border-soft)",
+					backgroundColor: "var(--paper)",
+					border: "var(--ink-width) solid var(--ink)",
 				}}
 			>
 				<p
-					className="text-[10px] font-bold uppercase tracking-[0.1em] mb-1"
-					style={{ color: "var(--color-text-muted)" }}
+					className="text-[11px] font-bold mb-1"
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("dashboard.recommended")}
 				</p>
-				<p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
+				<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
 					{hasPendingSession
 						? t(`dashboard.${pendingSession.sessionType}`)
 						: t("dashboard.reminder_short_practice")}
@@ -168,25 +166,27 @@ export default function PracticeSnapshotCard({
 			</div>
 
 			<div className="flex flex-col sm:flex-row gap-2">
-				<Button
+				{/* Not the shared Button: that component still carries the old
+				    tokens and renders a blue gradient inside an ink card. */}
+				<button
+					type="button"
 					onClick={handlePrimaryAction}
-					variant="primary"
-					size="md"
-					className="flex-1"
+					className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
+					style={{ background: "var(--surya)", color: "var(--on-fill)", cursor: "pointer" }}
 				>
 					<PlayCircle size={16} aria-hidden="true" />
 					{nextActionLabel}
-				</Button>
-				<Button
+				</button>
+				<button
+					type="button"
 					onClick={() => navigate("/journal")}
-					variant="outline"
-					size="md"
-					className="flex-1"
+					className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
+					style={{ cursor: "pointer" }}
 				>
 					<BookOpen size={16} aria-hidden="true" />
 					{t("dashboard.quick_garden")}
-				</Button>
+				</button>
 			</div>
-		</motion.section>
+		</section>
 	);
 }

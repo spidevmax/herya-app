@@ -1,10 +1,8 @@
-import { motion } from "framer-motion";
-import { Mail } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { requestPasswordReset } from "@/api/auth.api";
-import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
+import AuthShell from "@/components/identity/AuthShell";
 import { useLanguage } from "@/context/LanguageContext";
 
 const isDev = import.meta.env.DEV;
@@ -33,89 +31,91 @@ const ForgotPassword = () => {
 	};
 
 	return (
-		<div className="min-h-dvh w-full bg-[var(--gradient-app)] px-4 py-8 sm:px-6">
-			<motion.div
-				initial={{ opacity: 0, y: 18 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.35 }}
-				className="mx-auto w-full max-w-md rounded-3xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] sm:p-8"
-			>
-				<AuthBrandHeader compact showSubtitle={false} />
+		<AuthShell>
+			<h1 className="display text-[2.4rem]">{t("forgot_password.title")}</h1>
+			<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
+				{t("forgot_password.subtitle")}
+			</p>
 
-				<h1 className="font-display text-3xl font-bold text-[var(--color-text-primary)]">
-					{t("forgot_password.title")}
-				</h1>
-				<p className="mt-2 text-sm text-[var(--color-text-muted)]">
-					{t("forgot_password.subtitle")}
-				</p>
+			{error && (
+				<div
+					role="alert"
+					className="ink-block mt-5 px-4 py-3 text-sm font-bold"
+					style={{
+						background: "var(--alert-bg)",
+						borderColor: "var(--alert)",
+						color: "var(--alert)",
+						boxShadow: "none",
+					}}
+				>
+					{error}
+				</div>
+			)}
 
-				{error && (
-					<div
-						role="alert"
-						className="mt-4 rounded-2xl bg-[var(--color-error-bg)] px-4 py-3 text-sm text-[var(--color-error-text)]"
+			{submitted ? (
+				<div className="mt-7 flex flex-col gap-4">
+					<p
+						role="status"
+						className="ink-block px-4 py-3 text-[0.95rem] font-bold"
+						style={{ boxShadow: "none" }}
 					>
-						{error}
-					</div>
-				)}
+						{t("forgot_password.success")}
+					</p>
 
-				{submitted ? (
-					<div className="mt-6 space-y-4">
-						<p className="rounded-2xl bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text-secondary)]">
-							{t("forgot_password.success")}
-						</p>
-						{resetUrl && (
-							<a
-								href={resetUrl}
-								className="inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary-dark)] px-4 py-3 text-sm font-bold text-[var(--color-text-primary)] shadow-[var(--shadow-card)]"
-							>
-								{t("forgot_password.open_reset_link")}
-							</a>
-						)}
-						<Link
-							to="/login"
-							className="inline-flex w-full items-center justify-center rounded-2xl border border-[var(--color-border-soft)] px-4 py-3 text-sm font-semibold text-[var(--color-primary)]"
+					{/* Dev-only shortcut: the API returns the reset link directly so
+					    there is no need to go through a real inbox locally. */}
+					{resetUrl && (
+						<a
+							href={resetUrl}
+							className="ink-block ink-block--press display w-full py-3 text-center text-[1.05rem]"
+							style={{ background: "var(--surya)", color: "var(--on-fill)" }}
 						>
-							{t("forgot_password.back_to_login")}
-						</Link>
+							{t("forgot_password.open_reset_link")}
+						</a>
+					)}
+
+					<Link to="/login" className="text-center text-sm font-bold underline">
+						{t("forgot_password.back_to_login")}
+					</Link>
+				</div>
+			) : (
+				<form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5">
+					<div>
+						<label htmlFor="forgot-email" className="mb-2 block text-sm font-bold">
+							{t("forgot_password.email_placeholder")}
+						</label>
+						<input
+							id="forgot-email"
+							type="email"
+							autoComplete="email"
+							required
+							placeholder={t("forgot_password.email_placeholder")}
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							className="ink-field"
+						/>
 					</div>
-				) : (
-					<form onSubmit={handleSubmit} className="mt-6 space-y-4">
-						<div className="relative">
-							<Mail
-								size={17}
-								className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-							/>
-							<input
-								type="email"
-								autoComplete="email"
-								required
-								placeholder={t("forgot_password.email_placeholder")}
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-surface-card)] py-3.5 pl-11 pr-4 text-sm text-[var(--color-text-primary)] focus:border-[var(--color-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-primary)]/40"
-							/>
-						</div>
-						<button
-							type="submit"
-							disabled={loading}
-							className="w-full rounded-2xl bg-gradient-to-r from-[var(--color-secondary)] to-[var(--color-secondary-dark)] px-4 py-3.5 text-sm font-bold text-[var(--color-text-primary)] shadow-[var(--shadow-card)] disabled:cursor-not-allowed disabled:opacity-70"
-						>
-							{loading
-								? t("forgot_password.submitting")
-								: t("forgot_password.submit")}
-						</button>
-						<p className="text-center text-sm text-[var(--color-text-muted)]">
-							<Link
-								to="/login"
-								className="font-semibold text-[var(--color-primary)] hover:underline"
-							>
-								{t("forgot_password.back_to_login")}
-							</Link>
-						</p>
-					</form>
-				)}
-			</motion.div>
-		</div>
+
+					<button
+						type="submit"
+						disabled={loading}
+						className="ink-block ink-block--press display w-full py-3.5 text-[1.15rem]"
+						style={{
+							background: "var(--surya)",
+							color: "var(--on-fill)",
+							cursor: loading ? "wait" : "pointer",
+							opacity: loading ? 0.7 : 1,
+						}}
+					>
+						{loading ? t("forgot_password.submitting") : t("forgot_password.submit")}
+					</button>
+
+					<Link to="/login" className="text-center text-sm font-bold underline">
+						{t("forgot_password.back_to_login")}
+					</Link>
+				</form>
+			)}
+		</AuthShell>
 	);
 };
 

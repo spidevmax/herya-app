@@ -1,55 +1,46 @@
-import { motion } from "framer-motion";
-import { ArrowRight, Clock, Dumbbell, PersonStanding } from "lucide-react";
+import { Clock, Dumbbell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import {
-	LEVEL_LABEL_KEYS,
-	LEVEL_LABELS,
-	VK_FAMILY_MAP,
-} from "@/utils/constants";
+import { LEVEL_LABEL_KEYS, LEVEL_LABELS } from "@/utils/constants";
 import { localizedName } from "@/utils/libraryHelpers";
+import "@/styles/identity.css";
 
+/*
+ * The recommendation is the one piece of the dashboard that should feel like
+ * an invitation, so it takes a full surya fill — the warming channel, the one
+ * associated with beginning. Everything else on the page stays on paper.
+ */
 const HeroCard = ({ sequence, reason, loading }) => {
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
 
-	if (loading) return <div className="rounded-3xl h-52 skeleton" />;
+	if (loading) {
+		return <div data-identity="next" className="ink-block skeleton h-52" />;
+	}
 
 	if (!sequence) {
 		return (
 			<section
+				data-identity="next"
 				aria-label={t("dashboard.welcome_title")}
-				className="rounded-3xl p-6 text-white"
-				style={{
-					background:
-						"linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
-				}}
+				className="ink-block p-6"
 			>
-				<h2 className="font-display text-2xl font-bold tracking-tight mb-2">
-					{t("dashboard.welcome_title")}
-				</h2>
-				<p className="text-white/80 text-sm font-medium mb-4">
+				<h2 className="display text-[1.8rem]">{t("dashboard.welcome_title")}</h2>
+				<p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>
 					{t("hero.welcome_hint")}
 				</p>
-				<Button
-					variant="ghost"
-					className="text-white border border-white/40 hover:bg-white/20 cursor-pointer focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+				<button
+					type="button"
 					onClick={() => navigate("/library")}
+					className="ink-block ink-block--press mt-5 px-5 py-2.5 text-sm font-bold"
+					style={{ background: "var(--surya)", color: "var(--on-fill)", cursor: "pointer" }}
 				>
-					{t("hero.explore")} <ArrowRight size={16} aria-hidden="true" />
-				</Button>
+					{t("hero.explore")}
+				</button>
 			</section>
 		);
 	}
 
-	const family = VK_FAMILY_MAP[sequence.family] || {
-		color: "var(--color-primary)",
-		emoji: null,
-		label: sequence.family,
-	};
-	const heroColorStart = `color-mix(in srgb, ${family.color} 58%, var(--color-primary-dark))`;
-	const heroColorEnd = `color-mix(in srgb, ${family.color} 42%, var(--color-primary))`;
 	const recommendedMinutes = Number(sequence.estimatedDuration?.recommended);
 	const sequenceName = localizedName(sequence, lang);
 
@@ -65,96 +56,79 @@ const HeroCard = ({ sequence, reason, loading }) => {
 	};
 
 	return (
-		<motion.article
+		<article
+			data-identity="next"
 			aria-labelledby="hero-recommended-title"
-			className="rounded-3xl overflow-hidden relative"
-			whileHover={{ scale: 1.01 }}
-			transition={{ duration: 0.25 }}
-			style={{
-				background: `linear-gradient(135deg, ${heroColorStart}, ${heroColorEnd})`,
-			}}
+			className="ink-block p-6"
+			style={{ background: "var(--surya)", color: "var(--on-fill)" }}
 		>
-			<div className="p-6 relative">
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 pointer-events-none bg-black/10"
-				/>
-				<div
-					aria-hidden="true"
-					className="absolute right-4 top-1/2 -translate-y-1/2 opacity-20 float select-none pointer-events-none"
-				>
-					{family.emoji ? (
-						<span className="text-8xl">{family.emoji}</span>
-					) : (
-						<PersonStanding
-							size={88}
-							strokeWidth={1.8}
-							className="text-white"
-						/>
-					)}
-				</div>
-				<span className="relative inline-flex items-center gap-1 text-xs font-semibold text-white uppercase tracking-widest mb-1">
-					{t("dashboard.recommended")}
-				</span>
-				{reason ? (
-					<p className="relative text-white/85 text-[11px] mb-2 italic">
-						{reason}
-					</p>
-				) : (
-					<div className="mb-2" />
-				)}
-				<h2
-					id="hero-recommended-title"
-					className="relative font-display text-2xl font-bold tracking-tight text-white leading-tight mb-1"
-				>
-					{sequenceName}
-				</h2>
-				<p className="relative text-white/90 text-xs font-medium italic mb-4">
-					{sequence.sanskritName}
+			<p className="text-sm font-bold">{t("dashboard.recommended")}</p>
+			{reason && (
+				<p className="mt-1 text-[0.8rem]" style={{ opacity: 0.75 }}>
+					{reason}
 				</p>
-				<dl className="relative flex items-center gap-3 mb-5 m-0">
-					{sequence.estimatedDuration?.recommended && (
-						<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
-							<Clock size={13} aria-hidden="true" className="text-white" />
-							<dt className="sr-only">
-								{t("library.stat_duration", "Duration")}
-							</dt>
-							<dd className="text-white text-xs font-semibold m-0">
-								{sequence.estimatedDuration.recommended} min
-							</dd>
-						</div>
-					)}
-					<div className="flex items-center gap-1.5 bg-white/20 rounded-xl px-3 py-1">
-						<Dumbbell size={13} aria-hidden="true" className="text-white" />
-						<dt className="sr-only">{t("library.stat_level", "Level")}</dt>
-						<dd className="text-white text-xs font-semibold m-0">
-							{LEVEL_LABEL_KEYS[sequence.level]
-								? t(LEVEL_LABEL_KEYS[sequence.level])
-								: (LEVEL_LABELS[sequence.level] ?? sequence.difficulty)}
+			)}
+
+			<h2 id="hero-recommended-title" className="display mt-3 text-[2rem]">
+				{sequenceName}
+			</h2>
+			<p className="mt-1 text-sm italic" style={{ opacity: 0.8 }}>
+				{sequence.sanskritName}
+			</p>
+
+			<dl className="m-0 mt-4 flex flex-wrap items-center gap-2">
+				{sequence.estimatedDuration?.recommended && (
+					<div
+						className="flex items-center gap-1.5 px-3 py-1"
+						style={{
+							border: "var(--ink-width) solid var(--on-fill)",
+							borderRadius: "var(--radius-block)",
+						}}
+					>
+						<Clock size={13} aria-hidden="true" />
+						<dt className="sr-only">{t("library.stat_duration", "Duration")}</dt>
+						<dd className="m-0 text-xs font-bold">
+							{sequence.estimatedDuration.recommended} min
 						</dd>
 					</div>
-				</dl>
-				<div className="relative flex flex-wrap items-center gap-2">
-					<motion.button
-						type="button"
-						whileTap={{ scale: 0.97 }}
-						whileHover={{ y: -1 }}
-						className="inline-flex items-center gap-2 bg-white/10 text-sm font-bold px-5 py-2.5 rounded-2xl shadow-lg cursor-pointer transition-shadow hover:shadow-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent text-white backdrop-blur-md border border-white/20"
-						onClick={startPractice}
-					>
-						{t("hero.start")} <ArrowRight size={16} aria-hidden="true" />
-					</motion.button>
-					<button
-						type="button"
-						className="inline-flex items-center gap-1 text-xs font-semibold text-white/90 hover:text-white underline underline-offset-2 px-2 py-1 rounded-md cursor-pointer transition-colors hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-						onClick={() => navigate(`/library/sequence/${sequence._id}`)}
-						aria-label={`${t("hero.view_details", "View details")}: ${sequenceName}`}
-					>
-						{t("hero.view_details", "View details")}
-					</button>
+				)}
+				<div
+					className="flex items-center gap-1.5 px-3 py-1"
+					style={{
+						border: "var(--ink-width) solid var(--on-fill)",
+						borderRadius: "var(--radius-block)",
+					}}
+				>
+					<Dumbbell size={13} aria-hidden="true" />
+					<dt className="sr-only">{t("library.stat_level", "Level")}</dt>
+					<dd className="m-0 text-xs font-bold">
+						{LEVEL_LABEL_KEYS[sequence.level]
+							? t(LEVEL_LABEL_KEYS[sequence.level])
+							: (LEVEL_LABELS[sequence.level] ?? sequence.difficulty)}
+					</dd>
 				</div>
+			</dl>
+
+			<div className="mt-5 flex flex-wrap items-center gap-4">
+				<button
+					type="button"
+					onClick={startPractice}
+					className="ink-block ink-block--press display px-6 py-2.5 text-[1.05rem]"
+					style={{ background: "var(--ink)", color: "var(--paper)", cursor: "pointer" }}
+				>
+					{t("hero.start")}
+				</button>
+				<button
+					type="button"
+					onClick={() => navigate(`/library/sequence/${sequence._id}`)}
+					aria-label={`${t("hero.view_details", "View details")}: ${sequenceName}`}
+					className="text-sm font-bold underline"
+					style={{ cursor: "pointer" }}
+				>
+					{t("hero.view_details", "View details")}
+				</button>
 			</div>
-		</motion.article>
+		</article>
 	);
 };
 

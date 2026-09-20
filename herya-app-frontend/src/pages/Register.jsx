@@ -1,11 +1,11 @@
-import { motion } from "framer-motion";
-import { AlertCircle, Eye, EyeOff, Lock, Mail, User } from "lucide-react";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
-import { Button } from "@/components/ui";
+import BreathBuddy from "@/components/identity/BreathBuddy";
+import BreathMark from "@/components/identity/BreathMark";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -15,7 +15,8 @@ function FieldError({ id, message }) {
 		<p
 			id={id}
 			role="alert"
-			className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--color-error-text)]"
+			className="mt-1.5 flex items-center gap-1.5 text-xs font-bold"
+			style={{ color: "var(--alert)" }}
 		>
 			<AlertCircle size={14} aria-hidden="true" />
 			<span>{message}</span>
@@ -55,13 +56,10 @@ export default function Register() {
 		const next = {};
 		if (!form.name.trim()) next.name = t("register.errors.name_required");
 		if (!form.email.trim()) next.email = t("register.errors.email_required");
-		else if (!EMAIL_RE.test(form.email.trim()))
-			next.email = t("register.errors.email_invalid");
+		else if (!EMAIL_RE.test(form.email.trim())) next.email = t("register.errors.email_invalid");
 		if (!form.password) next.password = t("register.errors.password_required");
-		else if (form.password.length < 8)
-			next.password = t("register.errors.password_too_short");
-		if (!form.passwordConfirm)
-			next.passwordConfirm = t("register.errors.confirm_required");
+		else if (form.password.length < 8) next.password = t("register.errors.password_too_short");
+		if (!form.passwordConfirm) next.passwordConfirm = t("register.errors.confirm_required");
 		else if (form.password && form.password !== form.passwordConfirm)
 			next.passwordConfirm = t("register.password_mismatch");
 		return next;
@@ -78,24 +76,15 @@ export default function Register() {
 			lower.includes("in use") ||
 			lower.includes("exist")
 		) {
-			setErrors((prev) => ({
-				...prev,
-				email: t("register.errors.email_in_use"),
-			}));
+			setErrors((prev) => ({ ...prev, email: t("register.errors.email_in_use") }));
 			return;
 		}
 		if (lower.includes("email")) {
-			setErrors((prev) => ({
-				...prev,
-				email: t("register.errors.email_invalid"),
-			}));
+			setErrors((prev) => ({ ...prev, email: t("register.errors.email_invalid") }));
 			return;
 		}
 		if (lower.includes("password")) {
-			setErrors((prev) => ({
-				...prev,
-				password: t("register.errors.password_too_short"),
-			}));
+			setErrors((prev) => ({ ...prev, password: t("register.errors.password_too_short") }));
 			return;
 		}
 		setFormError(message || t("register.errors.generic"));
@@ -128,308 +117,227 @@ export default function Register() {
 		}
 	};
 
-	const inputErrorStyle = (field) =>
-		errors[field]
-			? {
-					borderColor: "var(--color-error-text)",
-					boxShadow: "0 0 0 1px var(--color-error-text)",
-				}
-			: undefined;
+	// Role toggle: the selected option fills with ink rather than tinting,
+	// so the choice is unmistakable without relying on colour alone.
+	const roleButtonStyle = (value) => ({
+		background: form.role === value ? "var(--ink)" : "var(--paper-raised)",
+		color: form.role === value ? "var(--paper)" : "var(--ink)",
+		cursor: "pointer",
+		boxShadow: "none",
+	});
 
 	return (
 		<div
-			className="min-h-dvh w-full px-4 py-8 sm:px-6 sm:py-10 lg:flex lg:h-dvh lg:min-h-0 lg:items-center lg:justify-center lg:overflow-auto lg:px-8 lg:py-8 xl:px-10"
-			style={{ background: "var(--gradient-primary)" }}
+			data-identity="next"
+			className="min-h-dvh w-full lg:grid lg:grid-cols-[1fr_1.1fr]"
+			style={{ background: "var(--paper)" }}
 		>
-			<div
-				className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md items-center justify-center lg:grid lg:min-h-0 lg:max-w-[90rem] lg:grid-cols-2 lg:items-stretch lg:overflow-hidden lg:rounded-[2rem] lg:shadow-[0_28px_90px_rgba(15,30,60,0.22)]"
+			{/* Left panel — surya here, chandra on the login screen. The two doors
+			    into the app take one breath channel each. */}
+			<aside
+				className="relative hidden flex-col justify-between p-12 lg:flex xl:p-16"
 				style={{
-					backgroundColor: "var(--color-surface-card)",
-					border: "1px solid var(--color-border)",
+					background: "var(--surya)",
+					borderRight: "var(--ink-width) solid var(--ink)",
 				}}
 			>
-				<aside className="relative hidden min-w-0 flex-col overflow-hidden bg-[#f5e7d4] bg-[url('/images/rex-mascot-register.png')] bg-cover bg-center bg-no-repeat px-14 py-16 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-20 xl:py-20 dark:bg-[#1f1611]">
-					<div
-						aria-hidden="true"
-						className="absolute inset-0"
-						style={{
-							background:
-								"linear-gradient(135deg, #faf1e3 0%, #f5e7d4 35%, rgba(204,140,103,0.55) 75%, rgba(160,89,57,0.65) 100%)",
-						}}
-					/>
-					<div
-						aria-hidden="true"
-						className="absolute inset-0"
-						style={{
-							background:
-								"radial-gradient(ellipse 60% 50% at 18% 22%, rgba(255,250,240,0.55), transparent 70%)",
-						}}
-					/>
-					<div
-						aria-hidden="true"
-						className="absolute inset-0 mix-blend-overlay opacity-[0.06]"
-						style={{
-							backgroundImage:
-								"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-						}}
-					/>
-					<div
-						aria-hidden="true"
-						className="pointer-events-none absolute inset-y-0 right-0 w-px"
-						style={{ boxShadow: "inset -1px 0 0 rgba(0,0,0,0.04)" }}
-					/>
+				<div className="flex items-center gap-3">
+					{/* On a surya ground the warm arc would vanish into it. */}
+					<BreathMark size={38} warm="var(--on-fill)" />
+					<span className="display text-[1.5rem]" style={{ color: "var(--on-fill)" }}>
+						Herya
+					</span>
+				</div>
 
-					<div className="relative z-10 max-w-[28ch]">
-						<h1 className="font-display font-medium tracking-[-0.01em] leading-none text-[44px] xl:text-[52px] text-[#2b1d14] dark:text-[#f3e9da]">
-							Herya
-						</h1>
-						<p className="mt-5 max-w-[26ch] text-[18px] xl:text-[20px] leading-[1.55] font-normal text-[#5a4536]/90 dark:text-[#bfa78f]">
-							{t("login.subtitle")}
-						</p>
-					</div>
-				</aside>
+				<div className="flex flex-1 items-center justify-center">
+					<BreathBuddy
+						size={200}
+						phase="exhale"
+						fill="var(--chandra)"
+						outline="var(--on-fill)"
+					/>
+				</div>
 
-				<div
-					className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full min-w-0 max-w-md items-center justify-center lg:mx-0 lg:min-h-[min(52rem,calc(100dvh-5rem))] lg:max-w-none lg:px-12 lg:py-10 xl:px-20"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
+				<p
+					className="display max-w-[16ch] text-[2.4rem] xl:text-[2.9rem]"
+					style={{ color: "var(--on-fill)" }}
 				>
-					<motion.div
-						initial={false}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35 }}
-						className="w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] sm:p-8 lg:max-w-md lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
-					>
-						<div className="lg:hidden">
-							<AuthBrandHeader />
-						</div>
+					{t("login.subtitle")}
+				</p>
+			</aside>
 
-						<div className="mb-7 text-center">
-							<h1 className="text-3xl font-semibold text-[var(--color-text-primary)]">
-								{t("register.heading")}
-							</h1>
-						</div>
+			{/* Right panel — the form */}
+			<div className="flex min-h-dvh items-center justify-center px-5 py-10 sm:px-8">
+				<div className="w-full max-w-[26rem]">
+					<div className="mb-8 flex items-center gap-3 lg:hidden">
+						<BreathMark size={34} />
+						<span className="display text-[1.4rem]">Herya</span>
+					</div>
 
-						{formError && (
-							<div
-								role="alert"
-								className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
-							>
-								<AlertCircle size={16} aria-hidden="true" />
-								<span>{formError}</span>
-							</div>
-						)}
+					<h1 className="display text-[2.6rem] sm:text-[3rem]">{t("register.heading")}</h1>
 
-						<form
-							onSubmit={handleSubmit}
-							noValidate
-							className="flex flex-col gap-4"
+					{formError && (
+						<div
+							role="alert"
+							className="ink-block mt-5 flex items-center gap-2 px-4 py-3 text-sm font-bold"
+							style={{
+								background: "var(--alert-bg)",
+								borderColor: "var(--alert)",
+								color: "var(--alert)",
+								boxShadow: "none",
+							}}
 						>
-							<div>
-								<p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--color-text-muted)]">
-									{t("register.account_type_label")}
-								</p>
-								<div className="grid grid-cols-2 gap-2">
-									<button
-										type="button"
-										onClick={() => setForm((f) => ({ ...f, role: "user" }))}
-										aria-pressed={form.role === "user"}
-										className="rounded-xl border px-3 py-2 text-sm font-semibold transition"
-										style={{
-											borderColor:
-												form.role === "user"
-													? "var(--color-primary)"
-													: "var(--color-border)",
-											backgroundColor:
-												form.role === "user"
-													? "color-mix(in srgb, var(--color-primary) 12%, transparent)"
-													: "var(--color-surface)",
-											color: "var(--color-text-primary)",
-										}}
-									>
-										{t("register.account_type_standard")}
-									</button>
-									<button
-										type="button"
-										onClick={() => setForm((f) => ({ ...f, role: "tutor" }))}
-										aria-pressed={form.role === "tutor"}
-										className="rounded-xl border px-3 py-2 text-sm font-semibold transition"
-										style={{
-											borderColor:
-												form.role === "tutor"
-													? "var(--color-primary)"
-													: "var(--color-border)",
-											backgroundColor:
-												form.role === "tutor"
-													? "color-mix(in srgb, var(--color-primary) 12%, transparent)"
-													: "var(--color-surface)",
-											color: "var(--color-text-primary)",
-										}}
-									>
-										{t("register.account_type_tutor")}
-									</button>
-								</div>
-							</div>
+							<AlertCircle size={16} aria-hidden="true" />
+							<span>{formError}</span>
+						</div>
+					)}
 
-							<div>
-								<label
-									htmlFor="register-name"
-									className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
+					<form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-5">
+						<fieldset className="border-0 p-0">
+							<legend className="mb-2 block text-sm font-bold">
+								{t("register.account_type_label")}
+							</legend>
+							<div className="grid grid-cols-2 gap-3">
+								<button
+									type="button"
+									onClick={() => setForm((f) => ({ ...f, role: "user" }))}
+									aria-pressed={form.role === "user"}
+									className="ink-block px-3 py-2.5 text-sm font-bold"
+									style={roleButtonStyle("user")}
 								>
-									{t("register.full_name")}
-								</label>
-								<div className="relative">
-									<User
-										size={18}
-										className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									/>
-									<input
-										id="register-name"
-										type="text"
-										autoComplete="name"
-										aria-invalid={!!errors.name}
-										aria-describedby={errors.name ? "name-error" : undefined}
-										placeholder={t("register.full_name")}
-										value={form.name}
-										onChange={(e) => updateField("name", e.target.value)}
-										className="input-base pl-10 pr-4"
-										style={inputErrorStyle("name")}
-									/>
-								</div>
-								<FieldError id="name-error" message={errors.name} />
+									{t("register.account_type_standard")}
+								</button>
+								<button
+									type="button"
+									onClick={() => setForm((f) => ({ ...f, role: "tutor" }))}
+									aria-pressed={form.role === "tutor"}
+									className="ink-block px-3 py-2.5 text-sm font-bold"
+									style={roleButtonStyle("tutor")}
+								>
+									{t("register.account_type_tutor")}
+								</button>
 							</div>
+						</fieldset>
 
-							<div>
-								<label
-									htmlFor="register-email"
-									className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
-								>
-									{t("login.email_placeholder")}
-								</label>
-								<div className="relative">
-									<Mail
-										size={18}
-										className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									/>
-									<input
-										id="register-email"
-										type="email"
-										autoComplete="email"
-										aria-invalid={!!errors.email}
-										aria-describedby={errors.email ? "email-error" : undefined}
-										placeholder={t("login.email_placeholder")}
-										value={form.email}
-										onChange={(e) => updateField("email", e.target.value)}
-										className="input-base pl-10 pr-4"
-										style={inputErrorStyle("email")}
-									/>
-								</div>
-								<FieldError id="email-error" message={errors.email} />
-							</div>
+						<div>
+							<label htmlFor="register-name" className="mb-2 block text-sm font-bold">
+								{t("register.full_name")}
+							</label>
+							<input
+								id="register-name"
+								type="text"
+								autoComplete="name"
+								aria-invalid={!!errors.name}
+								aria-describedby={errors.name ? "register-name-error" : undefined}
+								placeholder={t("register.full_name")}
+								value={form.name}
+								onChange={(e) => updateField("name", e.target.value)}
+								className="ink-field"
+							/>
+							<FieldError id="register-name-error" message={errors.name} />
+						</div>
 
-							<div>
-								<label
-									htmlFor="register-password"
-									className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
-								>
-									{t("register.password_label")}
-								</label>
-								<div className="relative">
-									<Lock
-										size={18}
-										className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									/>
-									<input
-										id="register-password"
-										type={showPw ? "text" : "password"}
-										autoComplete="new-password"
-										aria-invalid={!!errors.password}
-										aria-describedby={
-											errors.password ? "password-error" : undefined
-										}
-										placeholder={t("register.password_placeholder")}
-										value={form.password}
-										onChange={(e) => updateField("password", e.target.value)}
-										className="input-base pl-10 pr-11"
-										style={inputErrorStyle("password")}
-									/>
-									<button
-										type="button"
-										onClick={() => setShowPw((v) => !v)}
-										aria-label={
-											showPw
-												? t("login.hide_password")
-												: t("login.show_password")
-										}
-										className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									>
-										{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-									</button>
-								</div>
-								<FieldError id="password-error" message={errors.password} />
-							</div>
+						<div>
+							<label htmlFor="register-email" className="mb-2 block text-sm font-bold">
+								{t("login.email_placeholder")}
+							</label>
+							<input
+								id="register-email"
+								type="email"
+								autoComplete="email"
+								aria-invalid={!!errors.email}
+								aria-describedby={errors.email ? "register-email-error" : undefined}
+								placeholder={t("login.email_placeholder")}
+								value={form.email}
+								onChange={(e) => updateField("email", e.target.value)}
+								className="ink-field"
+							/>
+							<FieldError id="register-email-error" message={errors.email} />
+						</div>
 
-							<div>
-								<label
-									htmlFor="register-confirm-password"
-									className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
-								>
-									{t("register.confirm_password")}
-								</label>
-								<div className="relative">
-									<Lock
-										size={18}
-										className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									/>
-									<input
-										id="register-confirm-password"
-										type={showConfirmPw ? "text" : "password"}
-										autoComplete="new-password"
-										aria-invalid={!!errors.passwordConfirm}
-										aria-describedby={
-											errors.passwordConfirm ? "confirm-error" : undefined
-										}
-										placeholder={t("register.confirm_password")}
-										value={form.passwordConfirm}
-										onChange={(e) =>
-											updateField("passwordConfirm", e.target.value)
-										}
-										className="input-base pl-10 pr-11"
-										style={inputErrorStyle("passwordConfirm")}
-									/>
-									<button
-										type="button"
-										onClick={() => setShowConfirmPw((v) => !v)}
-										aria-label={
-											showConfirmPw
-												? t("login.hide_password")
-												: t("login.show_password")
-										}
-										className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-									>
-										{showConfirmPw ? <EyeOff size={18} /> : <Eye size={18} />}
-									</button>
-								</div>
-								<FieldError
-									id="confirm-error"
-									message={errors.passwordConfirm}
+						<div>
+							<label htmlFor="register-password" className="mb-2 block text-sm font-bold">
+								{t("register.password_label")}
+							</label>
+							<div className="relative">
+								<input
+									id="register-password"
+									type={showPw ? "text" : "password"}
+									autoComplete="new-password"
+									aria-invalid={!!errors.password}
+									aria-describedby={errors.password ? "register-password-error" : undefined}
+									placeholder={t("register.password_placeholder")}
+									value={form.password}
+									onChange={(e) => updateField("password", e.target.value)}
+									className="ink-field pr-12"
 								/>
+								<button
+									type="button"
+									onClick={() => setShowPw((v) => !v)}
+									aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
+									className="absolute right-4 top-1/2 -translate-y-1/2"
+									style={{ color: "var(--ink-soft)" }}
+								>
+									{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
 							</div>
+							<FieldError id="register-password-error" message={errors.password} />
+						</div>
 
-							<Button type="submit" disabled={loading} className="mt-1 w-full">
-								{loading ? t("register.submitting") : t("register.heading")}
-							</Button>
-						</form>
+						<div>
+							<label htmlFor="register-confirm" className="mb-2 block text-sm font-bold">
+								{t("register.confirm_password")}
+							</label>
+							<div className="relative">
+								<input
+									id="register-confirm"
+									type={showConfirmPw ? "text" : "password"}
+									autoComplete="new-password"
+									aria-invalid={!!errors.passwordConfirm}
+									aria-describedby={
+										errors.passwordConfirm ? "register-confirm-error" : undefined
+									}
+									placeholder={t("register.confirm_password")}
+									value={form.passwordConfirm}
+									onChange={(e) => updateField("passwordConfirm", e.target.value)}
+									className="ink-field pr-12"
+								/>
+								<button
+									type="button"
+									onClick={() => setShowConfirmPw((v) => !v)}
+									aria-label={
+										showConfirmPw ? t("login.hide_password") : t("login.show_password")
+									}
+									className="absolute right-4 top-1/2 -translate-y-1/2"
+									style={{ color: "var(--ink-soft)" }}
+								>
+									{showConfirmPw ? <EyeOff size={18} /> : <Eye size={18} />}
+								</button>
+							</div>
+							<FieldError id="register-confirm-error" message={errors.passwordConfirm} />
+						</div>
 
-						<p className="mt-6 text-center text-sm font-medium text-[var(--color-text-secondary)]">
-							{t("register.have_account")}{" "}
-							<Link
-								to="/login"
-								className="font-semibold text-[var(--color-primary)] hover:underline"
-							>
-								{t("register.login_link")}
-							</Link>
-						</p>
-					</motion.div>
+						<button
+							type="submit"
+							disabled={loading}
+							className="ink-block ink-block--press display mt-1 w-full py-3.5 text-[1.15rem]"
+							style={{
+								background: "var(--surya)",
+								color: "var(--on-fill)",
+								cursor: loading ? "wait" : "pointer",
+								opacity: loading ? 0.7 : 1,
+							}}
+						>
+							{loading ? t("register.submitting") : t("register.heading")}
+						</button>
+					</form>
+
+					<p className="mt-8 text-sm font-bold">
+						{t("register.have_account")}{" "}
+						<Link to="/login" className="underline" style={{ color: "var(--ink)" }}>
+							{t("register.login_link")}
+						</Link>
+					</p>
 				</div>
 			</div>
 		</div>

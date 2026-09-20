@@ -1,10 +1,12 @@
 import { AnimatePresence } from "framer-motion";
 import { BookOpen, Home, Leaf, Plus, User } from "lucide-react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import BreathMark from "@/components/identity/BreathMark";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import BottomNav from "./BottomNav";
 import PageTransition from "./PageTransition";
+import "@/styles/identity.css";
 
 const NAV_ITEMS_BASE = [
 	{ to: "/", icon: Home, labelKey: "nav.home" },
@@ -13,7 +15,7 @@ const NAV_ITEMS_BASE = [
 	{ to: "/profile", icon: User, labelKey: "nav.profile" },
 ];
 
-const DesktopSidebar = () => {
+export const DesktopSidebar = () => {
 	const { t } = useLanguage();
 	const navigate = useNavigate();
 	const { user } = useAuth();
@@ -24,21 +26,20 @@ const DesktopSidebar = () => {
 
 	return (
 		<aside
-			className="hidden lg:flex flex-col gap-2 fixed left-0 top-0 h-full w-56 pt-8 pb-6 px-3 z-40 border-r"
+			data-identity="next"
+			aria-label={t("nav.main")}
+			className="fixed left-0 top-0 z-40 hidden h-full w-56 flex-col gap-2 px-3 pb-6 pt-8 lg:flex"
 			style={{
-				backgroundColor: "var(--color-surface-card)",
-				borderColor: "var(--color-border)",
+				background: "var(--paper-raised)",
+				borderRight: "var(--ink-width) solid var(--ink)",
 			}}
 		>
-			{/* Logo */}
-			<div className="px-3 mb-6">
-				<h1 className="text-2xl font-bold text-[var(--color-primary)]">
-					Herya
-				</h1>
+			<div className="mb-7 flex items-center gap-2.5 px-2">
+				<BreathMark size={30} />
+				<span className="display text-[1.25rem]">Herya</span>
 			</div>
 
-			{/* Nav links */}
-			<nav className="flex flex-col gap-1 flex-1">
+			<nav className="flex flex-1 flex-col gap-1.5">
 				{NAV_ITEMS.map((item) => {
 					const Icon = item.icon;
 					return (
@@ -46,19 +47,20 @@ const DesktopSidebar = () => {
 							key={item.to}
 							to={item.to}
 							end={item.to === "/"}
-							className="flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all text-sm font-semibold"
+							className="flex items-center gap-3 px-3 py-2.5 text-sm font-bold"
 							style={({ isActive }) => ({
-								backgroundColor: isActive
-									? "var(--color-primary)15"
-									: "transparent",
-								color: isActive
-									? "var(--color-primary)"
-									: "var(--color-text-secondary)",
+								// Ink fill for the current section — the same device the
+								// role toggle and bottom nav use, so "selected" always
+								// looks the same across the app.
+								background: isActive ? "var(--ink)" : "transparent",
+								color: isActive ? "var(--paper)" : "var(--ink-soft)",
+								border: `var(--ink-width) solid ${isActive ? "var(--ink)" : "transparent"}`,
+								borderRadius: "var(--radius-block)",
 							})}
 						>
 							{({ isActive }) => (
 								<>
-									<Icon size={20} strokeWidth={isActive ? 2.5 : 1.8} />
+									<Icon size={19} strokeWidth={isActive ? 2.4 : 1.9} aria-hidden="true" />
 									<span>{t(item.labelKey)}</span>
 								</>
 							)}
@@ -67,15 +69,18 @@ const DesktopSidebar = () => {
 				})}
 			</nav>
 
-			{/* Start Practice button (no admin) */}
 			{!isAdmin && (
 				<button
 					type="button"
 					onClick={() => navigate("/start-practice")}
-					className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-white font-semibold text-sm transition-all hover:brightness-95 active:scale-[0.97]"
-					style={{ backgroundColor: "var(--color-primary)" }}
+					className="ink-block ink-block--press flex w-full items-center justify-center gap-2 py-3 text-sm font-bold"
+					style={{
+						background: "var(--surya)",
+						color: "var(--on-fill)",
+						cursor: "pointer",
+					}}
 				>
-					<Plus size={18} strokeWidth={2.5} />
+					<Plus size={18} strokeWidth={2.5} aria-hidden="true" />
 					{t("practice.start_practice")}
 				</button>
 			)}
@@ -86,28 +91,24 @@ const DesktopSidebar = () => {
 const AppLayout = () => {
 	const location = useLocation();
 	return (
-		<div
-			className="min-h-dvh"
-			style={{ backgroundColor: "var(--color-surface)" }}
-		>
-			{/* Desktop sidebar — hidden on mobile/tablet */}
+		<div className="min-h-dvh" style={{ backgroundColor: "var(--color-surface)" }}>
 			<DesktopSidebar />
 
-			{/* Main content area */}
-			<div className="lg:ml-56 flex justify-center">
+			{/* Content keeps the previous tokens until each page is migrated, so
+			    the shell can change without touching 48 components at once. */}
+			<div className="flex justify-center lg:ml-56">
 				<div
-					className="w-full max-w-[430px] sm:max-w-[540px] lg:max-w-[680px] xl:max-w-[900px] min-h-dvh flex flex-col"
+					className="flex min-h-dvh w-full max-w-[430px] flex-col sm:max-w-[540px] lg:max-w-[680px] xl:max-w-[900px]"
 					style={{ backgroundColor: "var(--color-surface)" }}
 				>
 					<AnimatePresence mode="wait">
 						<PageTransition key={location.pathname}>
-							<main className="pb-24 lg:pb-8 flex-1">
+							<main className="flex-1 pb-24 lg:pb-8">
 								<Outlet />
 							</main>
 						</PageTransition>
 					</AnimatePresence>
 
-					{/* Bottom nav — hidden on desktop */}
 					<footer className="lg:hidden">
 						<BottomNav />
 					</footer>

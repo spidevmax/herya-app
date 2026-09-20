@@ -1,8 +1,8 @@
-import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { DAY_LABEL_KEYS } from "@/utils/constants";
+import "@/styles/identity.css";
 
 const toLocalIsoDate = (date) => {
 	const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
@@ -50,7 +50,7 @@ export default function CalendarStrip({
 
 	if (loading) {
 		return (
-			<section aria-busy="true" aria-label={t("dashboard.practice_label")}>
+			<section data-identity="next" aria-busy="true" aria-label={t("dashboard.practice_label")}>
 				<div className="flex items-center justify-between mb-3">
 					<span className="skeleton h-3 w-28 rounded-lg" aria-hidden="true" />
 					<span className="skeleton h-4 w-20 rounded-full" aria-hidden="true" />
@@ -71,30 +71,25 @@ export default function CalendarStrip({
 	}
 
 	return (
-		<section aria-label={t("dashboard.practice_label")}>
+		<section data-identity="next" aria-label={t("dashboard.practice_label")}>
 			<header className="flex items-center justify-between mb-3 ">
-				<span
-					className="text-[11px] font-bold uppercase tracking-[0.1em]"
-					style={{ color: "var(--color-text-muted)" }}
-				>
+				<span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
 					{t("dashboard.practice_label")}
 				</span>
 				<div className="flex items-center gap-2">
 					{weekSessions !== null && weekSessions > 0 && (
 						<span
-							className="text-xs font-medium px-2 py-0.5 rounded-full"
+							className="px-2 py-0.5 text-xs font-bold"
 							style={{
-								backgroundColor: "var(--color-surface)",
-								color: "var(--color-text-secondary)",
+								border: "var(--ink-width) solid var(--ink)",
+								borderRadius: "var(--radius-block)",
+								color: "var(--ink-soft)",
 							}}
 						>
 							{t("dashboard.sessions_this_week", { n: weekSessions })}
 						</span>
 					)}
-					<span
-						className="font-bold text-sm"
-						style={{ color: "var(--color-secondary)" }}
-					>
+					<span className="text-sm font-bold" style={{ color: "var(--ink)" }}>
 						{t("dashboard.day_streak", { n: streak })}
 					</span>
 				</div>
@@ -104,40 +99,31 @@ export default function CalendarStrip({
 				aria-label={t("dashboard.practice_label")}
 				className="flex gap-2 overflow-x-auto  pb-1"
 			>
-				{days.map((d, i) => (
-					<motion.li
+				{days.map((d) => (
+					<li
 						key={d.iso}
-						initial={{ opacity: 0, y: 8 }}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: i * 0.03 }}
-						className="flex-shrink-0 flex flex-col items-center gap-1 w-10"
+						className="flex w-10 flex-shrink-0 flex-col items-center gap-1"
 						aria-label={`${t(d.labelKey)} ${d.day}${d.practiced ? ` — ${t("dashboard.practiced")}` : ""}${d.isToday ? ` — ${t("dashboard.today")}` : ""}`}
 					>
 						<span
-							className="text-[10px] font-semibold"
-							style={{
-								color: d.isToday
-									? "var(--color-primary)"
-									: "var(--color-text-muted)",
-							}}
+							className="text-[10px] font-bold"
+							style={{ color: d.isToday ? "var(--ink)" : "var(--ink-soft)" }}
 						>
 							{t(d.labelKey)}
 						</span>
+						{/* Today is ink-filled, a practised day is surya, an empty day
+						    is just an outline. Three states, no shadows. */}
 						<div
-							className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all"
+							className="flex h-9 w-9 items-center justify-center text-sm font-bold"
 							style={{
-								backgroundColor: d.isToday
-									? "var(--color-primary)"
+								background: d.isToday
+									? "var(--ink)"
 									: d.practiced
-										? "var(--color-secondary)"
-										: "var(--color-surface)",
-								color:
-									d.isToday || d.practiced
-										? "white"
-										: "var(--color-text-secondary)",
-								boxShadow: d.isToday
-									? "0 0 0 3px color-mix(in srgb, var(--color-primary) 18%, transparent), 0 4px 12px color-mix(in srgb, var(--color-primary) 35%, transparent)"
-									: "none",
+										? "var(--surya)"
+										: "transparent",
+								color: d.isToday ? "var(--paper)" : "var(--on-fill)",
+								border: "var(--ink-width) solid var(--ink)",
+								borderRadius: "999px",
 							}}
 						>
 							{d.practiced && !d.isToday ? (
@@ -146,7 +132,7 @@ export default function CalendarStrip({
 								d.day
 							)}
 						</div>
-					</motion.li>
+					</li>
 				))}
 			</ol>
 		</section>

@@ -1,10 +1,8 @@
-import { motion } from "framer-motion";
-import { ArrowLeft, Eye, EyeOff, Lock } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { resetPassword } from "@/api/auth.api";
-import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
-import { Button } from "@/components/ui";
+import AuthShell from "@/components/identity/AuthShell";
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function ResetPassword() {
@@ -34,18 +32,11 @@ export default function ResetPassword() {
 		setError("");
 		setErrorList([]);
 		if (!token) {
-			setError(
-				tr("reset_password.invalid_token", "Invalid or missing reset token"),
-			);
+			setError(tr("reset_password.invalid_token", "Invalid or missing reset token"));
 			return;
 		}
 		if (form.newPassword.length < 8) {
-			setError(
-				tr(
-					"reset_password.too_short",
-					"Password must be at least 8 characters",
-				),
-			);
+			setError(tr("reset_password.too_short", "Password must be at least 8 characters"));
 			return;
 		}
 		if (form.newPassword !== form.confirmPassword) {
@@ -68,8 +59,7 @@ export default function ResetPassword() {
 				setError("");
 			} else {
 				setError(
-					err?.response?.data?.message ||
-						tr("reset_password.error", "Password reset failed"),
+					err?.response?.data?.message || tr("reset_password.error", "Password reset failed"),
 				);
 			}
 		} finally {
@@ -77,269 +67,171 @@ export default function ResetPassword() {
 		}
 	};
 
+	const hasError = !!error || errorList.length > 0;
+
+	if (success) {
+		return (
+			<AuthShell>
+				<section role="status" aria-live="polite" aria-labelledby="reset-success-heading">
+					<h1 id="reset-success-heading" className="display text-[2.4rem]">
+						{tr("reset_password.success_title", "All set")}
+					</h1>
+					<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
+						{tr(
+							"reset_password.success_message",
+							"Your password has been successfully reset. Redirecting to login...",
+						)}
+					</p>
+					<Link
+						to="/login"
+						className="ink-block ink-block--press display mt-7 block w-full py-3.5 text-center text-[1.15rem]"
+						style={{ background: "var(--surya)", color: "var(--on-fill)" }}
+					>
+						{tr("reset_password.back_to_login", "Back to login")}
+					</Link>
+				</section>
+			</AuthShell>
+		);
+	}
+
 	return (
-		<main
-			className="min-h-dvh flex flex-col items-center justify-center px-6 overflow-hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(24rem,30rem)] lg:gap-12 lg:px-12 xl:px-20"
-			style={{ background: "var(--gradient-warm)" }}
-		>
-			<div
-				aria-hidden="true"
-				className="absolute top-[6%] left-[8%] w-20 h-20 rounded-full bg-[var(--color-surface-card)]/25 blur-xl"
-			/>
-			<div
-				aria-hidden="true"
-				className="absolute bottom-[12%] right-[10%] w-24 h-24 rounded-full bg-[var(--color-secondary)]/20 blur-xl"
-			/>
-
-			<aside className="relative z-10 hidden min-h-dvh items-center justify-center lg:flex">
-				<div className="max-w-xl">
-					<AuthBrandHeader showSubtitle={false} />
-					<div className="mt-10 rounded-[2rem] border border-white/25 bg-white/20 p-8 shadow-[var(--shadow-card)] backdrop-blur-sm">
-						<p className="text-lg font-semibold leading-8 text-[var(--color-text-primary)]">
-							{tr(
-								"reset_password.subtitle",
-								"Choose a secure password to access your account.",
-							)}
-						</p>
-					</div>
-				</div>
-			</aside>
-
-			<motion.div
-				initial={{ opacity: 0, y: 24 }}
-				animate={{ opacity: 1, y: 0 }}
-				transition={{ duration: 0.5 }}
-				className="w-full max-w-sm relative z-10 lg:max-w-md"
+		<AuthShell>
+			<button
+				type="button"
+				onClick={() => navigate(-1)}
+				className="mb-6 inline-flex items-center gap-2 text-sm font-bold underline"
+				style={{ color: "var(--ink-soft)" }}
 			>
-				<div className="lg:hidden">
-					<AuthBrandHeader compact showSubtitle={false} />
-				</div>
+				<ArrowLeft size={16} aria-hidden="true" />
+				{tr("reset_password.back", "Back")}
+			</button>
 
-				{!success && (
-					<>
+			<h1 className="display text-[2.4rem]">
+				{tr("reset_password.title", "Create a new password")}
+			</h1>
+			<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
+				{tr("reset_password.subtitle", "Choose a secure password to access your account.")}
+			</p>
+
+			{hasError && (
+				<div
+					id="reset-error"
+					role="alert"
+					className="ink-block mt-5 px-4 py-3 text-sm font-bold"
+					style={{
+						background: "var(--alert-bg)",
+						borderColor: "var(--alert)",
+						color: "var(--alert)",
+						boxShadow: "none",
+					}}
+				>
+					{error && <div>{error}</div>}
+					{errorList.length > 0 && (
+						<ul className="list-disc pl-5">
+							{errorList.map((msg) => (
+								<li key={typeof msg === "string" ? msg : JSON.stringify(msg)}>{msg}</li>
+							))}
+						</ul>
+					)}
+				</div>
+			)}
+
+			<form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5" autoComplete="off">
+				<div>
+					<label htmlFor="new-password" className="mb-2 block text-sm font-bold">
+						{tr("reset_password.new_password_label", "New password")}
+					</label>
+					<div className="relative">
+						<input
+							id="new-password"
+							name="new-password"
+							type={showPassword ? "text" : "password"}
+							autoComplete="new-password"
+							required
+							aria-describedby={hasError ? "reset-error" : undefined}
+							aria-invalid={!!error && touched.newPassword}
+							placeholder={tr("reset_password.new_password_label", "New password")}
+							value={form.newPassword}
+							onChange={(e) => {
+								setForm((f) => ({ ...f, newPassword: e.target.value }));
+								setTouched((prev) => ({ ...prev, newPassword: true }));
+							}}
+							className="ink-field pr-12"
+						/>
 						<button
 							type="button"
-							onClick={() => navigate(-1)}
-							aria-label={tr("reset_password.back", "Back")}
-							className="flex items-center gap-2 mb-6 font-bold text-lg text-[var(--color-primary)] hover:opacity-70 transition"
+							onClick={() => setShowPassword((v) => !v)}
+							aria-label={
+								showPassword
+									? tr("login.hide_password", "Hide password")
+									: tr("login.show_password", "Show password")
+							}
+							className="absolute right-4 top-1/2 -translate-y-1/2"
+							style={{ color: "var(--ink-soft)" }}
 						>
-							<ArrowLeft size={20} aria-hidden="true" />
-							{tr("reset_password.back", "Back")}
+							{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
 						</button>
+					</div>
+				</div>
 
-						<header className="text-center mb-8">
-							<Lock
-								size={54}
-								aria-hidden="true"
-								className="mb-4 inline-block text-[var(--color-primary)]"
-							/>
-							<h1 className="font-display text-4xl font-bold mb-2 text-[var(--color-primary)]">
-								{tr("reset_password.title", "Create a new password")}
-							</h1>
-							<p className="text-sm text-[var(--color-text-secondary)]">
-								{tr(
-									"reset_password.subtitle",
-									"Choose a secure password to access your account.",
-								)}
-							</p>
-						</header>
-
-						<motion.section
-							aria-label={tr("reset_password.title", "New password")}
-							className="rounded-3xl p-8 backdrop-blur-sm border-[3px] border-[var(--color-secondary)] bg-[var(--color-surface-card)]"
-							style={{
-								boxShadow: "var(--shadow-warm)",
+				<div>
+					<label htmlFor="confirm-password" className="mb-2 block text-sm font-bold">
+						{tr("reset_password.confirm_password_label", "Confirm password")}
+					</label>
+					<div className="relative">
+						<input
+							id="confirm-password"
+							name="confirm-password"
+							type={showConfirmPassword ? "text" : "password"}
+							autoComplete="new-password"
+							required
+							aria-describedby={hasError ? "reset-error" : undefined}
+							aria-invalid={!!error && touched.confirmPassword}
+							placeholder={tr("reset_password.confirm_password_label", "Confirm password")}
+							value={form.confirmPassword}
+							onChange={(e) => {
+								setForm((f) => ({ ...f, confirmPassword: e.target.value }));
+								setTouched((prev) => ({ ...prev, confirmPassword: true }));
 							}}
-							whileHover={{
-								y: -8,
-								scale: 1.02,
-								boxShadow: "var(--shadow-warm-hover)",
-							}}
+							className="ink-field pr-12"
+						/>
+						<button
+							type="button"
+							onClick={() => setShowConfirmPassword((v) => !v)}
+							aria-label={
+								showConfirmPassword
+									? tr("login.hide_password", "Hide password")
+									: tr("login.show_password", "Show password")
+							}
+							className="absolute right-4 top-1/2 -translate-y-1/2"
+							style={{ color: "var(--ink-soft)" }}
 						>
-							{(error || (errorList && errorList.length > 0)) && (
-								<motion.div
-									id="reset-error"
-									role="alert"
-									initial={{ opacity: 0, y: -8, scale: 0.95 }}
-									animate={{ opacity: 1, y: 0, scale: 1 }}
-									className="mb-4 px-5 py-4 rounded-2xl text-sm font-semibold bg-[var(--color-error-bg)] text-[var(--color-error-text)] border-l-4 border-[var(--color-accent)]"
-								>
-									{error && <div>{error}</div>}
-									{errorList && errorList.length > 0 && (
-										<ul className="list-disc pl-5">
-											{errorList.map((msg) => (
-												<li
-													key={
-														typeof msg === "string" ? msg : JSON.stringify(msg)
-													}
-												>
-													{msg}
-												</li>
-											))}
-										</ul>
-									)}
-								</motion.div>
-							)}
+							{showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+						</button>
+					</div>
+				</div>
 
-							<form
-								onSubmit={handleSubmit}
-								className="flex flex-col gap-5"
-								autoComplete="off"
-							>
-								<div className="relative">
-									<label htmlFor="new-password" className="sr-only">
-										{tr("reset_password.new_password_label", "New password")}
-									</label>
-									<Lock
-										size={20}
-										className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]"
-									/>
-									<input
-										id="new-password"
-										name="new-password"
-										type={showPassword ? "text" : "password"}
-										autoComplete="new-password"
-										required
-										aria-describedby={error ? "reset-error" : undefined}
-										aria-invalid={!!error}
-										placeholder="••••••••"
-										value={form.newPassword}
-										onChange={(e) => {
-											setForm((f) => ({ ...f, newPassword: e.target.value }));
-											setTouched((t) => ({ ...t, newPassword: true }));
-										}}
-										className={`input-base input-base-lg pl-12 pr-12 ${error && touched.newPassword ? "border-[var(--color-error-text)]" : ""}`}
-									/>
-									<button
-										type="button"
-										tabIndex={0}
-										onClick={() => setShowPassword((v) => !v)}
-										aria-label={
-											showPassword
-												? tr("login.hide_password", "Hide password")
-												: tr("login.show_password", "Show password")
-										}
-										className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] hover:opacity-70 transition"
-									>
-										{showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-									</button>
-								</div>
+				<button
+					type="submit"
+					disabled={loading}
+					aria-busy={loading}
+					className="ink-block ink-block--press display mt-1 w-full py-3.5 text-[1.15rem]"
+					style={{
+						background: "var(--surya)",
+						color: "var(--on-fill)",
+						cursor: loading ? "wait" : "pointer",
+						opacity: loading ? 0.7 : 1,
+					}}
+				>
+					{loading
+						? tr("reset_password.submitting", "Updating...")
+						: tr("reset_password.submit", "Update password")}
+				</button>
 
-								<div className="relative">
-									<label htmlFor="confirm-password" className="sr-only">
-										{tr(
-											"reset_password.confirm_password_label",
-											"Confirm password",
-										)}
-									</label>
-									<Lock
-										size={20}
-										className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)]"
-									/>
-									<input
-										id="confirm-password"
-										name="confirm-password"
-										type={showConfirmPassword ? "text" : "password"}
-										autoComplete="new-password"
-										required
-										aria-describedby={error ? "reset-error" : undefined}
-										aria-invalid={!!error}
-										placeholder="••••••••"
-										value={form.confirmPassword}
-										onChange={(e) => {
-											setForm((f) => ({
-												...f,
-												confirmPassword: e.target.value,
-											}));
-											setTouched((t) => ({ ...t, confirmPassword: true }));
-										}}
-										className={`input-base input-base-lg pl-12 pr-12 ${error && touched.confirmPassword ? "border-[var(--color-error-text)]" : ""}`}
-									/>
-									<button
-										type="button"
-										tabIndex={0}
-										onClick={() => setShowConfirmPassword((v) => !v)}
-										aria-label={
-											showConfirmPassword
-												? tr("login.hide_password", "Hide password")
-												: tr("login.show_password", "Show password")
-										}
-										className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-primary)] hover:opacity-70 transition"
-									>
-										{showConfirmPassword ? (
-											<EyeOff size={20} />
-										) : (
-											<Eye size={20} />
-										)}
-									</button>
-								</div>
-
-								<Button
-									type="submit"
-									disabled={loading}
-									size="lg"
-									className="mt-4 w-full"
-									aria-busy={loading}
-								>
-									{loading
-										? tr("reset_password.submitting", "Updating...")
-										: tr("reset_password.submit", "Update password")}
-								</Button>
-							</form>
-
-							<p className="text-center text-sm mt-6 font-semibold text-[var(--color-text-secondary)]">
-								<Link
-									to="/login"
-									className="font-bold text-[var(--color-secondary)] hover:underline transition"
-								>
-									{tr("reset_password.back_to_login", "Back to login")}
-								</Link>
-							</p>
-						</motion.section>
-					</>
-				)}
-
-				{success && (
-					<motion.section
-						aria-labelledby="reset-success-heading"
-						role="status"
-						aria-live="polite"
-						initial={{ opacity: 0, scale: 0.95 }}
-						animate={{ opacity: 1, scale: 1 }}
-						className="rounded-3xl p-8 border-[3px] border-[var(--color-secondary)] backdrop-blur-sm bg-[var(--color-surface-card)]"
-						style={{
-							boxShadow: "var(--shadow-warm)",
-						}}
-					>
-						<div className="text-center">
-							<Lock
-								size={46}
-								aria-hidden="true"
-								className="mb-4 inline-block text-[var(--color-primary)]"
-							/>
-							<h2
-								id="reset-success-heading"
-								className="font-display text-3xl font-bold mb-3 text-[var(--color-primary)]"
-							>
-								{tr("reset_password.success_title", "All set")}
-							</h2>
-							<p className="text-sm mb-6 font-semibold text-[var(--color-text-secondary)]">
-								{tr(
-									"reset_password.success_message",
-									"Your password has been successfully reset. Redirecting to login...",
-								)}
-							</p>
-							<Link
-								to="/login"
-								className="inline-block font-bold py-4 px-8 rounded-3xl bg-[var(--color-primary)] text-white transition hover:opacity-80"
-								style={{ boxShadow: "var(--shadow-button)" }}
-							>
-								{tr("reset_password.back_to_login", "Back to login")}
-							</Link>
-						</div>
-					</motion.section>
-				)}
-			</motion.div>
-		</main>
+				<Link to="/login" className="text-center text-sm font-bold underline">
+					{tr("reset_password.back_to_login", "Back to login")}
+				</Link>
+			</form>
+		</AuthShell>
 	);
 }

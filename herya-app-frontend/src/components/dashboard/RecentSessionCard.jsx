@@ -1,92 +1,89 @@
-import { motion } from "framer-motion";
-import {
-	CheckCircle,
-	Clock,
-	Leaf,
-	PersonStanding,
-	Star,
-	Wind,
-	XCircle,
-} from "lucide-react";
+import { Check, Clock, Leaf, PersonStanding, Star, Wind, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
-import { VK_FAMILY_MAP } from "@/utils/constants";
 import { format } from "@/utils/helpers";
-import { colorMix } from "@/utils/libraryHelpers";
+import "@/styles/identity.css";
 
-export default function RecentSessionCard({ session, index = 0 }) {
+const TYPE_ICON_MAP = {
+	vk_sequence: PersonStanding,
+	pranayama: Wind,
+	meditation: Leaf,
+	complete_practice: Star,
+};
+
+/*
+ * Session type maps to a breath channel rather than to a per-family colour.
+ * Posture work is effort (surya), breathwork is rest (chandra), meditation
+ * carries no fill. The same mapping the krama ladder uses, so a session reads
+ * the same wherever it appears.
+ */
+const TYPE_FILL = {
+	vk_sequence: "var(--surya)",
+	complete_practice: "var(--surya)",
+	pranayama: "var(--chandra)",
+	meditation: "transparent",
+};
+
+export default function RecentSessionCard({ session }) {
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
-	const family = session.vkSequence?.family
-		? VK_FAMILY_MAP[session.vkSequence.family]
-		: null;
-	const TYPE_ICON_MAP = {
-		vk_sequence: PersonStanding,
-		pranayama: Wind,
-		meditation: Leaf,
-		complete_practice: Star,
-	};
 	const SessionTypeIcon = TYPE_ICON_MAP[session.sessionType] || PersonStanding;
-	const color = family?.color || "var(--color-primary)";
+	const fill = TYPE_FILL[session.sessionType] ?? "transparent";
+	const open = () => navigate(`/sessions/${session._id}`);
 
 	return (
-		<motion.article
-			initial={{ opacity: 0, x: -16 }}
-			animate={{ opacity: 1, x: 0 }}
-			transition={{ delay: index * 0.08 }}
-			onClick={() => navigate(`/sessions/${session._id}`)}
+		<article
+			data-identity="next"
+			onClick={open}
 			onKeyDown={(e) => {
 				if (e.key === "Enter" || e.key === " ") {
 					e.preventDefault();
-					navigate(`/sessions/${session._id}`);
+					open();
 				}
 			}}
 			role="button"
 			tabIndex={0}
-			className="flex items-center gap-3 rounded-2xl p-4 shadow-[var(--shadow-card)] cursor-pointer active:scale-[0.98] transition-transform"
-			style={{ backgroundColor: "var(--color-surface-card)" }}
+			className="ink-block ink-block--press flex items-center gap-3 p-3"
+			style={{ cursor: "pointer" }}
 		>
-			<div
-				className="w-1.5 self-stretch rounded-full flex-shrink-0"
-				style={{ backgroundColor: color, minHeight: 40 }}
-			/>
-			<div
-				className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-				style={{ backgroundColor: colorMix(color, 12) }}
+			<span
+				aria-hidden="true"
+				className="flex h-10 w-10 shrink-0 items-center justify-center"
+				style={{
+					background: fill,
+					border: "var(--ink-width) solid var(--ink)",
+					borderRadius: "var(--radius-block)",
+					color: fill === "transparent" ? "var(--ink)" : "var(--on-fill)",
+				}}
 			>
-				{family?.emoji ? (
-					<span className="text-xl">{family.emoji}</span>
-				) : (
-					<SessionTypeIcon size={20} strokeWidth={2.2} style={{ color }} />
-				)}
-			</div>
-			<div className="flex-1 min-w-0">
-				<p
-					className="font-semibold text-sm truncate"
-					style={{ color: "var(--color-text-primary)" }}
-				>
+				<SessionTypeIcon size={19} strokeWidth={2.1} />
+			</span>
+
+			<div className="min-w-0 flex-1">
+				<p className="truncate text-sm font-bold">
 					{session.vkSequence?.englishName ||
 						t(`dashboard.${session.sessionType}`) ||
 						t("dashboard.sessions")}
 				</p>
-				<p className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+				<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 					{format.date(session.date || session.createdAt, lang)}
 				</p>
 			</div>
-			<div className="flex flex-col items-end gap-1 flex-shrink-0">
-				<div
-					className="flex items-center gap-1 text-xs"
-					style={{ color: "var(--color-text-secondary)" }}
+
+			<div className="flex shrink-0 flex-col items-end gap-1">
+				<span
+					className="flex items-center gap-1 text-xs font-bold"
+					style={{ color: "var(--ink-soft)" }}
 				>
-					<Clock size={11} />
+					<Clock size={11} aria-hidden="true" />
 					{session.duration} min
-				</div>
+				</span>
 				{session.completed ? (
-					<CheckCircle size={14} style={{ color: "var(--color-success)" }} />
+					<Check size={15} aria-hidden="true" style={{ color: "var(--ink)" }} />
 				) : (
-					<XCircle size={14} style={{ color: "var(--color-text-muted)" }} />
+					<X size={15} aria-hidden="true" style={{ color: "var(--ink-soft)" }} />
 				)}
 			</div>
-		</motion.article>
+		</article>
 	);
 }

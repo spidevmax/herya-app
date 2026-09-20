@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Droplets, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const getDismissKey = () => {
 	const today = new Date().toISOString().slice(0, 10);
@@ -37,8 +38,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 			return {
 				icon: Sparkles,
 				message: t("dashboard.reminder_short_practice"),
-				accent: "var(--color-primary)",
-				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 15%, transparent), color-mix(in srgb, var(--color-secondary) 12%, transparent))",
+				accent: "var(--chandra)",
 			};
 		}
 
@@ -46,8 +46,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 			return {
 				icon: Sparkles,
 				message: t("dashboard.reminder_keep_going"),
-				accent: "var(--color-secondary)",
-				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-secondary) 14%, transparent), color-mix(in srgb, var(--color-primary) 10%, transparent))",
+				accent: "var(--surya)",
 			};
 		}
 
@@ -55,8 +54,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 			return {
 				icon: Droplets,
 				message: t("dashboard.reminder_water"),
-				accent: "var(--color-primary)",
-				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 12%, transparent), color-mix(in srgb, var(--color-primary-light) 18%, transparent))",
+				accent: "var(--chandra)",
 			};
 		}
 
@@ -64,16 +62,14 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 			return {
 				icon: Sparkles,
 				message: t("dashboard.reminder_breathe"),
-				accent: "var(--color-secondary)",
-				bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-secondary) 10%, transparent), color-mix(in srgb, var(--color-accent) 12%, transparent))",
+				accent: "var(--surya)",
 			};
 		}
 
 		return {
 			icon: Droplets,
 			message: t("dashboard.reminder_water"),
-			accent: "var(--color-primary)",
-			bg: "linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 12%, transparent), color-mix(in srgb, var(--color-secondary) 10%, transparent))",
+			accent: "var(--chandra)",
 		};
 	}, [sessions.length, streak, t, user?.preferences?.timeOfDay]);
 
@@ -99,31 +95,32 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 				className=""
 			>
 				<aside
+					data-identity="next"
 					aria-label={t("dashboard.reminder_label")}
-					className="rounded-3xl p-4 shadow-[var(--shadow-card)] border"
-					style={{
-						background: reminder.bg,
-						borderColor: "var(--color-border-soft)",
-					}}
+					className="ink-block p-4"
+					style={{ background: reminder.accent, color: "var(--on-fill)" }}
 				>
 					<div className="flex items-start gap-3">
 						<div
-							className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-							style={{ backgroundColor: "var(--color-surface-card)" }}
+							className="flex h-10 w-10 flex-shrink-0 items-center justify-center"
+							style={{
+								background: "var(--paper-raised)",
+								border: "var(--ink-width) solid var(--on-fill)",
+								borderRadius: "var(--radius-block)",
+							}}
 						>
-							<Icon size={18} style={{ color: reminder.accent }} />
+							<Icon size={18} aria-hidden="true" style={{ color: "var(--ink)" }} />
 						</div>
 
 						<div className="flex-1 min-w-0">
 							<p
-								className="text-[11px] font-bold uppercase tracking-[0.14em] mb-1"
-								style={{ color: "var(--color-text-muted)" }}
+								className="mb-1 text-[11px] font-bold"
+								style={{ opacity: 0.75 }}
 							>
 								{t("dashboard.reminder_label")}
 							</p>
 							<p
-								className="text-sm font-semibold leading-6"
-								style={{ color: "var(--color-text-primary)" }}
+								className="text-sm font-bold leading-6"
 							>
 								{reminder.message}
 							</p>
@@ -135,7 +132,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 							className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition hover:bg-black/5"
 							aria-label={t("dashboard.dismiss_reminder")}
 						>
-							<X size={14} style={{ color: "var(--color-text-muted)" }} />
+							<X size={14} style={{ color: "var(--ink-soft)" }} />
 						</button>
 					</div>
 				</aside>

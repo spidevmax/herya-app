@@ -1,12 +1,12 @@
-import { motion } from "framer-motion";
-import { AlertCircle, ArrowLeft, Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { AlertCircle, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { requestPasswordReset } from "@/api/auth.api";
-import AuthBrandHeader from "@/components/auth/AuthBrandHeader";
-import { Button } from "@/components/ui";
+import BreathBuddy from "@/components/identity/BreathBuddy";
+import BreathMark from "@/components/identity/BreathMark";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -16,7 +16,8 @@ function FieldError({ id, message }) {
 		<p
 			id={id}
 			role="alert"
-			className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-[var(--color-error-text)]"
+			className="mt-1.5 flex items-center gap-1.5 text-xs font-bold"
+			style={{ color: "var(--alert)" }}
 		>
 			<AlertCircle size={14} aria-hidden="true" />
 			<span>{message}</span>
@@ -53,8 +54,7 @@ export default function Login() {
 	const validate = () => {
 		const next = {};
 		if (!form.email.trim()) next.email = t("login.errors.email_required");
-		else if (!EMAIL_RE.test(form.email.trim()))
-			next.email = t("login.errors.email_invalid");
+		else if (!EMAIL_RE.test(form.email.trim())) next.email = t("login.errors.email_invalid");
 		if (!form.password) next.password = t("login.errors.password_required");
 		return next;
 	};
@@ -130,294 +130,229 @@ export default function Login() {
 				setForgotStatus("");
 			}, 2000);
 		} catch (err) {
-			setForgotMessage(
-				err?.response?.data?.message || t("forgot_password.error"),
-			);
+			setForgotMessage(err?.response?.data?.message || t("forgot_password.error"));
 			setForgotStatus("error");
 		} finally {
 			setForgotLoading(false);
 		}
 	};
 
-	const inputErrorStyle = (field) =>
-		errors[field]
-			? {
-					borderColor: "var(--color-error-text)",
-					boxShadow: "0 0 0 1px var(--color-error-text)",
-				}
-			: undefined;
-
 	return (
 		<div
-			className="min-h-dvh w-full px-4 py-8 sm:px-6 sm:py-10 lg:flex lg:h-dvh lg:min-h-0 lg:items-center lg:justify-center lg:overflow-auto lg:px-8 lg:py-8 xl:px-10"
-			style={{ background: "var(--gradient-primary)" }}
+			data-identity="next"
+			className="min-h-dvh w-full lg:grid lg:grid-cols-[1fr_1.1fr]"
+			style={{ background: "var(--paper)" }}
 		>
-			<div
-				className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full max-w-md items-center justify-center lg:grid lg:min-h-0 lg:max-w-[90rem] lg:grid-cols-2 lg:items-stretch lg:overflow-hidden lg:rounded-[2rem] lg:shadow-[0_28px_90px_rgba(15,30,60,0.22)]"
+			{/* Left panel — the character does the welcoming. Flat colour, no
+			    photography, no gradient: the ground is one field of chandra. */}
+			<aside
+				className="relative hidden flex-col justify-between p-12 lg:flex xl:p-16"
 				style={{
-					backgroundColor: "var(--color-surface-card)",
-					border: "1px solid var(--color-border)",
+					background: "var(--chandra)",
+					borderRight: "var(--ink-width) solid var(--ink)",
 				}}
 			>
-				<aside className="relative hidden min-w-0 flex-col overflow-hidden bg-[#f5e7d4] bg-[url('/images/rex-mascot-login.png')] bg-cover bg-center bg-no-repeat px-14 py-16 lg:flex lg:min-h-[min(52rem,calc(100dvh-5rem))] xl:px-20 xl:py-20 dark:bg-[#1f1611]">
-					<div
-						aria-hidden="true"
-						className="absolute inset-0"
-						style={{
-							background:
-								"linear-gradient(135deg,#f6ead9 0%,#efdcc3 35%, rgba(191,124,85,0.55) 70%, rgba(120,66,44,0.75) 100%)",
-						}}
-					/>
-					<div
-						aria-hidden="true"
-						className="absolute inset-0"
-						style={{
-							background:
-								"radial-gradient(ellipse 60% 50% at 18% 22%, rgba(255,250,240,0.55), transparent 70%)",
-						}}
-					/>
-					<div
-						aria-hidden="true"
-						className="absolute inset-0 mix-blend-overlay opacity-[0.06]"
-						style={{
-							backgroundImage:
-								"url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
-						}}
-					/>
-					<div
-						aria-hidden="true"
-						className="pointer-events-none absolute inset-y-0 right-0 w-px"
-						style={{ boxShadow: "inset -1px 0 0 rgba(0,0,0,0.04)" }}
-					/>
+				<div className="flex items-center gap-3">
+					{/* On the chandra panel the cool arc would vanish, so it takes
+					    the ink used for text on a colour fill. */}
+					<BreathMark size={38} cool="var(--on-fill)" />
+					<span className="display text-[1.5rem]" style={{ color: "var(--on-fill)" }}>
+						Herya
+					</span>
+				</div>
 
-					<div className="relative z-10 max-w-[28ch]">
-						<h1 className="font-display font-medium tracking-[-0.02em] leading-none text-[52px] xl:text-[60px] text-[#2b1d14] dark:text-[#f3e9da]">
-							Herya
-						</h1>
-						<p className="mt-5 max-w-[26ch] text-[18px] xl:text-[20px] leading-[1.55] font-normal text-[#5a4536]/90 dark:text-[#bfa78f]">
-							{t("login.subtitle")}
-						</p>
-					</div>
-				</aside>
+				<div className="flex flex-1 items-center justify-center">
+					{/* outline is pinned to on-fill: theme ink goes near-white in dark
+					    mode and would wash the figure out against the panel. */}
+					<BreathBuddy
+						size={200}
+						phase="inhale"
+						fill="var(--surya)"
+						outline="var(--on-fill)"
+					/>
+				</div>
 
-				<div
-					className="mx-auto flex min-h-[calc(100dvh-4rem)] w-full min-w-0 max-w-md items-center justify-center lg:mx-0 lg:min-h-[min(52rem,calc(100dvh-5rem))] lg:max-w-none lg:px-12 lg:py-10 xl:px-20"
-					style={{ backgroundColor: "var(--color-surface-card)" }}
+				<p
+					className="display max-w-[16ch] text-[2.4rem] xl:text-[2.9rem]"
+					style={{ color: "var(--on-fill)" }}
 				>
-					<motion.div
-						initial={false}
-						animate={{ opacity: 1, y: 0 }}
-						transition={{ duration: 0.35 }}
-						className="w-full rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface-card)] p-6 shadow-[var(--shadow-card)] sm:p-8 lg:max-w-md lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none"
-					>
-						<div className="lg:hidden">
-							<AuthBrandHeader />
-						</div>
+					{t("login.subtitle")}
+				</p>
+			</aside>
 
-						{!showForgot ? (
-							<>
-								<div className="mb-7 text-center">
-									<h2 className="text-3xl font-semibold text-[var(--color-text-primary)]">
-										{t("login.welcome")}
-									</h2>
+			{/* Right panel — the form */}
+			<div className="flex min-h-dvh items-center justify-center px-5 py-10 sm:px-8">
+				<div className="w-full max-w-[26rem]">
+					{/* Brand shows on narrow screens, where the panel is gone. */}
+					<div className="mb-8 flex items-center gap-3 lg:hidden">
+						<BreathMark size={34} />
+						<span className="display text-[1.4rem]">Herya</span>
+					</div>
+
+					{!showForgot ? (
+						<>
+							<h1 className="display text-[2.6rem] sm:text-[3rem]">{t("login.welcome")}</h1>
+
+							{formError && (
+								<div
+									role="alert"
+									className="ink-block mt-5 flex items-center gap-2 px-4 py-3 text-sm font-bold"
+									style={{
+										background: "var(--alert-bg)",
+										borderColor: "var(--alert)",
+										color: "var(--alert)",
+										boxShadow: "none",
+									}}
+								>
+									<AlertCircle size={16} aria-hidden="true" />
+									<span>{formError}</span>
+								</div>
+							)}
+
+							<form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-5">
+								<div>
+									<label htmlFor="login-email" className="mb-2 block text-sm font-bold">
+										{t("login.email_placeholder")}
+									</label>
+									<input
+										id="login-email"
+										type="email"
+										autoComplete="email"
+										aria-invalid={!!errors.email}
+										aria-describedby={errors.email ? "login-email-error" : undefined}
+										placeholder={t("login.email_placeholder")}
+										value={form.email}
+										onChange={(e) => updateField("email", e.target.value)}
+										className="ink-field"
+									/>
+									<FieldError id="login-email-error" message={errors.email} />
 								</div>
 
-								{formError && (
-									<div
-										role="alert"
-										className="mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium bg-[var(--color-error-bg)] text-[var(--color-error-text)]"
-									>
-										<AlertCircle size={16} aria-hidden="true" />
-										<span>{formError}</span>
-									</div>
-								)}
-
-								<form
-									onSubmit={handleSubmit}
-									noValidate
-									className="flex flex-col gap-4"
-								>
-									<div>
-										<label
-											htmlFor="login-email"
-											className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
-										>
-											{t("login.email_placeholder")}
-										</label>
-										<div className="relative">
-											<Mail
-												size={18}
-												className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-											/>
-											<input
-												id="login-email"
-												type="email"
-												autoComplete="email"
-												aria-invalid={!!errors.email}
-												aria-describedby={
-													errors.email ? "login-email-error" : undefined
-												}
-												placeholder={t("login.email_placeholder")}
-												value={form.email}
-												onChange={(e) => updateField("email", e.target.value)}
-												className="input-base pl-10 pr-4"
-												style={inputErrorStyle("email")}
-											/>
-										</div>
-										<FieldError id="login-email-error" message={errors.email} />
-									</div>
-
-									<div>
-										<label
-											htmlFor="login-password"
-											className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
-										>
-											{t("login.password")}
-										</label>
-										<div className="relative">
-											<Lock
-												size={18}
-												className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-											/>
-											<input
-												id="login-password"
-												type={showPw ? "text" : "password"}
-												autoComplete="current-password"
-												aria-invalid={!!errors.password}
-												aria-describedby={
-													errors.password ? "login-password-error" : undefined
-												}
-												placeholder={t("login.password")}
-												value={form.password}
-												onChange={(e) =>
-													updateField("password", e.target.value)
-												}
-												className="input-base pl-10 pr-11"
-												style={inputErrorStyle("password")}
-											/>
-											<button
-												type="button"
-												onClick={() => setShowPw((v) => !v)}
-												aria-label={
-													showPw
-														? t("login.hide_password")
-														: t("login.show_password")
-												}
-												className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-											>
-												{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-											</button>
-										</div>
-										<FieldError
-											id="login-password-error"
-											message={errors.password}
+								<div>
+									<label htmlFor="login-password" className="mb-2 block text-sm font-bold">
+										{t("login.password")}
+									</label>
+									<div className="relative">
+										<input
+											id="login-password"
+											type={showPw ? "text" : "password"}
+											autoComplete="current-password"
+											aria-invalid={!!errors.password}
+											aria-describedby={errors.password ? "login-password-error" : undefined}
+											placeholder={t("login.password")}
+											value={form.password}
+											onChange={(e) => updateField("password", e.target.value)}
+											className="ink-field pr-12"
 										/>
-									</div>
-
-									<div className="text-right">
 										<button
 											type="button"
-											onClick={() => setShowForgot(true)}
-											className="text-sm font-medium text-[var(--color-primary)] hover:underline"
+											onClick={() => setShowPw((v) => !v)}
+											aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
+											className="absolute right-4 top-1/2 -translate-y-1/2"
+											style={{ color: "var(--ink-soft)" }}
 										>
-											{t("login.forgot_password")}
+											{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
 										</button>
 									</div>
+									<FieldError id="login-password-error" message={errors.password} />
+								</div>
 
-									<Button
-										type="submit"
-										disabled={loading}
-										className="mt-1 w-full"
-									>
-										{loading ? t("login.submitting") : t("login.submit")}
-									</Button>
-								</form>
+								<button
+									type="submit"
+									disabled={loading}
+									className="ink-block ink-block--press display mt-1 w-full py-3.5 text-[1.15rem]"
+									style={{
+										background: "var(--surya)",
+										color: "var(--on-fill)",
+										cursor: loading ? "wait" : "pointer",
+										opacity: loading ? 0.7 : 1,
+									}}
+								>
+									{loading ? t("login.submitting") : t("login.submit")}
+								</button>
 
-								<p className="mt-6 text-center text-sm font-medium text-[var(--color-text-secondary)]">
-									{t("login.no_account")}{" "}
-									<Link
-										to="/register"
-										className="font-semibold text-[var(--color-primary)] hover:underline"
-									>
-										{t("login.register_link")}
-									</Link>
-								</p>
-							</>
-						) : (
-							<>
 								<button
 									type="button"
-									onClick={() => setShowForgot(false)}
-									className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-primary)] hover:underline"
+									onClick={() => setShowForgot(true)}
+									className="text-sm font-bold underline"
+									style={{ color: "var(--ink-soft)" }}
 								>
-									<ArrowLeft size={16} /> {t("forgot_password.back_to_login")}
+									{t("login.forgot_password")}
 								</button>
-								<h2 className="text-2xl font-semibold text-[var(--color-text-primary)]">
-									{t("forgot_password.title")}
-								</h2>
-								<p className="mt-2 mb-6 text-sm font-medium text-[var(--color-text-secondary)]">
-									{t("forgot_password.subtitle")}
-								</p>
+							</form>
 
-								{forgotMessage && (
-									<div
-										className="mb-4 rounded-xl px-4 py-3 text-sm font-medium text-center"
-										style={{
-											backgroundColor:
-												forgotStatus === "success"
-													? "var(--color-info)"
-													: "var(--color-error-bg)",
-											color:
-												forgotStatus === "success"
-													? "white"
-													: "var(--color-error-text)",
-										}}
-									>
-										{forgotMessage}
-									</div>
-								)}
+							<p className="mt-8 text-sm font-bold">
+								{t("login.no_account")}{" "}
+								<Link to="/register" className="underline" style={{ color: "var(--ink)" }}>
+									{t("login.register_link")}
+								</Link>
+							</p>
+						</>
+					) : (
+						<>
+							<button
+								type="button"
+								onClick={() => setShowForgot(false)}
+								className="mb-6 inline-flex items-center gap-2 text-sm font-bold underline"
+								style={{ color: "var(--ink-soft)" }}
+							>
+								<ArrowLeft size={16} /> {t("forgot_password.back_to_login")}
+							</button>
 
-								<form
-									onSubmit={handleForgotSubmit}
-									className="flex flex-col gap-4"
+							<h1 className="display text-[2.2rem]">{t("forgot_password.title")}</h1>
+							<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
+								{t("forgot_password.subtitle")}
+							</p>
+
+							{forgotMessage && (
+								<div
+									role="status"
+									className="ink-block mt-5 px-4 py-3 text-sm font-bold"
+									style={{
+										background:
+											forgotStatus === "success" ? "var(--chandra)" : "var(--alert-bg)",
+										borderColor:
+											forgotStatus === "success" ? "var(--ink)" : "var(--alert)",
+										color: forgotStatus === "success" ? "var(--on-fill)" : "var(--alert)",
+										boxShadow: "none",
+									}}
 								>
-									<div>
-										<label
-											htmlFor="forgot-email"
-											className="mb-1.5 block text-sm font-semibold text-[var(--color-text-primary)]"
-										>
-											{t("forgot_password.email_placeholder")}
-										</label>
-										<div className="relative">
-											<Mail
-												size={18}
-												className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)]"
-											/>
-											<input
-												id="forgot-email"
-												type="email"
-												autoComplete="email"
-												required
-												placeholder={t("forgot_password.email_placeholder")}
-												value={forgotEmail}
-												onChange={(e) => setForgotEmail(e.target.value)}
-												className="input-base pl-10 pr-4"
-											/>
-										</div>
-									</div>
-									<Button
-										type="submit"
-										disabled={forgotLoading}
-										className="w-full"
-									>
-										{forgotLoading
-											? t("forgot_password.submitting")
-											: t("forgot_password.submit")}
-									</Button>
-								</form>
-							</>
-						)}
-					</motion.div>
+									{forgotMessage}
+								</div>
+							)}
+
+							<form onSubmit={handleForgotSubmit} className="mt-7 flex flex-col gap-5">
+								<div>
+									<label htmlFor="forgot-email" className="mb-2 block text-sm font-bold">
+										{t("forgot_password.email_placeholder")}
+									</label>
+									<input
+										id="forgot-email"
+										type="email"
+										autoComplete="email"
+										required
+										placeholder={t("forgot_password.email_placeholder")}
+										value={forgotEmail}
+										onChange={(e) => setForgotEmail(e.target.value)}
+										className="ink-field"
+									/>
+								</div>
+								<button
+									type="submit"
+									disabled={forgotLoading}
+									className="ink-block ink-block--press display w-full py-3.5 text-[1.15rem]"
+									style={{
+										background: "var(--surya)",
+										color: "var(--on-fill)",
+										cursor: forgotLoading ? "wait" : "pointer",
+										opacity: forgotLoading ? 0.7 : 1,
+									}}
+								>
+									{forgotLoading ? t("forgot_password.submitting") : t("forgot_password.submit")}
+								</button>
+							</form>
+						</>
+					)}
 				</div>
 			</div>
 		</div>

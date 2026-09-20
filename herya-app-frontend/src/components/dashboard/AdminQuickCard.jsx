@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import {
-	ArrowRight,
 	BarChart2,
 	BookOpen,
 	List,
@@ -12,15 +11,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAnalyticsDashboard } from "@/api/admin.api";
 import { useLanguage } from "@/context/LanguageContext";
+import "@/styles/identity.css";
 
-const StatTile = ({ icon, label, value, tone = "var(--color-primary)" }) => {
+const StatTile = ({ icon, label, value, tone = "var(--chandra)" }) => {
 	const Icon = icon;
 	return (
 		<li
-			className="rounded-2xl p-3"
+			className="ink-block p-3"
 			style={{
-				backgroundColor: "var(--color-surface)",
-				border: "1px solid var(--color-border-soft)",
+				backgroundColor: "var(--paper)",
+				border: "var(--ink-width) solid var(--ink)",
 			}}
 		>
 			<div className="flex items-center gap-2 mb-1">
@@ -28,21 +28,21 @@ const StatTile = ({ icon, label, value, tone = "var(--color-primary)" }) => {
 					aria-hidden="true"
 					className="w-7 h-7 rounded-lg flex items-center justify-center"
 					style={{
-						backgroundColor: `color-mix(in srgb, ${tone} 12%, transparent)`,
+						border: `var(--ink-width) solid ${tone}`,
 					}}
 				>
 					<Icon size={14} style={{ color: tone }} />
 				</span>
 				<p
-					className="text-[10px] font-bold uppercase tracking-[0.1em]"
-					style={{ color: "var(--color-text-muted)" }}
+					className="text-[11px] font-bold"
+					style={{ color: "var(--ink-soft)" }}
 				>
 					{label}
 				</p>
 			</div>
 			<p
 				className="text-lg font-bold"
-				style={{ color: "var(--color-text-primary)" }}
+				style={{ color: "var(--ink)" }}
 			>
 				{value}
 			</p>
@@ -56,12 +56,12 @@ const QuickAction = ({ icon, label, onClick, tone }) => {
 		<button
 			type="button"
 			onClick={onClick}
-			className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold cursor-pointer transition hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
+			className="ink-block ink-block--press flex cursor-pointer items-center gap-2 px-3 py-2 text-xs font-bold"
 			style={{
-				backgroundColor: `color-mix(in srgb, ${tone} 10%, transparent)`,
-				color: tone,
-				border: `1px solid color-mix(in srgb, ${tone} 28%, transparent)`,
-				"--tw-ring-color": tone,
+				backgroundColor: tone,
+				color: "var(--on-fill)",
+				border: "var(--ink-width) solid var(--ink)",
+				"--tw-ring-color": "var(--ink)",
 			}}
 		>
 			<Plus size={14} aria-hidden="true" />
@@ -99,24 +99,24 @@ export default function AdminQuickCard() {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.3 }}
 			aria-labelledby="admin-quick-title"
-			className="rounded-3xl p-4 shadow-[var(--shadow-card)]"
+			className="ink-block p-4"
 			style={{
-				backgroundColor: "var(--color-surface-card)",
-				border: "1px solid var(--color-border-soft)",
+				backgroundColor: "var(--paper-raised)",
+				border: "var(--ink-width) solid var(--ink)",
 			}}
 		>
 			<header className="flex items-start justify-between gap-3 mb-3">
 				<div>
 					<p
-						className="text-[11px] font-bold uppercase tracking-[0.1em]"
-						style={{ color: "var(--color-text-muted)" }}
+						className="text-[11px] font-bold"
+						style={{ color: "var(--ink-soft)" }}
 					>
 						{t("dashboard.admin_overview_label", "Admin overview")}
 					</p>
 					<h2
 						id="admin-quick-title"
 						className="font-display text-lg font-bold"
-						style={{ color: "var(--color-text-primary)" }}
+						style={{ color: "var(--ink)" }}
 					>
 						{t("dashboard.admin_overview_title", "Platform at a glance")}
 					</h2>
@@ -125,11 +125,12 @@ export default function AdminQuickCard() {
 					aria-hidden="true"
 					className="w-9 h-9 rounded-xl flex items-center justify-center"
 					style={{
-						backgroundColor:
-							"color-mix(in srgb, var(--color-primary) 12%, transparent)",
+						background: "var(--chandra)",
+						border: "var(--ink-width) solid var(--ink)",
+						borderRadius: "var(--radius-block)",
 					}}
 				>
-					<Shield size={18} style={{ color: "var(--color-primary)" }} />
+					<Shield size={18} style={{ color: "var(--on-fill)" }} />
 				</span>
 			</header>
 
@@ -148,25 +149,25 @@ export default function AdminQuickCard() {
 						icon={Users}
 						label={t("admin.dashboard_total_users")}
 						value={stats?.totalUsers ?? 0}
-						tone="var(--color-primary)"
+						tone="var(--chandra)"
 					/>
 					<StatTile
 						icon={BarChart2}
 						label={t("admin.dashboard_active_users")}
 						value={stats?.activeUsers ?? 0}
-						tone="var(--color-warning)"
+						tone="var(--surya)"
 					/>
 					<StatTile
 						icon={List}
 						label={t("admin.dashboard_total_sessions")}
 						value={stats?.totalSessions ?? 0}
-						tone="var(--color-info)"
+						tone="var(--chandra)"
 					/>
 					<StatTile
 						icon={BookOpen}
 						label={t("admin.dashboard_journal_entries")}
 						value={stats?.totalJournalEntries ?? 0}
-						tone="var(--color-secondary)"
+						tone="var(--surya)"
 					/>
 				</ul>
 			)}
@@ -180,7 +181,7 @@ export default function AdminQuickCard() {
 							icon={Users}
 							label={t("admin.tab_poses")}
 							onClick={() => goAdmin("poses")}
-							tone="var(--color-primary)"
+							tone="var(--chandra)"
 						/>
 					</li>
 					<li>
@@ -188,7 +189,7 @@ export default function AdminQuickCard() {
 							icon={List}
 							label={t("admin.tab_sequences")}
 							onClick={() => goAdmin("sequences")}
-							tone="var(--color-info)"
+							tone="var(--chandra)"
 						/>
 					</li>
 					<li>
@@ -196,7 +197,7 @@ export default function AdminQuickCard() {
 							icon={BookOpen}
 							label={t("admin.tab_breathing")}
 							onClick={() => goAdmin("breathing")}
-							tone="var(--color-secondary)"
+							tone="var(--surya)"
 						/>
 					</li>
 				</ul>
@@ -205,11 +206,10 @@ export default function AdminQuickCard() {
 			<button
 				type="button"
 				onClick={() => navigate("/admin")}
-				className="inline-flex items-center gap-1.5 text-xs font-semibold cursor-pointer rounded-md px-1 py-0.5 transition-colors hover:bg-[color-mix(in_srgb,var(--color-primary)_8%,transparent)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
-				style={{ color: "var(--color-primary)" }}
+				className="cursor-pointer text-sm font-bold underline"
+				style={{ color: "var(--ink)" }}
 			>
 				{t("dashboard.admin_open_panel", "Open admin panel")}
-				<ArrowRight size={14} aria-hidden="true" />
 			</button>
 		</motion.section>
 	);

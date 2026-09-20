@@ -1,4 +1,14 @@
 import { useEffect, useState } from "react";
+import BreathBuddy from "@/components/identity/BreathBuddy";
+import { DesktopSidebar } from "@/components/layout/AppLayout";
+import BottomNav from "@/components/layout/BottomNav";
+import { Badge, Button, Card, SkeletonCard, StatCard } from "@/components/ui";
+import AdminQuickCard from "@/components/dashboard/AdminQuickCard";
+import CalendarStrip from "@/components/dashboard/CalendarStrip";
+import HeroCard from "@/components/dashboard/HeroCard";
+import PracticeSnapshotCard from "@/components/dashboard/PracticeSnapshotCard";
+import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
+import BreathMark from "@/components/identity/BreathMark";
 import "@/styles/identity.css";
 
 /*
@@ -15,6 +25,25 @@ const BLOCKS = [
 ];
 
 const TOTAL = BLOCKS.reduce((sum, b) => sum + b.minutes, 0);
+
+// Fixtures so the dashboard cards can be reviewed without a signed-in session.
+const FIXTURE_SEQUENCE = {
+	_id: "seq1",
+	family: "tadasana",
+	level: 1,
+	englishName: "Tadasana Family - Level 1",
+	sanskritName: "Tāḍāsana",
+	difficulty: "beginner",
+	estimatedDuration: { recommended: 20 },
+};
+
+const FIXTURE_SESSIONS = [
+	{ _id: "s1", sessionType: "vk_sequence", duration: 45, completed: true, date: "2026-09-18", vkSequence: { englishName: "Standing Asymmetric - Level 2" } },
+	{ _id: "s2", sessionType: "pranayama", duration: 10, completed: true, date: "2026-09-17" },
+	{ _id: "s3", sessionType: "meditation", duration: 20, completed: false, date: "2026-09-16" },
+];
+
+const FIXTURE_DATES = ["2026-09-18", "2026-09-17", "2026-09-15", "2026-09-14"];
 
 function KramaLadder() {
 	return (
@@ -73,6 +102,18 @@ export default function IdentityProof() {
 		document.documentElement.classList.toggle("dark", dark);
 	}, [dark]);
 
+	// Walks the breath cycle so the character can be judged in motion.
+	const [phase, setPhase] = useState("inhale");
+	useEffect(() => {
+		const order = ["inhale", "hold", "exhale"];
+		let i = 0;
+		const id = setInterval(() => {
+			i = (i + 1) % order.length;
+			setPhase(order[i]);
+		}, 2200);
+		return () => clearInterval(id);
+	}, []);
+
 	return (
 		<div
 			data-identity="next"
@@ -80,7 +121,10 @@ export default function IdentityProof() {
 		>
 			<div style={{ maxWidth: "26rem", margin: "0 auto" }}>
 				<div className="mb-6 flex items-center justify-between">
-					<span className="display text-[1.05rem]">Identity proof</span>
+					<span className="flex items-center gap-2">
+						<BreathMark size={30} />
+						<span className="display text-[1.05rem]">Identity proof</span>
+					</span>
 					<button
 						type="button"
 						onClick={() => setDark((d) => !d)}
@@ -124,6 +168,70 @@ export default function IdentityProof() {
 						No colour, no character, no encouragement copy on this screen.
 					</p>
 				</section>
+
+				{/* Character — cycles through the breath phases */}
+				<section className="ink-block mt-5 flex flex-col items-center p-5">
+					<BreathBuddy
+						size={150}
+						phase={phase}
+						fill={phase === "exhale" ? "var(--chandra)" : "var(--surya)"}
+					/>
+					<p className="display mt-3 text-[1.3rem]">
+						{phase === "inhale" ? "Breathe in" : phase === "hold" ? "Hold" : "Breathe out"}
+					</p>
+					<p className="mt-1 text-[0.85rem]" style={{ color: "var(--ink-soft)" }}>
+						Ujjayi, 1:4:2 — the figure is the pacer, not a mascot.
+					</p>
+				</section>
+
+				{/* Shared UI library */}
+				<section className="mt-5 flex flex-col gap-3">
+					<div className="flex flex-wrap items-center gap-2">
+						<Button variant="primary">Primary</Button>
+						<Button variant="secondary">Secondary</Button>
+						<Button variant="accent">Accent</Button>
+					</div>
+					<div className="flex flex-wrap items-center gap-2">
+						<Button variant="outline">Outline</Button>
+						<Button variant="ghost">Ghost</Button>
+						<Button variant="primary" loading>
+							Loading
+						</Button>
+						<Button variant="primary" disabled>
+							Disabled
+						</Button>
+					</div>
+					<div className="flex flex-wrap items-center gap-2">
+						<Badge>Neutral</Badge>
+						<Badge color="var(--surya)">Surya</Badge>
+						<Badge color="var(--chandra)">Chandra</Badge>
+						<Badge color="var(--alert)">Alert</Badge>
+					</div>
+					<Card>
+						<p className="text-sm font-bold">Card — shared .section-card</p>
+					</Card>
+					<div className="grid grid-cols-2 gap-3">
+						<StatCard label="Sessions" value="42" />
+						<StatCard label="Minutes" value="320" color="var(--chandra)" />
+					</div>
+					<SkeletonCard lines={3} />
+				</section>
+
+				{/* Dashboard cards on fixture data */}
+				<section className="mt-5 flex flex-col gap-4">
+					<HeroCard sequence={FIXTURE_SEQUENCE} reason="Sigue tu progresión" loading={false} />
+					<CalendarStrip sessionDates={FIXTURE_DATES} streak={4} weekSessions={3} loading={false} />
+					<PracticeSnapshotCard streak={4} weekSessions={3} totalPracticeMinutes={320} loading={false} />
+					<AdminQuickCard />
+					{FIXTURE_SESSIONS.map((session) => (
+						<RecentSessionCard key={session._id} session={session} />
+					))}
+				</section>
+
+				{/* Navigation chrome, mounted live: the sidebar pins left at
+				    >=1024px, the bottom bar pins to the bottom below it. */}
+				<DesktopSidebar />
+				<BottomNav />
 
 				{/* Palette reference */}
 				<section className="mt-5 flex gap-2">
