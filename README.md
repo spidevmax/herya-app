@@ -28,7 +28,8 @@ be.
 .
 ├── .github/
 │   └── workflows/
-│       └── ci.yml        # lint + tests + build, one job per package
+│       └── ci.yml        # one job per package: lint, tests with coverage,
+│                          # plus a production build on the frontend
 ├── docs/
 │   └── herya-insomnia.json
 ├── herya-app-backend/
@@ -56,8 +57,8 @@ be.
 
 ## Requirements
 
-- Node.js 22.x
-- npm compatible with Node 22
+- Node.js 22 or newer — CI pins 22, and newer majors work
+- npm bundled with that Node version
 - MongoDB (local or Atlas)
 - Optional: Cloudinary for uploads
 - Optional: SMTP for password reset emails
