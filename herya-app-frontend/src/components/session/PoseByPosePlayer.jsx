@@ -22,6 +22,7 @@ import {
 	localized,
 	localizedArray,
 	localizedName,
+	translateWithFallback,
 } from "@/utils/libraryHelpers";
 
 const TABS = ["alignment", "breathing", "mistakes", "benefits"];
@@ -287,9 +288,16 @@ const PoseByPosePlayer = ({
 						<h3 className="text-lg font-semibold text-[var(--ink)]">
 							{poseName}
 						</h3>
-						{pose.name && pose.name !== poseName && (
+						{/*
+						 * Bajo el nombre traducido va la romanizacion del sanscrito
+						 * ("Prasarita Padottanasana"), que es la misma en los dos
+						 * idiomas y hace juego con el devanagari de arriba. Antes aqui
+						 * se pintaba pose.name, que es el nombre en ingles, asi que en
+						 * espanol se colaba una linea en ingles.
+						 */}
+						{pose.romanizationName && pose.romanizationName !== poseName && (
 							<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
-								{pose.name}
+								{pose.romanizationName}
 							</p>
 						)}
 
@@ -722,7 +730,18 @@ const PoseDetailPanel = ({
 						)}
 						{pose.targetMuscles?.length > 0 && (
 							<p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
-								{t("guided.target_muscles")}: {pose.targetMuscles.join(", ")}
+								{t("guided.target_muscles")}: {/*
+								 * targetMuscles llega de la base de datos en ingles
+								 * ("hamstrings"). Las traducciones viven bajo anatomy.*,
+								 * asi que se traduce cada musculo por separado antes de
+								 * unirlos. Si alguno no tiene traduccion se queda con su
+								 * nombre original en lugar de mostrar la clave.
+								 */}
+								{pose.targetMuscles
+									.map((muscle) =>
+										translateWithFallback(t, `anatomy.${muscle}`, muscle),
+									)
+									.join(", ")}
 							</p>
 						)}
 					</div>
