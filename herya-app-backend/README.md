@@ -293,6 +293,7 @@ Valid `userLevel` values: `beginner`, `intermediate`, `advanced`
 | GET | `/api/v1/sessions/stats` | ✅ user | Aggregated practice stats |
 | GET | `/api/v1/sessions/active/current` | ✅ user | Get current active guided session (if any) |
 | GET | `/api/v1/sessions/analytics/practice` | ✅ user | Get practice analytics summary |
+| GET | `/api/v1/sessions/analytics/tutor` | ✅ tutor | Tutor guiding analytics across child profiles |
 | GET | `/api/v1/sessions/:id` | ✅ user | Get session by ID |
 | PUT | `/api/v1/sessions/:id` | ✅ user | Update session |
 | DELETE | `/api/v1/sessions/:id` | ✅ user | Delete session |
@@ -327,6 +328,7 @@ Valid `sessionType` values: `vk_sequence`, `pranayama`, `meditation`, `complete_
 | GET | `/api/v1/journal-entries/:id` | ✅ user | Get entry by ID |
 | PUT | `/api/v1/journal-entries/:id` | ✅ user | Update entry |
 | DELETE | `/api/v1/journal-entries/:id` | ✅ user | Delete entry |
+| PATCH | `/api/v1/journal-entries/:id/complete` | ✅ user | Mark a check-in stub as complete |
 
 **Create entry body:**
 ```json
@@ -612,7 +614,7 @@ npm test -- --coverage
 | `users.test.js` | Profile CRUD, password change, stats |
 | `poses.test.js` | List, search, category filter, get by ID |
 | `breathingPatterns.test.js` | List, search, recommended, progression, get by ID |
-| `sessions.test.js` | CRUD, stats, auth guards |
+| `sessions.test.js` | CRUD, stats, auth guards, and keeping a tutor's own figures separate from the children they guide |
 | `journalEntries.test.js` | CRUD, auth guards |
 
 Each test suite runs in full isolation: collections are cleared between tests via `afterEach`.

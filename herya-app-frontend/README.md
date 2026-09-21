@@ -193,7 +193,7 @@ Routes are protected by two wrappers in `src/components/routing/`:
   a Spanish screen, so prefer a helper even when the Spanish value looks
   optional. Every helper falls back to the English value when the translation is
   missing, so nothing ever renders a raw key.
-- **Theme:** light / dark via `ThemeContext`, with tokens defined in [src/index.css](src/index.css) and [src/components/ui/tokens.js](src/components/ui/tokens.js).
+- **Theme:** light / dark via `ThemeContext`, which toggles a `dark` class on `<html>` and remembers the choice in `localStorage`. Tokens live in two places: [src/index.css](src/index.css) holds the Tailwind v4 `@theme` layer, and [src/styles/identity.css](src/styles/identity.css) holds the identity system. Both redefine their tokens under `html.dark`.
 
 Both contexts are mounted alongside `AuthContext` in [src/providers/Providers.jsx](src/providers/Providers.jsx).
 
@@ -269,9 +269,29 @@ with a centred FAB. The sidebar replaces it from `lg` up.
 
 Primitives live in [src/components/ui/index.jsx](src/components/ui/index.jsx) and are imported from a single barrel:
 
+**Actions and inputs**
+
 - `Button` — variants: `primary`, `secondary`, `accent`, `ghost`, `outline`
+- `ChipButton` — small pill button with an `active` state
+- `InlineLink` — link styled to sit inside a sentence
+- `Input` / `SelectField` — labelled form fields
+- `SearchBar` — search field with a clear button
+- `FilterChips` — single-choice filter row
+- `MoodSelector` — multi-choice mood picker, capped by `maxSelection`
+- `TabBar` — tab strip with roving selection
+
+**Containers and layout**
+
 - `Card` — animated card powered by Framer Motion
+- `SurfaceCard` — plain surface without the animation
+- `PageHeader` — page title plus optional description
+- `StickyHeader` — header that stays put, with a back button
+- `ConfirmModal` — confirmation dialog, with a `danger` variant for deletions
+
+**Feedback and data**
+
 - `Badge` — colored label
+- `StatCard` — icon, label and value for a single figure
 - `ProgressBar` / `CircleProgress` — linear and circular progress bars
 - `SkeletonCard` — loading placeholder
 - `LoadingSpinner` — spinner
