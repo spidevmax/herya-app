@@ -285,7 +285,9 @@ async function seedBreathingPatterns() {
 						.filter(Boolean)
 				: [];
 
-		// Helper: coerce CSV boolean values (dynamicTyping may yield true/false or "true"/"false")
+		// Turn a CSV value into a real true/false.
+		// The parser sometimes gives us a boolean and sometimes the text
+		// "true"/"false", so we accept both, plus 1 and "1".
 		const toBool = (val) => val === true || val === "true" || val === 1 || val === "1";
 
 		// Transform CSV data to BreathingPattern schema

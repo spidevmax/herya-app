@@ -156,7 +156,10 @@ function distributeAuto(corePoses, blockTotalSec, level, naturalSec) {
 	});
 	const totalWeight = weights.reduce((a, b) => a + b, 0);
 
-	// Check if minimum times are feasible
+	// Work out the least time this block could possibly take: every pose held
+	// for the minimum, counting both sides when a pose is done left and right.
+	// If even that does not fit in the time available we flag it below, because
+	// the result will be shorter than the user asked for.
 	const minRequired = corePoses.reduce((sum, cp) => {
 		const sides = isBilateral(cp) ? 2 : 1;
 		return sum + MIN_POSE_SEC * sides;
@@ -176,7 +179,9 @@ function distributeAuto(corePoses, blockTotalSec, level, naturalSec) {
 		MAX_POSE_RATIO,
 	);
 
-	// Apply minimums
+	// The shares above are exact fractions, and some may be below the minimum
+	// hold time. This raises those to the minimum, rounds everything to whole
+	// seconds, and adjusts so the parts still add up to the block total.
 	const poses = applyMinimumsAndRound(
 		corePoses,
 		rawAllocations,
@@ -194,10 +199,15 @@ function distributeAuto(corePoses, blockTotalSec, level, naturalSec) {
 	};
 }
 
-// Iteratively cap any allocation that exceeds maxRatio of total, redistributing
-// the excess proportionally to the remaining (non-capped) poses. The cap only
-// engages when there are enough other poses to absorb the excess without
-// violating their own minimums — with 1 or 2 poses, the cap is a no-op so the
+// Stops one pose from taking over a short block.
+//
+// If a pose is given more than maxRatio of the total time, we trim it back to
+// that limit and share the leftover seconds among the other poses, in the same
+// proportions they already had. Trimming one pose can push another over the
+// limit, so this repeats until nothing is over.
+//
+// With only one or two poses there is nobody to hand the leftover time to
+// without dropping them under their own minimum, so the limit is skipped and
 // natural ratio (e.g. 2:1) is preserved.
 function capDominantAllocations(allocations, total, maxRatio) {
 	if (allocations.length < 3 || total <= 0) return allocations.slice();

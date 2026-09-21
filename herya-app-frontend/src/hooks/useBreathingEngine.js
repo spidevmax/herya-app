@@ -38,7 +38,15 @@ const useBreathingEngine = ({
 	const intervalRef = useRef(null);
 	const lastTickRef = useRef(null);
 
-	// Callback refs to avoid stale closures
+	/*
+	 * Keep the latest version of each callback in a ref.
+	 *
+	 * The timer below is set up once and then runs for the whole session. If it
+	 * called onPhaseChange directly it would keep calling the very first one it
+	 * saw, even after the parent passes a new function on a later render. By
+	 * reading from a ref that we keep updated, the timer always calls the
+	 * newest one.
+	 */
 	const onPhaseChangeRef = useRef(onPhaseChange);
 	const onCycleCompleteRef = useRef(onCycleComplete);
 	const onCompleteRef = useRef(onComplete);
@@ -127,11 +135,13 @@ const useBreathingEngine = ({
 			const nextElapsed = s.phaseElapsed + dt;
 
 			if (nextElapsed >= dur) {
-				// Phase complete
+				// This phase (inhale, hold, exhale...) has run its full length,
+				// so move to the next one. The % wraps back to 0 after the last
+				// phase, which is how we know a whole breath has finished.
 				const nextIdx = (s.phaseIdx + 1) % activePhases.length;
 
 				if (nextIdx === 0) {
-					// Cycle complete
+					// Back at the first phase, so one complete breath is done.
 					const newCount = s.completedCycles + 1;
 					s.completedCycles = newCount;
 					setCompletedCycles(newCount);

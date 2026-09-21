@@ -57,7 +57,9 @@ const Library = () => {
 
 	const deferredQuery = useDeferredValue(query.trim().toLowerCase());
 
-	// ── Sync state → URL (debounced via deferred query) ─────────────────────
+	// ── Keep the address bar in step with the filters ───────────────────────
+	// deferredQuery (above) lags a moment behind what the user is typing, so
+	// the URL is not rewritten on every single keystroke.
 	useEffect(() => {
 		const params = new URLSearchParams();
 		if (tab !== "all") params.set("tab", tab);

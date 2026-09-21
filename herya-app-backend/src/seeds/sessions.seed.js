@@ -172,8 +172,10 @@ async function seedSessions() {
 				sessionData.completePractice = {
 					mainSequences: [sequence._id],
 					...(breathingPattern && { pranayama: breathingPattern._id }),
-					// NOTE: completePractice.meditation.type is a reserved Mongoose key;
-					// skip it in the seed to avoid a cast error.
+					// We leave completePractice.meditation.type out on purpose.
+					// Mongoose treats a field called "type" as a way of declaring
+					// what kind of data a field holds, not as a field of its own,
+					// so setting it here makes the save fail.
 				};
 			}
 

@@ -447,8 +447,12 @@ const breathingPatternSchema = new mongoose.Schema(
 	{
 		timestamps: true,
 		versionKey: false,
-		toJSON: { virtuals: true }, // Important for virtuals to be included in API responses
-		toObject: { virtuals: true }, // Important for virtuals to be included when converting to objects
+		// Virtuals are fields worked out from other fields instead of being
+		// stored in the database. They are left out by default when a document
+		// is turned into JSON or a plain object, so these two lines switch them
+		// back on and the API sends them with the rest of the data.
+		toJSON: { virtuals: true },
+		toObject: { virtuals: true },
 	},
 );
 

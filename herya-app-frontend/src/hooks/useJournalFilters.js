@@ -18,9 +18,12 @@ const parseDatePreset = (value) => {
 };
 
 /**
- * Manages all journal filter state, URL synchronisation, and derived
- * filtered/sorted results. Designed to be the single source of truth
- * between the URL and the UI.
+ * Holds everything to do with filtering the journal: the chosen filters, the
+ * filtered and sorted list, and keeping the address bar in step with them.
+ *
+ * All of it lives here rather than in the page so there is only one place that
+ * decides what the filters are. If the page also kept its own copy, the two
+ * could disagree and the list would stop matching the URL.
  */
 export const useJournalFilters = (entriesWithId) => {
 	const [searchParams, setSearchParams] = useSearchParams();
