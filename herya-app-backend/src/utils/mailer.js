@@ -2,6 +2,16 @@ const nodemailer = require("nodemailer");
 
 const parseBoolean = (value) => `${value}`.toLowerCase() === "true";
 
+/*
+ * The logo follows the deployed frontend rather than a raw.githubusercontent
+ * link: that URL pointed at the wrong account and returned 404, and it would
+ * break anyway if the repository ever stopped being public.
+ */
+const logoUrl = () => {
+	const base = process.env.FRONTEND_URL || "http://localhost:5173";
+	return `${base.replace(/\/$/, "")}/apple-touch-icon.png`;
+};
+
 const normalizeLocale = (value) => {
 	const short = `${value || "es"}`.toLowerCase().split("-")[0];
 	return short === "en" ? "en" : "es";
@@ -60,7 +70,7 @@ const buildPasswordResetEmail = ({ locale, name, resetUrl }) => {
 			<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:620px;margin:0 auto;background:#fff;border:1px solid #e0e7ef;border-radius:20px;box-shadow:0 18px 44px rgba(26,35,126,0.10);overflow:hidden;">
 				<tr>
 					<td style="padding:28px 28px 8px;text-align:center;">
-						<img src="https://raw.githubusercontent.com/marinalopezsanchez/herya-app/main/herya-app-frontend/public/apple-touch-icon.png" alt="Herya logo" width="48" height="48" style="border-radius:12px;box-shadow:0 2px 8px #eaf1ff;margin-bottom:8px;" />
+						<img src="${logoUrl()}" alt="Herya logo" width="48" height="48" style="border-radius:12px;box-shadow:0 2px 8px #eaf1ff;margin-bottom:8px;" />
 						<h1 style="margin:12px 0 4px;font-size:30px;letter-spacing:1.5px;color:#1a237e;font-family:'Inter',Arial,sans-serif;">Herya</h1>
 						<p style="margin:0 0 8px;font-size:13px;color:#3d5a80;">${copy.brandLine}</p>
 					</td>
