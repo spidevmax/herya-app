@@ -14,10 +14,7 @@ export default defineConfig({
 		globals: true,
 		environment: "jsdom",
 		setupFiles: ["./src/test/setup.js"],
-		exclude: [
-			"**/node_modules/**",
-			"**/dist/**",
-		],
+		exclude: ["**/node_modules/**", "**/dist/**"],
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "json", "html", "lcov"],
@@ -30,18 +27,24 @@ export default defineConfig({
 				"src/index.css",
 			],
 			/*
-			 * These must live under `thresholds`. Declared directly on
-			 * `coverage` they are silently ignored, which is how a documented
-			 * 70% gate sat inert over a suite at 25%.
+			 * Minimum coverage. If a run drops below any of these numbers the
+			 * command fails, so tests can't silently stop covering things.
 			 *
-			 * Set below the current numbers so the gate ratchets: it blocks
-			 * regressions today, and each batch of new tests should raise it.
-			 * They are a floor, not a target.
+			 * These options have to be inside `thresholds`. They used to be
+			 * written one level up, directly on `coverage`, where Vitest simply
+			 * ignores them. That is why the project claimed a 70% minimum for a
+			 * long time while the real coverage was around 25% and nothing ever
+			 * failed.
 			 *
-			 * Functions and branches carry extra headroom on purpose. Readings
-			 * of 28.6% / 53.2% have been observed against a steady 32.2% / 55.5%
-			 * while files were being edited, and a gate that trips at random is
-			 * a gate someone eventually deletes.
+			 * The numbers are set a bit BELOW what we currently reach, on
+			 * purpose. They are a floor to stop things getting worse, not a
+			 * goal. Raise them each time you add a batch of tests.
+			 *
+			 * Functions and branches have more slack than the others because
+			 * their measured value moves around a little between runs (we saw
+			 * 28.6% and 53.2% against a usual 32.2% and 55.5%). If the numbers
+			 * were tight, a run could fail without anyone changing the code,
+			 * and a check that fails for no reason is a check people turn off.
 			 */
 			thresholds: {
 				lines: 25,

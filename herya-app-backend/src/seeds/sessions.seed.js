@@ -109,17 +109,20 @@ async function seedSessions() {
 		}
 
 		/*
-		 * Ownership comes from the CSV. It used to come from User.findOne(),
-		 * which returns the admin created first in users.seed — an account the
-		 * router keeps away from /sessions and /journal, so every seeded
-		 * practice was invisible to every account a person can actually use.
+		 * Which user each session belongs to is read from the CSV.
+		 *
+		 * It used to use User.findOne(), which returns whichever user was saved
+		 * first. That is always the admin, because users.seed creates it before
+		 * the ones in the CSV. The app hides /sessions and /journal from admins,
+		 * so all the seeded practice existed but nobody could see it.
 		 */
 		const emails = [...new Set(data.map((row) => row.userEmail).filter(Boolean))];
 		const owners = await User.find({ email: { $in: emails } }, { _id: 1, email: 1 }).lean();
 		const userIdByEmail = new Map(owners.map((u) => [u.email, u._id]));
 
-		// Dates are laid out per owner so each one ends on today and runs back
-		// day by day — otherwise a shared counter leaves gaps and no streak.
+		// Give each user their own run of dates, ending today and going back one
+		// day at a time. If we used a single counter for everyone, each user
+		// would end up with gaps between their sessions and no streak.
 		const rowsByEmail = new Map();
 		for (const row of data) {
 			if (!rowsByEmail.has(row.userEmail)) rowsByEmail.set(row.userEmail, []);

@@ -9,13 +9,13 @@ export const DIFF_COLORS = {
 	advanced: "var(--surya)",
 };
 
-// Text colour for content sitting on DIFF_COLORS. Kept as a separate map so
-// a fill and its foreground can never drift apart — an ink fill with ink text
-// renders as a blank chip.
 /*
- * Accent colours for outlines and text. Distinct from DIFF_COLORS, which are
- * FILLS: passing a fill where an outline is expected renders an invisible
- * border, which is how the beginner badge disappeared on the admin screen.
+ * Colours for borders and text, NOT for backgrounds.
+ *
+ * DIFF_COLORS holds background colours, and one of them is the same light
+ * colour as the card behind it. When that was used as a border colour the
+ * border became invisible, and the "beginner" badge looked empty on the admin
+ * screen. Use this map whenever you need a border or a text colour.
  */
 export const DIFF_ACCENTS = {
 	beginner: "var(--ink)",
@@ -23,6 +23,14 @@ export const DIFF_ACCENTS = {
 	advanced: "var(--surya)",
 };
 
+/*
+ * Text colour to use when the text sits ON TOP of a DIFF_COLORS background.
+ *
+ * Keep this map next to DIFF_COLORS: if you change a background there, come
+ * here and check the text still contrasts with it. When the two lived in one
+ * place it was easy to set a dark background and leave the text dark too,
+ * which made the text disappear.
+ */
 export const DIFF_FG = {
 	beginner: "var(--ink)",
 	intermediate: "var(--on-fill)",
@@ -30,7 +38,12 @@ export const DIFF_FG = {
 };
 
 // ── Safe opacity via color-mix ──────────────────────────────────────────────
-// Replaces the broken `${color}18` hex-append pattern that fails with CSS vars.
+// Makes a colour see-through by a given percentage.
+//
+// The old way was to stick two hex digits on the end of a colour, like
+// `${color}18`. That only works when the colour is a plain hex string. Our
+// colours are CSS variables such as `var(--surya)`, so `var(--surya)18` is not
+// valid CSS and the browser just ignores it.
 export const colorMix = (color, pct) =>
 	`color-mix(in srgb, ${color} ${pct}%, transparent)`;
 

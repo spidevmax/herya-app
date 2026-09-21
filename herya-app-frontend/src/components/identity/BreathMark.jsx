@@ -9,9 +9,10 @@
  * Single stroke weight, no fill, no gradient: legible down to favicon size
  * and recolourable straight from the identity tokens.
  *
- * The two arcs must stay distinguishable from each other AND from whatever
- * they sit on, so both are overridable. On a chandra ground, pass
- * cool="var(--on-fill)" — otherwise that arc vanishes into the background.
+ * Both arc colours can be overridden, because each arc has to be visible
+ * against whatever is behind it. For example, on a blue (chandra) panel the
+ * blue arc would blend into the background and disappear, so there you pass
+ * cool="var(--on-fill)" to draw it in dark ink instead.
  */
 const BreathMark = ({
 	size = 48,

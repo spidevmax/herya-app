@@ -30,8 +30,11 @@ const formatTime = (sec) => {
 };
 
 /*
- * Breath-channel palette per profile style. `fg` is paired with `bg` so the
- * two can never drift apart and render unreadable text on a fill.
+ * Colours for each breathing style.
+ *
+ * `bg` is the background and `fg` is the text that goes on top of it. They are
+ * written together so that changing one makes you look at the other: a light
+ * background with light text is unreadable.
  */
 const PALETTE_TINTS = {
 	warm: { bg: "var(--surya)", accent: "var(--surya)", fg: "var(--on-fill)" },

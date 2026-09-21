@@ -7,11 +7,13 @@ on:
     branches: [main]
 
 jobs:
-  # This job used to be gated on
+  # This job used to only run when the condition below was true:
   #   contains(github.event.head_commit.modified, 'herya-app-frontend/')
-  # but `modified` is an array of full file paths, and contains() matches whole
-  # elements — never the 'herya-app-frontend/' prefix. The condition was always
-  # false on push, so the frontend was only ever checked on pull requests.
+  #
+  # That never worked. `modified` is a list of full file paths such as
+  # "herya-app-frontend/src/App.jsx", and contains() looks for a whole matching
+  # item in the list, not a prefix. So the condition was always false on a push
+  # and the frontend was only checked on pull requests.
   frontend:
     runs-on: ubuntu-latest
     defaults:

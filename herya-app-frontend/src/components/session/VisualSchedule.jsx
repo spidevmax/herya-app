@@ -15,7 +15,8 @@ const BLOCK_COLORS = {
 	meditation: "var(--ink)",
 };
 
-// Paired with BLOCK_COLORS so a fill and its text can never drift apart.
+// Text colour for each block type, to use on top of BLOCK_COLORS.
+// Meditation uses a dark background, so its text has to be light.
 const BLOCK_FG = {
 	vk_sequence: "var(--on-fill)",
 	pranayama: "var(--on-fill)",

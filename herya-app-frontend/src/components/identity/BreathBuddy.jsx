@@ -11,9 +11,12 @@
  *
  * `phase` is "inhale" | "hold" | "exhale". Eyes close on the hold.
  *
- * `outline` exists because the figure usually sits ON a colour fill, where
- * theme ink would turn near-white in dark mode and wash the character out.
- * On a colour panel pass "var(--on-fill)"; on paper leave the default.
+ * `outline` is the colour of the character's lines.
+ *
+ * The default (--ink) becomes almost white in dark mode. That is fine on a
+ * normal page, but the character usually sits on a coloured panel, where a
+ * near-white outline looks faded. On a coloured panel pass "var(--on-fill)",
+ * which stays dark in both themes.
  */
 const BreathBuddy = ({
 	size = 140,

@@ -17,9 +17,11 @@ async function seedJournalEntries() {
 		}
 
 		/*
-		 * Entries follow their session's owner instead of User.findOne(), so a
-		 * reflection can never end up on a different account than the practice
-		 * it describes — and never on the admin, which cannot open /journal.
+		 * Each entry belongs to the same user as the session it describes.
+		 *
+		 * We read the owner from the session instead of looking a user up
+		 * separately. That way a journal entry can never end up on a different
+		 * account than the practice it talks about.
 		 */
 		const sessions = await Session.find({}, { _id: 1, user: 1 }).sort({ date: 1 }).lean();
 

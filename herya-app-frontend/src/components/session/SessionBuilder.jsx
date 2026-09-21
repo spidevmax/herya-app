@@ -306,9 +306,10 @@ const SessionBuilder = ({
 
 	const blockTypeLabel = (bt) => t(`practice.type_${bt}`);
 
-	// Paired with blockTypeColor: meditation fills with ink, so its text must
-	// be paper. Keeping fill and foreground together stops them drifting apart
-	// and rendering a blank chip.
+	// Text colour to use on top of the background from blockTypeColor.
+	// Meditation gets a dark background, so its text has to be light; the
+	// other two get light backgrounds and dark text. Keep these two functions
+	// together so a change to one makes you check the other.
 	const blockTypeFg = (bt) =>
 		bt === "meditation" ? "var(--paper)" : "var(--on-fill)";
 

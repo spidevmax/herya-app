@@ -67,12 +67,19 @@ const useSessionTimer = (blocks = []) => {
 	}, [isRunning, tick]);
 
 	/*
-	 * Auto-advance block when block time expires. The omitted dependencies are
-	 * deliberate: this effect re-runs every tick through blockElapsedSec, so the
-	 * closure over currentBlockIndex is never stale, and listing it would re-fire
-	 * the check on each advance instead of only when a block's time runs out.
+	 * Moves on to the next block when the current one runs out of time.
+	 *
+	 * The linter wants currentBlockIndex, blocks.length and goToBlock listed in
+	 * the array below, and we leave them out on purpose:
+	 *
+	 * - blockElapsedSec changes every quarter of a second while the session is
+	 *   running, so this effect already runs again and again. Each run reads
+	 *   the newest values, so they never go out of date.
+	 * - If we added currentBlockIndex, the effect would also run the moment we
+	 *   move to a new block, and it would immediately check the time again.
+	 *   We only want that check when the clock says the block is over.
 	 */
-	// biome-ignore lint/correctness/useExhaustiveDependencies: see above
+	// biome-ignore lint/correctness/useExhaustiveDependencies: explained above
 	useEffect(() => {
 		if (!isRunning || !currentBlock) return;
 		if (

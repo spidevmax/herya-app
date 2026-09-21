@@ -27,12 +27,15 @@
 	--surya: #f2a03d; /* warming, inhalation, effort */
 	--chandra: #5b8def; /* cooling, exhalation, rest */
 
-	/* Both channel hues stay light in either theme, so text sitting ON them
-	   is always dark ink. This token must never flip with the theme. */
+	/* Use this for text that sits on top of --surya or --chandra.
+	   Those two colours stay light in both the light and the dark theme, so
+	   text on them always has to be dark. Unlike --ink, this one never
+	   changes when the theme changes. */
 	--on-fill: #1b1e3c;
 
-	/* Colour of the hard offset. Separate from --ink so dark mode can use a
-	   deep shade instead of a near-white one, which would read as a glow. */
+	/* Colour of the offset shadow behind cards and buttons.
+	   It is separate from --ink because in dark mode --ink becomes almost
+	   white, and a white shadow looks like a glow instead of a shadow. */
 	--edge: var(--ink);
 
 	/* ── Alert ── */

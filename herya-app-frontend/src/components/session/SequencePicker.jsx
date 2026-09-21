@@ -144,10 +144,14 @@ const SequencePicker = ({ sequences = [], selectedId, onSelect }) => {
 										style={{ borderColor: "var(--ink)" }}
 									>
 										{/*
-										 * Two sibling buttons instead of a preview control nested
-										 * inside the select button: nested interactive elements are
-										 * invalid HTML, which is why the preview was a span with
-										 * role="button" and hand-rolled key handling.
+										 * Two buttons side by side: one to pick the sequence, one
+										 * to preview it.
+										 *
+										 * HTML does not allow a button inside another button, so the
+										 * preview used to be a <span> pretending to be a button, with
+										 * its own keyboard handling written by hand. Splitting them
+										 * means both can be real buttons and the browser handles the
+										 * keyboard for us.
 										 */}
 										<div className="flex w-full items-center gap-2 px-3 py-2.5">
 											<button
