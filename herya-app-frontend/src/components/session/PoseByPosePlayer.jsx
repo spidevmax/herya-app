@@ -520,7 +520,13 @@ const PoseDetailPanel = ({
 			style={{ borderColor: "var(--ink)" }}
 		>
 			{/* Tabs */}
-			<div className="flex gap-0.5 px-3 pt-2 overflow-x-auto" role="tablist">
+			{/*
+			 * py-2 en lugar de pt-2: el anillo de foco del teclado sobresale 5px
+			 * por fuera del boton (2px de borde mas 3px de separacion). Como la
+			 * fila lleva overflow-x-auto y el navegador no permite recortar solo
+			 * en horizontal, sin hueco abajo el anillo se cortaba por la mitad.
+			 */}
+			<div className="flex gap-0.5 px-3 py-2 overflow-x-auto" role="tablist">
 				{TABS.map((tab) => (
 					<button
 						key={tab}
