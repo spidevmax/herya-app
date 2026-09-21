@@ -10,10 +10,25 @@ Herya is a full-stack yoga practice platform for personalized Vinyasa Krama sess
 
 ---
 
+## Why one repository
+
+The frontend and backend live in the same repository, each in its own folder.
+They almost always change together — a new endpoint usually arrives with the
+screen that calls it — so keeping them here means one commit tells the whole
+story instead of two that have to be read side by side. They still deploy
+separately, the frontend to Vercel and the backend to Render, and each has its
+own `package.json`, tests and lint config, so nothing is coupled that should not
+be.
+
+---
+
 ## Repository Structure
 
 ```
 .
+├── .github/
+│   └── workflows/
+│       └── ci.yml        # lint + tests + build, one job per package
 ├── docs/
 │   └── herya-insomnia.json
 ├── herya-app-backend/
@@ -115,12 +130,12 @@ inserts the rows through the matching Mongoose model.
 | --- | --- | --- |
 | `poses` | 26 | `poses.csv` |
 | `vksequences` | 21 | `sequences.csv` |
-| `breathingpatterns` | 16 | `breathingPatterns.csv` |
+| `breathingpatterns` | 16 | `breathingPatterns.csv` (9) + `SUPPLEMENTAL_PATTERNS` (7) |
 | `sessiontemplates` | 14 | `sessionTemplates.csv` |
 | `childprofiles` | 10 | `childProfiles.csv` |
 | `sessions` | 8 | `sessions.csv` |
 | `journalentries` | 8 | `journalEntries.csv` |
-| `users` | 7 | `users.csv` (+ generated admin) |
+| `users` | 7 | `users.csv` (6) + generated admin (1) |
 | **Total** | **110** | |
 
 ### Seed order
@@ -148,12 +163,25 @@ keeps the CSV files readable and diff-friendly.
 
 ### CSV conventions
 
-- Multi-value cells are comma-separated inside quotes, e.g. `"loud noises,bright lights"`.
+- Lists are separated by a pipe inside quotes, e.g.
+  `"lung capacity|mental alertness"`. A few free-text columns use commas
+  instead — `knownTriggers` in `childProfiles.csv` and `goals` in `users.csv`.
+- Nested lists are packed into one cell, since CSV has no nested columns.
+  `alignmentKeyPoints` in `poses.csv` separates points with `|` and the five
+  parts of each point with `~`:
+  `area ~ instruction ~ instructionEs ~ commonMistake ~ commonMistakeEs`.
+- User-facing text is bilingual, stored in paired columns: `benefits` next to
+  `benefitsEs`, `warnings` next to `warningsEs`. English is the fallback, so a
+  Spanish column may be left empty. Free text that belongs to a person — session
+  notes, journal entries — is not paired, and follows the owner's `language`
+  in `users.csv`.
 - `sessionTemplates.csv` is normalised **one row per block**, grouped by
   `templateKey`; a template with three blocks spans three rows. That is why it
   has 25 rows but produces 14 documents.
-- Every seed is idempotent: it checks `countDocuments()` first and skips if the
-  collection is already populated.
+- `npm run seed` drops the database first, so it always rebuilds from scratch.
+  Five of the scripts also skip when their collection is already populated,
+  which only matters if you run one of them on its own; the other three upsert
+  by natural key instead.
 
 ---
 
@@ -178,6 +206,23 @@ keeps the CSV files readable and diff-friendly.
 - `npm test` — Run Vitest
 - `npm run test:coverage` — Run tests with coverage
 - `npm run test:watch` — Vitest watch mode
+
+---
+
+## Tests and CI
+
+| Package | Runner | Tests |
+|---|---|---|
+| Frontend | Vitest + Testing Library | 198 across 17 files |
+| Backend | Jest + Supertest + mongodb-memory-server | 124 across 8 suites |
+
+The backend suite spins up an in-memory MongoDB, so running it never touches a
+real database.
+
+`.github/workflows/ci.yml` runs on every push and pull request, with one job per
+package: install, lint, tests with coverage, and then a production build for the
+frontend. Both packages have coverage floors that fail the build if they drop,
+set just under what the suites currently reach.
 
 ---
 
