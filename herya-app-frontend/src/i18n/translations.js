@@ -53,7 +53,7 @@ export const translations = {
 			profile: "Profile",
 		},
 		fab: {
-			vk_sequence: "Start Practice",
+			vk_sequence: "Start practice",
 			pranayama: "Pranayama",
 			meditation: "Meditation",
 			complete_practice: "Complete Practice",
@@ -375,7 +375,7 @@ export const translations = {
 				"Start your first VK session to get personalised recommendations.",
 			explore: "Explore Library",
 			recommended: "Recommended for you",
-			start: "Start Practice",
+			start: "Start practice",
 			view_details: "View details",
 		},
 		session: {
@@ -388,7 +388,7 @@ export const translations = {
 			pre_mood: "How are you feeling? (pick up to 3)",
 			pre_energy: "Energy level: {n}/10",
 			pre_duration: "Duration: {n} min",
-			begin: "Begin Practice",
+			begin: "Start practice",
 			active_title: "Practice in Progress",
 			active_minutes: "{n} minutes",
 			finish: "Finish Practice",
@@ -503,7 +503,7 @@ export const translations = {
 				"This sequence has no poses assigned yet in the backend data.",
 			key_poses: "Key Poses",
 			minutes: "min",
-			start: "Start This Practice",
+			start: "Start this practice",
 			view_pose: "View pose",
 			enter_from: "Enter from {pose}",
 			return_to: "Return to {pose}",
@@ -1022,7 +1022,7 @@ export const translations = {
 			photo_alt: "Entry photo {n}",
 		},
 		practice: {
-			start_practice: "Start Practice",
+			start_practice: "Start practice",
 			select_type_title: "Choose a practice",
 			select_type_subtitle: "Select the type of practice you want to do today",
 			type_vk_sequence: "Vinyasa Krama",
@@ -1052,8 +1052,8 @@ export const translations = {
 			reco_applied: "Applied automatically based on recent entries.",
 			preset_adult: "Adult start",
 			preset_tutor: "Tutor + child",
-			preset_tutor_hint:
-				"Auto-enables check-in and keeps sessions shorter and calmer.",
+			preset_hint:
+				"Tutor + child caps the session at {n} minutes, turns on check-in, and lowers stimulation. Adult start applies no caps.",
 			low_stim_mode: "Low stimulation",
 			low_stim_mode_hint: "Fewer cues, less motion, and softer feedback.",
 			change_type: "← Change type",
@@ -1084,7 +1084,7 @@ export const translations = {
 			checkin_stress: "Stress: {n}/10",
 			checkin_intention: "One intention (optional)",
 			checkin_intention_placeholder: "A word or short phrase",
-			begin_practice: "Begin Practice",
+			begin_practice: "Start practice",
 			aria_play: "Play",
 			aria_pause: "Pause",
 			aria_prev_block: "Previous block",
@@ -1212,6 +1212,7 @@ export const translations = {
 			add_child: "Add child",
 			no_children: "No child profiles yet",
 			child_age: "{n} years old",
+			child_stats: "{streak}-day streak · {minutes} min total",
 			edit_child: "Edit child",
 			edit_child_title: "Edit child profile",
 			new_child_title: "New child profile",
@@ -1375,7 +1376,7 @@ export const translations = {
 			profile: "Perfil",
 		},
 		fab: {
-			vk_sequence: "Iniciar práctica",
+			vk_sequence: "Empezar práctica",
 			pranayama: "Pranayama",
 			meditation: "Meditación",
 			complete_practice: "Práctica completa",
@@ -2351,7 +2352,7 @@ export const translations = {
 			photo_alt: "Foto de la entrada {n}",
 		},
 		practice: {
-			start_practice: "Iniciar Práctica",
+			start_practice: "Empezar práctica",
 			select_type_title: "Elige una práctica",
 			select_type_subtitle:
 				"Selecciona el tipo de práctica que quieres hacer hoy",
@@ -2383,8 +2384,8 @@ export const translations = {
 			reco_applied: "Aplicada automáticamente según tus entradas recientes.",
 			preset_adult: "Inicio adulto",
 			preset_tutor: "Tutor + niño",
-			preset_tutor_hint:
-				"Activa check-in automáticamente y mantiene la sesión más corta y calmada.",
+			preset_hint:
+				"Tutor + niño limita la sesión a {n} minutos, activa el check-in y reduce los estímulos. Inicio adulto no aplica límites.",
 			low_stim_mode: "Baja estimulación",
 			low_stim_mode_hint:
 				"Menos indicaciones, menos movimiento y feedback más suave.",
@@ -2416,7 +2417,7 @@ export const translations = {
 			checkin_stress: "Estrés: {n}/10",
 			checkin_intention: "Una intención (opcional)",
 			checkin_intention_placeholder: "Una palabra o frase corta",
-			begin_practice: "Comenzar Práctica",
+			begin_practice: "Empezar práctica",
 			aria_play: "Reproducir",
 			aria_pause: "Pausar",
 			aria_prev_block: "Bloque anterior",
@@ -2547,6 +2548,7 @@ export const translations = {
 			add_child: "Añadir niño",
 			no_children: "Aún no hay perfiles de niños",
 			child_age: "{n} años",
+			child_stats: "Racha de {streak} días · {minutes} min en total",
 			edit_child: "Editar niño",
 			edit_child_title: "Editar perfil del niño",
 			new_child_title: "Nuevo perfil de niño",

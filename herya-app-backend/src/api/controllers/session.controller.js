@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Session = require("../models/Session.model");
 const VKSequence = require("../models/VinyasaKramaSequence.model");
 const User = require("../models/User.model");
@@ -5,6 +6,38 @@ const JournalEntry = require("../models/JournalEntry.model");
 const { sendResponse } = require("../../utils/sendResponse");
 const { createError } = require("../../utils/createError");
 const { deleteImgCloudinary } = require("../../utils/deleteImage");
+
+const MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
+
+/**
+ * Turns a date into "the day it happened", ignoring the time of day and the
+ * server's timezone. Two sessions on the same calendar day (UTC) give the same
+ * number, so we can compare days by subtracting.
+ */
+const toUtcDay = (value) => {
+	const date = new Date(value);
+	return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+};
+
+/**
+ * Counts how many days in a row someone practised, ending on their most recent
+ * practice day. Several sessions on the same day only count once.
+ *
+ * Returns 0 for an empty list.
+ */
+const calculateStreakFromDates = (dates) => {
+	if (!dates || dates.length === 0) return 0;
+
+	// Unique practice days, newest first.
+	const days = [...new Set(dates.map(toUtcDay))].sort((a, b) => b - a);
+
+	let streak = 1;
+	for (let i = 1; i < days.length; i += 1) {
+		if (days[i - 1] - days[i] !== MILLIS_PER_DAY) break;
+		streak += 1;
+	}
+	return streak;
+};
 
 /**
  * Controller: createSession
@@ -387,9 +420,31 @@ const getSessionStats = async (req, res, next) => {
 		// Get user for basic stats
 		const user = await User.findById(req.user._id);
 
+		// Whose practice are we reporting on? A tutor's account holds both their
+		// own sessions and the ones they guided for a child. Child sessions
+		// carry a childProfile id; the tutor's own do not.
+		//
+		// By default we answer "how is MY practice going", so we ask for
+		// sessions with no childProfile. Passing ?childProfile=<id> asks about
+		// one child instead.
+		//
+		// Note: in MongoDB, matching a field against null also matches documents
+		// where the field was never set, which is exactly what we need here.
+		const childId = req.query.childProfile || null;
+
+		// An id that is not a valid ObjectId would make the database throw a
+		// cast error, which would surface as a confusing 500. Reject it here.
+		if (childId && !mongoose.Types.ObjectId.isValid(childId)) {
+			return next(createError(400, "Invalid childProfile id"));
+		}
+
+		// Sessions are always matched with user: req.user._id as well, so asking
+		// about a child that belongs to someone else simply returns nothing.
+		const scopeFilter = { childProfile: childId };
+
 		// Aggregate sessions by type
 		const sessionsByType = await Session.aggregate([
-			{ $match: { user: req.user._id, completed: true } },
+			{ $match: { user: req.user._id, completed: true, ...scopeFilter } },
 			{ $group: { _id: "$sessionType", count: { $sum: 1 } } },
 		]);
 
@@ -401,6 +456,7 @@ const getSessionStats = async (req, res, next) => {
 			user: req.user._id,
 			completed: true,
 			date: { $gte: fourWeeksAgo },
+			...scopeFilter,
 		}).populate("vkSequence");
 
 		// Count sessions per week
@@ -435,6 +491,10 @@ const getSessionStats = async (req, res, next) => {
 			recentSessions.length > 0 ? Math.round(totalMinutes / recentSessions.length) : 0;
 
 		// Tutor support insights from the last 4 weeks.
+		//
+		// Deliberately NOT scoped by childProfile: this block measures how the
+		// tutor is doing at guiding, so it should look across every child they
+		// guide. Only the personal figures above are scoped.
 		const tutorSessions = await Session.find({
 			user: req.user._id,
 			date: { $gte: fourWeeksAgo },
@@ -670,10 +730,44 @@ const getSessionStats = async (req, res, next) => {
 
 		tutorInsights.recommendationOutcome = recommendationOutcome;
 
-		return sendResponse(res, 200, true, "Stats retrieved successfully", {
+		// The running totals and streak are stored on the User document, and are
+		// only ever updated for the tutor's own practice. So they answer the
+		// default question, but they cannot answer one about a child. When a
+		// child is asked about, we work the same numbers out from their
+		// sessions instead.
+		let totals = {
 			totalSessions: user.totalSessions,
 			totalMinutes: user.totalMinutes,
 			currentStreak: user.currentStreak,
+			lastPracticeDate: user.lastPracticeDate,
+		};
+
+		if (childId) {
+			const childSessions = await Session.find({
+				user: req.user._id,
+				childProfile: childId,
+				completed: true,
+			})
+				.select("duration date")
+				.lean();
+
+			const childDates = childSessions.map((session) => session.date);
+
+			totals = {
+				totalSessions: childSessions.length,
+				totalMinutes: childSessions.reduce((sum, session) => sum + (session.duration || 0), 0),
+				currentStreak: calculateStreakFromDates(childDates),
+				lastPracticeDate:
+					childDates.length > 0
+						? new Date(Math.max(...childDates.map((date) => new Date(date))))
+						: null,
+			};
+		}
+
+		return sendResponse(res, 200, true, "Stats retrieved successfully", {
+			totalSessions: totals.totalSessions,
+			totalMinutes: totals.totalMinutes,
+			currentStreak: totals.currentStreak,
 			sessionsByType: sessionsByType.reduce((acc, item) => {
 				acc[item._id] = item.count;
 				return acc;
@@ -682,7 +776,7 @@ const getSessionStats = async (req, res, next) => {
 			mostPracticedFamilies,
 			avgDuration,
 			tutorInsights,
-			lastPracticeDate: user.lastPracticeDate,
+			lastPracticeDate: totals.lastPracticeDate,
 		});
 	} catch (error) {
 		return next(error);
@@ -702,17 +796,18 @@ const getSessionStats = async (req, res, next) => {
  * - vkProgression (if applicable)
  */
 async function updateUserStats(userId, session) {
+	// A tutor guides children from their own account, so a child's session is
+	// saved with the tutor as "user" plus a childProfile id. That practice
+	// belongs to the child, not to the tutor, so it must not inflate the
+	// tutor's own totals or streak. Sessions the tutor does for themselves have
+	// no childProfile, and those are the ones counted here.
+	if (session.childProfile) return;
+
 	const user = await User.findById(userId);
 
 	// Increment totals
 	user.totalSessions += 1;
 	user.totalMinutes += session.duration;
-
-	const MILLIS_PER_DAY = 1000 * 60 * 60 * 24;
-	const toUtcDay = (value) => {
-		const date = new Date(value);
-		return Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-	};
 
 	const sessionDay = toUtcDay(session.date);
 	const lastPracticeDay = user.lastPracticeDate ? toUtcDay(user.lastPracticeDate) : null;

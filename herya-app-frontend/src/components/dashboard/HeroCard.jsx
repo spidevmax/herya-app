@@ -123,8 +123,12 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					onClick={startPractice}
 					className="ink-block ink-block--press display px-6 py-2.5 text-[1.05rem]"
 					style={{
-						background: "var(--ink)",
-						color: "var(--paper)",
+						// Relleno claro, no de tinta. El borde y la sombra del
+						// ink-block son de color tinta, asi que si el fondo del
+						// boton tambien fuera tinta el contorno desapareceria y
+						// el boton se veria como una mancha negra sobre negro.
+						background: "var(--paper)",
+						color: "var(--ink)",
 						cursor: "pointer",
 					}}
 				>

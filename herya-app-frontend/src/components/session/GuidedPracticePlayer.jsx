@@ -19,6 +19,7 @@ import {
 	ProgressBar,
 } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import { localizedName } from "@/utils/libraryHelpers";
 import "@/styles/identity.css";
 import useSessionTimer from "@/hooks/useSessionTimer";
 import CycleBreathingPlayer from "./CycleBreathingPlayer";
@@ -57,7 +58,7 @@ const GuidedPracticePlayer = ({
 	onSaveProgress,
 	onTimerStart,
 }) => {
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const timer = useSessionTimer(blocks);
 	const [abandonModalOpen, setAbandonModalOpen] = useState(false);
 	const [safePauseOpen, setSafePauseOpen] = useState(false);
@@ -240,6 +241,31 @@ const GuidedPracticePlayer = ({
 	const BlockIcon = BLOCK_TYPE_ICONS[currentBlock?.blockType] || PersonStanding;
 
 	// Check if current block has guided sub-player content
+	/*
+	 * El nombre que se guardo en el bloque al construir la sesion es un texto
+	 * fijo en un idioma. Si la practica se creo en ingles y luego cambias el
+	 * perfil a espanol, ese texto se queda como estaba.
+	 *
+	 * Aqui ya tenemos las secuencias y los patrones completos, asi que sacamos
+	 * el nombre del idioma activo en cada render. El label guardado queda solo
+	 * como respaldo, por si el bloque apunta a algo que no esta en la lista.
+	 */
+	const blockName = (block) => {
+		if (!block) return "";
+		// Solo las secuencias. Los bloques de pranayama guardan a proposito el
+		// nombre sanscrito romanizado (por ejemplo "Nadi Shodhana"), que es
+		// igual en los dos idiomas, asi que ahi el label guardado ya vale.
+		const sequence = sequencesData[block.vkSequence];
+		return localizedName(sequence, lang) || block.label || "";
+	};
+
+	// VisualSchedule pinta block.label, asi que le pasamos los bloques con el
+	// nombre ya traducido en lugar de duplicar la logica alli.
+	const scheduleBlocks = blocks.map((block) => ({
+		...block,
+		label: blockName(block),
+	}));
+
 	const isGuidedVK =
 		currentBlock?.blockType === "vk_sequence" &&
 		currentBlock?.guided &&
@@ -333,7 +359,7 @@ const GuidedPracticePlayer = ({
 								aria-current={
 									idx === timer.currentBlockIndex ? "step" : undefined
 								}
-								aria-label={block.label || `Block ${idx + 1}`}
+								aria-label={blockName(block) || `Block ${idx + 1}`}
 								className="transition-all rounded-full block"
 								style={{
 									width: idx === timer.currentBlockIndex ? 24 : 8,
@@ -355,7 +381,7 @@ const GuidedPracticePlayer = ({
 			{/* Visual schedule — predictability board for tutor mode */}
 			{isTutorMode && (
 				<VisualSchedule
-					blocks={blocks}
+					blocks={scheduleBlocks}
 					currentBlockIndex={timer.currentBlockIndex}
 					compact
 				/>
@@ -442,7 +468,7 @@ const GuidedPracticePlayer = ({
 									id={`block-start-heading-${timer.currentBlockIndex}`}
 									className="text-xl font-semibold mb-1 text-[var(--ink)]"
 								>
-									{currentBlock.label}
+									{blockName(currentBlock)}
 								</h3>
 								<p
 									className="text-sm mb-5"
@@ -502,7 +528,7 @@ const GuidedPracticePlayer = ({
 									id={`block-timer-heading-${timer.currentBlockIndex}`}
 									className="text-xl font-semibold mb-1 text-[var(--ink)]"
 								>
-									{currentBlock.label}
+									{blockName(currentBlock)}
 								</h3>
 
 								<p
@@ -597,7 +623,7 @@ const GuidedPracticePlayer = ({
 							className="text-sm font-semibold"
 							style={{ color: "var(--ink)" }}
 						>
-							{nextBlock.label} · {nextBlock.durationMinutes}m
+							{blockName(nextBlock)} · {nextBlock.durationMinutes}m
 						</p>
 					</div>
 				</aside>

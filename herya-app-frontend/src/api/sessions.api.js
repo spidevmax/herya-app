@@ -5,7 +5,14 @@ export const getSessionById = (id) => api.get(`/sessions/${id}`);
 export const createSession = (data) => api.post("/sessions", data);
 export const updateSession = (id, data) => api.put(`/sessions/${id}`, data);
 export const deleteSession = (id) => api.delete(`/sessions/${id}`);
-export const getSessionStats = () => api.get("/sessions/stats");
+// Sin argumento devuelve las cifras de quien ha iniciado sesion. Un tutor
+// puede pasar el id de un perfil de nino para pedir las de ese nino, porque las
+// sesiones guiadas se guardan bajo la cuenta del tutor.
+export const getSessionStats = (childProfile) =>
+	api.get(
+		"/sessions/stats",
+		childProfile ? { params: { childProfile } } : undefined,
+	);
 
 // Guided practice flow
 export const getActiveSession = () => api.get("/sessions/active/current");

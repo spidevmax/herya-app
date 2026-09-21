@@ -1155,14 +1155,20 @@ const StartPractice = () => {
 											},
 										)}
 									</div>
-									{isTutorPractice && (
-										<p
-											className="mt-2 text-xs"
-											style={{ color: "var(--ink-soft)" }}
-										>
-											{t("practice.preset_tutor_hint")}
-										</p>
-									)}
+									{/*
+									 * El texto compara las dos opciones, asi que se
+									 * muestra siempre. Antes solo aparecia con "Tutor +
+									 * nino" ya elegido, que es justo cuando ya no hace
+									 * falta para decidir.
+									 */}
+									<p
+										className="mt-2 text-xs"
+										style={{ color: "var(--ink-soft)" }}
+									>
+										{t("practice.preset_hint", {
+											n: TUTOR_MAX_TOTAL_MINUTES,
+										})}
+									</p>
 								</section>
 							)}
 

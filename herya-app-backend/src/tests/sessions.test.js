@@ -1,6 +1,7 @@
 const request = require("supertest");
 const app = require("../app");
-const { createUser } = require("./helpers");
+const mongoose = require("mongoose");
+const { createUser, createSession } = require("./helpers");
 
 const BASE = "/api/v1/sessions";
 const SESSION_PAYLOAD = { sessionType: "meditation", duration: 30 };
@@ -262,5 +263,89 @@ describe("Sessions — GET /stats", () => {
 		expect(res.body.data.tutorInsights).toHaveProperty("recommendationOutcome");
 		expect(res.body.data.tutorInsights.recommendationOutcome).toHaveProperty("appliedCount");
 		expect(res.body.data.tutorInsights.recommendationOutcome).toHaveProperty("improvedRate");
+	});
+});
+
+describe("Sessions — GET /stats, tutor vs guided child", () => {
+	// A tutor guides children from their own account. Those sessions are saved
+	// under the tutor with a childProfile id. They belong to the child, so they
+	// must not show up in the tutor's own figures.
+	const childId = new mongoose.Types.ObjectId().toString();
+
+	const createTutorWithBothSessions = async (email) => {
+		const { token } = await createUser({ email, role: "tutor" });
+
+		// The tutor's own practice.
+		await createSession(token, { duration: 30, completed: true });
+
+		// A session the tutor guided for a child. A different sessionType makes
+		// it obvious if it ever leaks into the tutor's own breakdown.
+		await createSession(token, {
+			sessionType: "pranayama",
+			duration: 20,
+			completed: true,
+			childProfile: childId,
+		});
+
+		return token;
+	};
+
+	it("leaves guided child sessions out of the tutor's own totals", async () => {
+		const token = await createTutorWithBothSessions("stats-tutor-own@test.com");
+
+		const res = await request(app).get(`${BASE}/stats`).set("Authorization", `Bearer ${token}`);
+
+		expect(res.status).toBe(200);
+		// Only the 30-minute session the tutor did for themselves.
+		expect(res.body.data.totalSessions).toBe(1);
+		expect(res.body.data.totalMinutes).toBe(30);
+
+		// The breakdown and averages are built from a separate query, so check
+		// the child's pranayama session is absent from those too.
+		expect(res.body.data.sessionsByType).toEqual({ meditation: 1 });
+		expect(res.body.data.avgDuration).toBe(30);
+	});
+
+	it("returns the child's own figures when asked about that child", async () => {
+		const token = await createTutorWithBothSessions("stats-tutor-child@test.com");
+
+		const res = await request(app)
+			.get(`${BASE}/stats?childProfile=${childId}`)
+			.set("Authorization", `Bearer ${token}`);
+
+		expect(res.status).toBe(200);
+		// Only the 20-minute session guided for the child.
+		expect(res.body.data.totalSessions).toBe(1);
+		expect(res.body.data.totalMinutes).toBe(20);
+		expect(res.body.data.currentStreak).toBe(1);
+	});
+
+	it("does not leak another tutor's child sessions", async () => {
+		await createTutorWithBothSessions("stats-tutor-a@test.com");
+		const { token: otherToken } = await createUser({
+			email: "stats-tutor-b@test.com",
+			role: "tutor",
+		});
+
+		const res = await request(app)
+			.get(`${BASE}/stats?childProfile=${childId}`)
+			.set("Authorization", `Bearer ${otherToken}`);
+
+		expect(res.status).toBe(200);
+		expect(res.body.data.totalSessions).toBe(0);
+		expect(res.body.data.totalMinutes).toBe(0);
+	});
+
+	it("returns 400 for a childProfile id that is not a valid ObjectId", async () => {
+		const { token } = await createUser({
+			email: "stats-tutor-bad-id@test.com",
+			role: "tutor",
+		});
+
+		const res = await request(app)
+			.get(`${BASE}/stats?childProfile=not-an-id`)
+			.set("Authorization", `Bearer ${token}`);
+
+		expect(res.status).toBe(400);
 	});
 });

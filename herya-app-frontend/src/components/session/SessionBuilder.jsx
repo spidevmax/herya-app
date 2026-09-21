@@ -17,6 +17,7 @@ import { getBreathingPatterns } from "@/api/breathing.api";
 import { getSequences } from "@/api/sequences.api";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import { localizedName } from "@/utils/libraryHelpers";
 import "@/styles/identity.css";
 import {
 	distributePoseTime,
@@ -475,6 +476,8 @@ const BlockCard = ({
 	blockTypeLabel,
 	t,
 }) => {
+	// El nombre guardado depende del idioma activo al construir la sesion.
+	const { lang } = useLanguage();
 	const [expanded, setExpanded] = useState(true);
 	const color = blockTypeColor(block.blockType);
 
@@ -596,7 +599,7 @@ const BlockCard = ({
 										onSelect={(seq) => {
 											onUpdate({
 												vkSequence: seq._id,
-												label: seq.englishName || "",
+												label: localizedName(seq, lang),
 												durationMinutes:
 													seq.estimatedDuration?.recommended ||
 													block.durationMinutes,

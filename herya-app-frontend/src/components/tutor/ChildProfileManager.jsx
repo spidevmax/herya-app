@@ -6,6 +6,7 @@ import {
 	getChildProfiles,
 	updateChildProfile,
 } from "@/api/childProfiles.api";
+import { getSessionStats } from "@/api/sessions.api";
 import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
@@ -41,6 +42,8 @@ const ChildProfileManager = ({
 	const [showForm, setShowForm] = useState(false);
 	const [editingProfile, setEditingProfile] = useState(null);
 	const [form, setForm] = useState(defaultForm());
+	// Cifras de practica por nino, guardadas por id: { [childId]: { streak, minutes } }
+	const [statsByChild, setStatsByChild] = useState({});
 
 	function defaultForm() {
 		return {
@@ -53,6 +56,39 @@ const ChildProfileManager = ({
 		};
 	}
 
+	/*
+	 * Las sesiones que el tutor guia para un nino se guardan bajo la cuenta del
+	 * tutor, con el id del nino dentro. El backend sabe devolver las cifras de
+	 * un nino concreto, pero de uno en uno, asi que pedimos una por perfil y las
+	 * lanzamos a la vez en lugar de esperar a que acabe cada una.
+	 *
+	 * Esto va aparte de la carga de perfiles: si falla, la lista se sigue
+	 * viendo, solo que sin cifras. Elegir un nino es lo importante aqui.
+	 */
+	const loadStats = useCallback(async (list) => {
+		if (list.length === 0) return;
+
+		const results = await Promise.all(
+			list.map(async (profile) => {
+				try {
+					const res = await getSessionStats(profile._id);
+					const data = res.data?.data || {};
+					return [
+						profile._id,
+						{
+							streak: data.currentStreak || 0,
+							minutes: data.totalMinutes || 0,
+						},
+					];
+				} catch {
+					return null;
+				}
+			}),
+		);
+
+		setStatsByChild(Object.fromEntries(results.filter(Boolean)));
+	}, []);
+
 	// useCallback so the mount effect can list it as a dependency; without a
 	// stable identity it would refetch on every render.
 	const loadProfiles = useCallback(async () => {
@@ -60,13 +96,15 @@ const ChildProfileManager = ({
 		try {
 			const res = await getChildProfiles();
 			const data = res.data?.data || res.data || [];
-			setProfiles(Array.isArray(data) ? data : []);
+			const list = Array.isArray(data) ? data : [];
+			setProfiles(list);
+			loadStats(list);
 		} catch {
 			setProfiles([]);
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [loadStats]);
 
 	useEffect(() => {
 		loadProfiles();
@@ -185,6 +223,10 @@ const ChildProfileManager = ({
 				<ul className="flex flex-col gap-2 list-none m-0 p-0">
 					{profiles.map((profile) => {
 						const isSelected = selectedChildId === profile._id;
+						const stats = statsByChild[profile._id];
+						// Un nino sin sesiones todavia no tiene nada que contar.
+						// "Racha de 0 dias" no informa, asi que no se muestra.
+						const hasStats = stats && stats.minutes > 0;
 						return (
 							<li
 								key={profile._id}
@@ -229,6 +271,17 @@ const ChildProfileManager = ({
 												style={{ color: "var(--ink-soft)" }}
 											>
 												{t("tutor.child_age", { n: profile.age })}
+											</span>
+										)}
+										{hasStats && (
+											<span
+												className="block text-[10px]"
+												style={{ color: "var(--ink-soft)" }}
+											>
+												{t("tutor.child_stats", {
+													streak: stats.streak,
+													minutes: stats.minutes,
+												})}
 											</span>
 										)}
 									</span>

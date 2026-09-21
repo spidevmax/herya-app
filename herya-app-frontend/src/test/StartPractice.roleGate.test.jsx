@@ -33,7 +33,7 @@ vi.mock("@/context/LanguageContext", () => ({
 				"practice.preset_adult": "Adult start",
 				"practice.preset_tutor": "Tutor + child",
 				"practice.low_stim_mode": "Low stimulation",
-				"practice.preset_tutor_hint": "Tutor hint",
+				"practice.preset_hint": "Tutor hint",
 				"practice.low_stim_mode_hint": "Low stim hint",
 				"practice.reco_title": "Recommendation",
 				"practice.reco_apply": "Apply",
