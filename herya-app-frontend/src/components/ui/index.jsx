@@ -467,7 +467,11 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 export const Badge = ({ children, color = "var(--ink)", className = "" }) => {
 	return (
 		<span
-			className={`inline-flex items-center px-2.5 py-0.5 text-xs font-bold ${className}`}
+			// gap-1.5: separa el icono del texto. Sin el quedaban pegados, porque
+			// JSX no deja espacio entre un elemento y la expresion siguiente.
+			// El texto seguido cuenta como un solo elemento flex, asi que esto no
+			// abre huecos dentro de la frase.
+			className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-bold ${className}`}
 			style={{
 				border: `var(--ink-width) solid ${color}`,
 				borderRadius: "var(--radius-block)",
