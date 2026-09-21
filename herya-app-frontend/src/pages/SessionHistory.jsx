@@ -48,7 +48,7 @@ const TYPE_FILTER_I18N = {
 	complete_practice: "session_history.filter_complete",
 };
 
-function SessionCard({ session, index, onClick, t, lang }) {
+const SessionCard = ({ session, index, onClick, t, lang }) => {
 	const color = TYPE_COLORS[session.sessionType] || "var(--chandra)";
 	const TypeIcon = TYPE_ICONS[session.sessionType] || PersonStanding;
 	const label = t(
@@ -103,9 +103,9 @@ function SessionCard({ session, index, onClick, t, lang }) {
 			</div>
 		</motion.button>
 	);
-}
+};
 
-export default function SessionHistory() {
+const SessionHistory = () => {
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
 	const [sessions, setSessions] = useState([]);
@@ -221,4 +221,6 @@ export default function SessionHistory() {
 			)}
 		</main>
 	);
-}
+};
+
+export default SessionHistory;

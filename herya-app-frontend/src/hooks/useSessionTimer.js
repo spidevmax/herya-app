@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * - Pause/resume with accurate elapsed time tracking
  * - Block transitions
  */
-export default function useSessionTimer(blocks = []) {
+const useSessionTimer = (blocks = []) => {
 	const [isRunning, setIsRunning] = useState(false);
 	const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
 	const [globalElapsedSec, setGlobalElapsedSec] = useState(0);
@@ -183,4 +183,6 @@ export default function useSessionTimer(blocks = []) {
 		goToBlock,
 		reset,
 	};
-}
+};
+
+export default useSessionTimer;

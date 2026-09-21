@@ -1,7 +1,9 @@
-export default function SectionTitle({ children }) {
+const SectionTitle = ({ children }) => {
 	return (
 		<h2 className="text-[11px] font-bold" style={{ color: "var(--ink-soft)" }}>
 			{children}
 		</h2>
 	);
-}
+};
+
+export default SectionTitle;

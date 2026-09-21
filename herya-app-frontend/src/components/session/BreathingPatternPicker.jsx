@@ -30,11 +30,7 @@ const effectColor = (e) => {
 	}
 };
 
-export default function BreathingPatternPicker({
-	patterns = [],
-	selectedId,
-	onSelect,
-}) {
+const BreathingPatternPicker = ({ patterns = [], selectedId, onSelect }) => {
 	const { t, lang } = useLanguage();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
@@ -265,4 +261,6 @@ export default function BreathingPatternPicker({
 			)}
 		</div>
 	);
-}
+};
+
+export default BreathingPatternPicker;

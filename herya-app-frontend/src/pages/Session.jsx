@@ -115,7 +115,7 @@ const getPreferredBreathingEffect = (timeOfDay) => {
 	return map[timeOfDay] || "balancing";
 };
 
-export default function Session() {
+const Session = () => {
 	const { type } = useParams();
 	const [params] = useSearchParams();
 	const navigate = useNavigate();
@@ -1022,4 +1022,6 @@ export default function Session() {
 			</div>
 		</main>
 	);
-}
+};
+
+export default Session;

@@ -1,4 +1,4 @@
-export default function Toggle({ id, label, checked, onChange }) {
+const Toggle = ({ id, label, checked, onChange }) => {
 	return (
 		<label
 			htmlFor={id}
@@ -28,4 +28,6 @@ export default function Toggle({ id, label, checked, onChange }) {
 			</span>
 		</label>
 	);
-}
+};
+
+export default Toggle;

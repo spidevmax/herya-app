@@ -4,7 +4,7 @@ import { Button } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 
-export default function NotFound() {
+const NotFound = () => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 
@@ -75,4 +75,6 @@ export default function NotFound() {
 			</article>
 		</main>
 	);
-}
+};
+
+export default NotFound;

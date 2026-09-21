@@ -31,12 +31,12 @@ function getCalendarDays(sessionDates = []) {
 
 const SKELETON_DAYS = Array.from({ length: 14 }, (_, i) => `d-${i}`);
 
-export default function CalendarStrip({
+const CalendarStrip = ({
 	sessionDates = [],
 	streak = 0,
 	weekSessions = null,
 	loading = false,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const stripRef = useRef(null);
 	const days = useMemo(() => getCalendarDays(sessionDates), [sessionDates]);
@@ -141,4 +141,6 @@ export default function CalendarStrip({
 			</ol>
 		</section>
 	);
-}
+};
+
+export default CalendarStrip;

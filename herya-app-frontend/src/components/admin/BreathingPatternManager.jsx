@@ -72,7 +72,7 @@ const toForm = (item) => ({
 	baseBreathDuration: String(item?.baseBreathDuration ?? 5),
 });
 
-function BreathingPatternModal({ item, onClose, onSaved }) {
+const BreathingPatternModal = ({ item, onClose, onSaved }) => {
 	const { t } = useLanguage();
 	const isEditing = Boolean(item);
 	const [form, setForm] = useState(() => toForm(item));
@@ -475,9 +475,9 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 			</section>
 		</div>
 	);
-}
+};
 
-export default function BreathingPatternManager() {
+const BreathingPatternManager = () => {
 	const { t } = useLanguage();
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -723,4 +723,6 @@ export default function BreathingPatternManager() {
 			)}
 		</section>
 	);
-}
+};
+
+export default BreathingPatternManager;

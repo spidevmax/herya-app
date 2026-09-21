@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 
-export default function SafetyBanner({
-	contraindications = [],
-	warnings = "",
-}) {
+const SafetyBanner = ({ contraindications = [], warnings = "" }) => {
 	const { t } = useLanguage();
 	const [expanded, setExpanded] = useState(false);
 
@@ -84,4 +81,6 @@ export default function SafetyBanner({
 			</AnimatePresence>
 		</motion.aside>
 	);
-}
+};
+
+export default SafetyBanner;

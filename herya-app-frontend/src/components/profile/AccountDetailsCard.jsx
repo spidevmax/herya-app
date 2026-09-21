@@ -20,14 +20,14 @@ const inputStyle = {
 	color: "var(--ink)",
 };
 
-export default function AccountDetailsCard({
+const AccountDetailsCard = ({
 	draft,
 	setDraft,
 	selectedGoals,
 	toggleArrayItem,
 	fieldErrors,
 	hideGoals = false,
-}) {
+}) => {
 	const { t } = useLanguage();
 
 	const getOptionLabel = (group, key) =>
@@ -157,4 +157,6 @@ export default function AccountDetailsCard({
 			)}
 		</section>
 	);
-}
+};
+
+export default AccountDetailsCard;

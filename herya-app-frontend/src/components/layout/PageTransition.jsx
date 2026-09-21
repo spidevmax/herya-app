@@ -11,7 +11,7 @@ import { motion, useReducedMotion } from "framer-motion";
  * When the operating system asks for reduced motion, the transition is
  * dropped entirely rather than shortened.
  */
-export default function PageTransition({ children }) {
+const PageTransition = ({ children }) => {
 	const reduceMotion = useReducedMotion();
 
 	if (reduceMotion) return <div>{children}</div>;
@@ -26,4 +26,6 @@ export default function PageTransition({ children }) {
 			{children}
 		</motion.div>
 	);
-}
+};
+
+export default PageTransition;

@@ -24,13 +24,13 @@ const Stat = ({ label, value }) => (
 	</div>
 );
 
-export default function PracticeSnapshotCard({
+const PracticeSnapshotCard = ({
 	streak = 0,
 	weekSessions = 0,
 	totalPracticeMinutes = 0,
 	pendingSession = null,
 	loading = false,
-}) {
+}) => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const hasPendingSession = Boolean(pendingSession);
@@ -190,4 +190,6 @@ export default function PracticeSnapshotCard({
 			</div>
 		</section>
 	);
-}
+};
+
+export default PracticeSnapshotCard;

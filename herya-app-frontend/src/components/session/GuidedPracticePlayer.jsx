@@ -45,7 +45,7 @@ const BLOCK_TYPE_ICONS = {
 	meditation: Leaf,
 };
 
-export default function GuidedPracticePlayer({
+const GuidedPracticePlayer = ({
 	blocks,
 	sequencesData = {},
 	patternsData = {},
@@ -56,7 +56,7 @@ export default function GuidedPracticePlayer({
 	onAbandon,
 	onSaveProgress,
 	onTimerStart,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const timer = useSessionTimer(blocks);
 	const [abandonModalOpen, setAbandonModalOpen] = useState(false);
@@ -884,4 +884,6 @@ export default function GuidedPracticePlayer({
 			/>
 		</section>
 	);
-}
+};
+
+export default GuidedPracticePlayer;

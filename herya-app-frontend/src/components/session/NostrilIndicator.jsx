@@ -10,11 +10,11 @@ import "@/styles/identity.css";
  * @param {string} phaseKey - Current breathing phase
  * @param {string} color - Accent colour for the active side
  */
-export default function NostrilIndicator({
+const NostrilIndicator = ({
 	nostrilFlow = "left",
 	phaseKey,
 	color = "var(--surya)",
-}) {
+}) => {
 	const { t } = useLanguage();
 	const isLeft = nostrilFlow === "left";
 	const isRight = nostrilFlow === "right";
@@ -150,4 +150,6 @@ export default function NostrilIndicator({
 			</figcaption>
 		</figure>
 	);
-}
+};
+
+export default NostrilIndicator;

@@ -44,13 +44,13 @@ const formatTime = (sec) => {
 	return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 
-export default function PhasedMeditationPlayer({
+const PhasedMeditationPlayer = ({
 	meditationType = "guided",
 	durationMinutes = 10,
 	guided = true,
 	lowStimMode = false,
 	onComplete,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const totalSec = durationMinutes * 60;
 
@@ -317,4 +317,6 @@ export default function PhasedMeditationPlayer({
 			</div>
 		</section>
 	);
-}
+};
+
+export default PhasedMeditationPlayer;

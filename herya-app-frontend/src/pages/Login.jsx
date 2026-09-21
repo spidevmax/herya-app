@@ -10,7 +10,7 @@ import "@/styles/identity.css";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function FieldError({ id, message }) {
+const FieldError = ({ id, message }) => {
 	if (!message) return null;
 	return (
 		<p
@@ -23,9 +23,9 @@ function FieldError({ id, message }) {
 			<span>{message}</span>
 		</p>
 	);
-}
+};
 
-export default function Login() {
+const Login = () => {
 	const navigate = useNavigate();
 	const { login } = useAuth();
 	const { t } = useLanguage();
@@ -409,4 +409,6 @@ export default function Login() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default Login;

@@ -15,12 +15,12 @@
  * theme ink would turn near-white in dark mode and wash the character out.
  * On a colour panel pass "var(--on-fill)"; on paper leave the default.
  */
-export default function BreathBuddy({
+const BreathBuddy = ({
 	size = 140,
 	phase = "inhale",
 	fill = "var(--surya)",
 	outline = "var(--ink)",
-}) {
+}) => {
 	const scale = phase === "inhale" ? 1 : phase === "hold" ? 1 : 0.82;
 	const holding = phase === "hold";
 
@@ -91,4 +91,6 @@ export default function BreathBuddy({
 			</g>
 		</svg>
 	);
-}
+};
+
+export default BreathBuddy;

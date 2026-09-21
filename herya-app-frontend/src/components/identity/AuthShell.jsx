@@ -12,7 +12,7 @@ import "@/styles/identity.css";
  * Replaces the previous AuthBrandHeader (removed), whose gradient tile and
  * blurred dots belonged to the old identity.
  */
-export default function AuthShell({ children }) {
+const AuthShell = ({ children }) => {
 	return (
 		<div
 			data-identity="next"
@@ -28,4 +28,6 @@ export default function AuthShell({ children }) {
 			</div>
 		</div>
 	);
-}
+};
+
+export default AuthShell;

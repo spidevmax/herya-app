@@ -32,7 +32,7 @@ const formatValue = (value) => {
 	return String(value);
 };
 
-function PoseCard({ pose, index, onClick, t }) {
+const PoseCard = ({ pose, index, onClick, t }) => {
 	const diffLabels = {
 		beginner: t("library.beginner"),
 		intermediate: t("library.intermediate"),
@@ -211,9 +211,9 @@ function PoseCard({ pose, index, onClick, t }) {
 			</div>
 		</motion.button>
 	);
-}
+};
 
-export default function Poses() {
+const Poses = () => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const [poses, setPoses] = useState([]);
@@ -357,4 +357,6 @@ export default function Poses() {
 			)}
 		</main>
 	);
-}
+};
+
+export default Poses;

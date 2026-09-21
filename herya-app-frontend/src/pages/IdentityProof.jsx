@@ -79,7 +79,7 @@ const FIXTURE_SESSIONS = [
 
 const FIXTURE_DATES = ["2026-09-18", "2026-09-17", "2026-09-15", "2026-09-14"];
 
-function KramaLadder() {
+const KramaLadder = () => {
 	return (
 		<ol
 			className="mt-5 flex flex-col gap-2"
@@ -137,9 +137,9 @@ function KramaLadder() {
 			})}
 		</ol>
 	);
-}
+};
 
-export default function IdentityProof() {
+const IdentityProof = () => {
 	// Drives the real mechanism (html.dark) rather than a local class, so the
 	// proof exercises the same cascade the product uses.
 	const [dark, setDark] = useState(() =>
@@ -338,4 +338,6 @@ export default function IdentityProof() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default IdentityProof;

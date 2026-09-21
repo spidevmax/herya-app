@@ -55,7 +55,7 @@ const TYPE_CONFIG = {
 	},
 };
 
-export default function SessionDetail() {
+const SessionDetail = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
@@ -368,4 +368,6 @@ export default function SessionDetail() {
 			/>
 		</main>
 	);
-}
+};
+
+export default SessionDetail;

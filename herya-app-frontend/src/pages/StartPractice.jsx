@@ -168,7 +168,7 @@ const getRecommendationFromRecentJournals = (journals = []) => {
  * 3. Execute guided (GuidedPracticePlayer)
  * 4. Post-practice journal (PostPracticeJournal)
  */
-export default function StartPractice() {
+const StartPractice = () => {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const [searchParams] = useSearchParams();
@@ -1449,4 +1449,6 @@ export default function StartPractice() {
 			/>
 		</main>
 	);
-}
+};
+
+export default StartPractice;

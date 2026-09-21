@@ -9,7 +9,7 @@ const getDismissKey = () => {
 	return `herya_dashboard_reminder_dismissed_${today}`;
 };
 
-export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
+const SoftReminderCard = ({ user, sessions = [], streak = 0 }) => {
 	const { t } = useLanguage();
 	const [isVisible, setIsVisible] = useState(() => {
 		try {
@@ -139,4 +139,6 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 			</motion.div>
 		</AnimatePresence>
 	);
-}
+};
+
+export default SoftReminderCard;

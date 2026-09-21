@@ -13,12 +13,12 @@
  * they sit on, so both are overridable. On a chandra ground, pass
  * cool="var(--on-fill)" — otherwise that arc vanishes into the background.
  */
-export default function BreathMark({
+const BreathMark = ({
 	size = 48,
 	title = "Breath mark",
 	warm = "var(--surya)",
 	cool = "var(--chandra)",
-}) {
+}) => {
 	const S = 48;
 	const c = S / 2;
 	const r = 17;
@@ -62,4 +62,6 @@ export default function BreathMark({
 			/>
 		</svg>
 	);
-}
+};
+
+export default BreathMark;

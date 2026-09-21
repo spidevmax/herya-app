@@ -13,12 +13,12 @@ const inputStyle = {
 	color: "var(--ink)",
 };
 
-export default function PracticePreferencesCard({
+const PracticePreferencesCard = ({
 	draft,
 	isTutor,
 	setPreference,
 	fieldErrors,
-}) {
+}) => {
 	const { t } = useLanguage();
 
 	const getOptionLabel = (group, key) =>
@@ -215,4 +215,6 @@ export default function PracticePreferencesCard({
 			</div>
 		</section>
 	);
-}
+};
+
+export default PracticePreferencesCard;

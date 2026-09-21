@@ -71,7 +71,7 @@ const normalizePoseList = (payload) => {
 	return [];
 };
 
-function PoseFormModal({ pose, onClose, onSaved }) {
+const PoseFormModal = ({ pose, onClose, onSaved }) => {
 	const { t } = useLanguage();
 	const isEditing = Boolean(pose);
 	const [form, setForm] = useState(() => toFormState(pose));
@@ -489,9 +489,9 @@ function PoseFormModal({ pose, onClose, onSaved }) {
 			</motion.section>
 		</motion.div>
 	);
-}
+};
 
-export default function PoseManager() {
+const PoseManager = () => {
 	const { t } = useLanguage();
 	const [poses, setPoses] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -788,4 +788,6 @@ export default function PoseManager() {
 			)}
 		</section>
 	);
-}
+};
+
+export default PoseManager;

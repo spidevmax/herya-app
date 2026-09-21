@@ -4,7 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 
-export default function AuthCallback() {
+const AuthCallback = () => {
 	const navigate = useNavigate();
 	const [params] = useSearchParams();
 	const { loginWithToken } = useAuth();
@@ -91,4 +91,6 @@ export default function AuthCallback() {
 			</section>
 		</main>
 	);
-}
+};
+
+export default AuthCallback;

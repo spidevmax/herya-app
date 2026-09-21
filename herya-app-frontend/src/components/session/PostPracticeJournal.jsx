@@ -29,7 +29,7 @@ const SIGNAL_SCORES = {
 const VALID_MOOD_BEFORE = new Set(MOOD_OPTIONS);
 const VALID_MOOD_AFTER = new Set(MOOD_AFTER_OPTIONS);
 
-export default function PostPracticeJournal({
+const PostPracticeJournal = ({
 	sessionSummary,
 	checkInData,
 	isTutorMode = false,
@@ -37,7 +37,7 @@ export default function PostPracticeJournal({
 	saving,
 	error = null,
 	onDismissError,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const [moodAfter, setMoodAfter] = useState([]);
 	const [energyAfter, setEnergyAfter] = useState(5);
@@ -497,4 +497,6 @@ export default function PostPracticeJournal({
 			</Button>
 		</motion.form>
 	);
-}
+};
+
+export default PostPracticeJournal;

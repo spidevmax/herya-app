@@ -9,7 +9,7 @@ import "@/styles/identity.css";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function FieldError({ id, message }) {
+const FieldError = ({ id, message }) => {
 	if (!message) return null;
 	return (
 		<p
@@ -22,9 +22,9 @@ function FieldError({ id, message }) {
 			<span>{message}</span>
 		</p>
 	);
-}
+};
 
-export default function Register() {
+const Register = () => {
 	const navigate = useNavigate();
 	const { register } = useAuth();
 	const { t } = useLanguage();
@@ -399,4 +399,6 @@ export default function Register() {
 			</div>
 		</div>
 	);
-}
+};
+
+export default Register;

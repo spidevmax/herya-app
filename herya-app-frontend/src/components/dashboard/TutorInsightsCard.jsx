@@ -90,7 +90,7 @@ const DeltaRow = ({ value, label, invert = false }) => {
 	);
 };
 
-export default function TutorInsightsCard({ tutorInsights }) {
+const TutorInsightsCard = ({ tutorInsights }) => {
 	const { t } = useLanguage();
 	const data = tutorInsights || {};
 	const sessionCount = data.sessionCount || 0;
@@ -416,4 +416,6 @@ export default function TutorInsightsCard({ tutorInsights }) {
 			)}
 		</section>
 	);
-}
+};
+
+export default TutorInsightsCard;

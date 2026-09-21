@@ -30,11 +30,11 @@ const AVATAR_COLORS = [
  * - onSelectChild: callback (profile) when a child is selected
  * - compact: smaller mode for embedding in session flow
  */
-export default function ChildProfileManager({
+const ChildProfileManager = ({
 	selectedChildId,
 	onSelectChild,
 	compact = false,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const [profiles, setProfiles] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -453,4 +453,6 @@ export default function ChildProfileManager({
 			</AnimatePresence>
 		</section>
 	);
-}
+};
+
+export default ChildProfileManager;

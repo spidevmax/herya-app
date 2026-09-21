@@ -33,11 +33,11 @@ const BLOCK_FG = {
  * - currentBlockIndex: which block is active (-1 = not started)
  * - compact: if true, renders a smaller inline version
  */
-export default function VisualSchedule({
+const VisualSchedule = ({
 	blocks = [],
 	currentBlockIndex = -1,
 	compact = false,
-}) {
+}) => {
 	const { t } = useLanguage();
 
 	if (blocks.length === 0) return null;
@@ -142,4 +142,6 @@ export default function VisualSchedule({
 			</ol>
 		</section>
 	);
-}
+};
+
+export default VisualSchedule;

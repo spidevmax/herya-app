@@ -23,11 +23,7 @@ const formatFamily = (family, t) => {
 	return entry?.label || family?.replace(/[_-]/g, " ") || "";
 };
 
-export default function SequencePicker({
-	sequences = [],
-	selectedId,
-	onSelect,
-}) {
+const SequencePicker = ({ sequences = [], selectedId, onSelect }) => {
 	const { t, lang } = useLanguage();
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
@@ -266,9 +262,9 @@ export default function SequencePicker({
 			)}
 		</div>
 	);
-}
+};
 
-function SequencePreview({ sequence }) {
+const SequencePreview = ({ sequence }) => {
 	const { t, lang } = useLanguage();
 	const poses = sequence.structure?.corePoses || [];
 
@@ -365,4 +361,6 @@ function SequencePreview({ sequence }) {
 			)}
 		</div>
 	);
-}
+};
+
+export default SequencePicker;

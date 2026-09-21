@@ -19,7 +19,7 @@ import {
 } from "@/utils/constants";
 import { localized, localizedName } from "@/utils/libraryHelpers";
 
-export default function SequenceDetail() {
+const SequenceDetail = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
@@ -789,4 +789,6 @@ export default function SequenceDetail() {
 			)}
 		</main>
 	);
-}
+};
+
+export default SequenceDetail;

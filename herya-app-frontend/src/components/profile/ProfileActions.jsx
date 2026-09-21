@@ -6,7 +6,7 @@ import SectionTitle from "./SectionTitle";
 
 const cardStyle = { backgroundColor: "var(--paper-raised)" };
 
-export default function ProfileActions({
+const ProfileActions = ({
 	savingProfile,
 	saveSuccess,
 	saveError,
@@ -14,7 +14,7 @@ export default function ProfileActions({
 	onSave,
 	onLogout,
 	onDeleteClick,
-}) {
+}) => {
 	const { t } = useLanguage();
 
 	return (
@@ -87,4 +87,6 @@ export default function ProfileActions({
 			</div>
 		</section>
 	);
-}
+};
+
+export default ProfileActions;

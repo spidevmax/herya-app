@@ -4,10 +4,7 @@ import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 
-export default function PostPracticeNudge({
-	durationMinutes = 0,
-	stressAfter = null,
-}) {
+const PostPracticeNudge = ({ durationMinutes = 0, stressAfter = null }) => {
 	const { t } = useLanguage();
 	const [visible, setVisible] = useState(true);
 
@@ -88,4 +85,6 @@ export default function PostPracticeNudge({
 			</motion.aside>
 		</AnimatePresence>
 	);
-}
+};
+
+export default PostPracticeNudge;

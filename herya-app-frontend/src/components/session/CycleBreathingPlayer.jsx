@@ -57,12 +57,12 @@ const PALETTE_TINTS = {
 	},
 };
 
-export default function CycleBreathingPlayer({
+const CycleBreathingPlayer = ({
 	pattern,
 	config = {},
 	onComplete,
 	onCycleComplete,
-}) {
+}) => {
 	const { t, lang } = useLanguage();
 
 	// ── Resolve profile ──────────────────────────────────────────────────
@@ -676,4 +676,6 @@ export default function CycleBreathingPlayer({
 				)}
 		</section>
 	);
-}
+};
+
+export default CycleBreathingPlayer;

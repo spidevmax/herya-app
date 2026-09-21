@@ -15,7 +15,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 
-function UserRow({ user, onChangeRole, onDelete, t }) {
+const UserRow = ({ user, onChangeRole, onDelete, t }) => {
 	const [nextRole, setNextRole] = useState(user.role);
 	const selectId = `role-select-${user._id}`;
 
@@ -92,9 +92,9 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 			</div>
 		</article>
 	);
-}
+};
 
-export default function Admin() {
+const Admin = () => {
 	const { user } = useAuth();
 	const { t } = useLanguage();
 	const navigate = useNavigate();
@@ -299,4 +299,6 @@ export default function Admin() {
 			/>
 		</main>
 	);
-}
+};
+
+export default Admin;

@@ -60,12 +60,12 @@ const getPranayamaEstimatedMinutes = (block, pattern) => {
 
 let blockIdCounter = 0;
 const nextBlockId = () => `block_${++blockIdCounter}_${Date.now()}`;
-export default function SessionBuilder({
+const SessionBuilder = ({
 	practiceType,
 	initialBlocks = [],
 	onStartSession,
 	onBlocksChange,
-}) {
+}) => {
 	const { t } = useLanguage();
 	const [blocks, setBlocks] = useState([]);
 	const [sequences, setSequences] = useState([]);
@@ -460,9 +460,9 @@ export default function SessionBuilder({
 			</Button>
 		</section>
 	);
-}
+};
 
-function BlockCard({
+const BlockCard = ({
 	block,
 	index,
 	sequences,
@@ -473,7 +473,7 @@ function BlockCard({
 	blockTypeFg,
 	blockTypeLabel,
 	t,
-}) {
+}) => {
 	const [expanded, setExpanded] = useState(true);
 	const color = blockTypeColor(block.blockType);
 
@@ -835,18 +835,18 @@ function BlockCard({
 			</AnimatePresence>
 		</motion.article>
 	);
-}
+};
 
 const DISTRIBUTION_MODES = ["auto", "equal", "manual"];
 
-function VKPoseBreakdown({
+const VKPoseBreakdown = ({
 	distribution,
 	distributionMode,
 	onChangeMode,
 	onManualOverride,
 	color,
 	t,
-}) {
+}) => {
 	const { poses, warning, naturalSec, totalSec } = distribution;
 	const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -1026,4 +1026,6 @@ function VKPoseBreakdown({
 			</div>
 		</div>
 	);
-}
+};
+
+export default SessionBuilder;

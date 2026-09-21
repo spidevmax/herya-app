@@ -6,7 +6,7 @@ const STORAGE_KEY = "herya_active_session";
  * Persists session draft and active state to localStorage
  * so the user can recover if the app closes mid-session.
  */
-export default function useSessionPersistence() {
+const useSessionPersistence = () => {
 	const [recovered, setRecovered] = useState(null);
 
 	useEffect(() => {
@@ -48,4 +48,6 @@ export default function useSessionPersistence() {
 	}, []);
 
 	return { recovered, saveSession, clearSession, dismissRecovery };
-}
+};
+
+export default useSessionPersistence;

@@ -30,7 +30,7 @@ const ENERGY_ICONS = {
 	heating: Flame,
 };
 
-function RatioBox({ label, value, color }) {
+const RatioBox = ({ label, value, color }) => {
 	return (
 		<div className="flex flex-col items-center gap-1">
 			<div
@@ -51,9 +51,9 @@ function RatioBox({ label, value, color }) {
 			</span>
 		</div>
 	);
-}
+};
 
-export default function BreathingDetail() {
+const BreathingDetail = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
@@ -376,4 +376,6 @@ export default function BreathingDetail() {
 			</div>
 		</main>
 	);
-}
+};
+
+export default BreathingDetail;

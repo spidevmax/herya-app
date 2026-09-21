@@ -45,7 +45,7 @@ const prefetchDashboardRoutes = (role) => {
 };
 
 /** Syncs language and theme from user.preferences after login */
-function SyncUserPreferences() {
+const SyncUserPreferences = () => {
 	const { user } = useAuth();
 	const { lang, setLanguage } = useLanguage();
 	const { setTheme } = useTheme();
@@ -60,9 +60,9 @@ function SyncUserPreferences() {
 	}, [user, lang, setLanguage, setTheme]);
 
 	return null;
-}
+};
 
-function PrefetchLikelyRoutes() {
+const PrefetchLikelyRoutes = () => {
 	const { user, loading } = useAuth();
 
 	useEffect(() => {
@@ -85,17 +85,17 @@ function PrefetchLikelyRoutes() {
 	}, [loading, user]);
 
 	return null;
-}
+};
 
-function LegacyPoseDetailRedirect() {
+const LegacyPoseDetailRedirect = () => {
 	const { id } = useParams();
 	return <Navigate replace to={`/library/pose/${id}`} />;
-}
+};
 
-function LegacyBreathingDetailRedirect() {
+const LegacyBreathingDetailRedirect = () => {
 	const { id } = useParams();
 	return <Navigate replace to={`/library/breathing/${id}`} />;
-}
+};
 
 import { useAuth } from "@/context/AuthContext";
 

@@ -18,7 +18,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * @param {function} options.onCycleComplete - (completedCount) => void
  * @param {function} options.onComplete     - () => void — all cycles done
  */
-export default function useBreathingEngine({
+const useBreathingEngine = ({
 	activePhases = [],
 	phaseDurations = {},
 	targetCycles = 10,
@@ -26,7 +26,7 @@ export default function useBreathingEngine({
 	onPhaseChange,
 	onCycleComplete,
 	onComplete,
-}) {
+}) => {
 	const [isRunning, setIsRunning] = useState(false);
 	const [phaseIdx, setPhaseIdx] = useState(0);
 	const [phaseElapsed, setPhaseElapsed] = useState(0);
@@ -234,4 +234,6 @@ export default function useBreathingEngine({
 		toggle,
 		reset,
 	};
-}
+};
+
+export default useBreathingEngine;

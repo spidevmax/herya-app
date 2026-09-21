@@ -26,7 +26,7 @@ import {
 
 const TABS = ["alignment", "breathing", "mistakes", "benefits"];
 
-export default function PoseByPosePlayer({
+const PoseByPosePlayer = ({
 	sequence,
 	level = "beginner",
 	guided = true,
@@ -37,7 +37,7 @@ export default function PoseByPosePlayer({
 	manualOverrides = {},
 	onComplete,
 	onPoseChange,
-}) {
+}) => {
 	const { t, lang } = useLanguage();
 	const [poseIndex, setPoseIndex] = useState(0);
 	const [side, setSide] = useState(null); // null | "left" | "right"
@@ -479,9 +479,16 @@ export default function PoseByPosePlayer({
 			</div>
 		</section>
 	);
-}
+};
 
-function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
+const PoseDetailPanel = ({
+	pose,
+	corePose,
+	activeTab,
+	setActiveTab,
+	t,
+	lang,
+}) => {
 	const alignmentPoints = pose.alignmentDetails?.keyPoints || [];
 	const mistakes =
 		localizedArray(pose, "commonMistakes", lang).length > 0
@@ -723,4 +730,6 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 			</div>
 		</section>
 	);
-}
+};
+
+export default PoseByPosePlayer;

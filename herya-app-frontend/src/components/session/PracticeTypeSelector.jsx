@@ -30,7 +30,7 @@ const PRACTICE_TYPES = [
 	},
 ];
 
-export default function PracticeTypeSelector({ onSelect }) {
+const PracticeTypeSelector = ({ onSelect }) => {
 	const { t } = useLanguage();
 
 	return (
@@ -91,4 +91,6 @@ export default function PracticeTypeSelector({ onSelect }) {
 			</div>
 		</section>
 	);
-}
+};
+
+export default PracticeTypeSelector;

@@ -28,7 +28,7 @@ const getGreetingKey = (hour) => {
 	return "dashboard.greeting_night";
 };
 
-export default function Dashboard() {
+const Dashboard = () => {
 	const { user } = useAuth();
 	const navigate = useNavigate();
 	const { t } = useLanguage();
@@ -402,4 +402,6 @@ export default function Dashboard() {
 			</div>
 		</main>
 	);
-}
+};
+
+export default Dashboard;

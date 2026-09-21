@@ -5,7 +5,7 @@ import { resetPassword } from "@/api/auth.api";
 import AuthShell from "@/components/identity/AuthShell";
 import { useLanguage } from "@/context/LanguageContext";
 
-export default function ResetPassword() {
+const ResetPassword = () => {
 	const navigate = useNavigate();
 	const { t } = useLanguage();
 	const [searchParams] = useSearchParams();
@@ -266,4 +266,6 @@ export default function ResetPassword() {
 			</form>
 		</AuthShell>
 	);
-}
+};
+
+export default ResetPassword;

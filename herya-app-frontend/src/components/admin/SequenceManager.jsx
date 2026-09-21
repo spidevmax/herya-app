@@ -51,7 +51,7 @@ const toForm = (sequence) => ({
 	primaryBenefit: sequence?.therapeuticFocus?.primaryBenefit ?? "",
 });
 
-function SequenceModal({ sequence, onClose, onSaved }) {
+const SequenceModal = ({ sequence, onClose, onSaved }) => {
 	const { t } = useLanguage();
 	const isEditing = Boolean(sequence);
 	const [form, setForm] = useState(() => toForm(sequence));
@@ -270,9 +270,9 @@ function SequenceModal({ sequence, onClose, onSaved }) {
 			</section>
 		</div>
 	);
-}
+};
 
-export default function SequenceManager() {
+const SequenceManager = () => {
 	const { t } = useLanguage();
 	const [items, setItems] = useState([]);
 	const [loading, setLoading] = useState(true);
@@ -494,4 +494,6 @@ export default function SequenceManager() {
 			)}
 		</section>
 	);
-}
+};
+
+export default SequenceManager;

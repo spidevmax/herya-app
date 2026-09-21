@@ -12,11 +12,11 @@ import { useCallback, useEffect, useRef } from "react";
  *
  * The hook respects `prefers-reduced-motion` by defaulting to lower volume.
  */
-export default function usePranayamaAudio({
+const usePranayamaAudio = ({
 	enabled = true,
 	guideVolume = 1, // 0–1 multiplier for breathing guide tones
 	cueVolume = 1, // 0–1 multiplier for phase-change bells
-} = {}) {
+} = {}) => {
 	const ctxRef = useRef(null);
 	const activeNodesRef = useRef([]);
 	const reducedMotion =
@@ -190,4 +190,6 @@ export default function usePranayamaAudio({
 		stopAll,
 		getCtx,
 	};
-}
+};
+
+export default usePranayamaAudio;

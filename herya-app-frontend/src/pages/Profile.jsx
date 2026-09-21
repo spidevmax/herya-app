@@ -65,7 +65,7 @@ function draftsAreEqual(a, b) {
 	return JSON.stringify(a) === JSON.stringify(b);
 }
 
-export default function Profile() {
+const Profile = () => {
 	const { user, logout, updateUser } = useAuth();
 	const { t } = useLanguage();
 	const isTutor = user?.role === "tutor";
@@ -352,4 +352,6 @@ export default function Profile() {
 			/>
 		</main>
 	);
-}
+};
+
+export default Profile;

@@ -61,7 +61,7 @@ const QuickAction = ({ icon, label, onClick, tone }) => {
 	);
 };
 
-export default function AdminQuickCard() {
+const AdminQuickCard = () => {
 	const { t } = useLanguage();
 	const navigate = useNavigate();
 	const [stats, setStats] = useState(null);
@@ -203,4 +203,6 @@ export default function AdminQuickCard() {
 			</button>
 		</motion.section>
 	);
-}
+};
+
+export default AdminQuickCard;

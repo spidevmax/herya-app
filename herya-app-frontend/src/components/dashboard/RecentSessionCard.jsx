@@ -32,7 +32,7 @@ const TYPE_FILL = {
 	meditation: "transparent",
 };
 
-export default function RecentSessionCard({ session }) {
+const RecentSessionCard = ({ session }) => {
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
 	const SessionTypeIcon = TYPE_ICON_MAP[session.sessionType] || PersonStanding;
@@ -96,4 +96,6 @@ export default function RecentSessionCard({ session }) {
 			</div>
 		</button>
 	);
-}
+};
+
+export default RecentSessionCard;

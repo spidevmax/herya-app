@@ -19,7 +19,7 @@ function normalizeLegacyPattern(p) {
 	};
 }
 
-export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
+const PranayamaMetronome = ({ patternKey = "4-4-4-4" }) => {
 	const { t } = useLanguage();
 	const [selectedKey, setSelectedKey] = useState(patternKey);
 
@@ -233,4 +233,6 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 			</dl>
 		</section>
 	);
-}
+};
+
+export default PranayamaMetronome;

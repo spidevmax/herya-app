@@ -67,7 +67,7 @@ const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
 	</motion.section>
 );
 
-function RelatedPoseChip({ pose, onClick, lang }) {
+const RelatedPoseChip = ({ pose, onClick, lang }) => {
 	const relatedImage =
 		pose.image || pose.media?.thumbnail?.url || pose.media?.images?.[0]?.url;
 	const displayName = localizedName(pose, lang);
@@ -94,9 +94,9 @@ function RelatedPoseChip({ pose, onClick, lang }) {
 			</p>
 		</button>
 	);
-}
+};
 
-export default function PoseDetail() {
+const PoseDetail = () => {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const { t, lang } = useLanguage();
@@ -846,4 +846,6 @@ export default function PoseDetail() {
 			</div>
 		</main>
 	);
-}
+};
+
+export default PoseDetail;

@@ -27,11 +27,7 @@ const COUNTDOWN_SEC = 5;
  * - visible: whether the warning is currently shown
  * - onCountdownEnd: called when countdown reaches 0
  */
-export default function TransitionWarning({
-	nextBlock,
-	visible = false,
-	onCountdownEnd,
-}) {
+const TransitionWarning = ({ nextBlock, visible = false, onCountdownEnd }) => {
 	const { t } = useLanguage();
 	const [remaining, setRemaining] = useState(COUNTDOWN_SEC);
 
@@ -137,4 +133,6 @@ export default function TransitionWarning({
 			)}
 		</AnimatePresence>
 	);
-}
+};
+
+export default TransitionWarning;
