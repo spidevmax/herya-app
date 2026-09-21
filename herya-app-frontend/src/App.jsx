@@ -22,7 +22,6 @@ const Library = lazy(() => import("@/pages/Library"));
 const Login = lazy(() => import("@/pages/Login"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const PoseDetail = lazy(() => import("@/pages/PoseDetail"));
-const Poses = lazy(() => import("@/pages/Poses"));
 const Profile = lazy(() => import("@/pages/Profile"));
 const Register = lazy(() => import("@/pages/Register"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
@@ -152,7 +151,6 @@ const AppRoutes = () => {
 							path="/library/breathing/:id"
 							element={<BreathingDetail />}
 						/>
-						{!isAdmin && <Route path="/poses" element={<Poses />} />}
 						{!isAdmin && (
 							<Route path="/poses/:id" element={<LegacyPoseDetailRedirect />} />
 						)}

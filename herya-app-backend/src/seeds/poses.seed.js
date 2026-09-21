@@ -30,6 +30,38 @@ async function seedPoses() {
 						.filter(Boolean)
 				: [];
 
+		/*
+		 * Los puntos de alineacion vienen en una sola celda porque el CSV no
+		 * admite listas anidadas. Cada punto se separa con "|" y dentro lleva
+		 * cinco trozos separados por "~":
+		 *
+		 *   zona ~ instruccion ~ instruccion en espanol ~ error ~ error en espanol
+		 *
+		 * El error es opcional: si va vacio, el punto se guarda sin el.
+		 */
+		const parseAlignmentKeyPoints = (value) => {
+			if (!value) return [];
+
+			return value
+				.split("|")
+				.map((punto) => {
+					const [area, instruction, instructionEs, commonMistake, commonMistakeEs] = punto
+						.split("~")
+						.map((parte) => parte?.trim() || "");
+
+					if (!area || !instruction) return null;
+
+					return {
+						area,
+						instruction,
+						instructionEs: instructionEs || undefined,
+						commonMistake: commonMistake || undefined,
+						commonMistakeEs: commonMistakeEs || undefined,
+					};
+				})
+				.filter(Boolean);
+		};
+
 		const poses = data.map((row) => {
 			// Parse categories - split by | and filter valid enum values
 			const validCategories = [
@@ -92,6 +124,9 @@ async function seedPoses() {
 				breathingCueEs: row.breathingCueEs?.trim() || undefined,
 				tags: parseArray(row.tags),
 				isSystemPose: row.isSystemPose === "true",
+				alignmentDetails: {
+					keyPoints: parseAlignmentKeyPoints(row.alignmentKeyPoints),
+				},
 			};
 		});
 

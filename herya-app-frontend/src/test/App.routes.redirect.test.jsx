@@ -55,7 +55,6 @@ vi.mock("@/pages/PoseDetail", () => ({ default: () => <div>PoseDetail</div> }));
 vi.mock("@/pages/BreathingDetail", () => ({
 	default: () => <div>BreathingDetail</div>,
 }));
-vi.mock("@/pages/Poses", () => ({ default: () => <div>Poses</div> }));
 vi.mock("@/pages/StartPractice", () => ({
 	default: () => <div>StartPractice</div>,
 }));

@@ -564,10 +564,12 @@ const PoseDetailPanel = ({
 										className="text-xs font-semibold capitalize"
 										style={{ color: "var(--ink)" }}
 									>
-										{kp.area}
+										{/* La zona es un valor fijo en ingles ("spine"),
+										    con su traduccion en anatomy.* */}
+										{translateWithFallback(t, `anatomy.${kp.area}`, kp.area)}
 									</p>
 									<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
-										{kp.instruction}
+										{localized(kp, "instruction", lang)}
 									</p>
 									{kp.commonMistake && (
 										<p
@@ -575,7 +577,7 @@ const PoseDetailPanel = ({
 											style={{ color: "var(--alert)" }}
 										>
 											<AlertTriangle size={10} />
-											{kp.commonMistake}
+											{localized(kp, "commonMistake", lang)}
 										</p>
 									)}
 								</div>

@@ -257,8 +257,13 @@ const poseSchema = new mongoose.Schema(
 							"head",
 						],
 					},
+					// Cada texto lleva su version en espanol al lado, igual que
+					// benefits/benefitsEs. El ayudante localized() del frontend
+					// escoge una u otra segun el idioma activo.
 					instruction: { type: String, trim: true },
+					instructionEs: { type: String, trim: true },
 					commonMistake: { type: String, trim: true },
+					commonMistakeEs: { type: String, trim: true },
 				},
 			],
 
