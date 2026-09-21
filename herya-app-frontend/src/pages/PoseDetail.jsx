@@ -213,14 +213,15 @@ const PoseDetail = () => {
 	const poseDisplaySanskrit = pose.sanskritName;
 	const poseImage =
 		pose.image || pose.media?.thumbnail?.url || pose.media?.images?.[0]?.url;
-	const poseDisplayCategory =
-		typeof pose.category === "string"
-			? pose.category.replace(/_/g, " ")
-			: Array.isArray(pose.category)
-				? pose.category.join(", ")
-				: pose.category
-					? String(pose.category)
-					: null;
+	// La categoria llega como texto o como lista de textos. En los dos casos
+	// cada valor se traduce por separado antes de juntarlos.
+	const traducirCategoria = (c) =>
+		translateWithFallback(t, `library.categories.${c}`, formatValue(c));
+	const poseDisplayCategory = Array.isArray(pose.category)
+		? pose.category.map(traducirCategoria).join(", ") || null
+		: pose.category
+			? traducirCategoria(String(pose.category))
+			: null;
 	const poseDisplayFamily =
 		typeof pose.family === "string" ? pose.family.replace(/_/g, " ") : null;
 	// Backend keys: preparatoryPoses, followUpPoses, counterposes
@@ -348,12 +349,21 @@ const PoseDetail = () => {
 							)}
 							{pose.drishti && (
 								<Badge color="var(--surya)">
-									{t("pose_detail.drishti")}: {formatValue(pose.drishti)}
+									{t("pose_detail.drishti")}:{" "}
+									{translateWithFallback(
+										t,
+										`library.drishti.${pose.drishti}`,
+										formatValue(pose.drishti),
+									)}
 								</Badge>
 							)}
 							{pose.energyEffect && (
 								<Badge color="var(--ink)">
-									{formatValue(pose.energyEffect)}
+									{translateWithFallback(
+										t,
+										`library.effects.${pose.energyEffect}`,
+										formatValue(pose.energyEffect),
+									)}
 								</Badge>
 							)}
 						</div>
@@ -393,7 +403,11 @@ const PoseDetail = () => {
 											{t("pose_detail.sidedness")}
 										</p>
 										<p className="text-sm font-semibold text-[var(--ink)] mt-0.5">
-											{formatValue(pose.sidedness.type)}
+											{translateWithFallback(
+												t,
+												`pose_detail.sidedness_values.${pose.sidedness.type}`,
+												formatValue(pose.sidedness.type),
+											)}
 										</p>
 									</div>
 								)}
@@ -439,11 +453,21 @@ const PoseDetail = () => {
 					{(pose.chakraRelated || pose.transitionType) && (
 						<div className="flex flex-wrap gap-2 mb-4">
 							{pose.chakraRelated && (
-								<Badge color="var(--alert)">{pose.chakraRelated}</Badge>
+								<Badge color="var(--alert)">
+									{translateWithFallback(
+										t,
+										`library.chakras.${pose.chakraRelated}`,
+										formatValue(pose.chakraRelated),
+									)}
+								</Badge>
 							)}
 							{pose.transitionType && (
 								<Badge color="var(--chandra)">
-									{formatValue(pose.transitionType)}
+									{translateWithFallback(
+										t,
+										`library.transitions.${pose.transitionType}`,
+										formatValue(pose.transitionType),
+									)}
 								</Badge>
 							)}
 						</div>
@@ -463,7 +487,11 @@ const PoseDetail = () => {
 								<b className="text-[var(--ink)]">
 									{t("pose_detail.sidedness")}:
 								</b>{" "}
-								{formatValue(pose.sidedness.type)}
+								{translateWithFallback(
+									t,
+									`pose_detail.sidedness_values.${pose.sidedness.type}`,
+									formatValue(pose.sidedness.type),
+								)}
 								{pose.sidedness.breathsPerSide
 									? ` · ${pose.sidedness.breathsPerSide} ${t("pose_detail.breaths_per_side")}`
 									: ""}
