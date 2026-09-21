@@ -36,27 +36,46 @@ const formatTime = (sec) => {
  * written together so that changing one makes you look at the other: a light
  * background with light text is unreadable.
  */
+/*
+ * Cada color de relleno va con el color de texto que se lee encima.
+ *
+ *   bg     + fg        -> paneles
+ *   accent + accentFg  -> botones activos
+ *
+ * accentFg existe aparte porque fg esta pensado para ir sobre bg, y en la
+ * paleta "balanced" no coinciden: ahi accent es tinta y fg tambien, asi que
+ * usar fg sobre accent dejaba el texto invisible.
+ */
 const PALETTE_TINTS = {
-	warm: { bg: "var(--surya)", accent: "var(--surya)", fg: "var(--on-fill)" },
+	warm: {
+		bg: "var(--surya)",
+		accent: "var(--surya)",
+		fg: "var(--on-fill)",
+		accentFg: "var(--on-fill)",
+	},
 	calming: {
 		bg: "var(--chandra)",
 		accent: "var(--chandra)",
 		fg: "var(--on-fill)",
+		accentFg: "var(--on-fill)",
 	},
 	cooling: {
 		bg: "var(--chandra)",
 		accent: "var(--chandra)",
 		fg: "var(--on-fill)",
+		accentFg: "var(--on-fill)",
 	},
 	energizing: {
 		bg: "var(--surya)",
 		accent: "var(--surya)",
 		fg: "var(--on-fill)",
+		accentFg: "var(--on-fill)",
 	},
 	balanced: {
 		bg: "var(--paper-raised)",
 		accent: "var(--ink)",
 		fg: "var(--ink)",
+		accentFg: "var(--paper)",
 	},
 };
 
@@ -89,13 +108,22 @@ const CycleBreathingPlayer = ({
 	});
 
 	// ── Haptic helper ────────────────────────────────────────────────────
+	/*
+	 * La baja estimulacion apaga la vibracion, aunque el usuario la tenga
+	 * activada. hapticActive es esa condicion real, y la usan tanto vibrate()
+	 * como el boton, para que el boton no diga que esta encendido cuando no va
+	 * a vibrar. hapticEnabled se conserva aparte: es la preferencia del
+	 * usuario, y vuelve al apagar la baja estimulacion.
+	 */
+	const hapticActive = hapticEnabled && !lowStim;
+
 	const vibrate = useCallback(
 		(ms) => {
-			if (hapticEnabled && !lowStim && navigator.vibrate) {
+			if (hapticActive && navigator.vibrate) {
 				navigator.vibrate(ms);
 			}
 		},
-		[hapticEnabled, lowStim],
+		[hapticActive],
 	);
 
 	// ── Custom ratio from config ─────────────────────────────────────────
@@ -597,7 +625,7 @@ const CycleBreathingPlayer = ({
 							: "var(--paper-raised)",
 						borderColor: "var(--ink)",
 						borderWidth: "var(--ink-width)",
-						color: audioEnabled ? paletteTint.fg : "var(--ink-soft)",
+						color: audioEnabled ? paletteTint.accentFg : "var(--ink-soft)",
 					}}
 					aria-label={t(
 						audioEnabled ? "pranayama.audio_on" : "pranayama.audio_off",
@@ -619,24 +647,36 @@ const CycleBreathingPlayer = ({
 					<button
 						type="button"
 						onClick={() => setHapticEnabled((v) => !v)}
-						className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors"
+						disabled={lowStim}
+						className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors disabled:cursor-not-allowed"
 						style={{
-							backgroundColor: hapticEnabled
+							backgroundColor: hapticActive
 								? paletteTint.accent
 								: "var(--paper-raised)",
-							borderColor: hapticEnabled ? paletteTint.accent : "var(--ink)",
-							color: hapticEnabled ? paletteTint.accent : "var(--ink-soft)",
+							borderColor: hapticActive ? paletteTint.accent : "var(--ink)",
+							color: hapticActive ? paletteTint.accentFg : "var(--ink-soft)",
+							opacity: lowStim ? 0.55 : 1,
 						}}
-						aria-label={t(
-							hapticEnabled
-								? "pranayama.vibration_on"
-								: "pranayama.vibration_off",
-						)}
-						aria-pressed={hapticEnabled}
+						// Con baja estimulacion el motivo no se ve en el boton, asi que
+						// se explica aqui: el texto llega al raton y al lector de
+						// pantalla.
+						title={
+							lowStim ? t("pranayama.vibration_blocked_by_low_stim") : undefined
+						}
+						aria-label={
+							lowStim
+								? t("pranayama.vibration_blocked_by_low_stim")
+								: t(
+										hapticEnabled
+											? "pranayama.vibration_on"
+											: "pranayama.vibration_off",
+									)
+						}
+						aria-pressed={hapticActive}
 					>
 						<Vibrate size={12} aria-hidden="true" />
 						{t(
-							hapticEnabled
+							hapticActive
 								? "pranayama.vibration_on"
 								: "pranayama.vibration_off",
 						)}
@@ -653,7 +693,7 @@ const CycleBreathingPlayer = ({
 							? paletteTint.accent
 							: "var(--paper-raised)",
 						borderColor: lowStim ? paletteTint.accent : "var(--ink)",
-						color: lowStim ? paletteTint.accent : "var(--ink-soft)",
+						color: lowStim ? paletteTint.accentFg : "var(--ink-soft)",
 					}}
 					aria-label={t("pranayama.low_stimulation")}
 					aria-pressed={lowStim}

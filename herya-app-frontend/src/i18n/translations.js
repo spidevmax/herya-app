@@ -508,6 +508,7 @@ export const translations = {
 			audio_off: "Sound off",
 			vibration_on: "Vibration on",
 			vibration_off: "Vibration off",
+			vibration_blocked_by_low_stim: "Low stimulation turns vibration off",
 			nostril_left: "Left nostril",
 			nostril_right: "Right nostril",
 			nostril_both: "Both nostrils",
@@ -1887,6 +1888,8 @@ export const translations = {
 			audio_off: "Sonido desactivado",
 			vibration_on: "Vibración activada",
 			vibration_off: "Vibración desactivada",
+			vibration_blocked_by_low_stim:
+				"La baja estimulación desactiva la vibración",
 			nostril_left: "Fosa izquierda",
 			nostril_right: "Fosa derecha",
 			nostril_both: "Ambas fosas",
