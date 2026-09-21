@@ -153,7 +153,6 @@ Routes are protected by two wrappers in `src/components/routing/`:
 | `/library/sequence/:id` | SequenceDetail | Sequence detail |
 | `/library/pose/:id` | PoseDetail | Pose detail |
 | `/library/breathing/:id` | BreathingDetail | Breathing pattern detail |
-| `/poses` | Poses | Pose listing (non-admin) |
 | `/start-practice` | StartPractice | Practice-type selector |
 | `/session/:type` | Session | Guided practice flow (non-admin) |
 | `/sessions` | SessionHistory | Session history |
@@ -166,12 +165,34 @@ Routes are protected by two wrappers in `src/components/routing/`:
 | `*` | NotFound | 404 |
 
 > `/garden` redirects to `/journal` for backward compatibility. `/poses/:id` and `/breathing/:id` redirect to their counterparts under `/library/*`.
+>
+> `/identity-proof` is not part of the product and nothing links to it. It
+> renders the surya/chandra design system against real seeded content so the
+> visual direction can be reviewed on one page.
 
 ---
 
 ## Internationalization and theming
 
 - **Languages:** Spanish and English. Dictionaries in [src/i18n/translations.js](src/i18n/translations.js); the active language is managed by `LanguageContext` and persisted to `localStorage`.
+- **Translating database content:** interface text goes through `t()`, but the
+  content itself (pose names, benefits, warnings) lives in MongoDB and is
+  translated a second way. Documents carry paired fields — `benefits` and
+  `benefitsEs`, `warnings` and `warningsEs` — and the helpers in
+  [src/utils/libraryHelpers.js](src/utils/libraryHelpers.js) pick the right one
+  for the active language:
+
+  | Helper | Use it for |
+  |---|---|
+  | `localized(item, field, lang)` | a single string, such as `warnings` |
+  | `localizedArray(item, field, lang)` | a list, such as `benefits` |
+  | `localizedName(item, lang)` | the display name of a pose or sequence |
+  | `translateWithFallback(t, key, fallback)` | fixed values that are the same in every document, such as `energyEffect` or a chakra, which have their own key groups under `library.*` |
+
+  Reading `item.field` directly is the usual cause of a stray English string on
+  a Spanish screen, so prefer a helper even when the Spanish value looks
+  optional. Every helper falls back to the English value when the translation is
+  missing, so nothing ever renders a raw key.
 - **Theme:** light / dark via `ThemeContext`, with tokens defined in [src/index.css](src/index.css) and [src/components/ui/tokens.js](src/components/ui/tokens.js).
 
 Both contexts are mounted alongside `AuthContext` in [src/providers/Providers.jsx](src/providers/Providers.jsx).

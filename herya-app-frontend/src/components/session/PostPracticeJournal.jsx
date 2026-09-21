@@ -337,8 +337,8 @@ const PostPracticeJournal = ({
 			{/* Energy & Stress */}
 			{!isTutorMode && (
 				<JournalCard
-					title="Body Check"
-					subtitle="A quick read of your current energy and nervous system load."
+					title={t("practice.journal_body_check")}
+					subtitle={t("practice.journal_body_check_subtitle")}
 				>
 					<section
 						aria-label={t("practice.journal_energy_after", { n: energyAfter })}
@@ -370,7 +370,7 @@ const PostPracticeJournal = ({
 			{!isTutorMode && (
 				<JournalCard
 					title={t("practice.journal_sensations")}
-					subtitle="Notice the clearest body sensations that are present after practice."
+					subtitle={t("practice.journal_sensations_subtitle")}
 				>
 					<SensationChips
 						value={physicalSensations}

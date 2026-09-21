@@ -62,13 +62,13 @@ const PranayamaMetronome = ({ patternKey = "4-4-4-4" }) => {
 
 	return (
 		<section
-			aria-label="Pranayama Metronome"
+			aria-label={t("guided.metronome_label")}
 			className="flex flex-col items-center gap-6 py-6"
 		>
 			{/* Pattern selector */}
 			<ul
 				className="flex gap-2 flex-wrap justify-center list-none m-0 p-0"
-				aria-label="Patterns"
+				aria-label={t("guided.patterns_label")}
 			>
 				{Object.entries(PRANAYAMA_PATTERNS).map(([key, p]) => (
 					<li key={key}>

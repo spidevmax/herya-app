@@ -544,8 +544,35 @@ References are resolved by natural key rather than raw ObjectId: seeds look up
 the user's email, the child's name, the sequence's `family:level` pair, or the
 breathing pattern's `romanizationName`, then store the resulting `_id`.
 
-`sessionTemplates.csv` is normalised one row per block, grouped by `templateKey`,
-so its 25 rows produce 14 documents.
+The Documents column counts what ends up in the collection, which is not always
+the number of rows in the CSV:
+
+- `sessionTemplates.csv` is normalised one row per block, grouped by
+  `templateKey`, so its 25 rows produce 14 documents.
+- `breathingPatterns.csv` holds 9 rows. The other 7 come from
+  `SUPPLEMENTAL_PATTERNS`, defined inside `breathingPatterns.seed.js`.
+- `users.csv` holds 6 rows. The admin account is created by the seed script
+  rather than read from the file.
+
+### Bilingual content
+
+Text the user reads is stored twice, in paired fields: `benefits` alongside
+`benefitsEs`, `warnings` alongside `warningsEs`, `name` alongside `nameEs`. The
+CSVs mirror that with paired columns, and the frontend picks the right one for
+the active language. English is the fallback, so the Spanish column may be left
+empty.
+
+Free text that belongs to a person — session notes, journal entries, child
+profiles — is not paired, because it is whatever that user wrote. Seed rows for
+those follow the owner's `language` in `users.csv` instead.
+
+Nested lists are packed into a single cell, since CSV has no nested columns.
+`poses.csv` uses `alignmentKeyPoints`, where `|` separates the points and `~`
+separates the five parts of each one:
+
+```
+area ~ instruction ~ instructionEs ~ commonMistake ~ commonMistakeEs
+```
 
 Default seeded users:
 

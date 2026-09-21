@@ -510,6 +510,7 @@ export const translations = {
 			vibration_off: "Vibration off",
 			nostril_left: "Left nostril",
 			nostril_right: "Right nostril",
+			nostril_both: "Both nostrils",
 			safety_kapalabhati:
 				"Avoid if pregnant, hypertensive, or with heart conditions. Stop if dizzy.",
 			safety_bhastrika:
@@ -907,6 +908,8 @@ export const translations = {
 			breathing_manager_delete_desc:
 				"This breathing pattern will be permanently deleted.",
 			breathing_manager_romanization: "Romanization",
+			breathing_manager_ratio_hint:
+				"Inhale : hold : exhale : hold (after exhale)",
 			breathing_manager_iast: "IAST",
 			breathing_manager_sanskrit: "Sanskrit",
 			breathing_manager_description: "Description",
@@ -1175,6 +1178,11 @@ export const translations = {
 			journal_energy_after: "Energy level: {n}/10",
 			journal_stress_after: "Stress level: {n}/10",
 			journal_sensations: "Physical sensations",
+			journal_body_check: "Body check",
+			journal_body_check_subtitle:
+				"A quick read of your current energy and nervous system load.",
+			journal_sensations_subtitle:
+				"Notice the clearest body sensations that are present after practice.",
 			journal_emotional_notes: "Body & mind",
 			tutor_notes: "Short note for the tutor",
 			journal_emotional_placeholder: "What did you notice?",
@@ -1279,6 +1287,8 @@ export const translations = {
 			play: "Play",
 			pause: "Pause",
 			reset: "Reset",
+			metronome_label: "Pranayama metronome",
+			patterns_label: "Patterns",
 
 			// Safety
 			safety_warning: "Contraindications",
@@ -1879,6 +1889,7 @@ export const translations = {
 			vibration_off: "Vibración desactivada",
 			nostril_left: "Fosa izquierda",
 			nostril_right: "Fosa derecha",
+			nostril_both: "Ambas fosas",
 			safety_kapalabhati:
 				"Evitar en embarazo, hipertensión o problemas cardíacos. Detener si hay mareo.",
 			safety_bhastrika:
@@ -2279,6 +2290,8 @@ export const translations = {
 			breathing_manager_delete_desc:
 				"Este patrón de respiración se eliminará de forma permanente.",
 			breathing_manager_romanization: "Romanización",
+			breathing_manager_ratio_hint:
+				"Inhalación : retención : exhalación : retención (tras exhalar)",
 			breathing_manager_iast: "IAST",
 			breathing_manager_sanskrit: "Sánscrito",
 			breathing_manager_description: "Descripción",
@@ -2555,6 +2568,11 @@ export const translations = {
 			journal_energy_after: "Nivel de energía: {n}/10",
 			journal_stress_after: "Nivel de estrés: {n}/10",
 			journal_sensations: "Sensaciones físicas",
+			journal_body_check: "Chequeo corporal",
+			journal_body_check_subtitle:
+				"Una lectura rápida de tu energía y de cómo está tu sistema nervioso.",
+			journal_sensations_subtitle:
+				"Fíjate en las sensaciones corporales más claras después de la práctica.",
 			journal_emotional_notes: "Cuerpo y mente",
 			tutor_notes: "Nota breve para el tutor",
 			journal_emotional_placeholder: "¿Qué notaste?",
@@ -2661,6 +2679,8 @@ export const translations = {
 			play: "Reproducir",
 			pause: "Pausar",
 			reset: "Reiniciar",
+			metronome_label: "Metrónomo de pranayama",
+			patterns_label: "Patrones",
 
 			// Safety
 			safety_warning: "Contraindicaciones",

@@ -625,7 +625,7 @@ const BreathingPatternManager = () => {
 												"color-mix(in srgb, var(--chandra) 12%, transparent)",
 											color: "var(--chandra)",
 										}}
-										title="Inhale : Hold : Exhale : Hold (after exhale)"
+										title={t("admin.breathing_manager_ratio_hint")}
 									>
 										{item.patternRatio?.inhale ?? 1}:
 										{item.patternRatio?.hold ?? 0}:

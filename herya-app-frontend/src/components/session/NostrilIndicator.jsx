@@ -24,7 +24,7 @@ const NostrilIndicator = ({
 	const rightActive = isRight || isBoth;
 	const label =
 		nostrilFlow === "both"
-			? "Both nostrils"
+			? t("pranayama.nostril_both")
 			: nostrilFlow === "none"
 				? t("pranayama.hold")
 				: t(isLeft ? "pranayama.nostril_left" : "pranayama.nostril_right");
