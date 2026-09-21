@@ -16,9 +16,7 @@ export default function Toggle({ id, label, checked, onChange }) {
 				aria-hidden="true"
 				className="w-11 h-6 rounded-full transition-colors duration-200 relative inline-block"
 				style={{
-					backgroundColor: checked
-						? "var(--chandra)"
-						: "var(--ink)",
+					backgroundColor: checked ? "var(--chandra)" : "var(--ink)",
 				}}
 			>
 				<span

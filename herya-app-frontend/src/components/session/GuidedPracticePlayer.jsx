@@ -289,10 +289,7 @@ export default function GuidedPracticePlayer({
 				/>
 				<dl className="flex justify-between mt-1 m-0">
 					<div className="flex gap-1">
-						<dt
-							className="text-[10px]"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 							{t("practice.time_elapsed")}:
 						</dt>
 						<dd
@@ -303,10 +300,7 @@ export default function GuidedPracticePlayer({
 						</dd>
 					</div>
 					<div className="flex gap-1">
-						<dt
-							className="text-[10px]"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 							{t("practice.time_remaining")}:
 						</dt>
 						<dd
@@ -763,19 +757,13 @@ export default function GuidedPracticePlayer({
 										{t("practice.safe_pause_anchor_title")}
 									</h4>
 									{anchorPhrase && (
-										<p
-											className="text-xs"
-											style={{ color: "var(--ink-soft)" }}
-										>
+										<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 											{t("practice.safe_pause_anchor_phrase_label")}:{" "}
 											{anchorPhrase}
 										</p>
 									)}
 									{anchorBodyCue && (
-										<p
-											className="text-xs"
-											style={{ color: "var(--ink-soft)" }}
-										>
+										<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 											{t("practice.safe_pause_anchor_cue_label")}:{" "}
 											{anchorBodyCue}
 										</p>

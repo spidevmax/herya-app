@@ -47,9 +47,19 @@ export default function BreathMark({
 		>
 			<title>{title}</title>
 			{/* right side — surya, the warming channel */}
-			<path d={arc(10, 170)} stroke={warm} strokeWidth={w} strokeLinecap="round" />
+			<path
+				d={arc(10, 170)}
+				stroke={warm}
+				strokeWidth={w}
+				strokeLinecap="round"
+			/>
 			{/* left side — chandra, the cooling channel */}
-			<path d={arc(190, 350)} stroke={cool} strokeWidth={w} strokeLinecap="round" />
+			<path
+				d={arc(190, 350)}
+				stroke={cool}
+				strokeWidth={w}
+				strokeLinecap="round"
+			/>
 		</svg>
 	);
 }

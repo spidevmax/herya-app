@@ -1,15 +1,11 @@
 const TONE_STYLES = {
 	default: {
-		border:
-			"1px solid color-mix(in srgb, var(--ink) 72%, transparent)",
-		background:
-			"var(--paper-raised)",
+		border: "1px solid color-mix(in srgb, var(--ink) 72%, transparent)",
+		background: "var(--paper-raised)",
 	},
 	soft: {
-		border:
-			"1px solid color-mix(in srgb, var(--surya) 12%, var(--ink) 88%)",
-		background:
-			"var(--paper-raised)",
+		border: "1px solid color-mix(in srgb, var(--surya) 12%, var(--ink) 88%)",
+		background: "var(--paper-raised)",
 	},
 };
 
@@ -29,9 +25,7 @@ const JournalCard = ({
 				{title}
 			</h2>
 			{subtitle && (
-				<p className="mt-1 mb-0 text-sm text-[var(--ink-soft)]">
-					{subtitle}
-				</p>
+				<p className="mt-1 mb-0 text-sm text-[var(--ink-soft)]">{subtitle}</p>
 			)}
 		</div>
 		{children}

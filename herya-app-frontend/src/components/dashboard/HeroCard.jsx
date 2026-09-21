@@ -25,7 +25,9 @@ const HeroCard = ({ sequence, reason, loading }) => {
 				aria-label={t("dashboard.welcome_title")}
 				className="ink-block p-6"
 			>
-				<h2 className="display text-[1.8rem]">{t("dashboard.welcome_title")}</h2>
+				<h2 className="display text-[1.8rem]">
+					{t("dashboard.welcome_title")}
+				</h2>
 				<p className="mt-2 text-sm" style={{ color: "var(--ink-soft)" }}>
 					{t("hero.welcome_hint")}
 				</p>
@@ -33,7 +35,11 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					type="button"
 					onClick={() => navigate("/library")}
 					className="ink-block ink-block--press mt-5 px-5 py-2.5 text-sm font-bold"
-					style={{ background: "var(--surya)", color: "var(--on-fill)", cursor: "pointer" }}
+					style={{
+						background: "var(--surya)",
+						color: "var(--on-fill)",
+						cursor: "pointer",
+					}}
 				>
 					{t("hero.explore")}
 				</button>
@@ -86,7 +92,9 @@ const HeroCard = ({ sequence, reason, loading }) => {
 						}}
 					>
 						<Clock size={13} aria-hidden="true" />
-						<dt className="sr-only">{t("library.stat_duration", "Duration")}</dt>
+						<dt className="sr-only">
+							{t("library.stat_duration", "Duration")}
+						</dt>
 						<dd className="m-0 text-xs font-bold">
 							{sequence.estimatedDuration.recommended} min
 						</dd>
@@ -114,7 +122,11 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					type="button"
 					onClick={startPractice}
 					className="ink-block ink-block--press display px-6 py-2.5 text-[1.05rem]"
-					style={{ background: "var(--ink)", color: "var(--paper)", cursor: "pointer" }}
+					style={{
+						background: "var(--ink)",
+						color: "var(--paper)",
+						cursor: "pointer",
+					}}
 				>
 					{t("hero.start")}
 				</button>

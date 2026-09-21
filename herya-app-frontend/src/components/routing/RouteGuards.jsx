@@ -3,13 +3,12 @@ import { LoadingSpinner } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 
 const FullPageSpinner = () => (
-	<div
-		role="status"
+	<output
 		aria-live="polite"
-		className="min-h-dvh flex items-center justify-center"
+		className="flex min-h-dvh items-center justify-center"
 	>
 		<LoadingSpinner size={40} color="var(--chandra)" />
-	</div>
+	</output>
 );
 
 export const ProtectedRoute = ({ children }) => {

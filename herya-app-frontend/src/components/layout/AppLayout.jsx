@@ -60,7 +60,11 @@ export const DesktopSidebar = () => {
 						>
 							{({ isActive }) => (
 								<>
-									<Icon size={19} strokeWidth={isActive ? 2.4 : 1.9} aria-hidden="true" />
+									<Icon
+										size={19}
+										strokeWidth={isActive ? 2.4 : 1.9}
+										aria-hidden="true"
+									/>
 									<span>{t(item.labelKey)}</span>
 								</>
 							)}

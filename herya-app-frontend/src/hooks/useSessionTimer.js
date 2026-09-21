@@ -66,7 +66,13 @@ export default function useSessionTimer(blocks = []) {
 		return () => clearInterval(intervalRef.current);
 	}, [isRunning, tick]);
 
-	// Auto-advance block when block time expires
+	/*
+	 * Auto-advance block when block time expires. The omitted dependencies are
+	 * deliberate: this effect re-runs every tick through blockElapsedSec, so the
+	 * closure over currentBlockIndex is never stale, and listing it would re-fire
+	 * the check on each advance instead of only when a block's time runs out.
+	 */
+	// biome-ignore lint/correctness/useExhaustiveDependencies: see above
 	useEffect(() => {
 		if (!isRunning || !currentBlock) return;
 		if (
@@ -77,7 +83,6 @@ export default function useSessionTimer(blocks = []) {
 				goToBlock(currentBlockIndex + 1);
 			}
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [blockElapsedSec, currentBlockDurationSec, isRunning]);
 
 	const start = useCallback(() => {

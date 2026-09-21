@@ -109,9 +109,7 @@ export default function Dashboard() {
 			style={{ background: "var(--paper)" }}
 		>
 			{/* ── Header ────────────────────────────────────────────────────── */}
-			<header
-				className="flex items-center justify-between gap-3"
-			>
+			<header className="flex items-center justify-between gap-3">
 				<div className="flex items-center gap-3 min-w-0">
 					<span
 						aria-hidden="true"
@@ -141,7 +139,10 @@ export default function Dashboard() {
 							{t(greetingKey)},
 						</p>
 						<div className="flex items-center gap-2 flex-wrap">
-							<h1 className="display truncate text-[1.9rem]" style={{ color: "var(--ink)" }}>
+							<h1
+								className="display truncate text-[1.9rem]"
+								style={{ color: "var(--ink)" }}
+							>
 								{firstName}
 							</h1>
 							{roleTone && (
@@ -220,9 +221,7 @@ export default function Dashboard() {
 			────────────────────────────────────────────────────────────────── */}
 			<div className="flex flex-col lg:grid lg:grid-cols-[55%_45%] lg:gap-5">
 				{/* Mobile-only calendar (shown first on small screens) */}
-				<div
-					className="mb-5 lg:hidden"
-				>
+				<div className="mb-5 lg:hidden">
 					<CalendarStrip
 						sessionDates={sessionDates}
 						streak={stats?.currentStreak ?? 0}
@@ -234,8 +233,7 @@ export default function Dashboard() {
 				{/* Left column (desktop): Hero + Recent */}
 				<div className="flex flex-col gap-5 lg:col-start-1">
 					{!isAdminUser && (
-						<div
-						>
+						<div>
 							<HeroCard
 								sequence={recommended}
 								reason={recommendReason}
@@ -244,9 +242,7 @@ export default function Dashboard() {
 						</div>
 					)}
 
-					<div
-						className="flex flex-col gap-3"
-					>
+					<div className="flex flex-col gap-3">
 						{loading ? (
 							<>
 								<div className="h-4 w-36 rounded-lg skeleton" />
@@ -342,9 +338,7 @@ export default function Dashboard() {
 											aria-label={t("dashboard.no_sessions_title")}
 											className="ink-block p-6 text-center"
 										>
-											<p
-												className="mb-1 text-sm font-bold"
-											>
+											<p className="mb-1 text-sm font-bold">
 												{t("dashboard.no_sessions_title")}
 											</p>
 											<p
@@ -363,8 +357,7 @@ export default function Dashboard() {
 
 				{/* Right column (desktop): Calendar + Snapshot + Tutor */}
 				<div className="hidden lg:flex lg:flex-col gap-5 lg:col-start-2">
-					<div
-					>
+					<div>
 						<CalendarStrip
 							sessionDates={sessionDates}
 							streak={stats?.currentStreak ?? 0}
@@ -373,8 +366,7 @@ export default function Dashboard() {
 						/>
 					</div>
 
-					<div
-					>
+					<div>
 						<PracticeSnapshotCard
 							streak={stats?.currentStreak ?? 0}
 							weekSessions={weekSessions ?? 0}
@@ -385,17 +377,14 @@ export default function Dashboard() {
 					</div>
 
 					{isTutorUser && (
-						<div
-						>
+						<div>
 							<TutorInsightsCard tutorInsights={stats?.tutorInsights} />
 						</div>
 					)}
 				</div>
 
 				{/* Mobile-only: Snapshot + Tutor after Recent */}
-				<div
-					className="mt-5 lg:hidden"
-				>
+				<div className="mt-5 lg:hidden">
 					<PracticeSnapshotCard
 						streak={stats?.currentStreak ?? 0}
 						weekSessions={weekSessions ?? 0}
@@ -406,9 +395,7 @@ export default function Dashboard() {
 				</div>
 
 				{isTutorUser && (
-					<div
-						className="mt-5 lg:hidden"
-					>
+					<div className="mt-5 lg:hidden">
 						<TutorInsightsCard tutorInsights={stats?.tutorInsights} />
 					</div>
 				)}

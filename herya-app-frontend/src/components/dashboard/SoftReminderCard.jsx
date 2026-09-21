@@ -109,7 +109,11 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 								borderRadius: "var(--radius-block)",
 							}}
 						>
-							<Icon size={18} aria-hidden="true" style={{ color: "var(--ink)" }} />
+							<Icon
+								size={18}
+								aria-hidden="true"
+								style={{ color: "var(--ink)" }}
+							/>
 						</div>
 
 						<div className="flex-1 min-w-0">
@@ -119,11 +123,7 @@ export default function SoftReminderCard({ user, sessions = [], streak = 0 }) {
 							>
 								{t("dashboard.reminder_label")}
 							</p>
-							<p
-								className="text-sm font-bold leading-6"
-							>
-								{reminder.message}
-							</p>
+							<p className="text-sm font-bold leading-6">{reminder.message}</p>
 						</div>
 
 						<button

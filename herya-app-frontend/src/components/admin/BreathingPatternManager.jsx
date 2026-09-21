@@ -398,9 +398,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 
 					<div className="grid gap-4 sm:grid-cols-4">
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--ink)]">
-								Inhale
-							</span>
+							<span className="font-semibold text-[var(--ink)]">Inhale</span>
 							<input
 								type="number"
 								min="0"
@@ -413,9 +411,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--ink)]">
-								Hold
-							</span>
+							<span className="font-semibold text-[var(--ink)]">Hold</span>
 							<input
 								type="number"
 								min="0"
@@ -428,9 +424,7 @@ function BreathingPatternModal({ item, onClose, onSaved }) {
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span className="font-semibold text-[var(--ink)]">
-								Exhale
-							</span>
+							<span className="font-semibold text-[var(--ink)]">Exhale</span>
 							<input
 								type="number"
 								min="0"

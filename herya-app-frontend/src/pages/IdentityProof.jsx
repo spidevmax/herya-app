@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import BreathBuddy from "@/components/identity/BreathBuddy";
-import { DesktopSidebar } from "@/components/layout/AppLayout";
-import BottomNav from "@/components/layout/BottomNav";
-import { Badge, Button, Card, SkeletonCard, StatCard } from "@/components/ui";
 import AdminQuickCard from "@/components/dashboard/AdminQuickCard";
 import CalendarStrip from "@/components/dashboard/CalendarStrip";
 import HeroCard from "@/components/dashboard/HeroCard";
 import PracticeSnapshotCard from "@/components/dashboard/PracticeSnapshotCard";
 import RecentSessionCard from "@/components/dashboard/RecentSessionCard";
+import BreathBuddy from "@/components/identity/BreathBuddy";
 import BreathMark from "@/components/identity/BreathMark";
+import { DesktopSidebar } from "@/components/layout/AppLayout";
+import BottomNav from "@/components/layout/BottomNav";
+import { Badge, Button, Card, SkeletonCard, StatCard } from "@/components/ui";
 import "@/styles/identity.css";
 
 /*
@@ -19,9 +19,24 @@ import "@/styles/identity.css";
  */
 
 const BLOCKS = [
-	{ label: "Standing warm-up", detail: "Tadasana, level 1", minutes: 20, channel: "surya" },
-	{ label: "Ujjayi breathing", detail: "8 cycles, 1:4:2", minutes: 8, channel: "chandra" },
-	{ label: "Closing stillness", detail: "Body scan", minutes: 7, channel: "none" },
+	{
+		label: "Standing warm-up",
+		detail: "Tadasana, level 1",
+		minutes: 20,
+		channel: "surya",
+	},
+	{
+		label: "Ujjayi breathing",
+		detail: "8 cycles, 1:4:2",
+		minutes: 8,
+		channel: "chandra",
+	},
+	{
+		label: "Closing stillness",
+		detail: "Body scan",
+		minutes: 7,
+		channel: "none",
+	},
 ];
 
 const TOTAL = BLOCKS.reduce((sum, b) => sum + b.minutes, 0);
@@ -38,30 +53,58 @@ const FIXTURE_SEQUENCE = {
 };
 
 const FIXTURE_SESSIONS = [
-	{ _id: "s1", sessionType: "vk_sequence", duration: 45, completed: true, date: "2026-09-18", vkSequence: { englishName: "Standing Asymmetric - Level 2" } },
-	{ _id: "s2", sessionType: "pranayama", duration: 10, completed: true, date: "2026-09-17" },
-	{ _id: "s3", sessionType: "meditation", duration: 20, completed: false, date: "2026-09-16" },
+	{
+		_id: "s1",
+		sessionType: "vk_sequence",
+		duration: 45,
+		completed: true,
+		date: "2026-09-18",
+		vkSequence: { englishName: "Standing Asymmetric - Level 2" },
+	},
+	{
+		_id: "s2",
+		sessionType: "pranayama",
+		duration: 10,
+		completed: true,
+		date: "2026-09-17",
+	},
+	{
+		_id: "s3",
+		sessionType: "meditation",
+		duration: 20,
+		completed: false,
+		date: "2026-09-16",
+	},
 ];
 
 const FIXTURE_DATES = ["2026-09-18", "2026-09-17", "2026-09-15", "2026-09-14"];
 
 function KramaLadder() {
 	return (
-		<ol className="mt-5 flex flex-col gap-2" style={{ listStyle: "none", padding: 0 }}>
+		<ol
+			className="mt-5 flex flex-col gap-2"
+			style={{ listStyle: "none", padding: 0 }}
+		>
 			{BLOCKS.map((block, i) => {
 				const filled = block.channel !== "none";
 				const fill = filled ? `var(--${block.channel})` : "var(--paper-raised)";
 				// Text on a channel fill is always dark ink — both hues stay light
 				// in either theme, so theme-flipping the text would break contrast.
 				const onFill = filled ? "var(--on-fill)" : "var(--ink)";
-				const onFillSoft = filled ? "color-mix(in srgb, var(--on-fill) 72%, transparent)" : "var(--ink-soft)";
+				const onFillSoft = filled
+					? "color-mix(in srgb, var(--on-fill) 72%, transparent)"
+					: "var(--ink-soft)";
 				return (
 					<li
 						key={block.label}
 						className="ink-block flex items-stretch overflow-hidden"
 						/* Height carries duration: the session's shape is readable
 						   before any number is. */
-						style={{ minHeight: `${block.minutes * 3.2}px`, background: fill, color: onFill }}
+						style={{
+							minHeight: `${block.minutes * 3.2}px`,
+							background: fill,
+							color: onFill,
+						}}
 					>
 						<span
 							className="display flex w-12 shrink-0 items-center justify-center text-[1.05rem]"
@@ -78,11 +121,16 @@ function KramaLadder() {
 								<span className="block text-[1rem] font-bold leading-tight">
 									{block.label}
 								</span>
-								<span className="block text-[0.82rem]" style={{ color: onFillSoft }}>
+								<span
+									className="block text-[0.82rem]"
+									style={{ color: onFillSoft }}
+								>
 									{block.detail}
 								</span>
 							</span>
-							<span className="display shrink-0 text-[1.15rem]">{block.minutes}m</span>
+							<span className="display shrink-0 text-[1.15rem]">
+								{block.minutes}m
+							</span>
 						</span>
 					</li>
 				);
@@ -138,14 +186,21 @@ export default function IdentityProof() {
 				{/* Session card — the krama ladder */}
 				<section className="ink-block p-5">
 					<h1 className="display text-[2.1rem]">Morning Reset</h1>
-					<p className="mt-2 text-[0.9rem]" style={{ color: "var(--ink-soft)" }}>
+					<p
+						className="mt-2 text-[0.9rem]"
+						style={{ color: "var(--ink-soft)" }}
+					>
 						Three blocks, {TOTAL} minutes. Practised 12 times.
 					</p>
 					<KramaLadder />
 					<button
 						type="button"
 						className="ink-block ink-block--press display mt-5 w-full py-3 text-[1.1rem]"
-						style={{ background: "var(--surya)", color: "var(--on-fill)", cursor: "pointer" }}
+						style={{
+							background: "var(--surya)",
+							color: "var(--on-fill)",
+							cursor: "pointer",
+						}}
 					>
 						Begin practice
 					</button>
@@ -158,13 +213,17 @@ export default function IdentityProof() {
 				>
 					<h2 className="display text-[1.15rem]">Before you begin with Lily</h2>
 					<p className="mt-3 text-[0.92rem] leading-relaxed">
-						Keep breathing blocks under five minutes. Asthma — avoid rapid breathing.
+						Keep breathing blocks under five minutes. Asthma — avoid rapid
+						breathing.
 					</p>
 					<p className="mt-3 text-[0.92rem] leading-relaxed">
-						Her anchor phrase is <strong>“My breath helps me.”</strong> Her body cue is
-						shoulders dropping.
+						Her anchor phrase is <strong>“My breath helps me.”</strong> Her body
+						cue is shoulders dropping.
 					</p>
-					<p className="mt-4 text-[0.8rem]" style={{ color: "var(--ink-soft)" }}>
+					<p
+						className="mt-4 text-[0.8rem]"
+						style={{ color: "var(--ink-soft)" }}
+					>
 						No colour, no character, no encouragement copy on this screen.
 					</p>
 				</section>
@@ -177,9 +236,16 @@ export default function IdentityProof() {
 						fill={phase === "exhale" ? "var(--chandra)" : "var(--surya)"}
 					/>
 					<p className="display mt-3 text-[1.3rem]">
-						{phase === "inhale" ? "Breathe in" : phase === "hold" ? "Hold" : "Breathe out"}
+						{phase === "inhale"
+							? "Breathe in"
+							: phase === "hold"
+								? "Hold"
+								: "Breathe out"}
 					</p>
-					<p className="mt-1 text-[0.85rem]" style={{ color: "var(--ink-soft)" }}>
+					<p
+						className="mt-1 text-[0.85rem]"
+						style={{ color: "var(--ink-soft)" }}
+					>
 						Ujjayi, 1:4:2 — the figure is the pacer, not a mascot.
 					</p>
 				</section>
@@ -219,9 +285,23 @@ export default function IdentityProof() {
 
 				{/* Dashboard cards on fixture data */}
 				<section className="mt-5 flex flex-col gap-4">
-					<HeroCard sequence={FIXTURE_SEQUENCE} reason="Sigue tu progresión" loading={false} />
-					<CalendarStrip sessionDates={FIXTURE_DATES} streak={4} weekSessions={3} loading={false} />
-					<PracticeSnapshotCard streak={4} weekSessions={3} totalPracticeMinutes={320} loading={false} />
+					<HeroCard
+						sequence={FIXTURE_SEQUENCE}
+						reason="Sigue tu progresión"
+						loading={false}
+					/>
+					<CalendarStrip
+						sessionDates={FIXTURE_DATES}
+						streak={4}
+						weekSessions={3}
+						loading={false}
+					/>
+					<PracticeSnapshotCard
+						streak={4}
+						weekSessions={3}
+						totalPracticeMinutes={320}
+						loading={false}
+					/>
 					<AdminQuickCard />
 					{FIXTURE_SESSIONS.map((session) => (
 						<RecentSessionCard key={session._id} session={session} />
@@ -246,7 +326,10 @@ export default function IdentityProof() {
 								className="ink-block"
 								style={{ background: value, height: "3rem", boxShadow: "none" }}
 							/>
-							<span className="mt-1.5 block text-[0.72rem]" style={{ color: "var(--ink-soft)" }}>
+							<span
+								className="mt-1.5 block text-[0.72rem]"
+								style={{ color: "var(--ink-soft)" }}
+							>
 								{name}
 							</span>
 						</div>

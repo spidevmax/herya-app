@@ -186,10 +186,7 @@ export default function SessionHistory() {
 				<div className="px-4">
 					<EmptyState
 						icon={
-							<ClipboardList
-								size={52}
-								style={{ color: "var(--chandra)" }}
-							/>
+							<ClipboardList size={52} style={{ color: "var(--chandra)" }} />
 						}
 						title={t("session_history.empty_title")}
 						description={t("session_history.empty_hint")}

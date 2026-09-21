@@ -115,18 +115,13 @@ export default function VisualSchedule({
 								<p
 									className={`${compact ? "text-xs" : "text-sm"} font-semibold truncate`}
 									style={{
-										color: isDone
-											? "var(--ink-soft)"
-											: "var(--ink)",
+										color: isDone ? "var(--ink-soft)" : "var(--ink)",
 										textDecoration: isDone ? "line-through" : "none",
 									}}
 								>
 									{block.label}
 								</p>
-								<p
-									className="text-[10px]"
-									style={{ color: "var(--ink-soft)" }}
-								>
+								<p className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 									{t(`practice.type_${block.blockType}`)} ·{" "}
 									{block.durationMinutes}m
 								</p>

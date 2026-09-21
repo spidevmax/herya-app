@@ -46,10 +46,7 @@ export default function SafetyBanner({
 					{t("guided.safety_warning")} ({items.length})
 				</span>
 				{items.length > 0 && (
-					<span
-						aria-hidden="true"
-						style={{ color: "var(--ink)" }}
-					>
+					<span aria-hidden="true" style={{ color: "var(--ink)" }}>
 						{expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
 					</span>
 				)}

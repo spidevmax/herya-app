@@ -16,13 +16,6 @@ const BLOCK_COLORS = {
 	meditation: "var(--ink)",
 };
 
-// Paired with BLOCK_COLORS so a fill and its text can never drift apart.
-const BLOCK_FG = {
-	vk_sequence: "var(--on-fill)",
-	pranayama: "var(--on-fill)",
-	meditation: "var(--paper)",
-};
-
 const COUNTDOWN_SEC = 5;
 
 /**
@@ -75,7 +68,7 @@ export default function TransitionWarning({
 					animate={{ opacity: 1, scale: 1 }}
 					exit={{ opacity: 0, scale: 0.9 }}
 					className="fixed inset-0 z-50 flex items-center justify-center p-6"
-					style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+					style={{ backgroundColor: "rgba(27, 30, 60, 0.55)" }}
 					role="alertdialog"
 					aria-live="assertive"
 					aria-labelledby="transition-warning-title"
@@ -86,14 +79,15 @@ export default function TransitionWarning({
 						className="rounded-3xl p-6 text-center max-w-xs w-full"
 						style={{
 							backgroundColor: "var(--paper-raised)",
-							border: `3px solid ${color}`,
+							border: `var(--ink-width) solid ${color}`,
 						}}
 					>
 						<span
 							aria-hidden="true"
 							className="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4"
 							style={{
-								backgroundColor: `color-mix(in srgb, ${color} 15%, transparent)`,
+								border: `var(--ink-width) solid ${color}`,
+								borderRadius: "var(--radius-block)",
 							}}
 						>
 							<Icon size={32} style={{ color }} />
@@ -135,10 +129,7 @@ export default function TransitionWarning({
 							{remaining}
 						</motion.p>
 
-						<p
-							className="text-xs mt-2"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<p className="text-xs mt-2" style={{ color: "var(--ink-soft)" }}>
 							{t("practice.transition_countdown")}
 						</p>
 					</motion.section>

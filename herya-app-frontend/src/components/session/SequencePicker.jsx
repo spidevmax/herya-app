@@ -23,8 +23,6 @@ const formatFamily = (family, t) => {
 	return entry?.label || family?.replace(/[_-]/g, " ") || "";
 };
 
-
-
 export default function SequencePicker({
 	sequences = [],
 	selectedId,
@@ -65,9 +63,7 @@ export default function SequencePicker({
 				className="w-full rounded-xl border px-3 py-2.5 text-left flex items-center gap-2 transition"
 				style={{
 					backgroundColor: "var(--paper)",
-					borderColor: selected
-						? "var(--chandra)"
-						: "var(--ink)",
+					borderColor: selected ? "var(--chandra)" : "var(--ink)",
 				}}
 			>
 				{selected ? (
@@ -86,10 +82,7 @@ export default function SequencePicker({
 						</p>
 					</div>
 				) : (
-					<span
-						className="text-sm flex-1"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<span className="text-sm flex-1" style={{ color: "var(--ink-soft)" }}>
 						{t("practice.select_sequence")}
 					</span>
 				)}
@@ -154,12 +147,18 @@ export default function SequencePicker({
 										className="border-b last:border-b-0"
 										style={{ borderColor: "var(--ink)" }}
 									>
-										<button
-											type="button"
-											onClick={() => handleSelect(seq)}
-											className="w-full px-3 py-2.5 text-left flex items-center gap-2 hover:brightness-95 transition"
-										>
-											<div className="flex-1 min-w-0">
+										{/*
+										 * Two sibling buttons instead of a preview control nested
+										 * inside the select button: nested interactive elements are
+										 * invalid HTML, which is why the preview was a span with
+										 * role="button" and hand-rolled key handling.
+										 */}
+										<div className="flex w-full items-center gap-2 px-3 py-2.5">
+											<button
+												type="button"
+												onClick={() => handleSelect(seq)}
+												className="min-w-0 flex-1 text-left"
+											>
 												<p
 													className="text-sm font-medium truncate"
 													style={{
@@ -178,7 +177,8 @@ export default function SequencePicker({
 																DIFF_ACCENTS[seq.difficulty] ?? "var(--ink)"
 															}`,
 															borderRadius: "var(--radius-block)",
-															color: DIFF_ACCENTS[seq.difficulty] ?? "var(--ink)",
+															color:
+																DIFF_ACCENTS[seq.difficulty] ?? "var(--ink)",
 														}}
 													>
 														{t(`library.${seq.difficulty}`)}
@@ -211,32 +211,20 @@ export default function SequencePicker({
 														</span>
 													)}
 												</div>
-											</div>
+											</button>
 
-											{/* Preview button (fix: not a button inside button) */}
-											<span
-												role="button"
-												tabIndex={0}
-												onClick={(e) => {
-													e.stopPropagation();
-													setPreviewId(previewId === seq._id ? null : seq._id);
-												}}
-												onKeyDown={(e) => {
-													if (e.key === "Enter" || e.key === " ") {
-														e.stopPropagation();
-														setPreviewId(
-															previewId === seq._id ? null : seq._id,
-														);
-													}
-												}}
-												className="p-1.5 rounded-lg shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--chandra)]"
-												style={{
-													color: "var(--ink-soft)",
-												}}
+											<button
+												type="button"
+												onClick={() =>
+													setPreviewId(previewId === seq._id ? null : seq._id)
+												}
+												aria-expanded={previewId === seq._id}
+												className="shrink-0 cursor-pointer p-1.5"
+												style={{ color: "var(--ink-soft)" }}
 												aria-label={t("guided.preview_sequence")}
 											>
 												<Eye size={14} />
-											</span>
+											</button>
 
 											{selectedId === seq._id && (
 												<Check
@@ -247,7 +235,7 @@ export default function SequencePicker({
 													}}
 												/>
 											)}
-										</button>
+										</div>
 
 										{/* Preview panel */}
 										<AnimatePresence>
@@ -285,10 +273,7 @@ function SequencePreview({ sequence }) {
 	const poses = sequence.structure?.corePoses || [];
 
 	return (
-		<div
-			className="px-3 pb-3 border-t"
-			style={{ borderColor: "var(--ink)" }}
-		>
+		<div className="px-3 pb-3 border-t" style={{ borderColor: "var(--ink)" }}>
 			{/* Therapeutic focus */}
 			{(localized(sequence.therapeuticFocus, "primaryBenefit", lang) ||
 				sequence.therapeuticFocus?.primaryBenefit) && (

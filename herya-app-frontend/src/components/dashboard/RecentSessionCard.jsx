@@ -1,4 +1,12 @@
-import { Check, Clock, Leaf, PersonStanding, Star, Wind, X } from "lucide-react";
+import {
+	Check,
+	Clock,
+	Leaf,
+	PersonStanding,
+	Star,
+	Wind,
+	X,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
 import { format } from "@/utils/helpers";
@@ -31,19 +39,17 @@ export default function RecentSessionCard({ session }) {
 	const fill = TYPE_FILL[session.sessionType] ?? "transparent";
 	const open = () => navigate(`/sessions/${session._id}`);
 
+	/*
+	 * A real button rather than an article carrying role="button": the element
+	 * is entirely a click target, and native buttons already handle Enter,
+	 * Space and focus without a keydown handler.
+	 */
 	return (
-		<article
+		<button
+			type="button"
 			data-identity="next"
 			onClick={open}
-			onKeyDown={(e) => {
-				if (e.key === "Enter" || e.key === " ") {
-					e.preventDefault();
-					open();
-				}
-			}}
-			role="button"
-			tabIndex={0}
-			className="ink-block ink-block--press flex items-center gap-3 p-3"
+			className="ink-block ink-block--press flex w-full items-center gap-3 p-3 text-left"
 			style={{ cursor: "pointer" }}
 		>
 			<span
@@ -81,9 +87,13 @@ export default function RecentSessionCard({ session }) {
 				{session.completed ? (
 					<Check size={15} aria-hidden="true" style={{ color: "var(--ink)" }} />
 				) : (
-					<X size={15} aria-hidden="true" style={{ color: "var(--ink-soft)" }} />
+					<X
+						size={15}
+						aria-hidden="true"
+						style={{ color: "var(--ink-soft)" }}
+					/>
 				)}
 			</div>
-		</article>
+		</button>
 	);
 }

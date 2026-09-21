@@ -10,7 +10,6 @@ import {
 	Minus,
 	PersonStanding,
 	Plus,
-	Timer,
 	X,
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -310,7 +309,8 @@ export default function SessionBuilder({
 	// Paired with blockTypeColor: meditation fills with ink, so its text must
 	// be paper. Keeping fill and foreground together stops them drifting apart
 	// and rendering a blank chip.
-	const blockTypeFg = (bt) => (bt === "meditation" ? "var(--paper)" : "var(--on-fill)");
+	const blockTypeFg = (bt) =>
+		bt === "meditation" ? "var(--paper)" : "var(--on-fill)";
 
 	const blockTypeColor = (bt) => {
 		switch (bt) {
@@ -330,15 +330,9 @@ export default function SessionBuilder({
 			<div className="flex items-center justify-center py-16">
 				<div className="text-center">
 					<div className="mb-3 flex justify-center">
-						<PersonStanding
-							size={38}
-							style={{ color: "var(--chandra)" }}
-						/>
+						<PersonStanding size={38} style={{ color: "var(--chandra)" }} />
 					</div>
-					<p
-						style={{ color: "var(--ink-soft)" }}
-						className="text-sm"
-					>
+					<p style={{ color: "var(--ink-soft)" }} className="text-sm">
 						{t("practice.loading_catalog")}
 					</p>
 				</div>
@@ -403,10 +397,7 @@ export default function SessionBuilder({
 					className="rounded-2xl border-2 border-dashed p-8 text-center"
 					style={{ borderColor: "var(--ink)" }}
 				>
-					<p
-						className="text-sm mb-1"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<p className="text-sm mb-1" style={{ color: "var(--ink-soft)" }}>
 						{t("practice.empty_blocks")}
 					</p>
 					<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
@@ -538,10 +529,7 @@ function BlockCard({
 					className="cursor-grab"
 					style={{ color: "var(--ink-soft)" }}
 				/>
-				<span
-					className="text-[11px] font-semibold"
-					style={{ color }}
-				>
+				<span className="text-[11px] font-semibold" style={{ color }}>
 					{index + 1}. {blockTypeLabel(block.blockType)}
 				</span>
 
@@ -780,31 +768,29 @@ function BlockCard({
 
 							{/* Meditation type */}
 							{block.blockType === "meditation" && (
-								<>
-									<select
-										value={block.meditationType}
-										onChange={(e) =>
-											onUpdate({
-												meditationType: e.target.value,
-												label:
-													t(`session.meditation_types.${e.target.value}`) ||
-													e.target.value,
-											})
-										}
-										className="w-full rounded-xl border px-3 py-2 text-sm"
-										style={{
-											backgroundColor: "var(--paper)",
-											borderColor: "var(--ink)",
-											color: "var(--ink)",
-										}}
-									>
-										{MEDITATION_STYLES.map((style) => (
-											<option key={style} value={style}>
-												{t(`session.meditation_types.${style}`)}
-											</option>
-										))}
-									</select>
-								</>
+								<select
+									value={block.meditationType}
+									onChange={(e) =>
+										onUpdate({
+											meditationType: e.target.value,
+											label:
+												t(`session.meditation_types.${e.target.value}`) ||
+												e.target.value,
+										})
+									}
+									className="w-full rounded-xl border px-3 py-2 text-sm"
+									style={{
+										backgroundColor: "var(--paper)",
+										borderColor: "var(--ink)",
+										color: "var(--ink)",
+									}}
+								>
+									{MEDITATION_STYLES.map((style) => (
+										<option key={style} value={style}>
+											{t(`session.meditation_types.${style}`)}
+										</option>
+									))}
+								</select>
 							)}
 
 							{/* Duration selector (manual for meditation and VK sequence only) */}
@@ -911,9 +897,7 @@ function VKPoseBreakdown({
 										backgroundColor:
 											distributionMode === mode ? color : "transparent",
 										color:
-											distributionMode === mode
-												? "white"
-												: "var(--ink-soft)",
+											distributionMode === mode ? "white" : "var(--ink-soft)",
 									}}
 								>
 									{t(`practice.dist_${mode}`)}
@@ -1018,10 +1002,7 @@ function VKPoseBreakdown({
 						)}
 
 						{/* Breaths */}
-						<span
-							className="text-[10px]"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<span className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 							{p.breaths}b
 						</span>
 					</div>
@@ -1033,10 +1014,7 @@ function VKPoseBreakdown({
 				className="flex items-center justify-between pt-1 border-t"
 				style={{ borderColor: "var(--ink)" }}
 			>
-				<span
-					className="text-[10px]"
-					style={{ color: "var(--ink-soft)" }}
-				>
+				<span className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 					{t("practice.natural_duration")}: {formatPoseDuration(naturalSec)}
 				</span>
 				<span

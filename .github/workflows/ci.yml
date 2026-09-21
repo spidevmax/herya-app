@@ -7,8 +7,12 @@ on:
     branches: [main]
 
 jobs:
+  # This job used to be gated on
+  #   contains(github.event.head_commit.modified, 'herya-app-frontend/')
+  # but `modified` is an array of full file paths, and contains() matches whole
+  # elements — never the 'herya-app-frontend/' prefix. The condition was always
+  # false on push, so the frontend was only ever checked on pull requests.
   frontend:
-    if: contains(github.event.head_commit.modified, 'herya-app-frontend/') || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,7 +25,8 @@ jobs:
           cache: npm
           cache-dependency-path: herya-app-frontend/package-lock.json
       - run: npm ci
-      - run: npm test -- --maxWorkers=1
+      - run: npm run lint
+      - run: npm run test:coverage -- --maxWorkers=1
       - run: npm run build
 
   backend:

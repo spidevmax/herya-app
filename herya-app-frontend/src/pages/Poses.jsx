@@ -153,9 +153,7 @@ function PoseCard({ pose, index, onClick, t }) {
 				</div>
 				<div className="flex gap-1.5 mt-2.5 flex-wrap">
 					{pose.difficulty && (
-						<Badge
-							color={DIFF_COLORS[pose.difficulty] ?? "var(--ink-soft)"}
-						>
+						<Badge color={DIFF_COLORS[pose.difficulty] ?? "var(--ink-soft)"}>
 							{diffLabels[pose.difficulty] ?? pose.difficulty}
 						</Badge>
 					)}
@@ -337,10 +335,7 @@ export default function Poses() {
 				<div className="px-4">
 					<EmptyState
 						icon={
-							<PersonStanding
-								size={56}
-								style={{ color: "var(--chandra)" }}
-							/>
+							<PersonStanding size={56} style={{ color: "var(--chandra)" }} />
 						}
 						title={t("library.empty_poses")}
 						description={t("library.empty_poses_hint")}

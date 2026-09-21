@@ -337,7 +337,10 @@ const Library = () => {
 			style={{ background: "var(--paper)" }}
 		>
 			<header className="px-4">
-				<h1 className="display mb-1 text-[2.4rem]" style={{ color: "var(--ink)" }}>
+				<h1
+					className="display mb-1 text-[2.4rem]"
+					style={{ color: "var(--ink)" }}
+				>
 					{t("library.title", "Library")}
 				</h1>
 				<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
@@ -367,15 +370,9 @@ const Library = () => {
 						className="shrink-0 rounded-full border-2 px-4 py-2 text-sm font-bold transition-all"
 						style={{
 							backgroundColor:
-								tab === tabItem.key
-									? "var(--ink)"
-									: "var(--paper-raised)",
-							color:
-								tab === tabItem.key ? "var(--paper)" : "var(--ink-soft)",
-							borderColor:
-								tab === tabItem.key
-									? "var(--ink)"
-									: "var(--ink)",
+								tab === tabItem.key ? "var(--ink)" : "var(--paper-raised)",
+							color: tab === tabItem.key ? "var(--paper)" : "var(--ink-soft)",
+							borderColor: tab === tabItem.key ? "var(--ink)" : "var(--ink)",
 						}}
 					>
 						{tabItem.label}
@@ -486,13 +483,9 @@ const Library = () => {
 													? "var(--ink)"
 													: "var(--paper-raised)",
 											color:
-												effectFilter === option
-													? "white"
-													: "var(--ink-soft)",
+												effectFilter === option ? "white" : "var(--ink-soft)",
 											borderColor:
-												effectFilter === option
-													? "var(--ink)"
-													: "var(--ink)",
+												effectFilter === option ? "var(--ink)" : "var(--ink)",
 										}}
 									>
 										{label}

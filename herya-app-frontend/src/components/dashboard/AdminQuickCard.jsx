@@ -1,12 +1,5 @@
 import { motion } from "framer-motion";
-import {
-	BarChart2,
-	BookOpen,
-	List,
-	Plus,
-	Shield,
-	Users,
-} from "lucide-react";
+import { BarChart2, BookOpen, List, Plus, Shield, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAnalyticsDashboard } from "@/api/admin.api";
@@ -40,10 +33,7 @@ const StatTile = ({ icon, label, value, tone = "var(--chandra)" }) => {
 					{label}
 				</p>
 			</div>
-			<p
-				className="text-lg font-bold"
-				style={{ color: "var(--ink)" }}
-			>
+			<p className="text-lg font-bold" style={{ color: "var(--ink)" }}>
 				{value}
 			</p>
 		</li>

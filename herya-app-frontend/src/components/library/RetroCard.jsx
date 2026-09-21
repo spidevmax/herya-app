@@ -208,9 +208,7 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 								style={{ color: fg }}
 								aria-hidden="true"
 							>
-								{monogram || (
-									<PersonStanding size={28} style={{ color: fg }} />
-								)}
+								{monogram || <PersonStanding size={28} style={{ color: fg }} />}
 							</div>
 						)}
 					</figure>

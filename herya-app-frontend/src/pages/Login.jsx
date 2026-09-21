@@ -54,7 +54,8 @@ export default function Login() {
 	const validate = () => {
 		const next = {};
 		if (!form.email.trim()) next.email = t("login.errors.email_required");
-		else if (!EMAIL_RE.test(form.email.trim())) next.email = t("login.errors.email_invalid");
+		else if (!EMAIL_RE.test(form.email.trim()))
+			next.email = t("login.errors.email_invalid");
 		if (!form.password) next.password = t("login.errors.password_required");
 		return next;
 	};
@@ -130,7 +131,9 @@ export default function Login() {
 				setForgotStatus("");
 			}, 2000);
 		} catch (err) {
-			setForgotMessage(err?.response?.data?.message || t("forgot_password.error"));
+			setForgotMessage(
+				err?.response?.data?.message || t("forgot_password.error"),
+			);
 			setForgotStatus("error");
 		} finally {
 			setForgotLoading(false);
@@ -156,7 +159,10 @@ export default function Login() {
 					{/* On the chandra panel the cool arc would vanish, so it takes
 					    the ink used for text on a colour fill. */}
 					<BreathMark size={38} cool="var(--on-fill)" />
-					<span className="display text-[1.5rem]" style={{ color: "var(--on-fill)" }}>
+					<span
+						className="display text-[1.5rem]"
+						style={{ color: "var(--on-fill)" }}
+					>
 						Herya
 					</span>
 				</div>
@@ -191,7 +197,9 @@ export default function Login() {
 
 					{!showForgot ? (
 						<>
-							<h1 className="display text-[2.6rem] sm:text-[3rem]">{t("login.welcome")}</h1>
+							<h1 className="display text-[2.6rem] sm:text-[3rem]">
+								{t("login.welcome")}
+							</h1>
 
 							{formError && (
 								<div
@@ -209,9 +217,16 @@ export default function Login() {
 								</div>
 							)}
 
-							<form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-5">
+							<form
+								onSubmit={handleSubmit}
+								noValidate
+								className="mt-7 flex flex-col gap-5"
+							>
 								<div>
-									<label htmlFor="login-email" className="mb-2 block text-sm font-bold">
+									<label
+										htmlFor="login-email"
+										className="mb-2 block text-sm font-bold"
+									>
 										{t("login.email_placeholder")}
 									</label>
 									<input
@@ -219,7 +234,9 @@ export default function Login() {
 										type="email"
 										autoComplete="email"
 										aria-invalid={!!errors.email}
-										aria-describedby={errors.email ? "login-email-error" : undefined}
+										aria-describedby={
+											errors.email ? "login-email-error" : undefined
+										}
 										placeholder={t("login.email_placeholder")}
 										value={form.email}
 										onChange={(e) => updateField("email", e.target.value)}
@@ -229,7 +246,10 @@ export default function Login() {
 								</div>
 
 								<div>
-									<label htmlFor="login-password" className="mb-2 block text-sm font-bold">
+									<label
+										htmlFor="login-password"
+										className="mb-2 block text-sm font-bold"
+									>
 										{t("login.password")}
 									</label>
 									<div className="relative">
@@ -238,7 +258,9 @@ export default function Login() {
 											type={showPw ? "text" : "password"}
 											autoComplete="current-password"
 											aria-invalid={!!errors.password}
-											aria-describedby={errors.password ? "login-password-error" : undefined}
+											aria-describedby={
+												errors.password ? "login-password-error" : undefined
+											}
 											placeholder={t("login.password")}
 											value={form.password}
 											onChange={(e) => updateField("password", e.target.value)}
@@ -247,14 +269,21 @@ export default function Login() {
 										<button
 											type="button"
 											onClick={() => setShowPw((v) => !v)}
-											aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
+											aria-label={
+												showPw
+													? t("login.hide_password")
+													: t("login.show_password")
+											}
 											className="absolute right-4 top-1/2 -translate-y-1/2"
 											style={{ color: "var(--ink-soft)" }}
 										>
 											{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
 										</button>
 									</div>
-									<FieldError id="login-password-error" message={errors.password} />
+									<FieldError
+										id="login-password-error"
+										message={errors.password}
+									/>
 								</div>
 
 								<button
@@ -283,7 +312,11 @@ export default function Login() {
 
 							<p className="mt-8 text-sm font-bold">
 								{t("login.no_account")}{" "}
-								<Link to="/register" className="underline" style={{ color: "var(--ink)" }}>
+								<Link
+									to="/register"
+									className="underline"
+									style={{ color: "var(--ink)" }}
+								>
 									{t("login.register_link")}
 								</Link>
 							</p>
@@ -299,31 +332,48 @@ export default function Login() {
 								<ArrowLeft size={16} /> {t("forgot_password.back_to_login")}
 							</button>
 
-							<h1 className="display text-[2.2rem]">{t("forgot_password.title")}</h1>
-							<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
+							<h1 className="display text-[2.2rem]">
+								{t("forgot_password.title")}
+							</h1>
+							<p
+								className="mt-3 text-[0.95rem]"
+								style={{ color: "var(--ink-soft)" }}
+							>
 								{t("forgot_password.subtitle")}
 							</p>
 
 							{forgotMessage && (
-								<div
-									role="status"
-									className="ink-block mt-5 px-4 py-3 text-sm font-bold"
+								<output
+									className="ink-block mt-5 block px-4 py-3 text-sm font-bold"
 									style={{
 										background:
-											forgotStatus === "success" ? "var(--chandra)" : "var(--alert-bg)",
+											forgotStatus === "success"
+												? "var(--chandra)"
+												: "var(--alert-bg)",
 										borderColor:
-											forgotStatus === "success" ? "var(--ink)" : "var(--alert)",
-										color: forgotStatus === "success" ? "var(--on-fill)" : "var(--alert)",
+											forgotStatus === "success"
+												? "var(--ink)"
+												: "var(--alert)",
+										color:
+											forgotStatus === "success"
+												? "var(--on-fill)"
+												: "var(--alert)",
 										boxShadow: "none",
 									}}
 								>
 									{forgotMessage}
-								</div>
+								</output>
 							)}
 
-							<form onSubmit={handleForgotSubmit} className="mt-7 flex flex-col gap-5">
+							<form
+								onSubmit={handleForgotSubmit}
+								className="mt-7 flex flex-col gap-5"
+							>
 								<div>
-									<label htmlFor="forgot-email" className="mb-2 block text-sm font-bold">
+									<label
+										htmlFor="forgot-email"
+										className="mb-2 block text-sm font-bold"
+									>
 										{t("forgot_password.email_placeholder")}
 									</label>
 									<input
@@ -348,7 +398,9 @@ export default function Login() {
 										opacity: forgotLoading ? 0.7 : 1,
 									}}
 								>
-									{forgotLoading ? t("forgot_password.submitting") : t("forgot_password.submit")}
+									{forgotLoading
+										? t("forgot_password.submitting")
+										: t("forgot_password.submit")}
 								</button>
 							</form>
 						</>

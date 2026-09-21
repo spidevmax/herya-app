@@ -139,8 +139,7 @@ export default function PhasedMeditationPlayer({
 		main: "var(--chandra)",
 		close: "var(--surya)",
 	};
-	const currentColor =
-		phaseColors[currentPhase.phase.type] || "var(--ink)";
+	const currentColor = phaseColors[currentPhase.phase.type] || "var(--ink)";
 
 	return (
 		<section
@@ -149,10 +148,7 @@ export default function PhasedMeditationPlayer({
 		>
 			{/* Header */}
 			<header className="text-center">
-				<p
-					className="text-xs font-semibold"
-					style={{ color: "var(--ink)" }}
-				>
+				<p className="text-xs font-semibold" style={{ color: "var(--ink)" }}>
 					{t(`session.meditation_types.${meditationType}`)}
 				</p>
 			</header>
@@ -196,9 +192,7 @@ export default function PhasedMeditationPlayer({
 							<span
 								className="text-[9px] font-semibold uppercase"
 								style={{
-									color: isActive
-										? phaseColors[phase.type]
-										: "var(--ink-soft)",
+									color: isActive ? phaseColors[phase.type] : "var(--ink-soft)",
 								}}
 							>
 								{t(`guided.phase_${phase.type}`)}
@@ -237,10 +231,7 @@ export default function PhasedMeditationPlayer({
 						style={{ color: currentColor, opacity: 0.5 }}
 						className="mb-2"
 					/>
-					<p
-						className="text-2xl font-bold"
-						style={{ color: "var(--ink)" }}
-					>
+					<p className="text-2xl font-bold" style={{ color: "var(--ink)" }}>
 						{formatTime(remaining)}
 					</p>
 					<p

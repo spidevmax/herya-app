@@ -64,7 +64,12 @@ export default function BreathBuddy({
 
 				{/* eyes: dots open, arcs closed on the retention */}
 				{holding ? (
-					<g stroke="var(--on-fill)" strokeWidth="3" strokeLinecap="round" fill="none">
+					<g
+						stroke="var(--on-fill)"
+						strokeWidth="3"
+						strokeLinecap="round"
+						fill="none"
+					>
 						<path d="M44 58 Q49 63 54 58" />
 						<path d="M66 58 Q71 63 76 58" />
 					</g>

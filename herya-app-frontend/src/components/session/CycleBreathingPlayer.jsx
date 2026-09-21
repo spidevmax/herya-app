@@ -35,10 +35,26 @@ const formatTime = (sec) => {
  */
 const PALETTE_TINTS = {
 	warm: { bg: "var(--surya)", accent: "var(--surya)", fg: "var(--on-fill)" },
-	calming: { bg: "var(--chandra)", accent: "var(--chandra)", fg: "var(--on-fill)" },
-	cooling: { bg: "var(--chandra)", accent: "var(--chandra)", fg: "var(--on-fill)" },
-	energizing: { bg: "var(--surya)", accent: "var(--surya)", fg: "var(--on-fill)" },
-	balanced: { bg: "var(--paper-raised)", accent: "var(--ink)", fg: "var(--ink)" },
+	calming: {
+		bg: "var(--chandra)",
+		accent: "var(--chandra)",
+		fg: "var(--on-fill)",
+	},
+	cooling: {
+		bg: "var(--chandra)",
+		accent: "var(--chandra)",
+		fg: "var(--on-fill)",
+	},
+	energizing: {
+		bg: "var(--surya)",
+		accent: "var(--surya)",
+		fg: "var(--on-fill)",
+	},
+	balanced: {
+		bg: "var(--paper-raised)",
+		accent: "var(--ink)",
+		fg: "var(--ink)",
+	},
 };
 
 export default function CycleBreathingPlayer({
@@ -160,7 +176,6 @@ export default function CycleBreathingPlayer({
 	}, [
 		engine.isRunning,
 		engine.isPausing,
-		engine.currentPhaseKey,
 		engine.currentPhaseDuration,
 		audio,
 		profile.audio,
@@ -242,16 +257,12 @@ export default function CycleBreathingPlayer({
 			</header>
 
 			{/* Cycle counter — always visible */}
-			<div
-				className="text-center"
-				role="status"
+			<output
+				className="block text-center"
 				aria-live="polite"
 				aria-atomic="true"
 			>
-				<p
-					className="text-sm font-bold"
-					style={{ color: "var(--ink)" }}
-				>
+				<p className="text-sm font-bold" style={{ color: "var(--ink)" }}>
 					{showCompletionState
 						? t("pranayama.cycles_completed", {
 								current: engine.completedCycles,
@@ -263,14 +274,11 @@ export default function CycleBreathingPlayer({
 							})}
 				</p>
 				{!engine.isRunning && !showCompletionState && totalEstimatedSec > 0 && (
-					<p
-						className="text-xs mt-0.5"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<p className="text-xs mt-0.5" style={{ color: "var(--ink-soft)" }}>
 						{formatTime(totalEstimatedSec)}
 					</p>
 				)}
-			</div>
+			</output>
 
 			{/* Nostril indicator for alternate-nostril techniques */}
 			{runtimePhaseSequence.some((step) => step.nostrilFlow !== "both") &&
@@ -613,12 +621,8 @@ export default function CycleBreathingPlayer({
 							backgroundColor: hapticEnabled
 								? paletteTint.accent
 								: "var(--paper-raised)",
-							borderColor: hapticEnabled
-								? paletteTint.accent
-								: "var(--ink)",
-							color: hapticEnabled
-								? paletteTint.accent
-								: "var(--ink-soft)",
+							borderColor: hapticEnabled ? paletteTint.accent : "var(--ink)",
+							color: hapticEnabled ? paletteTint.accent : "var(--ink-soft)",
 						}}
 						aria-label={t(
 							hapticEnabled
@@ -645,9 +649,7 @@ export default function CycleBreathingPlayer({
 						backgroundColor: lowStim
 							? paletteTint.accent
 							: "var(--paper-raised)",
-						borderColor: lowStim
-							? paletteTint.accent
-							: "var(--ink)",
+						borderColor: lowStim ? paletteTint.accent : "var(--ink)",
 						color: lowStim ? paletteTint.accent : "var(--ink-soft)",
 					}}
 					aria-label={t("pranayama.low_stimulation")}

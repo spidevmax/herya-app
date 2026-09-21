@@ -1,4 +1,3 @@
-import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import {
 	ChevronLeft,
 	Flame,
@@ -14,6 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
+import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import "@/styles/identity.css";
 import {
 	colorMix,
@@ -21,8 +21,6 @@ import {
 	localizedArray,
 	translateWithFallback,
 } from "@/utils/libraryHelpers";
-
-
 
 const ENERGY_ICONS = {
 	calming: Waves,
@@ -175,10 +173,7 @@ export default function BreathingDetail() {
 						{pattern.romanizationName}
 					</h1>
 					{pattern.iastName && (
-						<p
-							className="text-sm italic"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<p className="text-sm italic" style={{ color: "var(--ink-soft)" }}>
 							{pattern.iastName}
 						</p>
 					)}
@@ -297,10 +292,7 @@ export default function BreathingDetail() {
 									className="flex items-start gap-2 text-sm"
 									style={{ color: "var(--ink-soft)" }}
 								>
-									<span
-										aria-hidden="true"
-										style={{ color: "var(--chandra)" }}
-									>
+									<span aria-hidden="true" style={{ color: "var(--chandra)" }}>
 										✓
 									</span>
 									{b}
@@ -338,10 +330,7 @@ export default function BreathingDetail() {
 									className="flex items-start gap-2 text-sm"
 									style={{ color: "var(--ink-soft)" }}
 								>
-									<span
-										aria-hidden="true"
-										style={{ color: "var(--surya)" }}
-									>
+									<span aria-hidden="true" style={{ color: "var(--surya)" }}>
 										⚠
 									</span>
 									{c}

@@ -56,10 +56,13 @@ export default function Register() {
 		const next = {};
 		if (!form.name.trim()) next.name = t("register.errors.name_required");
 		if (!form.email.trim()) next.email = t("register.errors.email_required");
-		else if (!EMAIL_RE.test(form.email.trim())) next.email = t("register.errors.email_invalid");
+		else if (!EMAIL_RE.test(form.email.trim()))
+			next.email = t("register.errors.email_invalid");
 		if (!form.password) next.password = t("register.errors.password_required");
-		else if (form.password.length < 8) next.password = t("register.errors.password_too_short");
-		if (!form.passwordConfirm) next.passwordConfirm = t("register.errors.confirm_required");
+		else if (form.password.length < 8)
+			next.password = t("register.errors.password_too_short");
+		if (!form.passwordConfirm)
+			next.passwordConfirm = t("register.errors.confirm_required");
 		else if (form.password && form.password !== form.passwordConfirm)
 			next.passwordConfirm = t("register.password_mismatch");
 		return next;
@@ -76,15 +79,24 @@ export default function Register() {
 			lower.includes("in use") ||
 			lower.includes("exist")
 		) {
-			setErrors((prev) => ({ ...prev, email: t("register.errors.email_in_use") }));
+			setErrors((prev) => ({
+				...prev,
+				email: t("register.errors.email_in_use"),
+			}));
 			return;
 		}
 		if (lower.includes("email")) {
-			setErrors((prev) => ({ ...prev, email: t("register.errors.email_invalid") }));
+			setErrors((prev) => ({
+				...prev,
+				email: t("register.errors.email_invalid"),
+			}));
 			return;
 		}
 		if (lower.includes("password")) {
-			setErrors((prev) => ({ ...prev, password: t("register.errors.password_too_short") }));
+			setErrors((prev) => ({
+				...prev,
+				password: t("register.errors.password_too_short"),
+			}));
 			return;
 		}
 		setFormError(message || t("register.errors.generic"));
@@ -144,7 +156,10 @@ export default function Register() {
 				<div className="flex items-center gap-3">
 					{/* On a surya ground the warm arc would vanish into it. */}
 					<BreathMark size={38} warm="var(--on-fill)" />
-					<span className="display text-[1.5rem]" style={{ color: "var(--on-fill)" }}>
+					<span
+						className="display text-[1.5rem]"
+						style={{ color: "var(--on-fill)" }}
+					>
 						Herya
 					</span>
 				</div>
@@ -174,7 +189,9 @@ export default function Register() {
 						<span className="display text-[1.4rem]">Herya</span>
 					</div>
 
-					<h1 className="display text-[2.6rem] sm:text-[3rem]">{t("register.heading")}</h1>
+					<h1 className="display text-[2.6rem] sm:text-[3rem]">
+						{t("register.heading")}
+					</h1>
 
 					{formError && (
 						<div
@@ -192,7 +209,11 @@ export default function Register() {
 						</div>
 					)}
 
-					<form onSubmit={handleSubmit} noValidate className="mt-7 flex flex-col gap-5">
+					<form
+						onSubmit={handleSubmit}
+						noValidate
+						className="mt-7 flex flex-col gap-5"
+					>
 						<fieldset className="border-0 p-0">
 							<legend className="mb-2 block text-sm font-bold">
 								{t("register.account_type_label")}
@@ -220,7 +241,10 @@ export default function Register() {
 						</fieldset>
 
 						<div>
-							<label htmlFor="register-name" className="mb-2 block text-sm font-bold">
+							<label
+								htmlFor="register-name"
+								className="mb-2 block text-sm font-bold"
+							>
 								{t("register.full_name")}
 							</label>
 							<input
@@ -228,7 +252,9 @@ export default function Register() {
 								type="text"
 								autoComplete="name"
 								aria-invalid={!!errors.name}
-								aria-describedby={errors.name ? "register-name-error" : undefined}
+								aria-describedby={
+									errors.name ? "register-name-error" : undefined
+								}
 								placeholder={t("register.full_name")}
 								value={form.name}
 								onChange={(e) => updateField("name", e.target.value)}
@@ -238,7 +264,10 @@ export default function Register() {
 						</div>
 
 						<div>
-							<label htmlFor="register-email" className="mb-2 block text-sm font-bold">
+							<label
+								htmlFor="register-email"
+								className="mb-2 block text-sm font-bold"
+							>
 								{t("login.email_placeholder")}
 							</label>
 							<input
@@ -246,7 +275,9 @@ export default function Register() {
 								type="email"
 								autoComplete="email"
 								aria-invalid={!!errors.email}
-								aria-describedby={errors.email ? "register-email-error" : undefined}
+								aria-describedby={
+									errors.email ? "register-email-error" : undefined
+								}
 								placeholder={t("login.email_placeholder")}
 								value={form.email}
 								onChange={(e) => updateField("email", e.target.value)}
@@ -256,7 +287,10 @@ export default function Register() {
 						</div>
 
 						<div>
-							<label htmlFor="register-password" className="mb-2 block text-sm font-bold">
+							<label
+								htmlFor="register-password"
+								className="mb-2 block text-sm font-bold"
+							>
 								{t("register.password_label")}
 							</label>
 							<div className="relative">
@@ -265,7 +299,9 @@ export default function Register() {
 									type={showPw ? "text" : "password"}
 									autoComplete="new-password"
 									aria-invalid={!!errors.password}
-									aria-describedby={errors.password ? "register-password-error" : undefined}
+									aria-describedby={
+										errors.password ? "register-password-error" : undefined
+									}
 									placeholder={t("register.password_placeholder")}
 									value={form.password}
 									onChange={(e) => updateField("password", e.target.value)}
@@ -274,18 +310,26 @@ export default function Register() {
 								<button
 									type="button"
 									onClick={() => setShowPw((v) => !v)}
-									aria-label={showPw ? t("login.hide_password") : t("login.show_password")}
+									aria-label={
+										showPw ? t("login.hide_password") : t("login.show_password")
+									}
 									className="absolute right-4 top-1/2 -translate-y-1/2"
 									style={{ color: "var(--ink-soft)" }}
 								>
 									{showPw ? <EyeOff size={18} /> : <Eye size={18} />}
 								</button>
 							</div>
-							<FieldError id="register-password-error" message={errors.password} />
+							<FieldError
+								id="register-password-error"
+								message={errors.password}
+							/>
 						</div>
 
 						<div>
-							<label htmlFor="register-confirm" className="mb-2 block text-sm font-bold">
+							<label
+								htmlFor="register-confirm"
+								className="mb-2 block text-sm font-bold"
+							>
 								{t("register.confirm_password")}
 							</label>
 							<div className="relative">
@@ -295,18 +339,24 @@ export default function Register() {
 									autoComplete="new-password"
 									aria-invalid={!!errors.passwordConfirm}
 									aria-describedby={
-										errors.passwordConfirm ? "register-confirm-error" : undefined
+										errors.passwordConfirm
+											? "register-confirm-error"
+											: undefined
 									}
 									placeholder={t("register.confirm_password")}
 									value={form.passwordConfirm}
-									onChange={(e) => updateField("passwordConfirm", e.target.value)}
+									onChange={(e) =>
+										updateField("passwordConfirm", e.target.value)
+									}
 									className="ink-field pr-12"
 								/>
 								<button
 									type="button"
 									onClick={() => setShowConfirmPw((v) => !v)}
 									aria-label={
-										showConfirmPw ? t("login.hide_password") : t("login.show_password")
+										showConfirmPw
+											? t("login.hide_password")
+											: t("login.show_password")
 									}
 									className="absolute right-4 top-1/2 -translate-y-1/2"
 									style={{ color: "var(--ink-soft)" }}
@@ -314,7 +364,10 @@ export default function Register() {
 									{showConfirmPw ? <EyeOff size={18} /> : <Eye size={18} />}
 								</button>
 							</div>
-							<FieldError id="register-confirm-error" message={errors.passwordConfirm} />
+							<FieldError
+								id="register-confirm-error"
+								message={errors.passwordConfirm}
+							/>
 						</div>
 
 						<button
@@ -334,7 +387,11 @@ export default function Register() {
 
 					<p className="mt-8 text-sm font-bold">
 						{t("register.have_account")}{" "}
-						<Link to="/login" className="underline" style={{ color: "var(--ink)" }}>
+						<Link
+							to="/login"
+							className="underline"
+							style={{ color: "var(--ink)" }}
+						>
 							{t("register.login_link")}
 						</Link>
 					</p>

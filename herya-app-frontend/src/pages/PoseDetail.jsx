@@ -62,9 +62,7 @@ const DetailBlock = ({ title, children, order = 0, reduceMotion = false }) => (
 		className="ink-block p-4"
 		style={{ backgroundColor: "var(--paper-raised)" }}
 	>
-		<h2 className="font-display font-bold text-[var(--ink)] mb-3">
-			{title}
-		</h2>
+		<h2 className="font-display font-bold text-[var(--ink)] mb-3">{title}</h2>
 		{children}
 	</motion.section>
 );
@@ -254,10 +252,7 @@ export default function PoseDetail() {
 						className="w-full h-full flex items-center justify-center text-8xl"
 						style={{ y: heroY, scale: heroScale }}
 					>
-						<PersonStanding
-							size={84}
-							style={{ color: "var(--chandra)" }}
-						/>
+						<PersonStanding size={84} style={{ color: "var(--chandra)" }} />
 					</motion.div>
 				)}
 				<div
@@ -324,8 +319,7 @@ export default function PoseDetail() {
 							<div
 								className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold shrink-0"
 								style={{
-									backgroundColor:
-										"var(--paper-raised)",
+									backgroundColor: "var(--paper-raised)",
 									color: "var(--chandra)",
 								}}
 							>
@@ -341,9 +335,7 @@ export default function PoseDetail() {
 						<div className="flex flex-wrap gap-1.5 mt-3">
 							{pose.difficulty && (
 								<Badge
-									color={
-										DIFF_COLORS[pose.difficulty] ?? "var(--ink-soft)"
-									}
+									color={DIFF_COLORS[pose.difficulty] ?? "var(--ink-soft)"}
 								>
 									{diffLabels[pose.difficulty] ?? pose.difficulty}
 								</Badge>
@@ -430,8 +422,7 @@ export default function PoseDetail() {
 							<p
 								className="mt-4 text-[var(--ink-soft)] text-sm leading-relaxed border-l-2 pl-3"
 								style={{
-									borderColor:
-										"var(--paper-raised)",
+									borderColor: "var(--paper-raised)",
 								}}
 							>
 								{localized(pose, "description", lang)}
@@ -482,9 +473,7 @@ export default function PoseDetail() {
 							localized(pose, "breathingCue", lang) || pose.breathingCue,
 						) && (
 							<p>
-								<b className="text-[var(--ink)]">
-									{t("pose_detail.breathe")}
-								</b>{" "}
+								<b className="text-[var(--ink)]">{t("pose_detail.breathe")}</b>{" "}
 								{formatValue(localized(pose, "breathingCue", lang))}
 							</p>
 						)}

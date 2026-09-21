@@ -50,7 +50,11 @@ export default function CalendarStrip({
 
 	if (loading) {
 		return (
-			<section data-identity="next" aria-busy="true" aria-label={t("dashboard.practice_label")}>
+			<section
+				data-identity="next"
+				aria-busy="true"
+				aria-label={t("dashboard.practice_label")}
+			>
 				<div className="flex items-center justify-between mb-3">
 					<span className="skeleton h-3 w-28 rounded-lg" aria-hidden="true" />
 					<span className="skeleton h-4 w-20 rounded-full" aria-hidden="true" />

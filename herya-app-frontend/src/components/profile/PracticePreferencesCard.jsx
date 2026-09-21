@@ -38,10 +38,7 @@ export default function PracticePreferencesCard({
 			<SectionTitle>{t("profile.practice_preferences")}</SectionTitle>
 			<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 				<label className="space-y-1.5 text-sm">
-					<span
-						className="font-semibold"
-						style={{ color: "var(--ink)" }}
-					>
+					<span className="font-semibold" style={{ color: "var(--ink)" }}>
 						{t("profile.intensity")}
 					</span>
 					<select
@@ -60,10 +57,7 @@ export default function PracticePreferencesCard({
 					</select>
 				</label>
 				<label className="space-y-1.5 text-sm">
-					<span
-						className="font-semibold"
-						style={{ color: "var(--ink)" }}
-					>
+					<span className="font-semibold" style={{ color: "var(--ink)" }}>
 						{t("profile.session_duration")}
 					</span>
 					<input
@@ -90,10 +84,7 @@ export default function PracticePreferencesCard({
 					)}
 				</label>
 				<label className="space-y-1.5 text-sm">
-					<span
-						className="font-semibold"
-						style={{ color: "var(--ink)" }}
-					>
+					<span className="font-semibold" style={{ color: "var(--ink)" }}>
 						{t("profile.time_of_day")}
 					</span>
 					<select
@@ -114,10 +105,7 @@ export default function PracticePreferencesCard({
 			</div>
 
 			{isTutor && (
-				<div
-					className="pt-4 border-t"
-					style={{ borderColor: "var(--ink)" }}
-				>
+				<div className="pt-4 border-t" style={{ borderColor: "var(--ink)" }}>
 					<div className="flex items-center justify-between gap-4">
 						<div>
 							<p
@@ -126,10 +114,7 @@ export default function PracticePreferencesCard({
 							>
 								{t("profile.low_stim_mode")}
 							</p>
-							<p
-								className="text-xs mt-1"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
 								{t("profile.low_stim_mode_hint")}
 							</p>
 						</div>
@@ -144,10 +129,7 @@ export default function PracticePreferencesCard({
 					</div>
 					<div className="grid grid-cols-1 2xl:grid-cols-2 gap-3 mt-4">
 						<label className="space-y-1.5 text-sm">
-							<span
-								className="font-semibold"
-								style={{ color: "var(--ink)" }}
-							>
+							<span className="font-semibold" style={{ color: "var(--ink)" }}>
 								{t("profile.safety_anchor_phrase")}
 							</span>
 							<input
@@ -165,10 +147,7 @@ export default function PracticePreferencesCard({
 							/>
 						</label>
 						<label className="space-y-1.5 text-sm">
-							<span
-								className="font-semibold"
-								style={{ color: "var(--ink)" }}
-							>
+							<span className="font-semibold" style={{ color: "var(--ink)" }}>
 								{t("profile.safety_anchor_body_cue")}
 							</span>
 							<input
@@ -197,10 +176,7 @@ export default function PracticePreferencesCard({
 				<SectionTitle>{t("profile.interface_title")}</SectionTitle>
 				<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 					<label className="space-y-1.5 text-sm">
-						<span
-							className="font-semibold"
-							style={{ color: "var(--ink)" }}
-						>
+						<span className="font-semibold" style={{ color: "var(--ink)" }}>
 							{t("profile.language")}
 						</span>
 						<select
@@ -216,10 +192,7 @@ export default function PracticePreferencesCard({
 						</select>
 					</label>
 					<label className="space-y-1.5 text-sm">
-						<span
-							className="font-semibold"
-							style={{ color: "var(--ink)" }}
-						>
+						<span className="font-semibold" style={{ color: "var(--ink)" }}>
 							{t("profile.theme")}
 						</span>
 						<select

@@ -32,11 +32,18 @@ export default function ResetPassword() {
 		setError("");
 		setErrorList([]);
 		if (!token) {
-			setError(tr("reset_password.invalid_token", "Invalid or missing reset token"));
+			setError(
+				tr("reset_password.invalid_token", "Invalid or missing reset token"),
+			);
 			return;
 		}
 		if (form.newPassword.length < 8) {
-			setError(tr("reset_password.too_short", "Password must be at least 8 characters"));
+			setError(
+				tr(
+					"reset_password.too_short",
+					"Password must be at least 8 characters",
+				),
+			);
 			return;
 		}
 		if (form.newPassword !== form.confirmPassword) {
@@ -59,7 +66,8 @@ export default function ResetPassword() {
 				setError("");
 			} else {
 				setError(
-					err?.response?.data?.message || tr("reset_password.error", "Password reset failed"),
+					err?.response?.data?.message ||
+						tr("reset_password.error", "Password reset failed"),
 				);
 			}
 		} finally {
@@ -72,11 +80,14 @@ export default function ResetPassword() {
 	if (success) {
 		return (
 			<AuthShell>
-				<section role="status" aria-live="polite" aria-labelledby="reset-success-heading">
+				<output aria-live="polite" aria-labelledby="reset-success-heading">
 					<h1 id="reset-success-heading" className="display text-[2.4rem]">
 						{tr("reset_password.success_title", "All set")}
 					</h1>
-					<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
+					<p
+						className="mt-3 text-[0.95rem]"
+						style={{ color: "var(--ink-soft)" }}
+					>
 						{tr(
 							"reset_password.success_message",
 							"Your password has been successfully reset. Redirecting to login...",
@@ -89,7 +100,7 @@ export default function ResetPassword() {
 					>
 						{tr("reset_password.back_to_login", "Back to login")}
 					</Link>
-				</section>
+				</output>
 			</AuthShell>
 		);
 	}
@@ -110,7 +121,10 @@ export default function ResetPassword() {
 				{tr("reset_password.title", "Create a new password")}
 			</h1>
 			<p className="mt-3 text-[0.95rem]" style={{ color: "var(--ink-soft)" }}>
-				{tr("reset_password.subtitle", "Choose a secure password to access your account.")}
+				{tr(
+					"reset_password.subtitle",
+					"Choose a secure password to access your account.",
+				)}
 			</p>
 
 			{hasError && (
@@ -129,16 +143,25 @@ export default function ResetPassword() {
 					{errorList.length > 0 && (
 						<ul className="list-disc pl-5">
 							{errorList.map((msg) => (
-								<li key={typeof msg === "string" ? msg : JSON.stringify(msg)}>{msg}</li>
+								<li key={typeof msg === "string" ? msg : JSON.stringify(msg)}>
+									{msg}
+								</li>
 							))}
 						</ul>
 					)}
 				</div>
 			)}
 
-			<form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5" autoComplete="off">
+			<form
+				onSubmit={handleSubmit}
+				className="mt-7 flex flex-col gap-5"
+				autoComplete="off"
+			>
 				<div>
-					<label htmlFor="new-password" className="mb-2 block text-sm font-bold">
+					<label
+						htmlFor="new-password"
+						className="mb-2 block text-sm font-bold"
+					>
 						{tr("reset_password.new_password_label", "New password")}
 					</label>
 					<div className="relative">
@@ -150,7 +173,10 @@ export default function ResetPassword() {
 							required
 							aria-describedby={hasError ? "reset-error" : undefined}
 							aria-invalid={!!error && touched.newPassword}
-							placeholder={tr("reset_password.new_password_label", "New password")}
+							placeholder={tr(
+								"reset_password.new_password_label",
+								"New password",
+							)}
 							value={form.newPassword}
 							onChange={(e) => {
 								setForm((f) => ({ ...f, newPassword: e.target.value }));
@@ -175,7 +201,10 @@ export default function ResetPassword() {
 				</div>
 
 				<div>
-					<label htmlFor="confirm-password" className="mb-2 block text-sm font-bold">
+					<label
+						htmlFor="confirm-password"
+						className="mb-2 block text-sm font-bold"
+					>
 						{tr("reset_password.confirm_password_label", "Confirm password")}
 					</label>
 					<div className="relative">
@@ -187,7 +216,10 @@ export default function ResetPassword() {
 							required
 							aria-describedby={hasError ? "reset-error" : undefined}
 							aria-invalid={!!error && touched.confirmPassword}
-							placeholder={tr("reset_password.confirm_password_label", "Confirm password")}
+							placeholder={tr(
+								"reset_password.confirm_password_label",
+								"Confirm password",
+							)}
 							value={form.confirmPassword}
 							onChange={(e) => {
 								setForm((f) => ({ ...f, confirmPassword: e.target.value }));

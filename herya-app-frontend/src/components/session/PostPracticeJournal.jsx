@@ -209,10 +209,7 @@ export default function PostPracticeJournal({
 							>
 								{formatTime(sessionSummary.globalElapsedSec || 0)}
 							</dd>
-							<dt
-								className="text-[10px]"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 								{t("practice.duration")}
 							</dt>
 						</div>
@@ -223,20 +220,14 @@ export default function PostPracticeJournal({
 							>
 								{sessionSummary.blocksCompleted || 0}
 							</dd>
-							<dt
-								className="text-[10px]"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 								{t("practice.blocks_completed")}
 							</dt>
 						</div>
 					</dl>
 				)}
 				{isTutorMode && tutorSummaryKey && (
-					<p
-						className="text-xs mt-3"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<p className="text-xs mt-3" style={{ color: "var(--ink-soft)" }}>
 						{t(tutorSummaryKey)}
 					</p>
 				)}
@@ -303,9 +294,7 @@ export default function PostPracticeJournal({
 									onClick={() => setSignalAfter(signal)}
 									className="rounded-xl px-3 py-2.5 text-xs font-semibold transition flex items-center justify-center gap-1.5 min-h-[48px]"
 									style={{
-										backgroundColor: selected
-											? signalColor
-											: "var(--paper)",
+										backgroundColor: selected ? signalColor : "var(--paper)",
 										color: selected ? "white" : "var(--ink-soft)",
 										border: `2px solid ${selected ? signalColor : "var(--ink)"}`,
 									}}
@@ -329,9 +318,7 @@ export default function PostPracticeJournal({
 									onClick={() => toggleMood(m)}
 									className="px-4 py-2 rounded-full text-sm font-semibold capitalize transition-transform duration-200 hover:-translate-y-0.5"
 									style={{
-										background: selected
-											? color
-											: "var(--paper-raised)",
+										background: selected ? color : "var(--paper-raised)",
 										color: selected ? "white" : "var(--ink-soft)",
 										border: `1px solid ${selected ? color : "color-mix(in srgb, var(--ink) 75%, transparent)"}`,
 										boxShadow: selected
@@ -481,10 +468,7 @@ export default function PostPracticeJournal({
 						border: "var(--ink-width) solid var(--surya)",
 					}}
 				>
-					<p
-						className="text-sm font-medium"
-						style={{ color: "var(--ink)" }}
-					>
+					<p className="text-sm font-medium" style={{ color: "var(--ink)" }}>
 						{error}
 					</p>
 					{onDismissError && (

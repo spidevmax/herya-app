@@ -928,16 +928,10 @@ export default function StartPractice() {
 						style={{ color: "var(--chandra)" }}
 					/>
 				</motion.div>
-				<h1
-					className="text-2xl font-semibold"
-					style={{ color: "var(--ink)" }}
-				>
+				<h1 className="text-2xl font-semibold" style={{ color: "var(--ink)" }}>
 					{t("practice.done_title")}
 				</h1>
-				<p
-					className="text-sm text-center"
-					style={{ color: "var(--ink-soft)" }}
-				>
+				<p className="text-sm text-center" style={{ color: "var(--ink-soft)" }}>
 					{t("practice.done_subtitle")}
 				</p>
 
@@ -1124,7 +1118,10 @@ export default function StartPractice() {
 										{t(recommendationReasonKey)}
 									</p>
 									{recommendationApplied && (
-										<p className="mt-1 text-xs" style={{ color: "var(--ink-soft)" }}>
+										<p
+											className="mt-1 text-xs"
+											style={{ color: "var(--ink-soft)" }}
+										>
 											{t("practice.reco_applied")}
 										</p>
 									)}
@@ -1147,9 +1144,7 @@ export default function StartPractice() {
 															background: selected
 																? "var(--ink)"
 																: "var(--paper-raised)",
-															color: selected
-																? "var(--paper)"
-																: "var(--ink)",
+															color: selected ? "var(--paper)" : "var(--ink)",
 															cursor: "pointer",
 															boxShadow: "none",
 														}}
@@ -1161,7 +1156,10 @@ export default function StartPractice() {
 										)}
 									</div>
 									{isTutorPractice && (
-										<p className="mt-2 text-xs" style={{ color: "var(--ink-soft)" }}>
+										<p
+											className="mt-2 text-xs"
+											style={{ color: "var(--ink-soft)" }}
+										>
 											{t("practice.preset_tutor_hint")}
 										</p>
 									)}
@@ -1263,7 +1261,9 @@ export default function StartPractice() {
 																	backgroundColor: selected
 																		? "var(--on-fill)"
 																		: colorVar,
-																	transform: selected ? "scale(1.25)" : "scale(1)",
+																	transform: selected
+																		? "scale(1.25)"
+																		: "scale(1)",
 																}}
 															/>
 															<div className="flex items-center gap-2 w-full">
@@ -1354,8 +1354,7 @@ export default function StartPractice() {
 													style={{
 														backgroundColor: "var(--paper)",
 														color: "var(--ink)",
-														borderColor:
-															"var(--ink-soft)",
+														borderColor: "var(--ink-soft)",
 													}}
 												/>
 											</div>

@@ -1,11 +1,5 @@
 /** @vitest-environment jsdom */
-import {
-	cleanup,
-	fireEvent,
-	render,
-	waitFor,
-	within,
-} from "@testing-library/react";
+import { cleanup, render, within } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import TutorInsightsCard from "../components/dashboard/TutorInsightsCard";

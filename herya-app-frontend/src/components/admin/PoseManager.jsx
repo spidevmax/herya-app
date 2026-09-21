@@ -13,8 +13,8 @@ import { useEffect, useMemo, useState } from "react";
 import { createPose, deletePose, updatePose } from "@/api/admin.api";
 import { getPoses } from "@/api/poses.api";
 import { Badge, Button, ConfirmModal, SkeletonCard } from "@/components/ui";
-import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import { useLanguage } from "@/context/LanguageContext";
+import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import "@/styles/identity.css";
 
 const PRIMARY_CATEGORIES = [
@@ -700,7 +700,9 @@ export default function PoseManager() {
 												{pose.romanizationName}
 											</p>
 										</div>
-										<Badge color={DIFF_ACCENTS[pose.difficulty] ?? "var(--ink)"}>
+										<Badge
+											color={DIFF_ACCENTS[pose.difficulty] ?? "var(--ink)"}
+										>
 											{pose.difficulty}
 										</Badge>
 									</header>

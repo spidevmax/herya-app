@@ -77,9 +77,7 @@ export default function BreathingPatternPicker({
 				className="w-full rounded-xl border px-3 py-2.5 text-left flex items-center gap-2 transition"
 				style={{
 					backgroundColor: "var(--paper)",
-					borderColor: selected
-						? "var(--surya)"
-						: "var(--ink)",
+					borderColor: selected ? "var(--surya)" : "var(--ink)",
 				}}
 			>
 				{selected ? (
@@ -99,10 +97,7 @@ export default function BreathingPatternPicker({
 						</p>
 					</div>
 				) : (
-					<span
-						className="text-sm flex-1"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<span className="text-sm flex-1" style={{ color: "var(--ink-soft)" }}>
 						{t("practice.select_breathing")}
 					</span>
 				)}

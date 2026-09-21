@@ -194,10 +194,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 												"Practice Type",
 											)}
 										</p>
-										<p
-											className="text-sm"
-											style={{ color: "var(--ink)" }}
-										>
+										<p className="text-sm" style={{ color: "var(--ink)" }}>
 											{translateWithFallback(
 												t,
 												`journal.practice_types.${entry.session.sessionType}`,
@@ -225,10 +222,7 @@ export const EntryModal = ({ entry, isOpen, onClose }) => {
 												"Duration",
 											)}
 										</p>
-										<p
-											className="text-sm"
-											style={{ color: "var(--ink)" }}
-										>
+										<p className="text-sm" style={{ color: "var(--ink)" }}>
 											{durationMinutes}{" "}
 											{translateWithFallback(
 												t,

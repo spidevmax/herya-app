@@ -162,10 +162,7 @@ export default function PranayamaMetronome({ patternKey = "4-4-4-4" }) {
 			</div>
 
 			{/* Cycle count */}
-			<p
-				className="text-sm font-medium"
-				style={{ color: "var(--ink-soft)" }}
-			>
+			<p className="text-sm font-medium" style={{ color: "var(--ink-soft)" }}>
 				{engine.completedCycles}{" "}
 				{engine.completedCycles === 1
 					? t("pranayama.cycles_one", { n: engine.completedCycles })

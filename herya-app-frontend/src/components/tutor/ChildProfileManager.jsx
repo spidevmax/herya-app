@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Pencil, UserPlus, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
 	createChildProfile,
 	getChildProfiles,
@@ -20,10 +20,6 @@ const AVATAR_COLORS = [
 	"#B4D455",
 	"#9B59B6",
 ];
-
-const THEME_OPTIONS = ["light", "dark", "nature", "ocean", "sunset"];
-const SOUND_OPTIONS = ["nature", "simple_tones", "silence"];
-const ANIMATION_OPTIONS = ["slow", "normal", "reduced"];
 
 /**
  * ChildProfileManager — tutor-facing UI to manage child profiles.
@@ -57,11 +53,9 @@ export default function ChildProfileManager({
 		};
 	}
 
-	useEffect(() => {
-		loadProfiles();
-	}, []);
-
-	const loadProfiles = async () => {
+	// useCallback so the mount effect can list it as a dependency; without a
+	// stable identity it would refetch on every render.
+	const loadProfiles = useCallback(async () => {
 		setLoading(true);
 		try {
 			const res = await getChildProfiles();
@@ -72,7 +66,11 @@ export default function ChildProfileManager({
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
+
+	useEffect(() => {
+		loadProfiles();
+	}, [loadProfiles]);
 
 	const handleSave = async () => {
 		if (!form.name.trim()) return;
@@ -172,14 +170,13 @@ export default function ChildProfileManager({
 
 			{/* Profile list */}
 			{loading ? (
-				<p
-					className="text-xs"
-					role="status"
+				<output
+					className="block text-xs"
 					aria-live="polite"
 					style={{ color: "var(--ink-soft)" }}
 				>
 					{t("ui.loading")}...
-				</p>
+				</output>
 			) : profiles.length === 0 && !showForm ? (
 				<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 					{t("tutor.no_children")}

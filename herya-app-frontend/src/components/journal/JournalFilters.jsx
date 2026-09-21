@@ -91,9 +91,7 @@ export const JournalFilters = ({
 						<span
 							className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold"
 							style={{
-								backgroundColor: hasActiveFilters
-									? "white"
-									: "var(--chandra)",
+								backgroundColor: hasActiveFilters ? "white" : "var(--chandra)",
 								color: hasActiveFilters ? "var(--chandra)" : "white",
 							}}
 						>

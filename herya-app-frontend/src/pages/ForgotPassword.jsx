@@ -54,13 +54,12 @@ const ForgotPassword = () => {
 
 			{submitted ? (
 				<div className="mt-7 flex flex-col gap-4">
-					<p
-						role="status"
-						className="ink-block px-4 py-3 text-[0.95rem] font-bold"
+					<output
+						className="ink-block block px-4 py-3 text-[0.95rem] font-bold"
 						style={{ boxShadow: "none" }}
 					>
 						{t("forgot_password.success")}
-					</p>
+					</output>
 
 					{/* Dev-only shortcut: the API returns the reset link directly so
 					    there is no need to go through a real inbox locally. */}
@@ -81,7 +80,10 @@ const ForgotPassword = () => {
 			) : (
 				<form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-5">
 					<div>
-						<label htmlFor="forgot-email" className="mb-2 block text-sm font-bold">
+						<label
+							htmlFor="forgot-email"
+							className="mb-2 block text-sm font-bold"
+						>
 							{t("forgot_password.email_placeholder")}
 						</label>
 						<input
@@ -107,7 +109,9 @@ const ForgotPassword = () => {
 							opacity: loading ? 0.7 : 1,
 						}}
 					>
-						{loading ? t("forgot_password.submitting") : t("forgot_password.submit")}
+						{loading
+							? t("forgot_password.submitting")
+							: t("forgot_password.submit")}
 					</button>
 
 					<Link to="/login" className="text-center text-sm font-bold underline">

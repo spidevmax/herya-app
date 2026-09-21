@@ -72,10 +72,7 @@ export default function ProfileActions({
 			</Button>
 
 			{/* Separator + destructive delete */}
-			<div
-				className="pt-4 mt-1 border-t"
-				style={{ borderColor: "var(--ink)" }}
-			>
+			<div className="pt-4 mt-1 border-t" style={{ borderColor: "var(--ink)" }}>
 				<button
 					type="button"
 					onClick={onDeleteClick}

@@ -21,10 +21,8 @@ import { MOOD_AFTER_OPTIONS } from "@/utils/constants";
 const AUTO_NAVIGATE_DELAY = 2500;
 
 const SOFT_PANEL_STYLE = {
-	border:
-		"1px solid color-mix(in srgb, var(--ink) 68%, transparent)",
-	background:
-		"var(--paper-raised)",
+	border: "1px solid color-mix(in srgb, var(--ink) 68%, transparent)",
+	background: "var(--paper-raised)",
 };
 
 const SuccessOverlay = ({ onDone, t }) => {
@@ -288,10 +286,7 @@ const JournalForm = () => {
 						className="flex h-12 w-12 items-center justify-center rounded-full "
 						style={SOFT_PANEL_STYLE}
 					>
-						<ChevronLeft
-							size={24}
-							className="text-[var(--ink-soft)]"
-						/>
+						<ChevronLeft size={24} className="text-[var(--ink-soft)]" />
 					</button>
 					<div>
 						<h1 className="font-display text-2xl font-bold text-[var(--ink)]">
@@ -591,10 +586,8 @@ const JournalForm = () => {
 				<div
 					className="rounded-[28px] p-3 shadow-[0_18px_44px_rgba(20,38,74,0.16)] backdrop-blur-sm"
 					style={{
-						background:
-							"var(--paper-raised)",
-						border:
-							"1px solid color-mix(in srgb, var(--ink) 72%, transparent)",
+						background: "var(--paper-raised)",
+						border: "1px solid color-mix(in srgb, var(--ink) 72%, transparent)",
 					}}
 				>
 					<Button

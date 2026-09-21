@@ -69,10 +69,7 @@ const TutorStat = ({ label, value }) => (
 		>
 			{label}
 		</dt>
-		<dd
-			className="text-lg font-bold m-0"
-			style={{ color: "var(--ink)" }}
-		>
+		<dd className="text-lg font-bold m-0" style={{ color: "var(--ink)" }}>
 			{value}
 		</dd>
 	</div>
@@ -369,18 +366,12 @@ export default function TutorInsightsCard({ tutorInsights }) {
 					</h3>
 					{recommendationOutcome.appliedCount > 0 ? (
 						<div className="flex flex-col gap-1">
-							<p
-								className="text-xs m-0"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs m-0" style={{ color: "var(--ink-soft)" }}>
 								{t("dashboard.tutor_insights_outcome_improved", {
 									n: recommendationOutcome.improvedRate || 0,
 								})}
 							</p>
-							<p
-								className="text-xs m-0"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs m-0" style={{ color: "var(--ink-soft)" }}>
 								{t("dashboard.tutor_insights_outcome_applied", {
 									n: recommendationOutcome.appliedCount || 0,
 								})}
@@ -389,10 +380,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 									n: recommendationOutcome.withSignalOutcome || 0,
 								})}
 							</p>
-							<p
-								className="text-xs m-0"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs m-0" style={{ color: "var(--ink-soft)" }}>
 								{t("dashboard.tutor_insights_outcome_by_preset", {
 									tutor: recommendationOutcome.byPreset?.tutor || 0,
 									adult: recommendationOutcome.byPreset?.adult || 0,
@@ -400,10 +388,7 @@ export default function TutorInsightsCard({ tutorInsights }) {
 							</p>
 						</div>
 					) : (
-						<p
-							className="text-xs m-0"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<p className="text-xs m-0" style={{ color: "var(--ink-soft)" }}>
 							{t("dashboard.tutor_insights_outcome_empty")}
 						</p>
 					)}

@@ -47,10 +47,7 @@ export default function AccountDetailsCard({
 			<SectionTitle>{t("profile.account_details")}</SectionTitle>
 			<div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
 				<label className="space-y-1.5 text-sm">
-					<span
-						className="font-semibold"
-						style={{ color: "var(--ink)" }}
-					>
+					<span className="font-semibold" style={{ color: "var(--ink)" }}>
 						{t("profile.name")}
 					</span>
 					<input
@@ -75,10 +72,7 @@ export default function AccountDetailsCard({
 					)}
 				</label>
 				<label className="space-y-1.5 text-sm">
-					<span
-						className="font-semibold"
-						style={{ color: "var(--ink)" }}
-					>
+					<span className="font-semibold" style={{ color: "var(--ink)" }}>
 						{t("profile.email")}
 					</span>
 					<input
@@ -103,10 +97,7 @@ export default function AccountDetailsCard({
 					)}
 				</label>
 				<label className="space-y-1.5 text-sm">
-					<span
-						className="font-semibold"
-						style={{ color: "var(--ink)" }}
-					>
+					<span className="font-semibold" style={{ color: "var(--ink)" }}>
 						{t("profile.pronouns")}
 					</span>
 					<input
@@ -134,16 +125,12 @@ export default function AccountDetailsCard({
 						>
 							{t("profile.goals_title")}
 						</p>
-						<span
-							className="text-xs"
-							style={{ color: "var(--ink-soft)" }}
-						>
+						<span className="text-xs" style={{ color: "var(--ink-soft)" }}>
 							{t("profile.goals_hint")}
 						</span>
 					</div>
-					<div
-						className="flex flex-wrap gap-2"
-						role="group"
+					<fieldset
+						className="flex flex-wrap gap-2 border-0 p-0"
 						aria-label={t("profile.goals_title")}
 					>
 						{GOAL_OPTIONS.map((goal) => {
@@ -156,9 +143,7 @@ export default function AccountDetailsCard({
 									aria-pressed={active}
 									className="px-3 py-2 rounded-full text-xs font-semibold transition-colors duration-150"
 									style={{
-										backgroundColor: active
-											? "var(--chandra)"
-											: "var(--paper)",
+										backgroundColor: active ? "var(--chandra)" : "var(--paper)",
 										color: active ? "white" : "var(--ink-soft)",
 										border: "var(--ink-width) solid var(--ink)",
 									}}
@@ -167,7 +152,7 @@ export default function AccountDetailsCard({
 								</button>
 							);
 						})}
-					</div>
+					</fieldset>
 				</div>
 			)}
 		</section>

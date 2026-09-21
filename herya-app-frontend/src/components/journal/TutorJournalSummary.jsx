@@ -97,10 +97,7 @@ export const TutorJournalSummary = ({ entries }) => {
 					>
 						{t("journal.tutor_summary_title")}
 					</h2>
-					<p
-						className="text-sm"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
 						{t("journal.tutor_summary_subtitle")}
 					</p>
 				</div>
@@ -115,10 +112,7 @@ export const TutorJournalSummary = ({ entries }) => {
 
 			<dl className="grid grid-cols-2 gap-2 mb-3">
 				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
-					<dt
-						className="text-[10px]"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 						{t("journal.tutor_summary_current_signal")}
 					</dt>
 					<dd
@@ -129,10 +123,7 @@ export const TutorJournalSummary = ({ entries }) => {
 					</dd>
 				</div>
 				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
-					<dt
-						className="text-[10px]"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 						{t("journal.tutor_summary_safe_pauses")}
 					</dt>
 					<dd
@@ -143,10 +134,7 @@ export const TutorJournalSummary = ({ entries }) => {
 					</dd>
 				</div>
 				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
-					<dt
-						className="text-[10px]"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 						{t("journal.tutor_summary_improved")}
 					</dt>
 					<dd
@@ -159,10 +147,7 @@ export const TutorJournalSummary = ({ entries }) => {
 					</dd>
 				</div>
 				<div className="rounded-xl p-2.5 bg-[var(--paper)]">
-					<dt
-						className="text-[10px]"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<dt className="text-[10px]" style={{ color: "var(--ink-soft)" }}>
 						{t("journal.tutor_summary_anchor_usage")}
 					</dt>
 					<dd

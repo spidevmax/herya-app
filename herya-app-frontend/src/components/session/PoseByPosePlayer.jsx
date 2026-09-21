@@ -288,20 +288,14 @@ export default function PoseByPosePlayer({
 							{poseName}
 						</h3>
 						{pose.name && pose.name !== poseName && (
-							<p
-								className="text-xs"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 								{pose.name}
 							</p>
 						)}
 
 						{/* Drishti */}
 						{pose.drishti && pose.drishti !== "none" && (
-							<p
-								className="text-xs mt-1"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
 								{t("guided.drishti")}: {pose.drishti.replace(/_/g, " ")}
 							</p>
 						)}
@@ -551,10 +545,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 									>
 										{kp.area}
 									</p>
-									<p
-										className="text-xs"
-										style={{ color: "var(--ink-soft)" }}
-									>
+									<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 										{kp.instruction}
 									</p>
 									{kp.commonMistake && (
@@ -579,10 +570,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 								</p>
 							))
 						) : (
-							<p
-								className="text-xs"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 								{t("guided.no_alignment_data")}
 							</p>
 						)}
@@ -609,10 +597,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 							</div>
 						)}
 						{pose.alignmentDetails?.activeBandhas?.length > 0 && (
-							<p
-								className="text-xs mt-1"
-								style={{ color: "var(--chandra)" }}
-							>
+							<p className="text-xs mt-1" style={{ color: "var(--chandra)" }}>
 								Bandhas: {pose.alignmentDetails.activeBandhas.join(", ")}
 							</p>
 						)}
@@ -621,10 +606,7 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 
 				{activeTab === "breathing" && (
 					<div className="flex flex-col gap-2">
-						<p
-							className="text-sm font-medium"
-							style={{ color: "var(--ink)" }}
-						>
+						<p className="text-sm font-medium" style={{ color: "var(--ink)" }}>
 							{localized(pose, "breathingCue", lang) ||
 								t("guided.breathe_steadily")}
 						</p>
@@ -679,19 +661,13 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 										className="shrink-0 mt-0.5"
 										style={{ color: "var(--alert)" }}
 									/>
-									<p
-										className="text-xs"
-										style={{ color: "var(--ink-soft)" }}
-									>
+									<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 										{m}
 									</p>
 								</div>
 							))
 						) : (
-							<p
-								className="text-xs"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 								{t("guided.no_mistakes_data")}
 							</p>
 						)}
@@ -733,18 +709,12 @@ function PoseDetailPanel({ pose, corePose, activeTab, setActiveTab, t, lang }) {
 								</p>
 							))
 						) : (
-							<p
-								className="text-xs"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
 								{t("guided.no_benefits_data")}
 							</p>
 						)}
 						{pose.targetMuscles?.length > 0 && (
-							<p
-								className="text-xs mt-1"
-								style={{ color: "var(--ink-soft)" }}
-							>
+							<p className="text-xs mt-1" style={{ color: "var(--ink-soft)" }}>
 								{t("guided.target_muscles")}: {pose.targetMuscles.join(", ")}
 							</p>
 						)}

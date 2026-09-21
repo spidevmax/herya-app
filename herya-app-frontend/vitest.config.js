@@ -29,10 +29,21 @@ export default defineConfig({
 				"src/main.jsx",
 				"src/index.css",
 			],
-			lines: 70,
-			functions: 70,
-			branches: 65,
-			statements: 70,
+			/*
+			 * These must live under `thresholds`. Declared directly on
+			 * `coverage` they are silently ignored, which is how a documented
+			 * 70% gate sat inert over a suite at 25%.
+			 *
+			 * Set just below the current numbers so the gate ratchets: it
+			 * blocks regressions today, and each batch of new tests should
+			 * raise it. They are a floor, not a target.
+			 */
+			thresholds: {
+				lines: 25,
+				functions: 31,
+				branches: 54,
+				statements: 25,
+			},
 		},
 	},
 });

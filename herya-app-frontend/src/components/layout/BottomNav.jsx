@@ -80,7 +80,9 @@ const BottomNav = () => {
 										</span>
 										<span
 											className="text-[10px] font-bold"
-											style={{ color: isActive ? "var(--ink)" : "var(--ink-soft)" }}
+											style={{
+												color: isActive ? "var(--ink)" : "var(--ink-soft)",
+											}}
 										>
 											{item.label}
 										</span>

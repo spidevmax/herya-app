@@ -1,144 +1,19 @@
 import { motion } from "framer-motion";
-import {
-	BarChart2,
-	BookOpen,
-	List,
-	ShieldCheck,
-	UserRound,
-	Users,
-} from "lucide-react";
+import { ShieldCheck, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
 	changeUserRole,
 	deleteAdminUser,
 	getAdminUsers,
-	getAnalyticsDashboard,
 } from "@/api/admin.api";
-import { getBreathingPatterns } from "@/api/breathing.api";
-import { getPoses } from "@/api/poses.api";
-import { getSequences } from "@/api/sequences.api";
 import BreathingPatternManager from "@/components/admin/BreathingPatternManager";
 import PoseManager from "@/components/admin/PoseManager";
 import SequenceManager from "@/components/admin/SequenceManager";
-import {
-	Badge,
-	ConfirmModal,
-	SkeletonCard,
-	StatCard,
-	TabBar,
-} from "@/components/ui";
+import { Badge, ConfirmModal, SkeletonCard, TabBar } from "@/components/ui";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
-
-function AdminDashboard({ stats, loading, t }) {
-	if (loading)
-		return (
-			<div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
-				{["d1", "d2", "d3"].map((k) => (
-					<SkeletonCard key={k} />
-				))}
-			</div>
-		);
-	if (!stats) return null;
-	return (
-		<div className="flex flex-col gap-4">
-			<ul className="grid grid-cols-2 gap-3 list-none m-0 p-0">
-				<li>
-					<StatCard
-						icon={<Users size={18} aria-hidden="true" />}
-						label={t("admin.dashboard_total_users")}
-						value={stats.totalUsers ?? 0}
-						color="var(--chandra)"
-					/>
-				</li>
-				<li>
-					<StatCard
-						icon={<List size={18} aria-hidden="true" />}
-						label={t("admin.dashboard_total_sessions")}
-						value={stats.totalSessions ?? 0}
-						color="var(--chandra)"
-					/>
-				</li>
-				<li>
-					<StatCard
-						icon={<BookOpen size={18} aria-hidden="true" />}
-						label={t("admin.dashboard_journal_entries")}
-						value={stats.totalJournalEntries ?? 0}
-						color="var(--chandra)"
-					/>
-				</li>
-				<li>
-					<StatCard
-						icon={<BarChart2 size={18} aria-hidden="true" />}
-						label={t("admin.dashboard_active_users")}
-						value={stats.activeUsers ?? 0}
-						color="var(--surya)"
-					/>
-				</li>
-			</ul>
-
-			{stats.popularSequences?.length > 0 && (
-				<section
-					aria-labelledby="admin-popular-sequences-heading"
-					className="ink-block p-4"
-				>
-					<h2
-						id="admin-popular-sequences-heading"
-						className="font-semibold text-[var(--ink)] text-sm mb-3"
-					>
-						{t("admin.dashboard_popular_sequences")}
-					</h2>
-					<ul className="list-none m-0 p-0">
-						{stats.popularSequences.map((s, i) => (
-							<li
-								key={s._id ?? `seq-${i}`}
-								className="flex items-center justify-between py-2 border-b border-[var(--ink)] last:border-0"
-							>
-								<p className="text-sm text-[var(--ink-soft)] truncate flex-1">
-									{s.name ?? s.englishName}
-								</p>
-								<span className="text-xs font-bold text-[var(--chandra)] ml-2">
-									{s.count ?? 0} sesiones
-								</span>
-							</li>
-						))}
-					</ul>
-				</section>
-			)}
-
-			{stats.sessionsByType && (
-				<section
-					aria-labelledby="admin-sessions-by-type-heading"
-					className="ink-block p-4"
-				>
-					<h2
-						id="admin-sessions-by-type-heading"
-						className="font-semibold text-[var(--ink)] text-sm mb-3"
-					>
-						{t("admin.dashboard_sessions_by_type")}
-					</h2>
-					<dl className="m-0">
-						{Object.entries(stats.sessionsByType).map(([type, count]) => (
-							<div
-								key={type}
-								className="flex items-center justify-between py-2 border-b border-[var(--ink)] last:border-0"
-							>
-								<dt className="text-sm text-[var(--ink-soft)] capitalize">
-									{type.replace(/_/g, " ")}
-								</dt>
-								<dd className="text-xs font-bold text-[var(--ink)]">
-									{count}
-								</dd>
-							</div>
-						))}
-					</dl>
-				</section>
-			)}
-		</div>
-	);
-}
 
 function UserRow({ user, onChangeRole, onDelete, t }) {
 	const [nextRole, setNextRole] = useState(user.role);
@@ -149,10 +24,7 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 	}, [user.role]);
 
 	return (
-		<article
-			aria-label={user.name}
-			className="ink-block p-4"
-		>
+		<article aria-label={user.name} className="ink-block p-4">
 			<header className="flex items-center gap-3 mb-3">
 				<div
 					aria-hidden="true"
@@ -222,49 +94,6 @@ function UserRow({ user, onChangeRole, onDelete, t }) {
 	);
 }
 
-function ContentSection({ title, items, loading, color }) {
-	if (loading) return <SkeletonCard lines={3} />;
-	const headingId = `content-section-${title.replace(/\s+/g, "-").toLowerCase()}-heading`;
-	return (
-		<section
-			aria-labelledby={headingId}
-			className="ink-block p-4"
-		>
-			<h2
-				id={headingId}
-				className="font-semibold text-[var(--ink)] text-sm mb-2"
-			>
-				{title}{" "}
-				<span className="text-[var(--ink-soft)] font-normal">
-					({items.length})
-				</span>
-			</h2>
-			<ul className="flex flex-col gap-1.5 max-h-48 overflow-y-auto list-none m-0 p-0">
-				{items.slice(0, 20).map((item) => (
-					<li
-						key={item._id}
-						className="flex items-center gap-2 py-1.5 border-b border-[var(--paper)] last:border-0"
-					>
-						<span
-							aria-hidden="true"
-							className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-							style={{ backgroundColor: color }}
-						/>
-						<p className="text-xs text-[var(--ink-soft)] truncate flex-1">
-							{item.englishName ?? item.name}
-						</p>
-						{item.difficulty && (
-							<span className="text-[10px] text-[var(--ink-soft)]">
-								{item.difficulty}
-							</span>
-						)}
-					</li>
-				))}
-			</ul>
-		</section>
-	);
-}
-
 export default function Admin() {
 	const { user } = useAuth();
 	const { t } = useLanguage();
@@ -285,32 +114,16 @@ export default function Admin() {
 		}
 	}, [tab, searchParams, setSearchParams]);
 
-	const [stats, setStats] = useState(null);
-	const [statsLoading, setStatsLoading] = useState(true);
-
 	const [users, setUsers] = useState([]);
 	const [usersLoading, setUsersLoading] = useState(false);
 	const [usersFetched, setUsersFetched] = useState(false);
 	const [deleteTarget, setDeleteTarget] = useState(null);
 	const [deleteLoading, setDeleteLoading] = useState(false);
 
-	const [poses, setPoses] = useState([]);
-	const [sequences, setSequences] = useState([]);
-	const [patterns, setPatterns] = useState([]);
-	const [contentLoading, setContentLoading] = useState(false);
-	const [contentFetched, setContentFetched] = useState(false);
-
 	// Redirect if not admin
 	useEffect(() => {
 		if (user && user.role !== "admin") navigate("/");
 	}, [user, navigate]);
-
-	useEffect(() => {
-		getAnalyticsDashboard()
-			.then((r) => setStats(r.data?.data || r.data))
-			.catch(() => setStats(null))
-			.finally(() => setStatsLoading(false));
-	}, []);
 
 	useEffect(() => {
 		if (tab === "users" && !usersFetched) {
@@ -326,33 +139,7 @@ export default function Admin() {
 					setUsersFetched(true);
 				});
 		}
-		if (tab === "content" && !contentFetched) {
-			setContentLoading(true);
-			Promise.allSettled([
-				getPoses({ limit: 100 }),
-				getSequences({ limit: 100 }),
-				getBreathingPatterns({ limit: 100 }),
-			])
-				.then(([p, s, b]) => {
-					if (p.status === "fulfilled") {
-						const l = p.value.data?.data || p.value.data || [];
-						setPoses(Array.isArray(l) ? l : []);
-					}
-					if (s.status === "fulfilled") {
-						const l = s.value.data?.data || s.value.data || [];
-						setSequences(Array.isArray(l) ? l : []);
-					}
-					if (b.status === "fulfilled") {
-						const l = b.value.data?.data || b.value.data || [];
-						setPatterns(Array.isArray(l) ? l : []);
-					}
-				})
-				.finally(() => {
-					setContentLoading(false);
-					setContentFetched(true);
-				});
-		}
-	}, [tab, usersFetched, contentFetched]);
+	}, [tab, usersFetched]);
 
 	const handleChangeRole = async (userId, newRole) => {
 		try {

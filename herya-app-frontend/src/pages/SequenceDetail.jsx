@@ -170,7 +170,11 @@ export default function SequenceDetail() {
 	const viewPoseLabel = tr("sequence_detail.view_pose", "View pose");
 
 	return (
-		<main data-identity="next" className="pb-6" style={{ background: "var(--paper)" }}>
+		<main
+			data-identity="next"
+			className="pb-6"
+			style={{ background: "var(--paper)" }}
+		>
 			<StickyHeader
 				onBack={() => navigate(-1)}
 				title={

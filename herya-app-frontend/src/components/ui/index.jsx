@@ -68,7 +68,6 @@ export const SearchBar = ({
 }) => {
 	return (
 		<div className={`relative ${className}`}>
-			{label ? <label className="sr-only">{label}</label> : null}
 			<Search
 				size={18}
 				className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-soft)]"
@@ -215,27 +214,22 @@ export const InlineLink = ({ children, className = "", ...props }) => (
 );
 
 // ── StatCard ──────────────────────────────────────────────────────────────────
-export const StatCard = ({
-	icon,
-	label,
-	value,
-	color = "var(--chandra)",
-}) => {
+export const StatCard = ({ icon, label, value, color = "var(--chandra)" }) => {
 	return (
 		<article
 			className="ink-block flex flex-col gap-2 p-3"
 			style={{ borderTopColor: color, borderTopWidth: "6px" }}
 		>
-			<header className="flex items-center gap-2" style={{ color: "var(--ink)" }}>
+			<header
+				className="flex items-center gap-2"
+				style={{ color: "var(--ink)" }}
+			>
 				<span aria-hidden="true">{icon}</span>
 				<p className="text-xs font-bold" style={{ color: "var(--ink-soft)" }}>
 					{label}
 				</p>
 			</header>
-			<p
-				className="text-xl font-bold"
-				style={{ color: "var(--ink)" }}
-			>
+			<p className="text-xl font-bold" style={{ color: "var(--ink)" }}>
 				{value}
 			</p>
 		</article>
@@ -488,10 +482,7 @@ export const Badge = ({ children, color = "var(--ink)", className = "" }) => {
 // ── SkeletonCard ──────────────────────────────────────────────────────────────
 export const SkeletonCard = ({ lines = 3, className = "" }) => {
 	return (
-		<div
-			aria-hidden="true"
-			className={`ink-block space-y-3 p-4 ${className}`}
-		>
+		<div aria-hidden="true" className={`ink-block space-y-3 p-4 ${className}`}>
 			<span className="skeleton h-5 w-3/4 rounded-lg block" />
 			{Array.from({ length: lines - 1 }, (_, idx) => idx + 1).map((lineNo) => (
 				<span
@@ -743,10 +734,7 @@ export const ConfirmModal = ({
 					{title}
 				</h3>
 				{description ? (
-					<p
-						id={descId}
-						className="mt-2 text-sm text-[var(--ink-soft)]"
-					>
+					<p id={descId} className="mt-2 text-sm text-[var(--ink-soft)]">
 						{description}
 					</p>
 				) : null}
@@ -811,15 +799,11 @@ export const PageHeader = ({
 	titleClassName = "",
 }) => (
 	<header className={`page-header ${className}`}>
-		<h1
-			className={`text-display-md text-[var(--ink)] ${titleClassName}`}
-		>
+		<h1 className={`text-display-md text-[var(--ink)] ${titleClassName}`}>
 			{title}
 		</h1>
 		{description ? (
-			<p className="text-body-sm text-[var(--ink-soft)]">
-				{description}
-			</p>
+			<p className="text-body-sm text-[var(--ink-soft)]">{description}</p>
 		) : null}
 	</header>
 );
@@ -842,11 +826,7 @@ export const StickyHeader = ({ onBack, title, children }) => {
 					/>
 				</button>
 			)}
-			{title && (
-				<h1 className="text-title-md text-[var(--ink)]">
-					{title}
-				</h1>
-			)}
+			{title && <h1 className="text-title-md text-[var(--ink)]">{title}</h1>}
 			{children}
 		</header>
 	);

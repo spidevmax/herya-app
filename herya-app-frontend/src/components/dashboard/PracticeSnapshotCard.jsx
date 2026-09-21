@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { BookOpen, PlayCircle, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
@@ -19,10 +18,7 @@ const Stat = ({ label, value }) => (
 		>
 			{label}
 		</p>
-		<p
-			className="text-lg font-bold"
-			style={{ color: "var(--ink)" }}
-		>
+		<p className="text-lg font-bold" style={{ color: "var(--ink)" }}>
 			{value}
 		</p>
 	</div>
@@ -121,10 +117,7 @@ export default function PracticeSnapshotCard({
 					>
 						{t("dashboard.quick_snapshot_title")}
 					</p>
-					<p
-						className="text-sm"
-						style={{ color: "var(--ink-soft)" }}
-					>
+					<p className="text-sm" style={{ color: "var(--ink-soft)" }}>
 						{t("dashboard.quick_snapshot_subtitle")}
 					</p>
 				</div>
@@ -132,7 +125,11 @@ export default function PracticeSnapshotCard({
 					className="w-8 h-8 rounded-xl flex items-center justify-center"
 					style={{ backgroundColor: "var(--paper)" }}
 				>
-					<Sparkles size={16} aria-hidden="true" style={{ color: "var(--ink)" }} />
+					<Sparkles
+						size={16}
+						aria-hidden="true"
+						style={{ color: "var(--ink)" }}
+					/>
 				</div>
 			</div>
 
@@ -172,7 +169,11 @@ export default function PracticeSnapshotCard({
 					type="button"
 					onClick={handlePrimaryAction}
 					className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
-					style={{ background: "var(--surya)", color: "var(--on-fill)", cursor: "pointer" }}
+					style={{
+						background: "var(--surya)",
+						color: "var(--on-fill)",
+						cursor: "pointer",
+					}}
 				>
 					<PlayCircle size={16} aria-hidden="true" />
 					{nextActionLabel}

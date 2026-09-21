@@ -1,6 +1,7 @@
 /** @vitest-environment jsdom */
-import { MemoryRouter } from "react-router-dom";
+
 import { render, screen, within } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import Library from "../pages/Library";
 
@@ -138,7 +139,9 @@ describe("Library", () => {
 		await screen.findByText("Moderate Flow");
 		// The label appears on the section header and again on every card, so
 		// the header is taken explicitly rather than by a unique-text lookup.
-		const sequenceSection = screen.getAllByText("VK Sequence")[0].closest("div");
+		const sequenceSection = screen
+			.getAllByText("VK Sequence")[0]
+			.closest("div");
 		const cards = within(sequenceSection.parentElement).getAllByRole("button");
 		const titles = cards.map((card) => card.textContent);
 

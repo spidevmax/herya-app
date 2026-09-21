@@ -27,9 +27,7 @@ const SensationChip = ({ label, active, onToggle }) => (
 		aria-pressed={active}
 		className="px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 hover:-translate-y-0.5"
 		style={{
-			background: active
-				? "var(--chandra)"
-				: "var(--paper-raised)",
+			background: active ? "var(--chandra)" : "var(--paper-raised)",
 			color: active ? "white" : "var(--ink-soft)",
 			borderColor: active
 				? "var(--chandra)"

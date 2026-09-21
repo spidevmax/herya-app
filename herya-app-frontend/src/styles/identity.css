@@ -53,7 +53,6 @@
 	--ink-width: 2px;
 	--radius-block: 14px;
 	--offset: 4px; /* hard offset replaces drop shadow */
-
 }
 
 /* Applying the system — typography and ground — stays opt-in per subtree so

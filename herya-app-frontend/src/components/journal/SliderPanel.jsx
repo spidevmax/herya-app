@@ -1,8 +1,6 @@
 const SOFT_PANEL_STYLE = {
-	border:
-		"1px solid color-mix(in srgb, var(--ink) 68%, transparent)",
-	background:
-		"var(--paper-raised)",
+	border: "1px solid color-mix(in srgb, var(--ink) 68%, transparent)",
+	background: "var(--paper-raised)",
 };
 
 const SliderPanel = ({
@@ -18,10 +16,7 @@ const SliderPanel = ({
 }) => (
 	<div className="rounded-2xl p-4" style={SOFT_PANEL_STYLE}>
 		<div className="mb-3 flex items-center justify-between gap-3">
-			<label
-				htmlFor={id}
-				className="text-sm font-semibold text-[var(--ink)]"
-			>
+			<label htmlFor={id} className="text-sm font-semibold text-[var(--ink)]">
 				{label}
 			</label>
 			<span

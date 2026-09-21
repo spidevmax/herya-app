@@ -631,100 +631,91 @@ export default function Session() {
 							) : seqId && (sequenceLoading || familyPosesLoading) ? (
 								<div className="w-full text-center py-16">
 									<div className="mb-4 flex justify-center">
-										<Hourglass
-											size={56}
-											style={{ color: "var(--chandra)" }}
-										/>
+										<Hourglass size={56} style={{ color: "var(--chandra)" }} />
 									</div>
 									<p className="text-xl font-semibold text-[var(--ink)]">
 										{tr("session.loading_sequence", "Loading sequence...")}
 									</p>
 								</div>
 							) : seqId && sequence && practicePoses.length > 0 ? (
-								<>
-									<div className="w-full">
-										<p className="text-xs font-medium text-[var(--ink-soft)] text-center mb-3">
-											{tr(
-												"session.pose_progress",
-												"Pose {current} of {total}",
-												{
-													current: currentPoseIndex + 1,
-													total: practicePoses.length,
-												},
-											)}
-										</p>
-										<motion.div
-											key={`pose-${currentPoseIndex}`}
-											initial={{ opacity: 0, y: 10 }}
-											animate={{ opacity: 1, y: 0 }}
-											transition={{ duration: 0.3 }}
-											className="bg-[var(--paper-raised)] rounded-2xl p-6 text-center"
-										>
-											<div className="text-6xl mb-4">
-												<PersonStanding
-													size={56}
-													style={{ color: "var(--chandra)" }}
-												/>
-											</div>
-											<h3 className="text-xl font-semibold text-[var(--ink)] mb-2">
-												{currentPoseName}
-											</h3>
-											{currentPoseSanskrit && (
-												<p className="text-sm italic text-[var(--ink-soft)] mb-4">
-													{currentPoseSanskrit}
-												</p>
-											)}
-											{currentPoseDescription && (
-												<p className="text-sm text-[var(--ink-soft)] mt-4">
-													{currentPoseDescription}
-												</p>
-											)}
-										</motion.div>
-
-										<div className="flex justify-between items-center mt-6 gap-2">
-											<button
-												type="button"
-												onClick={() =>
-													setCurrentPoseIndex(Math.max(0, currentPoseIndex - 1))
-												}
-												disabled={currentPoseIndex === 0}
-												className="w-10 h-10 rounded-full bg-[var(--paper)] flex items-center justify-center disabled:opacity-30"
-											>
-												<ChevronLeft size={20} />
-											</button>
-											<div className="flex-1 flex justify-center gap-1">
-												{practicePoses.map((pose, idx) => (
-													<button
-														key={`pose-dot-${typeof pose === "string" ? pose : pose._id || pose.id || pose.englishName || pose.name}`}
-														type="button"
-														onClick={() => setCurrentPoseIndex(idx)}
-														className={
-															"w-2 h-2 rounded-full transition " +
-															(idx === currentPoseIndex
-																? "bg-[var(--chandra)] w-6"
-																: "bg-[var(--ink)]")
-														}
-													/>
-												))}
-											</div>
-											<button
-												type="button"
-												onClick={() =>
-													setCurrentPoseIndex(
-														Math.min(
-															practicePoses.length - 1,
-															currentPoseIndex + 1,
-														),
-													)
-												}
-												disabled={currentPoseIndex === practicePoses.length - 1}
-												className="w-10 h-10 rounded-full bg-[var(--paper)] flex items-center justify-center disabled:opacity-30"
-											>
-												<ChevronRight size={20} />
-											</button>
+								<div className="w-full">
+									<p className="text-xs font-medium text-[var(--ink-soft)] text-center mb-3">
+										{tr("session.pose_progress", "Pose {current} of {total}", {
+											current: currentPoseIndex + 1,
+											total: practicePoses.length,
+										})}
+									</p>
+									<motion.div
+										key={`pose-${currentPoseIndex}`}
+										initial={{ opacity: 0, y: 10 }}
+										animate={{ opacity: 1, y: 0 }}
+										transition={{ duration: 0.3 }}
+										className="bg-[var(--paper-raised)] rounded-2xl p-6 text-center"
+									>
+										<div className="text-6xl mb-4">
+											<PersonStanding
+												size={56}
+												style={{ color: "var(--chandra)" }}
+											/>
 										</div>
+										<h3 className="text-xl font-semibold text-[var(--ink)] mb-2">
+											{currentPoseName}
+										</h3>
+										{currentPoseSanskrit && (
+											<p className="text-sm italic text-[var(--ink-soft)] mb-4">
+												{currentPoseSanskrit}
+											</p>
+										)}
+										{currentPoseDescription && (
+											<p className="text-sm text-[var(--ink-soft)] mt-4">
+												{currentPoseDescription}
+											</p>
+										)}
+									</motion.div>
+
+									<div className="flex justify-between items-center mt-6 gap-2">
+										<button
+											type="button"
+											onClick={() =>
+												setCurrentPoseIndex(Math.max(0, currentPoseIndex - 1))
+											}
+											disabled={currentPoseIndex === 0}
+											className="w-10 h-10 rounded-full bg-[var(--paper)] flex items-center justify-center disabled:opacity-30"
+										>
+											<ChevronLeft size={20} />
+										</button>
+										<div className="flex-1 flex justify-center gap-1">
+											{practicePoses.map((pose, idx) => (
+												<button
+													key={`pose-dot-${typeof pose === "string" ? pose : pose._id || pose.id || pose.englishName || pose.name}`}
+													type="button"
+													onClick={() => setCurrentPoseIndex(idx)}
+													className={
+														"w-2 h-2 rounded-full transition " +
+														(idx === currentPoseIndex
+															? "bg-[var(--chandra)] w-6"
+															: "bg-[var(--ink)]")
+													}
+												/>
+											))}
+										</div>
+										<button
+											type="button"
+											onClick={() =>
+												setCurrentPoseIndex(
+													Math.min(
+														practicePoses.length - 1,
+														currentPoseIndex + 1,
+													),
+												)
+											}
+											disabled={currentPoseIndex === practicePoses.length - 1}
+											className="w-10 h-10 rounded-full bg-[var(--paper)] flex items-center justify-center disabled:opacity-30"
+										>
+											<ChevronRight size={20} />
+										</button>
 									</div>
-								</>
+								</div>
 							) : seqId && sequence && practicePoses.length === 0 ? (
 								<div className="w-full text-center py-16">
 									<div className="mb-4 flex justify-center">
