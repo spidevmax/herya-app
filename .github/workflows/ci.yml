@@ -43,5 +43,5 @@ jobs:
           cache-dependency-path: herya-app-backend/package-lock.json
       - run: npm ci
       - run: npm run lint
-      - run: npm test
+      - run: npm run test:coverage
       - run: npm run check

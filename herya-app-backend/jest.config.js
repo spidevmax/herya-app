@@ -15,4 +15,17 @@ module.exports = {
 	],
 	coverageDirectory: "coverage",
 	coverageReporters: ["text", "lcov"],
+	/*
+	 * A floor, not a target: set just below the current numbers so the gate
+	 * ratchets — it blocks regressions today and should be raised with each
+	 * batch of new tests. Enforced in CI via `npm run test:coverage`.
+	 */
+	coverageThreshold: {
+		global: {
+			statements: 57,
+			branches: 35,
+			functions: 40,
+			lines: 59,
+		},
+	},
 };

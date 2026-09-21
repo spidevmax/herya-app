@@ -34,14 +34,19 @@ export default defineConfig({
 			 * `coverage` they are silently ignored, which is how a documented
 			 * 70% gate sat inert over a suite at 25%.
 			 *
-			 * Set just below the current numbers so the gate ratchets: it
-			 * blocks regressions today, and each batch of new tests should
-			 * raise it. They are a floor, not a target.
+			 * Set below the current numbers so the gate ratchets: it blocks
+			 * regressions today, and each batch of new tests should raise it.
+			 * They are a floor, not a target.
+			 *
+			 * Functions and branches carry extra headroom on purpose. Readings
+			 * of 28.6% / 53.2% have been observed against a steady 32.2% / 55.5%
+			 * while files were being edited, and a gate that trips at random is
+			 * a gate someone eventually deletes.
 			 */
 			thresholds: {
 				lines: 25,
-				functions: 31,
-				branches: 54,
+				functions: 27,
+				branches: 52,
 				statements: 25,
 			},
 		},
