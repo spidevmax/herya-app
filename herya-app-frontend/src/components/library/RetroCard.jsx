@@ -79,6 +79,15 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 			: "—";
 	};
 	const translateEffect = (e) => (e ? tr(`library.effects.${e}`, e) : "—");
+	/*
+	 * Ojo con translateFamily de arriba: ese es para familias de POSTURAS
+	 * (tadasana, supina...). Los pranayama tienen su propia clasificacion
+	 * (ujjayi_family, alternate_nostril...) en otro grupo de claves.
+	 */
+	const translateTechniqueFamily = (f) =>
+		f
+			? tr(`library.technique_families.${f}`, String(f).replace(/_/g, " "))
+			: "—";
 	const translateDrishti = (d) =>
 		d ? tr(`library.drishti.${d}`, String(d).replace(/_/g, " ")) : "—";
 
@@ -139,7 +148,11 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 							label: tr("library.stat_effect", "EFFECT"),
 						},
 						{
-							value: translateCategory(item.breathType ?? item.category),
+							// Los patrones de respiracion no traen breathType ni
+							// category: esos campos no existen en el modelo, por eso
+							// esta celda salia siempre vacia. Lo que los clasifica es
+							// techniqueFamily.
+							value: translateTechniqueFamily(item.techniqueFamily),
 							label: tr("library.stat_type", "TYPE"),
 						},
 						{

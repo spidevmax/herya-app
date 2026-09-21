@@ -2,6 +2,21 @@
  * Shared utilities for Library, SequenceDetail, PoseDetail, BreathingDetail.
  */
 
+import { VK_FAMILY_BY_SLUG } from "@/utils/constants";
+
+/**
+ * Convierte el slug de familia que manda la API ("one_leg_standing") en la
+ * etiqueta traducida ("Una pierna de pie").
+ *
+ * Si la familia no esta en el mapa, se muestra el slug con los guiones bajos
+ * cambiados por espacios, que es feo pero legible.
+ */
+export const formatFamily = (family, t) => {
+	const entry = VK_FAMILY_BY_SLUG[family];
+	if (entry?.labelKey && t) return t(entry.labelKey);
+	return entry?.label || family?.replace(/[_-]/g, " ") || "";
+};
+
 // ── Difficulty color map (shared between PoseDetail & BreathingDetail) ───────
 export const DIFF_COLORS = {
 	beginner: "var(--paper-raised)",

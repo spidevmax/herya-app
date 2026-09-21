@@ -318,9 +318,8 @@ const SequenceDetail = () => {
 											className="text-sm font-semibold mt-0.5"
 											style={{ color: "var(--ink)" }}
 										>
-											{LEVEL_LABEL_KEYS[seq.level]
-												? t(LEVEL_LABEL_KEYS[seq.level])
-												: (LEVEL_LABELS[seq.level] ?? seq.level)}
+											{/* La etiqueta de arriba ya dice "Nivel" */}
+											{seq.level}
 										</dd>
 									</div>
 								) : null}
@@ -395,10 +394,22 @@ const SequenceDetail = () => {
 											{tr("library.filter_family", "Family")}
 										</dt>
 										<dd
-											className="text-sm font-semibold mt-0.5 capitalize"
+											className="text-sm font-semibold mt-0.5"
 											style={{ color: "var(--ink)" }}
 										>
-											{seq.family.replace(/_/g, " ")}
+											{/*
+											 * Misma etiqueta traducida que usa la cabecera de
+											 * esta pagina. Antes se pintaba el slug crudo
+											 * ("one_leg_standing" con guiones cambiados por
+											 * espacios), que siempre salia en ingles.
+											 *
+											 * Se quita tambien "capitalize": ponia mayuscula
+											 * en cada palabra, que en espanol esta mal
+											 * ("Una Pierna De Pie").
+											 */}
+											{family?.labelKey
+												? t(family.labelKey)
+												: seq.family.replace(/_/g, " ")}
 										</dd>
 									</div>
 								) : null}

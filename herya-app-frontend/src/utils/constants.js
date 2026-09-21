@@ -113,12 +113,20 @@ const VK_FAMILY_BY_SLUG = Object.fromEntries(
 	VK_FAMILIES.map((f) => [f.labelKey.replace("constants.family_", ""), f]),
 );
 
-const LEVEL_LABELS = { 1: "Beginner", 2: "Intermediate", 3: "Advanced" };
+/*
+ * "level" es el paso dentro de la progresion de una familia: la Familia
+ * Tadasana tiene Nivel 1, 2 y 3, y getNextSequence() busca el nivel siguiente.
+ * No es lo mismo que "difficulty", que es la dificultad general.
+ *
+ * Antes estas etiquetas decian "Principiante/Intermedio/Avanzado", las mismas
+ * palabras que difficulty, y la interfaz mostraba el mismo texto dos veces.
+ */
+const LEVEL_LABELS = { 1: "Level 1", 2: "Level 2", 3: "Level 3" };
 
 const LEVEL_LABEL_KEYS = {
-	1: "constants.level_1",
-	2: "constants.level_2",
-	3: "constants.level_3",
+	1: "library.level_1",
+	2: "library.level_2",
+	3: "library.level_3",
 };
 
 const MOOD_OPTIONS = [

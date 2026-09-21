@@ -11,17 +11,13 @@ import {
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
-import { VK_FAMILY_BY_SLUG } from "@/utils/constants";
-import { DIFF_ACCENTS, localized, localizedName } from "@/utils/libraryHelpers";
+import {
+	DIFF_ACCENTS,
+	formatFamily,
+	localized,
+	localizedName,
+} from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
-
-const formatFamily = (family, t) => {
-	// The API sends a slug ("bow_sequence"); VK_FAMILY_MAP is keyed by numeric
-	// id, so every lookup missed and the raw slug was shown instead.
-	const entry = VK_FAMILY_BY_SLUG[family];
-	if (entry?.labelKey && t) return t(entry.labelKey);
-	return entry?.label || family?.replace(/[_-]/g, " ") || "";
-};
 
 const SequencePicker = ({ sequences = [], selectedId, onSelect }) => {
 	const { t, lang } = useLanguage();

@@ -1,7 +1,6 @@
 import { Clock, Dumbbell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/context/LanguageContext";
-import { LEVEL_LABEL_KEYS, LEVEL_LABELS } from "@/utils/constants";
 import { localizedName } from "@/utils/libraryHelpers";
 import "@/styles/identity.css";
 
@@ -110,9 +109,11 @@ const HeroCard = ({ sequence, reason, loading }) => {
 					<Dumbbell size={13} aria-hidden="true" />
 					<dt className="sr-only">{t("library.stat_level", "Level")}</dt>
 					<dd className="m-0 text-xs font-bold">
-						{LEVEL_LABEL_KEYS[sequence.level]
-							? t(LEVEL_LABEL_KEYS[sequence.level])
-							: (LEVEL_LABELS[sequence.level] ?? sequence.difficulty)}
+						{/*
+						 * Dificultad, no nivel: el titulo de la tarjeta ya termina
+						 * en "- Nivel 1", asi que repetirlo aqui no aporta nada.
+						 */}
+						{t(`library.${sequence.difficulty}`, sequence.difficulty)}
 					</dd>
 				</div>
 			</dl>

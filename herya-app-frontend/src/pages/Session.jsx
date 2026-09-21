@@ -24,6 +24,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 import { SESSION_TYPES } from "@/utils/constants";
+import { formatFamily, localizedName } from "@/utils/libraryHelpers";
 
 const MOOD_OPTIONS = [
 	"energized",
@@ -120,7 +121,7 @@ const Session = () => {
 	const [params] = useSearchParams();
 	const navigate = useNavigate();
 	const { user, refreshUser } = useAuth();
-	const { t } = useLanguage();
+	const { t, lang } = useLanguage();
 	const tr = (key, fallback, vars) => {
 		const value = t(key, vars);
 		return value === key ? fallback : value;
@@ -820,7 +821,10 @@ const Session = () => {
 																: "bg-[var(--paper-raised)] text-[var(--ink)]")
 														}
 													>
-														{item.englishName} · {item.family}
+														{/* englishName siempre es ingles y family
+														    es un slug; ambos tienen traduccion */}
+														{localizedName(item, lang)} ·{" "}
+														{formatFamily(item.family, t)}
 													</button>
 												))}
 											</div>
