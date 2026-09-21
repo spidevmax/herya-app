@@ -19,7 +19,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 import useBreathingEngine from "@/hooks/useBreathingEngine";
 import usePranayamaAudio from "@/hooks/usePranayamaAudio";
-import { localizedArray } from "@/utils/libraryHelpers";
+import { localized, localizedArray } from "@/utils/libraryHelpers";
 import NostrilIndicator from "./NostrilIndicator";
 import SafetyBanner from "./SafetyBanner";
 
@@ -545,7 +545,7 @@ const CycleBreathingPlayer = ({
 						warnings={
 							profile.safety.warningKey
 								? t(profile.safety.warningKey)
-								: pattern.warnings
+								: localized(pattern, "warnings", lang)
 						}
 					/>
 				</div>
@@ -673,7 +673,7 @@ const CycleBreathingPlayer = ({
 									? localizedArray(pattern, "contraindications", lang)
 									: pattern.contraindications
 							}
-							warnings={pattern.warnings}
+							warnings={localized(pattern, "warnings", lang)}
 						/>
 					</div>
 				)}

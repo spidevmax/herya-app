@@ -633,9 +633,16 @@ const SequenceDetail = () => {
 										</h3>
 										<ol className="flex flex-col gap-2 list-none m-0 p-0">
 											{section.items.map((pose) => (
+												/*
+												 * El desplazamiento al pasar el raton va en la
+												 * li, no en el boton de dentro. La li es quien
+												 * pinta el borde: si solo subiera el boton, su
+												 * fondo taparia el borde de arriba y la tarjeta
+												 * pareceria cortada por el top.
+												 */
 												<li
 													key={pose.id}
-													className="rounded-xl border"
+													className="rounded-xl border transition duration-200 hover:-translate-y-[1px]"
 													style={{
 														borderColor: "var(--ink)",
 													}}
@@ -647,7 +654,7 @@ const SequenceDetail = () => {
 																navigate(`/library/pose/${pose.poseId}`)
 															}
 															aria-label={`${viewPoseLabel}: ${pose.name}`}
-															className="group w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left transition hover:brightness-95 hover:-translate-y-[1px] cursor-pointer"
+															className="group w-full rounded-xl px-3 py-2 flex items-center justify-between gap-3 text-left transition hover:brightness-95 cursor-pointer"
 															style={{
 																backgroundColor: "var(--paper-raised)",
 															}}

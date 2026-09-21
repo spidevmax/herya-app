@@ -3,7 +3,11 @@ import { Check, ChevronDown, ChevronUp, Search, Wind, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
-import { localizedArray } from "@/utils/libraryHelpers";
+import {
+	localized,
+	localizedArray,
+	translateWithFallback,
+} from "@/utils/libraryHelpers";
 import SafetyBanner from "./SafetyBanner";
 
 const formatHuman = (v) =>
@@ -32,6 +36,26 @@ const effectColor = (e) => {
 
 const BreathingPatternPicker = ({ patterns = [], selectedId, onSelect }) => {
 	const { t, lang } = useLanguage();
+
+	/*
+	 * energyEffect y techniqueFamily llegan de la base de datos en ingles y en
+	 * minusculas ("heating", "alternate_nostril"). Cada uno tiene su propio
+	 * grupo de traducciones. Si algun valor nuevo no estuviera traducido, se
+	 * muestra el original con mayuscula inicial en vez de la clave suelta.
+	 */
+	const effectLabel = (value) =>
+		value
+			? translateWithFallback(t, `library.effects.${value}`, formatHuman(value))
+			: "";
+
+	const familyLabel = (value) =>
+		value
+			? translateWithFallback(
+					t,
+					`library.technique_families.${value}`,
+					formatHuman(value),
+				)
+			: "";
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
 
@@ -85,10 +109,17 @@ const BreathingPatternPicker = ({ patterns = [], selectedId, onSelect }) => {
 							{selected.romanizationName}
 						</p>
 						<p className="text-xs" style={{ color: "var(--ink-soft)" }}>
-							{getRatioDisplay(selected)} · {formatHuman(selected.energyEffect)}{" "}
+							{getRatioDisplay(selected)} · {effectLabel(selected.energyEffect)}{" "}
 							· {t(`library.${selected.difficulty}`)}
-							{selected.techniqueFamily
-								? ` · ${formatHuman(selected.techniqueFamily)}`
+							{/*
+							 * energyEffect y techniqueFamily son campos distintos, pero
+							 * en varios patrones valen lo mismo (Bhastrika es "heating"
+							 * en los dos). Repetir la palabra no aporta nada, asi que la
+							 * familia solo se anade cuando dice algo diferente.
+							 */}
+							{selected.techniqueFamily &&
+							selected.techniqueFamily !== selected.energyEffect
+								? ` · ${familyLabel(selected.techniqueFamily)}`
 								: ""}
 						</p>
 					</div>
@@ -200,7 +231,7 @@ const BreathingPatternPicker = ({ patterns = [], selectedId, onSelect }) => {
 														color: effectColor(pat.energyEffect),
 													}}
 												>
-													{formatHuman(pat.energyEffect)}
+													{effectLabel(pat.energyEffect)}
 												</span>
 												<span
 													className="text-[10px]"
@@ -217,7 +248,7 @@ const BreathingPatternPicker = ({ patterns = [], selectedId, onSelect }) => {
 															color: "var(--ink-soft)",
 														}}
 													>
-														{formatHuman(pat.techniqueFamily)}
+														{familyLabel(pat.techniqueFamily)}
 													</span>
 												)}
 												{pat.recommendedPractice?.cycles?.default && (
@@ -256,7 +287,7 @@ const BreathingPatternPicker = ({ patterns = [], selectedId, onSelect }) => {
 							? localizedArray(selected, "contraindications", lang)
 							: selected.contraindications
 					}
-					warnings={selected.warnings}
+					warnings={localized(selected, "warnings", lang)}
 				/>
 			)}
 		</div>

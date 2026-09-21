@@ -125,7 +125,19 @@ const CalendarStrip = ({
 									: d.practiced
 										? "var(--surya)"
 										: "transparent",
-								color: d.isToday ? "var(--paper)" : "var(--on-fill)",
+								/*
+								 * El color del texto acompana al fondo de la linea de
+								 * arriba, estado por estado. --on-fill solo vale cuando
+								 * hay relleno de surya o chandra debajo. En un dia vacio
+								 * el circulo es transparente, asi que el texto va en
+								 * --ink: si no, en tema oscuro quedaba azul marino sobre
+								 * fondo casi negro y no se leia.
+								 */
+								color: d.isToday
+									? "var(--paper)"
+									: d.practiced
+										? "var(--on-fill)"
+										: "var(--ink)",
 								border: "var(--ink-width) solid var(--ink)",
 								borderRadius: "999px",
 							}}

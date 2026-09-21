@@ -108,7 +108,7 @@ const PoseCard = ({ pose, index, onClick, t }) => {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ delay: Math.min(index * 0.03, 0.3) }}
 			onClick={onClick}
-			className="group bg-[var(--paper-raised)] border border-[var(--ink)] rounded-2xl p-4 flex items-start gap-4  w-full text-left transition-all duration-200 hover: hover:-translate-y-[1px] active:scale-[0.995] cursor-pointer"
+			className="group bg-[var(--paper-raised)] border border-[var(--ink)] rounded-2xl p-4 flex items-start gap-4 w-full text-left transition-all duration-200 hover:-translate-y-[1px] active:scale-[0.995] cursor-pointer"
 		>
 			<div
 				className="mt-0.5 flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-hidden"
