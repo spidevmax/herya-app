@@ -205,60 +205,87 @@ const SequenceDetail = () => {
 						className="ink-block relative overflow-hidden p-6"
 						style={{ background: "var(--surya)", color: "var(--on-fill)" }}
 					>
+						{/*
+						 * Adorno de fondo. Va en posicion absoluta, asi que no empuja
+						 * al texto: por eso el bloque de abajo reserva sitio con
+						 * padding derecho. En movil se encoge, porque a 96px se comia
+						 * media tarjeta y el titulo pasaba por encima.
+						 */}
 						<div
 							aria-hidden="true"
 							className="absolute bottom-4 right-4 select-none opacity-60"
 						>
 							{family.emoji ? (
-								<span className="text-8xl">{family.emoji}</span>
+								<span className="text-6xl sm:text-8xl">{family.emoji}</span>
 							) : (
+								<PersonStanding
+									size={60}
+									strokeWidth={1.8}
+									className="sm:hidden"
+									style={{ color: "var(--on-fill)" }}
+								/>
+							)}
+							{!family.emoji && (
 								<PersonStanding
 									size={88}
 									strokeWidth={1.8}
+									className="hidden sm:block"
 									style={{ color: "var(--on-fill)" }}
 								/>
 							)}
 						</div>
-						<p className="text-xs font-bold" style={{ opacity: 0.8 }}>
-							{family.labelKey ? t(family.labelKey) : family.label}
-						</p>
-						<h1
-							id="sequence-title"
-							className="font-display text-2xl font-bold  mt-1 mb-1"
-						>
-							{localizedName(seq, lang)}
-						</h1>
-						<p className="mb-4 text-sm italic" style={{ opacity: 0.75 }}>
-							{seq.sanskritName}
-						</p>
-						<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
-							{seq.estimatedDuration?.recommended && (
-								<li>
-									<Badge className=" bg-white/20 border-0">
-										<Clock size={12} aria-hidden="true" />
-										{seq.estimatedDuration.recommended}{" "}
-										{t("sequence_detail.minutes")}
-									</Badge>
-								</li>
-							)}
-							{seq.level && (
-								<li>
-									<Badge className=" bg-white/20 border-0">
-										<Dumbbell size={12} aria-hidden="true" />
-										{LEVEL_LABEL_KEYS[seq.level]
-											? t(LEVEL_LABEL_KEYS[seq.level])
-											: (LEVEL_LABELS[seq.level] ?? seq.level)}
-									</Badge>
-								</li>
-							)}
-							{seq.difficulty && (
-								<li>
-									<Badge className=" bg-white/20 border-0 capitalize">
-										{tr(`library.${seq.difficulty}`, seq.difficulty)}
-									</Badge>
-								</li>
-							)}
-						</ul>
+						{/* pr-* deja libre la esquina donde vive el adorno */}
+						<div className="relative pr-[5.25rem] sm:pr-28">
+							<p className="text-xs font-bold" style={{ opacity: 0.8 }}>
+								{family.labelKey ? t(family.labelKey) : family.label}
+							</p>
+							<h1
+								id="sequence-title"
+								className="font-display text-2xl font-bold  mt-1 mb-1"
+							>
+								{localizedName(seq, lang)}
+							</h1>
+							<p className="mb-4 text-sm italic" style={{ opacity: 0.75 }}>
+								{seq.sanskritName}
+							</p>
+							<ul className="flex flex-wrap gap-2 list-none m-0 p-0">
+								{seq.estimatedDuration?.recommended && (
+									<li>
+										<Badge
+											color="var(--on-fill)"
+											className=" bg-white/20 border-0"
+										>
+											<Clock size={12} aria-hidden="true" />
+											{seq.estimatedDuration.recommended}{" "}
+											{t("sequence_detail.minutes")}
+										</Badge>
+									</li>
+								)}
+								{seq.level && (
+									<li>
+										<Badge
+											color="var(--on-fill)"
+											className=" bg-white/20 border-0"
+										>
+											<Dumbbell size={12} aria-hidden="true" />
+											{LEVEL_LABEL_KEYS[seq.level]
+												? t(LEVEL_LABEL_KEYS[seq.level])
+												: (LEVEL_LABELS[seq.level] ?? seq.level)}
+										</Badge>
+									</li>
+								)}
+								{seq.difficulty && (
+									<li>
+										<Badge
+											color="var(--on-fill)"
+											className=" bg-white/20 border-0 capitalize"
+										>
+											{tr(`library.${seq.difficulty}`, seq.difficulty)}
+										</Badge>
+									</li>
+								)}
+							</ul>
+						</div>
 					</motion.section>
 
 					{(localized(seq, "description", lang) || seq.description) && (
@@ -440,7 +467,7 @@ const SequenceDetail = () => {
 										style={{ color: "var(--ink-soft)" }}
 									>
 										{tr("sequence_detail.primary_benefit", "Primary benefit")}:
-									</span>
+									</span>{" "}
 									{localized(therapeuticFocus, "primaryBenefit", lang)}
 								</p>
 							) : null}

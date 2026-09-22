@@ -705,8 +705,20 @@ const PoseDetail = () => {
 												key={`key-point-${point?.area || point?.instruction || String(point)}`}
 												className="text-sm text-[var(--ink-soft)] leading-relaxed"
 											>
-												{formatValue(point?.area)}
-												{point?.instruction ? `: ${point.instruction}` : ""}
+												{/*
+												 * La zona es un valor fijo en ingles ("hands")
+												 * con traduccion en anatomy.*, y la instruccion
+												 * viene emparejada con instructionEs. Antes se
+												 * pintaban los dos en crudo.
+												 */}
+												{translateWithFallback(
+													t,
+													`anatomy.${point?.area}`,
+													formatValue(point?.area),
+												)}
+												{localized(point, "instruction", lang)
+													? `: ${localized(point, "instruction", lang)}`
+													: ""}
 											</li>
 										))}
 									</ul>

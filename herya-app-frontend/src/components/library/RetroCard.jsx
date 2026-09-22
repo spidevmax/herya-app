@@ -218,10 +218,20 @@ const RetroCard = ({ item, type, onClick, typeLabel, fallbackItemLabel }) => {
 						) : (
 							<div
 								className="font-display flex h-full w-full items-center justify-center text-2xl font-black"
-								style={{ color: fg }}
+								/*
+								 * --ink, no palette.fg. Este panel se rellena con
+								 * --paper-raised, mientras que palette.fg es el color
+								 * que se lee sobre el relleno de la TARJETA (chandra o
+								 * surya). En modo oscuro palette.fg era azul marino
+								 * sobre un --paper-raised tambien azul marino, y el
+								 * monograma desaparecia.
+								 */
+								style={{ color: "var(--ink)" }}
 								aria-hidden="true"
 							>
-								{monogram || <PersonStanding size={28} style={{ color: fg }} />}
+								{monogram || (
+									<PersonStanding size={28} style={{ color: "var(--ink)" }} />
+								)}
 							</div>
 						)}
 					</figure>
