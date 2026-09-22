@@ -201,7 +201,12 @@ const PoseDetail = () => {
 			? localizedArray(pose, "commonMistakes", lang)
 			: normalizeList(pose.commonMistakes);
 	const props = normalizeList(pose.props);
-	const aliases = normalizeList(pose.alias);
+	// Mismo patron que benefits y commonMistakes: la version en espanol si
+	// existe, y si no el original en ingles.
+	const aliases =
+		localizedArray(pose, "alias", lang).length > 0
+			? localizedArray(pose, "alias", lang)
+			: normalizeList(pose.alias);
 	const setupSteps = normalizeList(pose.instructions?.setup);
 	const alignmentSteps = normalizeList(pose.instructions?.alignment);
 	const modificationSteps = normalizeList(pose.instructions?.modifications);

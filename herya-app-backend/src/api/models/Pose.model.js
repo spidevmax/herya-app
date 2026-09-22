@@ -58,6 +58,9 @@ const poseSchema = new mongoose.Schema(
 		iastName: { type: String, required: true, trim: true },
 		sanskritName: { type: String, required: true, trim: true },
 		alias: [{ type: String, trim: true }],
+		// Version en espanol de alias, igual que benefits/benefitsEs.
+		// Sin este campo Mongoose descartaba lo que el seed ya intentaba guardar.
+		aliasEs: [{ type: String, trim: true }],
 
 		// VK-SPECIFIC CLASSIFICATION
 		vkCategory: {
