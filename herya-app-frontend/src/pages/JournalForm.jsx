@@ -581,7 +581,14 @@ const JournalForm = () => {
 			<motion.div
 				initial={{ y: 80 }}
 				animate={{ y: 0 }}
-				className="fixed bottom-6 left-1/2 z-20 -translate-x-1/2 w-full max-w-[560px] px-4"
+				/*
+				 * La barra de guardar tambien es fija, igual que la navegacion
+				 * inferior. En movil la navegacion mide unos 85px desde abajo y
+				 * tiene mas z-index, asi que a bottom-6 el boton quedaba detras.
+				 * bottom-28 lo deja por encima; en pantallas grandes la navegacion
+				 * inferior no existe (lg:hidden) y vuelve a bottom-6.
+				 */
+				className="fixed bottom-28 lg:bottom-6 left-1/2 z-20 -translate-x-1/2 w-full max-w-[560px] px-4"
 			>
 				<div
 					className="rounded-[28px] p-3 shadow-[0_18px_44px_rgba(20,38,74,0.16)] backdrop-blur-sm"

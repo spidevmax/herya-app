@@ -1,7 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { useMemo, useState } from "react";
-import { PHASE_COLORS, PHASE_LABEL_KEYS } from "@/config/techniqueProfiles";
+import {
+	PHASE_COLORS,
+	PHASE_FG,
+	PHASE_LABEL_KEYS,
+} from "@/config/techniqueProfiles";
 import { useLanguage } from "@/context/LanguageContext";
 import "@/styles/identity.css";
 import useBreathingEngine from "@/hooks/useBreathingEngine";
@@ -49,6 +53,7 @@ const PranayamaMetronome = ({ patternKey = "4-4-4-4" }) => {
 	};
 
 	const color = PHASE_COLORS[engine.currentPhaseKey] || PHASE_COLORS.inhale;
+	const colorFg = PHASE_FG[engine.currentPhaseKey] || PHASE_FG.inhale;
 	const scale =
 		engine.currentPhaseKey === "inhale"
 			? 1.3
@@ -81,7 +86,7 @@ const PranayamaMetronome = ({ patternKey = "4-4-4-4" }) => {
 								selectedKey === key
 									? {
 											backgroundColor: "var(--chandra)",
-											color: "white",
+											color: "var(--on-fill)",
 											boxShadow: "var(--shadow-button)",
 										}
 									: {
@@ -190,8 +195,8 @@ const PranayamaMetronome = ({ patternKey = "4-4-4-4" }) => {
 					type="button"
 					whileTap={{ scale: 0.92 }}
 					onClick={engine.toggle}
-					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
-					style={{ backgroundColor: color }}
+					className="w-16 h-16 rounded-full flex items-center justify-center"
+					style={{ backgroundColor: color, color: colorFg }}
 					aria-pressed={engine.isRunning}
 					aria-label={engine.isRunning ? t("guided.pause") : t("guided.play")}
 				>

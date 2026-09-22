@@ -72,7 +72,7 @@ const AuthCallback = () => {
 						<button
 							type="button"
 							onClick={() => navigate("/login", { replace: true })}
-							className="px-4 py-2 rounded-xl bg-[var(--chandra)] text-white text-sm font-semibold"
+							className="px-4 py-2 rounded-xl bg-[var(--chandra)] text-[var(--on-fill)] text-sm font-semibold"
 						>
 							{t("auth_callback.back_to_login")}
 						</button>

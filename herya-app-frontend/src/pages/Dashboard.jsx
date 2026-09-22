@@ -191,7 +191,14 @@ const Dashboard = () => {
 						className="shrink-0 px-3 py-2 rounded-xl text-xs font-semibold"
 						style={{
 							backgroundColor: "var(--alert)",
-							color: "white",
+							/*
+							 * --paper-raised, elegido midiendo: es el unico valor que
+							 * pasa AA sobre --alert en los DOS temas (4.86 en claro,
+							 * 6.81 en oscuro). El "white" anterior fallaba en oscuro,
+							 * donde --alert se aclara, y --paper se queda a 4.43 en
+							 * claro, justo por debajo del minimo.
+							 */
+							color: "var(--paper-raised)",
 						}}
 					>
 						{t("dashboard.error_retry", "Retry")}

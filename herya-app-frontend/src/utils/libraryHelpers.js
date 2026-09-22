@@ -39,6 +39,20 @@ export const DIFF_ACCENTS = {
 };
 
 /*
+ * Color de texto para cuando DIFF_ACCENTS se usa como RELLENO.
+ *
+ * No sirve DIFF_FG: ese va emparejado con DIFF_COLORS, que son otros fondos.
+ * Aqui el de beginner es --ink, y sobre tinta el texto tiene que ser --paper.
+ * Antes se usaba un "text-white" fijo, que en modo claro funcionaba (blanco
+ * sobre tinta oscura) y en oscuro dejaba blanco sobre --ink casi blanco.
+ */
+export const DIFF_ACCENT_FG = {
+	beginner: "var(--paper)",
+	intermediate: "var(--on-fill)",
+	advanced: "var(--on-fill)",
+};
+
+/*
  * Text colour to use when the text sits ON TOP of a DIFF_COLORS background.
  *
  * Keep this map next to DIFF_COLORS: if you change a background there, come

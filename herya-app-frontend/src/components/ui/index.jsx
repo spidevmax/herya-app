@@ -448,7 +448,7 @@ export const FilterChips = ({ options, selected, onSelect }) => {
 						whileTap={{ scale: 0.95 }}
 						className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
 							selected === option.key
-								? "text-white "
+								? "text-[var(--on-fill)] "
 								: "bg-[var(--paper-raised)] text-[var(--ink-soft)] border border-[var(--ink)]"
 						}`}
 						style={

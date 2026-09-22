@@ -139,7 +139,16 @@ const PhasedMeditationPlayer = ({
 		main: "var(--chandra)",
 		close: "var(--surya)",
 	};
+	// Texto legible sobre cada relleno: --paper sobre tinta, --on-fill sobre
+	// chandra y surya.
+	const phaseTextColors = {
+		intro: "var(--paper)",
+		main: "var(--on-fill)",
+		close: "var(--on-fill)",
+	};
 	const currentColor = phaseColors[currentPhase.phase.type] || "var(--ink)";
+	const currentTextColor =
+		phaseTextColors[currentPhase.phase.type] || "var(--paper)";
 
 	return (
 		<section
@@ -304,8 +313,8 @@ const PhasedMeditationPlayer = ({
 					whileTap={{ scale: 0.92 }}
 					onClick={() => setIsRunning((r) => !r)}
 					aria-pressed={isRunning}
-					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
-					style={{ backgroundColor: currentColor }}
+					className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+					style={{ backgroundColor: currentColor, color: currentTextColor }}
 					aria-label={isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{isRunning ? (

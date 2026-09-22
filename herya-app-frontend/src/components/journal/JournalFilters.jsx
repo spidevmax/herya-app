@@ -90,9 +90,17 @@ export const JournalFilters = ({
 					{activeFilterCount > 0 && (
 						<span
 							className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold"
+							/*
+							 * La chapita se recorta contra el boton que la contiene:
+							 * cuando el boton esta activo es chandra, asi que aqui va
+							 * tinta; cuando no, el boton es papel y aqui va chandra.
+							 * Cada relleno lleva su texto emparejado.
+							 */
 							style={{
-								backgroundColor: hasActiveFilters ? "white" : "var(--chandra)",
-								color: hasActiveFilters ? "var(--chandra)" : "white",
+								backgroundColor: hasActiveFilters
+									? "var(--ink)"
+									: "var(--chandra)",
+								color: hasActiveFilters ? "var(--paper)" : "var(--on-fill)",
 							}}
 						>
 							{activeFilterCount}

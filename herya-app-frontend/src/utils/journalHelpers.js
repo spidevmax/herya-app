@@ -53,9 +53,18 @@ export const getMoodColorStyle = (mood) => {
 			borderColor: "var(--ink)",
 		};
 	}
+	/*
+	 * El color del animo va en el RELLENO, no en el texto. Antes el texto usaba
+	 * ese mismo color pastel sobre un fondo del 10% del mismo color: quedaba
+	 * pastel sobre casi blanco, con un contraste de 1.4:1 cuando el minimo
+	 * legible es 4.5:1.
+	 *
+	 * Al 30% el tinte se distingue y el texto en --ink se lee: medido sobre los
+	 * 19 animos en los dos temas, el peor caso da 6.5:1.
+	 */
 	return {
-		backgroundColor: `color-mix(in srgb, ${raw} 10%, transparent)`,
-		color: raw,
+		backgroundColor: `color-mix(in srgb, ${raw} 30%, transparent)`,
+		color: "var(--ink)",
 		borderColor: "var(--ink)",
 	};
 };

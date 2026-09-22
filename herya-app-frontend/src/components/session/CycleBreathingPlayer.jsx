@@ -13,6 +13,7 @@ import {
 	applyLowStim,
 	getProfile,
 	PHASE_COLORS,
+	PHASE_FG,
 	PHASE_LABEL_KEYS,
 } from "@/config/techniqueProfiles";
 import { useLanguage } from "@/context/LanguageContext";
@@ -220,6 +221,7 @@ const CycleBreathingPlayer = ({
 
 	// ── Derived UI values ────────────────────────────────────────────────
 	const color = PHASE_COLORS[currentPhaseKey] || PHASE_COLORS.inhale;
+	const colorFg = PHASE_FG[currentPhaseKey] || PHASE_FG.inhale;
 	const anim = profile.animation[currentPhaseKey] || {
 		scale: 1,
 		ease: "linear",
@@ -603,8 +605,8 @@ const CycleBreathingPlayer = ({
 					onClick={engine.toggle}
 					disabled={showCompletionState}
 					aria-pressed={engine.isRunning}
-					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg disabled:opacity-50"
-					style={{ backgroundColor: color }}
+					className="w-16 h-16 rounded-full flex items-center justify-center disabled:opacity-50"
+					style={{ backgroundColor: color, color: colorFg }}
 					aria-label={engine.isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{engine.isRunning ? (

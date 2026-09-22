@@ -269,7 +269,17 @@ const PoseDetail = () => {
 					type="button"
 					onClick={() => navigate(-1)}
 					aria-label={t("pose_detail.back")}
-					className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm"
+					/*
+					 * El fondo sale de --paper, no de un bg-white fijo. El icono es
+					 * --ink, que en modo oscuro es casi blanco: sobre un blanco fijo
+					 * la flecha desaparecia. Los dos tokens se invierten juntos, asi
+					 * que el contraste se mantiene en los dos temas.
+					 */
+					style={{
+						background: "var(--paper)",
+						border: "var(--ink-width) solid var(--ink)",
+					}}
+					className="absolute top-4 left-4 w-10 h-10 rounded-full backdrop-blur flex items-center justify-center"
 				>
 					<ChevronLeft
 						size={20}
@@ -606,7 +616,7 @@ const PoseDetail = () => {
 											>
 												<span
 													aria-hidden="true"
-													className="w-6 h-6 rounded-full bg-[var(--chandra)] text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+													className="w-6 h-6 rounded-full bg-[var(--chandra)] text-[var(--on-fill)] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
 												>
 													{i + 1}
 												</span>

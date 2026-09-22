@@ -13,7 +13,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getBreathingPatternById } from "@/api/breathing.api";
 import { SkeletonCard } from "@/components/ui";
 import { useLanguage } from "@/context/LanguageContext";
-import { DIFF_ACCENTS } from "@/utils/libraryHelpers";
+import { DIFF_ACCENT_FG, DIFF_ACCENTS } from "@/utils/libraryHelpers";
 import "@/styles/identity.css";
 import {
 	colorMix,
@@ -112,6 +112,7 @@ const BreathingDetail = () => {
 
 	const ratio = pattern.patternRatio ?? {};
 	const diffColor = DIFF_ACCENTS[pattern.difficulty] ?? "var(--ink)";
+	const diffTextColor = DIFF_ACCENT_FG[pattern.difficulty] ?? "var(--paper)";
 	const EnergyIcon = ENERGY_ICONS[pattern.energyEffect] ?? Wind;
 	const benefits =
 		localizedArray(pattern, "benefits", lang).length > 0
@@ -187,8 +188,8 @@ const BreathingDetail = () => {
 				<ul className="flex gap-2 flex-wrap justify-center list-none m-0 p-0">
 					<li>
 						<span
-							className="px-3 py-1 rounded-full text-xs font-bold text-white"
-							style={{ backgroundColor: diffColor }}
+							className="px-3 py-1 rounded-full text-xs font-bold"
+							style={{ backgroundColor: diffColor, color: diffTextColor }}
 						>
 							{translateWithFallback(
 								t,
@@ -357,7 +358,7 @@ const BreathingDetail = () => {
 								>
 									<span
 										aria-hidden="true"
-										className="w-6 h-6 rounded-full text-white text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
+										className="w-6 h-6 rounded-full text-[var(--on-fill)] text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5"
 										style={{ backgroundColor: "var(--chandra)" }}
 									>
 										{i + 1}

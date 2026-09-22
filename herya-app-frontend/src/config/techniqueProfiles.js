@@ -42,6 +42,21 @@ export const PHASE_COLORS = {
 	rest: "var(--ink-soft)",
 };
 
+/*
+ * Color de texto para cuando PHASE_COLORS se usa como RELLENO.
+ *
+ * Regla del sistema: sobre chandra o surya va --on-fill; sobre tinta va
+ * --paper. Antes estos botones usaban un "text-white" fijo, que en modo oscuro
+ * quedaba blanco sobre chandra claro (2.49) o sobre --ink casi blanco (1.2).
+ */
+export const PHASE_FG = {
+	inhale: "var(--on-fill)",
+	hold: "var(--paper)",
+	exhale: "var(--on-fill)",
+	holdAfterExhale: "var(--paper)",
+	rest: "var(--paper)",
+};
+
 // ── Translation keys per phase ──────────────────────────────────────────────
 export const PHASE_LABEL_KEYS = {
 	inhale: "pranayama.inhale",

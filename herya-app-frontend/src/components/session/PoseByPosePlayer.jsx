@@ -251,7 +251,7 @@ const PoseByPosePlayer = ({
 								className="absolute top-3 right-3 text-xs font-bold px-2.5 py-1 rounded-full"
 								style={{
 									backgroundColor: "var(--chandra)",
-									color: "white",
+									color: "var(--on-fill)",
 								}}
 							>
 								{side === "left"
@@ -436,8 +436,8 @@ const PoseByPosePlayer = ({
 					whileTap={{ scale: 0.92 }}
 					onClick={isRunning ? () => setIsRunning(false) : handleStart}
 					aria-pressed={isRunning}
-					className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
-					style={{ backgroundColor: "var(--chandra)" }}
+					className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+					style={{ backgroundColor: "var(--chandra)", color: "var(--on-fill)" }}
 					aria-label={isRunning ? t("guided.pause") : t("guided.play")}
 				>
 					{isRunning ? (

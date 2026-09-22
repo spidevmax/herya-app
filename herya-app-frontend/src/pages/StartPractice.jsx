@@ -1038,7 +1038,7 @@ const StartPractice = () => {
 						<button
 							type="button"
 							onClick={handleRecoverSession}
-							className="text-xs font-semibold text-white bg-amber-600 px-3 py-1 rounded-lg"
+							className="text-xs font-semibold text-[var(--on-fill)] bg-amber-600 px-3 py-1 rounded-lg"
 						>
 							{t("practice.resume")}
 						</button>

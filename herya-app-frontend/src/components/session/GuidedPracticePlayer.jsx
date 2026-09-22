@@ -40,6 +40,17 @@ const BLOCK_TYPE_COLORS = {
 	meditation: "var(--ink)",
 };
 
+/*
+ * Texto que se lee sobre BLOCK_TYPE_COLORS. Meditacion necesita --paper porque
+ * su relleno es tinta, que en modo oscuro es casi blanco; los otros dos van
+ * sobre chandra y surya, donde toca --on-fill.
+ */
+const BLOCK_TYPE_FG = {
+	vk_sequence: "var(--on-fill)",
+	pranayama: "var(--on-fill)",
+	meditation: "var(--paper)",
+};
+
 const BLOCK_TYPE_ICONS = {
 	vk_sequence: PersonStanding,
 	pranayama: Wind,
@@ -238,6 +249,7 @@ const GuidedPracticePlayer = ({
 	const nextBlock = blocks[timer.currentBlockIndex + 1] || null;
 	const blockColor =
 		BLOCK_TYPE_COLORS[currentBlock?.blockType] || "var(--chandra)";
+	const blockFg = BLOCK_TYPE_FG[currentBlock?.blockType] || "var(--on-fill)";
 	const BlockIcon = BLOCK_TYPE_ICONS[currentBlock?.blockType] || PersonStanding;
 
 	// Check if current block has guided sub-player content
@@ -482,8 +494,8 @@ const GuidedPracticePlayer = ({
 									whileTap={{ scale: 0.92 }}
 									onClick={startTimerWithBackend}
 									aria-label={t("practice.aria_play")}
-									className="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg"
-									style={{ backgroundColor: blockColor }}
+									className="mx-auto w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+									style={{ backgroundColor: blockColor, color: blockFg }}
 								>
 									<Play size={32} aria-hidden="true" className="ml-1" />
 								</motion.button>
@@ -545,8 +557,8 @@ const GuidedPracticePlayer = ({
 											whileTap={{ scale: 0.92 }}
 											onClick={startTimerWithBackend}
 											aria-label={t("practice.aria_play")}
-											className="mx-auto w-20 h-20 rounded-full flex items-center justify-center text-white shadow-lg"
-											style={{ backgroundColor: blockColor }}
+											className="mx-auto w-20 h-20 rounded-full flex items-center justify-center shadow-lg"
+											style={{ backgroundColor: blockColor, color: blockFg }}
 										>
 											<Play size={32} aria-hidden="true" className="ml-1" />
 										</motion.button>
@@ -663,8 +675,8 @@ const GuidedPracticePlayer = ({
 								? t("practice.aria_pause")
 								: t("practice.aria_play")
 						}
-						className="w-16 h-16 rounded-full flex items-center justify-center text-white shadow-lg"
-						style={{ backgroundColor: blockColor }}
+						className="w-16 h-16 rounded-full flex items-center justify-center shadow-lg"
+						style={{ backgroundColor: blockColor, color: blockFg }}
 					>
 						{timer.isRunning ? (
 							<Pause size={24} aria-hidden="true" />

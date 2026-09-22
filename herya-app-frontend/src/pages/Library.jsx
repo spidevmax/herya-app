@@ -450,9 +450,11 @@ const Library = () => {
 												difficultyFilter === option
 													? "var(--surya)"
 													: "var(--paper-raised)",
+											// --on-fill, no "white": el fondo es surya, un naranja
+											// claro, y el blanco apenas contrasta sobre el.
 											color:
 												difficultyFilter === option
-													? "white"
+													? "var(--on-fill)"
 													: "var(--ink-soft)",
 											borderColor:
 												difficultyFilter === option
@@ -484,8 +486,12 @@ const Library = () => {
 												effectFilter === option
 													? "var(--ink)"
 													: "var(--paper-raised)",
+											// --paper, no "white": el fondo es --ink, que en modo
+											// oscuro es casi blanco, y el texto desaparecia.
 											color:
-												effectFilter === option ? "white" : "var(--ink-soft)",
+												effectFilter === option
+													? "var(--paper)"
+													: "var(--ink-soft)",
 											borderColor:
 												effectFilter === option ? "var(--ink)" : "var(--ink)",
 										}}
@@ -540,7 +546,7 @@ const Library = () => {
 								setFailedTypes([]);
 								setHasFetched(false);
 							}}
-							className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold text-white"
+							className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-semibold text-[var(--on-fill)]"
 							style={{ backgroundColor: "var(--surya)" }}
 						>
 							{retryLabel}
@@ -597,7 +603,7 @@ const Library = () => {
 											setFailedTypes([]);
 											setHasFetched(false);
 										}}
-										className="mt-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white"
+										className="mt-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-[var(--paper)]"
 										style={{ backgroundColor: "var(--ink)" }}
 									>
 										{retryLabel}
