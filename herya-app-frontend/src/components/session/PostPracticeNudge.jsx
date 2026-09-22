@@ -62,13 +62,22 @@ const PostPracticeNudge = ({ durationMinutes = 0, stressAfter = null }) => {
 					<div className="flex-1">
 						<p
 							className="text-[10px] font-bold mb-1"
-							style={{ color: "var(--ink-soft)" }}
+							/*
+							 * --on-fill, no --ink-soft. El aviso se rellena con surya o
+							 * chandra, y esos dos colores se quedan claros en los dos
+							 * temas: --ink-soft encima era gris palido sobre naranja.
+							 *
+							 * Sin opacidad: atenuarlo al 75% lo dejaba en 3.41 sobre
+							 * chandra, por debajo del minimo. La jerarquia la dan el
+							 * tamano y el grosor.
+							 */
+							style={{ color: "var(--on-fill)" }}
 						>
 							{t("practice.post_nudge_label")}
 						</p>
 						<p
 							className="text-sm font-semibold"
-							style={{ color: "var(--ink)" }}
+							style={{ color: "var(--on-fill)" }}
 						>
 							{nudge.message}
 						</p>
@@ -79,7 +88,7 @@ const PostPracticeNudge = ({ durationMinutes = 0, stressAfter = null }) => {
 						className="w-8 h-8 rounded-full flex items-center justify-center transition hover:bg-black/5"
 						aria-label={t("practice.dismiss_nudge")}
 					>
-						<X size={14} style={{ color: "var(--ink-soft)" }} />
+						<X size={14} style={{ color: "var(--on-fill)" }} />
 					</button>
 				</div>
 			</motion.aside>

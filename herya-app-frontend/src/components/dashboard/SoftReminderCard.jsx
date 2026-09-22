@@ -117,10 +117,13 @@ const SoftReminderCard = ({ user, sessions = [], streak = 0 }) => {
 						</div>
 
 						<div className="flex-1 min-w-0">
-							<p
-								className="mb-1 text-[11px] font-bold"
-								style={{ opacity: 0.75 }}
-							>
+							{/*
+							 * Sin opacidad: el texto hereda --on-fill del contenedor, y
+							 * atenuarlo al 75% lo dejaba en 3.41 sobre chandra, por
+							 * debajo del minimo legible. La jerarquia la dan el tamano y
+							 * el grosor.
+							 */}
+							<p className="mb-1 text-[11px] font-bold">
 								{t("dashboard.reminder_label")}
 							</p>
 							<p className="text-sm font-bold leading-6">{reminder.message}</p>
@@ -132,7 +135,7 @@ const SoftReminderCard = ({ user, sessions = [], streak = 0 }) => {
 							className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition hover:bg-black/5"
 							aria-label={t("dashboard.dismiss_reminder")}
 						>
-							<X size={14} style={{ color: "var(--ink-soft)" }} />
+							<X size={14} style={{ color: "var(--on-fill)" }} />
 						</button>
 					</div>
 				</aside>
