@@ -162,31 +162,50 @@ const PracticeSnapshotCard = ({
 				</p>
 			</div>
 
-			<div className="flex flex-col sm:flex-row gap-2">
-				{/* Not the shared Button: that component still carries the old
+			{/*
+			 * @container + @xs: en vez de sm:. El prefijo sm: mira el ancho de la
+			 * VENTANA, pero esta tarjeta vive en una columna estrecha: con la
+			 * ventana a 1150px la tarjeta mide 284px, los dos botones se ponian en
+			 * fila de 120px cada uno y "Reanudar practica" no cabia. Al partirse en
+			 * dos lineas el texto se separaba del icono.
+			 *
+			 * La container query mide la TARJETA, asi que los botones se apilan
+			 * cuando de verdad no caben, sin importar el tamano de la ventana.
+			 */}
+			<div className="@container">
+				<div className="flex flex-col @xs:flex-row gap-2">
+					{/* Not the shared Button: that component still carries the old
 				    tokens and renders a blue gradient inside an ink card. */}
-				<button
-					type="button"
-					onClick={handlePrimaryAction}
-					className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
-					style={{
-						background: "var(--surya)",
-						color: "var(--on-fill)",
-						cursor: "pointer",
-					}}
-				>
-					<PlayCircle size={16} aria-hidden="true" />
-					{nextActionLabel}
-				</button>
-				<button
-					type="button"
-					onClick={() => navigate("/journal")}
-					className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
-					style={{ cursor: "pointer" }}
-				>
-					<BookOpen size={16} aria-hidden="true" />
-					{t("dashboard.quick_garden")}
-				</button>
+					<button
+						type="button"
+						onClick={handlePrimaryAction}
+						className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
+						style={{
+							background: "var(--surya)",
+							color: "var(--on-fill)",
+							cursor: "pointer",
+						}}
+					>
+						<PlayCircle size={16} aria-hidden="true" className="shrink-0" />
+						{/*
+						 * El texto va dentro de un span, no suelto. Un texto suelto en
+						 * un contenedor flex ocupa todo el ancho que sobra, asi que al
+						 * partirse en dos lineas se queda centrado dentro de esa caja
+						 * grande y el icono parece despegado. Dentro de un span la caja
+						 * se ajusta al texto y el gap vuelve a ser el que se pide.
+						 */}
+						<span>{nextActionLabel}</span>
+					</button>
+					<button
+						type="button"
+						onClick={() => navigate("/journal")}
+						className="ink-block ink-block--press flex flex-1 items-center justify-center gap-2 py-2.5 text-sm font-bold"
+						style={{ cursor: "pointer" }}
+					>
+						<BookOpen size={16} aria-hidden="true" className="shrink-0" />
+						<span>{t("dashboard.quick_garden")}</span>
+					</button>
+				</div>
 			</div>
 		</section>
 	);
