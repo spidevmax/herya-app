@@ -144,7 +144,7 @@ const AccountDetailsCard = ({
 									className="px-3 py-2 rounded-full text-xs font-semibold transition-colors duration-150"
 									style={{
 										backgroundColor: active ? "var(--chandra)" : "var(--paper)",
-										color: active ? "white" : "var(--ink-soft)",
+										color: active ? "var(--on-fill)" : "var(--ink-soft)",
 										border: "var(--ink-width) solid var(--ink)",
 									}}
 								>

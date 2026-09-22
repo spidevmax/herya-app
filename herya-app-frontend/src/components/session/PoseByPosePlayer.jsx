@@ -540,7 +540,7 @@ const PoseDetailPanel = ({
 						style={{
 							backgroundColor:
 								activeTab === tab ? "var(--chandra)" : "transparent",
-							color: activeTab === tab ? "white" : "var(--ink-soft)",
+							color: activeTab === tab ? "var(--on-fill)" : "var(--ink-soft)",
 						}}
 					>
 						{t(`guided.tab_${tab}`)}

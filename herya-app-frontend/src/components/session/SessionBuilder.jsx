@@ -901,7 +901,9 @@ const VKPoseBreakdown = ({
 										backgroundColor:
 											distributionMode === mode ? color : "transparent",
 										color:
-											distributionMode === mode ? "white" : "var(--ink-soft)",
+											distributionMode === mode
+												? blockTypeFg(block.blockType)
+												: "var(--ink-soft)",
 									}}
 								>
 									{t(`practice.dist_${mode}`)}

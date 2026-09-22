@@ -284,6 +284,14 @@ const PostPracticeJournal = ({
 									: signal === "yellow"
 										? "var(--surya)"
 										: "var(--alert)";
+							// Texto legible sobre cada color de senal. --paper-raised
+							// sobre la alerta es el unico que pasa AA en ambos temas.
+							const signalFg =
+								signal === "green"
+									? "var(--paper)"
+									: signal === "yellow"
+										? "var(--on-fill)"
+										: "var(--paper-raised)";
 							const SignalIcon =
 								signal === "green" ? Check : signal === "yellow" ? Minus : X;
 							return (
@@ -295,7 +303,7 @@ const PostPracticeJournal = ({
 									className="rounded-xl px-3 py-2.5 text-xs font-semibold transition flex items-center justify-center gap-1.5 min-h-[48px]"
 									style={{
 										backgroundColor: selected ? signalColor : "var(--paper)",
-										color: selected ? "white" : "var(--ink-soft)",
+										color: selected ? signalFg : "var(--ink-soft)",
 										border: `2px solid ${selected ? signalColor : "var(--ink)"}`,
 									}}
 									aria-label={t(`practice.signal_${signal}`)}
@@ -318,8 +326,17 @@ const PostPracticeJournal = ({
 									onClick={() => toggleMood(m)}
 									className="px-4 py-2 rounded-full text-sm font-semibold capitalize transition-transform duration-200 hover:-translate-y-0.5"
 									style={{
-										background: selected ? color : "var(--paper-raised)",
-										color: selected ? "white" : "var(--ink-soft)",
+										/*
+										 * Tinte al 30%, no el color plano. Los colores de
+										 * animo son pasteles muy claros: ningun texto llega
+										 * a 4.5:1 sobre ellos (--on-fill se queda en 3.24).
+										 * Con el tinte, --ink se lee y el color sigue
+										 * distinguiendose del estado sin marcar.
+										 */
+										background: selected
+											? `color-mix(in srgb, ${color} 30%, transparent)`
+											: "var(--paper-raised)",
+										color: selected ? "var(--ink)" : "var(--ink-soft)",
 										border: `1px solid ${selected ? color : "color-mix(in srgb, var(--ink) 75%, transparent)"}`,
 										boxShadow: selected
 											? "0 10px 24px rgba(25, 40, 72, 0.12)"

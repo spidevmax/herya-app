@@ -395,7 +395,7 @@ export const MoodSelector = ({
 										? "var(--chandra)"
 										: "var(--paper-raised)",
 									color: isSelected
-										? "white"
+										? "var(--on-fill)"
 										: isDisabled
 											? "var(--ink-soft)"
 											: "var(--ink-soft)",

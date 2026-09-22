@@ -59,22 +59,30 @@ const SIGNAL_SCORES = {
 	red: 0,
 };
 
+/*
+ * colorVar es el relleno de cada senal; fgVar es lo que se lee encima. Van
+ * juntos a proposito: sobre tinta toca --paper, sobre surya --on-fill y sobre
+ * la alerta --paper-raised, que es el unico que pasa AA en los dos temas.
+ */
 const SIGNAL_META = {
 	green: {
 		Icon: CircleCheck,
 		colorVar: "var(--ink)",
+		fgVar: "var(--paper)",
 		titleKey: "practice.signal_green",
 		hintKey: "practice.signal_green_hint",
 	},
 	yellow: {
 		Icon: CircleHelp,
 		colorVar: "var(--surya)",
+		fgVar: "var(--on-fill)",
 		titleKey: "practice.signal_yellow",
 		hintKey: "practice.signal_yellow_hint",
 	},
 	red: {
 		Icon: CircleAlert,
 		colorVar: "var(--alert)",
+		fgVar: "var(--paper-raised)",
 		titleKey: "practice.signal_red",
 		hintKey: "practice.signal_red_hint",
 	},
@@ -279,12 +287,6 @@ const StartPractice = () => {
 	}, [user?.preferences?.lowStimMode]);
 
 	useEffect(() => {
-		setPracticePreset(
-			isTutorUser ? PRACTICE_PRESETS.TUTOR : PRACTICE_PRESETS.ADULT,
-		);
-	}, [isTutorUser]);
-
-	useEffect(() => {
 		let mounted = true;
 
 		if (!isTutorUser) {
@@ -483,6 +485,32 @@ const StartPractice = () => {
 		},
 		[isTutorUser],
 	);
+
+	/*
+	 * Modo por defecto al cargar el usuario: tutor para los tutores, adulto
+	 * para el resto.
+	 *
+	 * Tiene que pasar por applyPracticePreset, no por setPracticePreset a
+	 * secas. El modo tutor no es solo una etiqueta: enciende el check-in, baja
+	 * los estimulos y fija la senal inicial. Antes este efecto solo cambiaba la
+	 * etiqueta, asi que el boton salia marcado como "Tutor + nino" pero el
+	 * check-in seguia apagado hasta que pulsabas el boton a mano.
+	 *
+	 * No pisa una eleccion manual ni una recomendacion ya aplicada.
+	 */
+	useEffect(() => {
+		if (hasManualPresetChoice || recommendationApplied) return;
+		// Solo para tutores. Para el resto el modo ya arranca en adulto, y
+		// aplicarlo aqui apagaria la baja estimulacion que tengan guardada en su
+		// perfil, porque el modo adulto la desactiva.
+		if (!isTutorUser) return;
+		applyPracticePreset(PRACTICE_PRESETS.TUTOR);
+	}, [
+		applyPracticePreset,
+		hasManualPresetChoice,
+		isTutorUser,
+		recommendationApplied,
+	]);
 
 	useEffect(() => {
 		if (phase !== "build") return;
@@ -988,7 +1016,7 @@ const StartPractice = () => {
 							backgroundColor: checkInEnabled
 								? "var(--chandra)"
 								: "var(--paper-raised)",
-							color: checkInEnabled ? "white" : "var(--ink-soft)",
+							color: checkInEnabled ? "var(--on-fill)" : "var(--ink-soft)",
 							border: `1px solid ${checkInEnabled ? "var(--chandra)" : "var(--ink)"}`,
 						}}
 					>
@@ -1230,7 +1258,8 @@ const StartPractice = () => {
 												{["green", "yellow", "red"].map((signal) => {
 													const selected = tutorSignal === signal;
 													const meta = SIGNAL_META[signal];
-													const { Icon, colorVar, titleKey, hintKey } = meta;
+													const { Icon, colorVar, fgVar, titleKey, hintKey } =
+														meta;
 													return (
 														<label
 															key={signal}
@@ -1242,9 +1271,10 @@ const StartPractice = () => {
 																backgroundColor: selected
 																	? colorVar
 																	: "var(--paper-raised)",
-																color: selected
-																	? "var(--on-fill)"
-																	: "var(--ink)",
+																// fgVar, no --on-fill: el relleno del verde es
+																// --ink, y --on-fill sobre tinta es invisible en
+																// modo claro.
+																color: selected ? fgVar : "var(--ink)",
 																boxShadow: selected
 																	? "none"
 																	: "var(--offset) var(--offset) 0 var(--edge)",
@@ -1264,9 +1294,7 @@ const StartPractice = () => {
 																aria-hidden="true"
 																className="absolute top-3 right-3 w-2 h-2 rounded-full transition-transform duration-200"
 																style={{
-																	backgroundColor: selected
-																		? "var(--on-fill)"
-																		: colorVar,
+																	backgroundColor: selected ? fgVar : colorVar,
 																	transform: selected
 																		? "scale(1.25)"
 																		: "scale(1)",
@@ -1287,20 +1315,36 @@ const StartPractice = () => {
 																	<Icon
 																		size={18}
 																		style={{
-																			color: selected ? "white" : colorVar,
+																			/*
+																			 * Sin marcar, el icono iba del mismo
+																			 * color que su fondo y no se veia;
+																			 * marcado, iba blanco sobre papel.
+																			 * Ahora cada estado lleva su contrario.
+																			 */
+																			color: selected ? "var(--ink)" : fgVar,
 																		}}
 																	/>
 																</span>
 																<span
 																	className="text-sm font-semibold leading-snug tracking-tight"
-																	style={{ color: "var(--ink)" }}
+																	/*
+																	 * Marcada, la tarjeta se rellena con el color
+																	 * de la senal, asi que el texto va en su
+																	 * pareja. En verde ese relleno es --ink y el
+																	 * titulo desaparecia.
+																	 */
+																	style={{
+																		color: selected ? fgVar : "var(--ink)",
+																	}}
 																>
 																	{t(titleKey)}
 																</span>
 															</div>
 															<span
 																className="text-xs leading-snug"
-																style={{ color: "var(--ink-soft)" }}
+																style={{
+																	color: selected ? fgVar : "var(--ink-soft)",
+																}}
 															>
 																{t(hintKey)}
 															</span>
