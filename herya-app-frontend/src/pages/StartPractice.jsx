@@ -741,7 +741,15 @@ const StartPractice = () => {
 						status: "planned",
 						...(sanitizedCheckIn ? { checkIn: sanitizedCheckIn } : {}),
 						...(recommendationContext ? { recommendationContext } : {}),
-						...(selectedChild?._id ? { childProfile: selectedChild._id } : {}),
+						/*
+						 * Solo se adjunta el nino si la practica es para el. Sin esta
+						 * condicion, elegir un nino y cambiar despues a "Inicio adulto"
+						 * guardaba la sesion propia del tutor a nombre del nino, y las
+						 * estadisticas la dejaban fuera de sus cifras.
+						 */
+						...(isTutorPractice && selectedChild?._id
+							? { childProfile: selectedChild._id }
+							: {}),
 					};
 
 					const res = await createSession(payload);
@@ -1200,8 +1208,12 @@ const StartPractice = () => {
 								</section>
 							)}
 
-							{/* Child profile selector — tutor only */}
-							{isTutorUser && (
+							{/*
+							 * isTutorPractice, no isTutorUser: en "Inicio adulto" el
+							 * tutor practica para si mismo, asi que elegir un nino no
+							 * significa nada.
+							 */}
+							{isTutorPractice && (
 								<ChildProfileManager
 									selectedChildId={selectedChild?._id}
 									onSelectChild={setSelectedChild}
@@ -1437,7 +1449,9 @@ const StartPractice = () => {
 								lowStimMode={lowStimMode}
 								isTutorMode={isTutorPractice}
 								safetyAnchors={
-									selectedChild?.safetyAnchors ||
+									// Los anclajes del nino solo cuando la practica es
+									// suya; en modo adulto valen los del propio tutor.
+									(isTutorPractice ? selectedChild?.safetyAnchors : null) ||
 									user?.preferences?.safetyAnchors
 								}
 								onComplete={handleComplete}
