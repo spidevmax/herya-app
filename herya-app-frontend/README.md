@@ -229,6 +229,33 @@ Both channel hues stay light in either theme, so text placed **on** them uses
 > a fill where an outline or label colour is expected renders an invisible chip —
 > this accounted for most of the visual bugs found during the redesign.
 
+#### How library cards are coloured
+
+Every card carries the same ink outline; that is what makes them read as one
+system. The meaning lives in the fill, and the maps are in
+[src/utils/libraryHelpers.js](src/utils/libraryHelpers.js).
+
+Sequences and poses are filled by **difficulty**, on the principle that the more
+a practice asks of the body, the warmer the card:
+
+| Fill | Difficulty |
+|---|---|
+| `--paper-raised` | Beginner |
+| `--chandra` | Intermediate |
+| `--surya` | Advanced |
+
+Breathing patterns are filled by **energy effect** instead, because that is what
+distinguishes one pranayama from another. Here the two channels map directly:
+
+| Fill | Effect |
+|---|---|
+| `--chandra` | Calming, cooling — the lunar channel |
+| `--surya` | Heating, energizing — the solar channel |
+| `--paper-raised` | Balancing — neither channel, so plain paper |
+
+An unknown difficulty or effect falls back to `--paper-raised`, so a new value
+added to the database renders as a neutral card rather than an uncoloured one.
+
 ### Typography
 
 - **Display:** Archivo Black — short headings only
