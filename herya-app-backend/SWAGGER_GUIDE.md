@@ -35,110 +35,12 @@ Typical flow:
 
 ## API Route Map
 
-Base prefix: /api/v1
+The full list lives in [README.md](README.md#api-reference), one table per
+resource, with the authentication each route needs and what it does.
 
-### Auth
-
-- POST /auth/register
-- POST /auth/login
-- POST /auth/forgot-password
-- POST /auth/reset-password
-- GET /auth/me
-- POST /auth/logout
-
-### Users
-
-- GET /users/me
-- PUT /users/me
-- PUT /users/change-password
-- DELETE /users/me
-- GET /users/me/stats
-- PUT /users/me/image
-- DELETE /users/me/image
-
-### Sessions
-
-- GET /sessions/stats
-- GET /sessions/active/current
-- GET /sessions/analytics/practice
-- GET /sessions
-- POST /sessions
-- GET /sessions/:id
-- PUT /sessions/:id
-- DELETE /sessions/:id
-- POST /sessions/:id/start
-- POST /sessions/:id/pause
-- POST /sessions/:id/advance-block
-- POST /sessions/:id/complete
-- POST /sessions/:id/abandon
-
-### Journal Entries
-
-- GET /journal-entries
-- POST /journal-entries
-- GET /journal-entries/:id
-- PUT /journal-entries/:id
-- DELETE /journal-entries/:id
-
-### Poses
-
-- GET /poses
-- GET /poses/search
-- GET /poses/category/:category
-- GET /poses/family/:family
-- GET /poses/:id
-- GET /poses/:id/related
-
-### Breathing Patterns
-
-- GET /breathing-patterns
-- GET /breathing-patterns/search
-- GET /breathing-patterns/recommended
-- GET /breathing-patterns/progression
-- GET /breathing-patterns/technique/:technique
-- GET /breathing-patterns/:id
-
-### Sequences
-
-- GET /sequences
-- GET /sequences/search
-- GET /sequences/family/:family
-- GET /sequences/stats/recommended
-- GET /sequences/:id
-
-### Child Profiles
-
-- GET /child-profiles
-- POST /child-profiles
-- GET /child-profiles/:id
-- PUT /child-profiles/:id
-- DELETE /child-profiles/:id
-
-### Session Templates
-
-- GET /session-templates
-- POST /session-templates
-- GET /session-templates/:id
-- PUT /session-templates/:id
-- DELETE /session-templates/:id
-- POST /session-templates/:id/use
-
-### Admin
-
-- GET /admin/users
-- PUT /admin/users/:id/role
-- DELETE /admin/users/:id
-- POST /admin/sequences
-- PUT /admin/sequences/:id
-- DELETE /admin/sequences/:id
-- POST /admin/poses
-- PUT /admin/poses/:id
-- DELETE /admin/poses/:id
-- POST /admin/breathing-patterns
-- PUT /admin/breathing-patterns/:id
-- DELETE /admin/breathing-patterns/:id
-- GET /admin/analytics/dashboard
-- GET /admin/analytics/users/:userId
+It is not repeated here on purpose: two copies of the same list drift apart, and
+the README's is the richer one. For an always-current version generated from the
+code itself, open Swagger at `/api-docs`.
 
 ## Configuration Source
 
